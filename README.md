@@ -5,7 +5,7 @@
 [![WebRTC](https://img.shields.io/badge/WebRTC-SFU-FF3E00?logo=webrtc)](https://webrtc.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An enterprise-grade, production-ready Flutter client library designed for building massive real-time live streaming applications like **TikTok Live**, **Bigo Live**, and **Twitch**. Powered by the custom Go-based **OmniCast SFU Engine** (`pion/webrtc`).
+An enterprise-grade, production-ready Flutter client library designed for building massive real-time live streaming applications like **TikTok Live**, **Bigo Live**, and **Twitch**. Powered by the **OmniCast Real-Time WebRTC SFU Engine**.
 
 ---
 
@@ -69,9 +69,9 @@ graph TD
         WebRTC["🎥 WebRTCManager & MediaStreamManager<br/>• PeerConnection & Transceivers<br/>• Local Camera / Microphone Hardware<br/>• Remote Track Renderers"]
     end
 
-    subgraph BackendEngine ["🌐 OmniCast Backend & SFU Engine (Go Pion)"]
+    subgraph BackendEngine ["🌐 OmniCast Backend & SFU Engine"]
         WSServer["🔌 WebSocket Signaling Server (JWT Verified)"]
-        SFU["⚡ Go WebRTC SFU Cluster (pion/webrtc)<br/>• Selective Forwarding Unit (SFU)<br/>• Simulcast Layer Routing<br/>• Cross-Room Media Bridging"]
+        SFU["⚡ WebRTC SFU Cluster<br/>• Selective Forwarding Unit (SFU)<br/>• Simulcast Layer Routing<br/>• Cross-Room Media Bridging"]
     end
 
     %% UI & Facade Connections
