@@ -35,16 +35,16 @@ OmniCast Flutter SDK is built with two core philosophies:
 
 ```mermaid
 graph TD
-    App[Your Custom Flutter App UI] --> Facade[OmniCastClient Facade]
+    App["Your Custom Flutter App UI"] --> Facade["OmniCastClient Facade"]
     
-    Facade --> Room[client.room (RoomManager)]
-    Facade --> Media[client.media (MediaController)]
-    Facade --> Seats[client.seats (SeatManager)]
-    Facade --> Interaction[client.interaction (InteractionManager)]
-    Facade --> PK[client.pk (PKManager)]
-    Facade --> State[client.state (RoomState)]
+    Facade --> Room["client.room (RoomManager)"]
+    Facade --> Media["client.media (MediaController)"]
+    Facade --> Seats["client.seats (SeatManager)"]
+    Facade --> Interaction["client.interaction (InteractionManager)"]
+    Facade --> PK["client.pk (PKManager)"]
+    Facade --> State["client.state (RoomState)"]
 
-    Room --> SFU[Go WebRTC SFU Engine]
+    Room --> SFU["Go WebRTC SFU Engine"]
     Media --> SFU
     Seats --> SFU
     PK --> SFU
