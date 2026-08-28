@@ -5,6 +5,26 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoParameters Presets & Constraints', () {
+    test('presetSmooth480p constraints match 640x480 @ 24fps with ideal constraints', () {
+      const params = VideoParameters.presetSmooth480p;
+      expect(params.width, 640);
+      expect(params.height, 480);
+      expect(params.frameRate, 24);
+      expect(params.maxBitrate, 800000);
+
+      final constraints = params.toMediaConstraints(video: true, audio: true);
+      expect(constraints['audio'], isTrue);
+      expect(constraints['video']['width']['ideal'], 640);
+      expect(constraints['video']['height']['ideal'], 480);
+      expect(constraints['video']['frameRate']['ideal'], 24);
+    });
+
+    test('WebRTCManager preferCodec prioritizes VP8 in m=video line', () {
+      const sampleSdp = 'v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 96 97 98\r\na=rtpmap:96 H264/90000\r\na=rtpmap:97 VP9/90000\r\na=rtpmap:98 VP8/90000\r\n';
+      final modifiedSdp = WebRTCManager.preferCodec(sampleSdp, 'VP8');
+      expect(modifiedSdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 98 96 97'));
+    });
+
     test('presetHD720p constraints match 1280x720 @ 30fps', () {
       const params = VideoParameters.presetHD720p;
       expect(params.width, 1280);

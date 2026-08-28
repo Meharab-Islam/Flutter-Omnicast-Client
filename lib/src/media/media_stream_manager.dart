@@ -10,7 +10,7 @@ class MediaStreamManager {
   final Map<String, RTCVideoRenderer> _remoteRenderers = {};
   final Map<String, MediaStream> _remoteStreams = {};
 
-  VideoParameters _currentParameters = VideoParameters.presetHD720p;
+  VideoParameters _currentParameters = VideoParameters.presetSmooth480p;
   bool _isAudioMuted = false;
   bool _isVideoMuted = false;
   bool _isDisposed = false;

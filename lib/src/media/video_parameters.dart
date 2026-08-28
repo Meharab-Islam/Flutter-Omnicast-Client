@@ -10,17 +10,18 @@ class VideoParameters {
   const VideoParameters({
     required this.width,
     required this.height,
-    this.frameRate = 30,
+    this.frameRate = 24,
     this.maxBitrate,
     this.facingMode = 'user',
   });
 
-  /// 1080p Full HD: 1920x1080 @ 30fps (Recommended for studio/high-bandwidth hosts)
-  static const VideoParameters presetFHD1080p = VideoParameters(
-    width: 1920,
-    height: 1080,
-    frameRate: 30,
-    maxBitrate: 4500000,
+  /// 480p Smooth (Bandwidth-Friendly & Android Optimized): 640x480 @ 24fps (Max 800 kbps)
+  /// Recommended default to prevent packet loss, hardware encoder crashes, and green/pink glitches.
+  static const VideoParameters presetSmooth480p = VideoParameters(
+    width: 640,
+    height: 480,
+    frameRate: 24,
+    maxBitrate: 800000,
     facingMode: 'user',
   );
 
@@ -30,6 +31,15 @@ class VideoParameters {
     height: 720,
     frameRate: 30,
     maxBitrate: 2500000,
+    facingMode: 'user',
+  );
+
+  /// 1080p Full HD: 1920x1080 @ 30fps (Recommended for studio/high-bandwidth hosts)
+  static const VideoParameters presetFHD1080p = VideoParameters(
+    width: 1920,
+    height: 1080,
+    frameRate: 30,
+    maxBitrate: 4500000,
     facingMode: 'user',
   );
 
@@ -64,7 +74,7 @@ class VideoParameters {
   factory VideoParameters.custom({
     required int width,
     required int height,
-    int fps = 30,
+    int fps = 24,
     int? maxBitrate,
     String facingMode = 'user',
   }) {
@@ -77,7 +87,8 @@ class VideoParameters {
     );
   }
 
-  /// Converts parameters to strict WebRTC `mandatory` getUserMedia constraints map.
+  /// Converts parameters to ideal/mandatory getUserMedia constraints map.
+  /// Prioritizes smoothness ({ideal: 640}, {ideal: 480}, {ideal: 24}) to prevent camera driver stalls.
   Map<String, dynamic> toMediaConstraints({
     bool video = true,
     bool audio = true,
@@ -93,6 +104,9 @@ class VideoParameters {
               },
               'facingMode': facingMode,
               'optional': [],
+              'width': {'ideal': width},
+              'height': {'ideal': height},
+              'frameRate': {'ideal': frameRate},
             }
           : false,
     };

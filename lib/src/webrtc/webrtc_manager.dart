@@ -7,7 +7,7 @@ import '../media/video_parameters.dart';
 typedef OnLocalIceCandidateCallback = void Function(RTCIceCandidate candidate);
 typedef OnRemoteTrackCallback = void Function(MediaStreamTrack track, MediaStream stream);
 
-/// Manages [RTCPeerConnection] lifecycle, SDP offer/answer negotiations,
+/// Manages [RTCPeerConnection] lifecycle, SDP offer/answer negotiations, VP8 codec preference,
 /// dynamic transceivers, ICE exchange, simulcast encodings, and Dynacast layer control.
 class WebRTCManager {
   final MediaStreamManager mediaStreamManager;
@@ -44,6 +44,41 @@ class WebRTCManager {
   bool get simulcastEnabled => _simulcastEnabled;
   RTCRtpSender? get videoSender => _videoSender;
   RTCRtpSender? get audioSender => _audioSender;
+
+  /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line.
+  /// Eliminates Android hardware H.264 green/pink screen artifacts and packet loss decoder freezes.
+  static String preferCodec(String sdp, String codec) {
+    final lines = sdp.split('\r\n');
+    final mVideoIndex = lines.indexWhere((l) => l.startsWith('m=video'));
+    if (mVideoIndex == -1) return sdp;
+
+    final mVideoLine = lines[mVideoIndex];
+    final parts = mVideoLine.split(' ');
+    if (parts.length < 4) return sdp;
+
+    final header = parts.sublist(0, 3); // ['m=video', port, proto]
+    final payloadTypes = parts.sublist(3);
+
+    final codecPayloads = <String>[];
+    final otherPayloads = <String>[];
+
+    for (final pt in payloadTypes) {
+      final rtpmap = lines.firstWhere(
+        (l) => l.toLowerCase().startsWith('a=rtpmap:$pt ${codec.toLowerCase()}'),
+        orElse: () => '',
+      );
+      if (rtpmap.isNotEmpty) {
+        codecPayloads.add(pt);
+      } else {
+        otherPayloads.add(pt);
+      }
+    }
+
+    if (codecPayloads.isEmpty) return sdp;
+
+    lines[mVideoIndex] = '${header.join(' ')} ${codecPayloads.join(' ')} ${otherPayloads.join(' ')}';
+    return lines.join('\r\n');
+  }
 
   /// Initializes a new [RTCPeerConnection] with standard configuration and sets up listeners.
   Future<RTCPeerConnection> initializePeerConnection() async {
@@ -99,7 +134,7 @@ class WebRTCManager {
     );
   }
 
-  /// Adds local media tracks to [RTCPeerConnection], optionally configuring Simulcast encodings.
+  /// Adds local media tracks to [RTCPeerConnection], configuring bandwidth-friendly VP8/bitrate encodings.
   Future<void> addLocalMediaTracks({bool enableSimulcast = true}) async {
     final pc = await initializePeerConnection();
     final localStream = mediaStreamManager.localStream;
@@ -115,13 +150,13 @@ class WebRTCManager {
       _audioSender = await pc.addTrack(audioTracks.first, localStream);
     }
 
-    // Add video track with Simulcast or Single encoding
+    // Add video track with mobile bandwidth optimization (Max 800 kbps, 24fps)
     final videoTracks = localStream.getVideoTracks();
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
 
       if (enableSimulcast) {
-        // Multi-layer simulcast transceivers: 'f' (full), 'h' (half), 'q' (quarter)
+        // Multi-layer simulcast transceivers: 'f' (smooth 480p), 'h' (half), 'q' (quarter)
         final transceiver = await pc.addTransceiver(
           track: videoTrack,
           kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
@@ -133,21 +168,21 @@ class WebRTCManager {
                 rid: 'f',
                 active: true,
                 scaleResolutionDownBy: 1.0,
-                maxBitrate: 2500000,
-                maxFramerate: 30,
+                maxBitrate: 800000, // 800 kbps for smooth 480p / 24fps
+                maxFramerate: 24,
               ),
               RTCRtpEncoding(
                 rid: 'h',
                 active: true,
                 scaleResolutionDownBy: 2.0,
-                maxBitrate: 800000,
-                maxFramerate: 30,
+                maxBitrate: 350000, // 350 kbps for half layer
+                maxFramerate: 20,
               ),
               RTCRtpEncoding(
                 rid: 'q',
                 active: true,
                 scaleResolutionDownBy: 4.0,
-                maxBitrate: 250000,
+                maxBitrate: 150000, // 150 kbps for quarter layer
                 maxFramerate: 15,
               ),
             ],
@@ -155,8 +190,16 @@ class WebRTCManager {
         );
         _videoSender = transceiver.sender;
       } else {
-        // Standard single high-quality encoding
+        // Standard single stream (Max 800 kbps)
         _videoSender = await pc.addTrack(videoTrack, localStream);
+        try {
+          final params = _videoSender!.parameters;
+          if (params.encodings != null && params.encodings!.isNotEmpty) {
+            params.encodings!.first.maxBitrate = 800000;
+            params.encodings!.first.maxFramerate = 24;
+            await _videoSender!.setParameters(params);
+          }
+        } catch (_) {}
       }
     }
   }
@@ -186,7 +229,7 @@ class WebRTCManager {
     }
   }
 
-  /// Creates an SDP Offer and sets it as the local description.
+  /// Creates an SDP Offer, prioritizes VP8 codec, and sets it as the local description.
   Future<RTCSessionDescription> createAndSetLocalOffer({
     bool offerToReceiveAudio = true,
     bool offerToReceiveVideo = true,
@@ -204,8 +247,10 @@ class WebRTCManager {
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      await pc.setLocalDescription(offer);
-      return offer;
+      final vp8Sdp = preferCodec(offer.sdp ?? '', 'VP8');
+      final mungedOffer = RTCSessionDescription(vp8Sdp, offer.type);
+      await pc.setLocalDescription(mungedOffer);
+      return mungedOffer;
     } finally {
       _isNegotiating = false;
     }
@@ -222,7 +267,7 @@ class WebRTCManager {
     await _processQueuedCandidates();
   }
 
-  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins).
+  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8-preferred answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(String sdp) async {
     final pc = await initializePeerConnection();
 
@@ -231,9 +276,11 @@ class WebRTCManager {
     await _processQueuedCandidates();
 
     final answer = await pc.createAnswer({});
-    await pc.setLocalDescription(answer);
+    final vp8Sdp = preferCodec(answer.sdp ?? '', 'VP8');
+    final mungedAnswer = RTCSessionDescription(vp8Sdp, answer.type);
+    await pc.setLocalDescription(mungedAnswer);
 
-    return answer;
+    return mungedAnswer;
   }
 
   /// Seamlessly upgrades a Viewer to a Co-Host without tearing down the existing [RTCPeerConnection].
@@ -257,61 +304,70 @@ class WebRTCManager {
     // 2. Add local tracks to existing PeerConnection with simulcast option
     await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
-    // 3. Create renegotiation offer
-    return await createAndSetLocalOffer();
+    // 3. Create renegotiation offer with VP8 preference
+    final offer = await _peerConnection!.createOffer();
+    final vp8Sdp = preferCodec(offer.sdp ?? '', 'VP8');
+    final mungedOffer = RTCSessionDescription(vp8Sdp, offer.type);
+    await _peerConnection!.setLocalDescription(mungedOffer);
+
+    return mungedOffer;
   }
 
-  /// Handles incoming remote ICE candidate.
-  Future<void> addRemoteCandidate(Map<String, dynamic> candidateMap) async {
-    final candidate = RTCIceCandidate(
-      candidateMap['candidate'] as String? ?? candidateMap['sdp'] as String?,
-      candidateMap['sdpMid'] as String?,
-      candidateMap['sdpMLineIndex'] as int?,
-    );
+  /// Queues or adds remote ICE candidates safely after remote description is set.
+  Future<void> addRemoteCandidate(dynamic candidate) async {
+    RTCIceCandidate? iceCandidate;
+    if (candidate is RTCIceCandidate) {
+      iceCandidate = candidate;
+    } else if (candidate is Map<String, dynamic>) {
+      iceCandidate = RTCIceCandidate(
+        candidate['candidate'] as String? ?? '',
+        candidate['sdpMid'] as String? ?? candidate['sdp_mid'] as String? ?? '',
+        (candidate['sdpMLineIndex'] as num?)?.toInt() ??
+            (candidate['sdp_m_line_index'] as num?)?.toInt() ??
+            0,
+      );
+    }
 
-    if (_peerConnection == null ||
-        await _peerConnection!.getRemoteDescription() == null) {
-      _queuedRemoteCandidates.add(candidate);
+    if (iceCandidate == null) return;
+
+    if (_peerConnection == null) {
+      _queuedRemoteCandidates.add(iceCandidate);
       return;
     }
 
-    try {
-      await _peerConnection!.addCandidate(candidate);
-    } catch (e) {
-      debugPrint('[WebRTCManager] Failed to add ICE candidate: $e');
+    final remoteDesc = await _peerConnection!.getRemoteDescription();
+    if (remoteDesc == null) {
+      _queuedRemoteCandidates.add(iceCandidate);
+    } else {
+      await _peerConnection!.addCandidate(iceCandidate);
     }
   }
 
   Future<void> _processQueuedCandidates() async {
     if (_peerConnection == null) return;
-    final candidates = List<RTCIceCandidate>.from(_queuedRemoteCandidates);
-    _queuedRemoteCandidates.clear();
-
-    for (final candidate in candidates) {
-      try {
-        await _peerConnection!.addCandidate(candidate);
-      } catch (e) {
-        debugPrint('[WebRTCManager] Failed to add queued ICE candidate: $e');
-      }
+    for (final candidate in _queuedRemoteCandidates) {
+      await _peerConnection!.addCandidate(candidate);
     }
+    _queuedRemoteCandidates.clear();
   }
 
-  /// Closes and cleans up the active [RTCPeerConnection].
+  /// Closes and resets the active PeerConnection.
   Future<void> closePeerConnection() async {
-    _queuedRemoteCandidates.clear();
-    _videoSender = null;
-    _audioSender = null;
     if (_peerConnection != null) {
       await _peerConnection!.close();
       await _peerConnection!.dispose();
       _peerConnection = null;
     }
+    _queuedRemoteCandidates.clear();
+    _videoSender = null;
+    _audioSender = null;
   }
 
-  /// Permanently disposes the [WebRTCManager].
+  /// Disposes the PeerConnection, senders, and clears candidate queues.
   Future<void> dispose() async {
     if (_isDisposed) return;
     _isDisposed = true;
+
     await closePeerConnection();
   }
 }

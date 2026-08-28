@@ -5,9 +5,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('GlobalMediaConfig & Initialization', () {
-    test('default GlobalMediaConfig has standard HD720p and enabled features', () {
+    test('default GlobalMediaConfig has standard Smooth480p and enabled features', () {
       const config = GlobalMediaConfig();
-      expect(config.defaultResolution, VideoParameters.presetHD720p);
+      expect(config.defaultResolution, VideoParameters.presetSmooth480p);
       expect(config.enableSimulcast, isTrue);
       expect(config.enableDynacast, isTrue);
       expect(config.enableAdaptiveStreaming, isTrue);

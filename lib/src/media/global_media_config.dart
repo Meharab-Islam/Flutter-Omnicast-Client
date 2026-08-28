@@ -4,6 +4,7 @@ import 'video_parameters.dart';
 /// Dynacast, and adaptive streaming across the OmniCast SDK.
 class GlobalMediaConfig {
   /// Default video capture and encoding resolution/framerate parameters.
+  /// Defaults to [VideoParameters.presetSmooth480p] (640x480 @ 24fps) for stable, glitch-free Android & iOS streaming.
   final VideoParameters defaultResolution;
 
   /// Whether multi-layer simulcast ('f', 'h', 'q') is enabled by default for publishers.
@@ -19,7 +20,7 @@ class GlobalMediaConfig {
   final bool autoPauseOnBackground;
 
   const GlobalMediaConfig({
-    this.defaultResolution = VideoParameters.presetHD720p,
+    this.defaultResolution = VideoParameters.presetSmooth480p,
     this.enableSimulcast = true,
     this.enableDynacast = true,
     this.enableAdaptiveStreaming = true,
