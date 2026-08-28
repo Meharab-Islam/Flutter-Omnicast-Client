@@ -18,9 +18,14 @@ abstract final class OmniCastTokenGenerator {
     final signingSecret = jwtSecret ?? apiSecret ?? 'default_secret';
     final jwt = JWT(
       {
-        if (apiKey != null && apiKey.isNotEmpty) 'apiKey': apiKey,
-        'roomId': roomId,
+        if (apiKey != null && apiKey.isNotEmpty) ...{
+          'api_key': apiKey,
+          'apiKey': apiKey,
+        },
+        'user_id': userId,
         'userId': userId,
+        'room_id': roomId,
+        'roomId': roomId,
         'role': role,
         if (metadata != null && metadata.isNotEmpty) 'metadata': metadata,
       },
