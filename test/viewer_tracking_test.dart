@@ -53,7 +53,17 @@ void main() {
       expect(fromJson.displayName, 'StarViewer');
       expect(fromJson.avatarUrl, 'https://example.com/avatar.png');
       expect(fromJson.role, UserRole.viewer);
-      expect(fromJson.metadata?['badge'], 'vip');
+      expect(fromJson.metadata['badge'], 'vip');
+    });
+
+    test('OmniCastParticipant defaults metadata to empty map if null in JSON', () {
+      final p = OmniCastParticipant.fromJson({
+        'user_id': 'u100',
+        'display_name': 'NoMetaUser',
+      });
+
+      expect(p.metadata, isNotNull);
+      expect(p.metadata, isEmpty);
     });
 
     test('RoomManager totalViewerCount and activeViewersList atomic updates', () async {

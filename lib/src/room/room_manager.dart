@@ -205,6 +205,7 @@ class RoomManager {
     required String roomId,
     required String userId,
     RoomOptions options = const RoomOptions(),
+    Map<String, dynamic>? metadata,
   }) async {
     _roomState.setSession(
       roomId: roomId,
@@ -225,6 +226,11 @@ class RoomManager {
 
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
+    final mergedMetadata = {
+      ...?options.metadata,
+      ...?metadata,
+    };
+
     _signalingClient.send(SignalingMessage(
       event: SignalingEvents.createRoom,
       roomId: roomId,
@@ -233,6 +239,7 @@ class RoomManager {
         'options': options.toJson(),
         'sdp': offer.sdp,
         'type': offer.type,
+        'metadata': ?mergedMetadata.isEmpty ? null : mergedMetadata,
       },
     ));
   }
@@ -241,6 +248,7 @@ class RoomManager {
   Future<void> joinRoom({
     required String roomId,
     required String userId,
+    Map<String, dynamic>? metadata,
   }) async {
     _roomState.setSession(
       roomId: roomId,
@@ -258,6 +266,7 @@ class RoomManager {
       payload: {
         'sdp': offer.sdp,
         'type': offer.type,
+        'metadata': ?metadata,
       },
     ));
   }

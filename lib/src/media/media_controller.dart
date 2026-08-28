@@ -107,6 +107,39 @@ class MediaController with WidgetsBindingObserver {
     }
   }
 
+  /// Starts local hardware media capture and publishes streams as Host with custom metadata.
+  Future<void> startAsHost({
+    required String roomId,
+    required String userId,
+    Map<String, dynamic>? metadata,
+    VideoParameters? videoParameters,
+    bool enableSimulcast = true,
+  }) async {
+    final params = videoParameters ?? currentParameters;
+    await _mediaStreamManager.openUserMedia(
+      audio: true,
+      video: true,
+      parameters: params,
+    );
+    await _webRTCManager.addLocalMediaTracks(
+      enableSimulcast: enableSimulcast,
+    );
+
+    final offer = await _webRTCManager.createAndSetLocalOffer();
+
+    _signalingClient.send(SignalingMessage(
+      event: SignalingEvents.publish,
+      roomId: roomId,
+      userId: userId,
+      payload: {
+        'sdp': offer.sdp,
+        'type': offer.type,
+        'simulcast': enableSimulcast,
+        'metadata': ?metadata,
+      },
+    ));
+  }
+
   /// Enables or mutes the local microphone.
   void setMicrophoneMuted(bool muted) {
     _mediaStreamManager.toggleAudio(!muted);

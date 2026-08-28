@@ -203,6 +203,7 @@
       "package_crypto_crypto_dart",
       "state",
       "statefulwidget",
+      "stream",
       "streamsubscription",
       "timer"
     ],
@@ -250,45 +251,6 @@
       "signalingclient_get"
     ],
     "5": [
-      "changenotifier",
-      "lib_src_room_room_manager",
-      "lib_src_room_room_manager_activeseatsnotifier",
-      "lib_src_room_room_manager_activeviewerslist",
-      "lib_src_room_room_manager_batchdebouncetimer",
-      "lib_src_room_room_manager_bindsignalingevents",
-      "lib_src_room_room_manager_bindstatenotifiers",
-      "lib_src_room_room_manager_connectionstatenotifier",
-      "lib_src_room_room_manager_createroom",
-      "lib_src_room_room_manager_dispose",
-      "lib_src_room_room_manager_flushparticipantbatch",
-      "lib_src_room_room_manager_handleroominfosync",
-      "lib_src_room_room_manager_joinroom",
-      "lib_src_room_room_manager_kickuser",
-      "lib_src_room_room_manager_leaveroom",
-      "lib_src_room_room_manager_maxviewersinmemory",
-      "lib_src_room_room_manager_pendingjoins",
-      "lib_src_room_room_manager_pendingleaves",
-      "lib_src_room_room_manager_pinnedusernotifier",
-      "lib_src_room_room_manager_queueuserjoined",
-      "lib_src_room_room_manager_queueuserleft",
-      "lib_src_room_room_manager_rolenotifier",
-      "lib_src_room_room_manager_roommanager",
-      "lib_src_room_room_manager_roomstate",
-      "lib_src_room_room_manager_schedulebatchflush",
-      "lib_src_room_room_manager_signalingclient",
-      "lib_src_room_room_manager_signalingsubscription",
-      "lib_src_room_room_manager_syncgranularnotifiers",
-      "lib_src_room_room_manager_totalviewercount",
-      "lib_src_room_room_manager_viewercountnotifier",
-      "lib_src_room_room_manager_viewersnotifier",
-      "lib_src_room_room_manager_webrtcmanager",
-      "lib_src_state_room_state_roomstate",
-      "models_seat_models_dart",
-      "set",
-      "signalingclient",
-      "static_const_int"
-    ],
-    "6": [
       "double_get",
       "duration_get",
       "lib_src_models_pk_models",
@@ -327,7 +289,7 @@
       "lib_src_models_pk_models_totalscore",
       "static_const_pkstate"
     ],
-    "7": [
+    "6": [
       "lib_src_media_media_controller",
       "lib_src_media_media_controller_adaptivestreamingenabled",
       "lib_src_media_media_controller_autopauseonbackground",
@@ -354,14 +316,52 @@
       "lib_src_media_media_controller_setvideoparameters",
       "lib_src_media_media_controller_signalingclient",
       "lib_src_media_media_controller_simulcastlayernotifier",
+      "lib_src_media_media_controller_startashost",
       "lib_src_media_media_controller_streammanager",
       "lib_src_media_media_controller_switchcamera",
       "lib_src_media_media_controller_wascameraenabledbeforepause",
       "lib_src_media_media_controller_webrtcmanager",
       "media_stream_manager_dart",
       "mediastreammanager_get",
+      "signalingclient",
       "string_get",
       "widgetsbindingobserver"
+    ],
+    "7": [
+      "lib_src_room_room_manager",
+      "lib_src_room_room_manager_activeseatsnotifier",
+      "lib_src_room_room_manager_activeviewerslist",
+      "lib_src_room_room_manager_batchdebouncetimer",
+      "lib_src_room_room_manager_bindsignalingevents",
+      "lib_src_room_room_manager_bindstatenotifiers",
+      "lib_src_room_room_manager_connectionstatenotifier",
+      "lib_src_room_room_manager_createroom",
+      "lib_src_room_room_manager_dispose",
+      "lib_src_room_room_manager_flushparticipantbatch",
+      "lib_src_room_room_manager_handleroominfosync",
+      "lib_src_room_room_manager_joinroom",
+      "lib_src_room_room_manager_kickuser",
+      "lib_src_room_room_manager_leaveroom",
+      "lib_src_room_room_manager_maxviewersinmemory",
+      "lib_src_room_room_manager_pendingjoins",
+      "lib_src_room_room_manager_pendingleaves",
+      "lib_src_room_room_manager_pinnedusernotifier",
+      "lib_src_room_room_manager_queueuserjoined",
+      "lib_src_room_room_manager_queueuserleft",
+      "lib_src_room_room_manager_rolenotifier",
+      "lib_src_room_room_manager_roommanager",
+      "lib_src_room_room_manager_roomstate",
+      "lib_src_room_room_manager_schedulebatchflush",
+      "lib_src_room_room_manager_signalingclient",
+      "lib_src_room_room_manager_signalingsubscription",
+      "lib_src_room_room_manager_syncgranularnotifiers",
+      "lib_src_room_room_manager_totalviewercount",
+      "lib_src_room_room_manager_viewercountnotifier",
+      "lib_src_room_room_manager_viewersnotifier",
+      "lib_src_room_room_manager_webrtcmanager",
+      "models_seat_models_dart",
+      "set",
+      "static_const_int"
     ],
     "8": [
       "lib_src_webrtc_webrtc_manager",
@@ -524,33 +524,6 @@
       "videoparameters_get"
     ],
     "13": [
-      "lib_src_interaction_interaction_manager",
-      "lib_src_interaction_interaction_manager_balancestream",
-      "lib_src_interaction_interaction_manager_balanceupdatedcontroller",
-      "lib_src_interaction_interaction_manager_bindstatenotifiers",
-      "lib_src_interaction_interaction_manager_bindstreams",
-      "lib_src_interaction_interaction_manager_chatcontroller",
-      "lib_src_interaction_interaction_manager_chatstream",
-      "lib_src_interaction_interaction_manager_dispose",
-      "lib_src_interaction_interaction_manager_giftreceivedcontroller",
-      "lib_src_interaction_interaction_manager_giftstream",
-      "lib_src_interaction_interaction_manager_hostcoinbalancenotifier",
-      "lib_src_interaction_interaction_manager_interactionmanager",
-      "lib_src_interaction_interaction_manager_latestgiftnotifier",
-      "lib_src_interaction_interaction_manager_onbalanceupdated",
-      "lib_src_interaction_interaction_manager_ongiftreceived",
-      "lib_src_interaction_interaction_manager_roomstate",
-      "lib_src_interaction_interaction_manager_sendchat",
-      "lib_src_interaction_interaction_manager_sendgift",
-      "lib_src_interaction_interaction_manager_signalingclient",
-      "lib_src_interaction_interaction_manager_syncinteractionnotifiers",
-      "lib_src_interaction_interaction_manager_userbalancenotifier",
-      "models_interaction_models_dart",
-      "roomstate",
-      "stream",
-      "valuenotifier"
-    ],
-    "14": [
       "lib_src_models_interaction_models",
       "lib_src_models_interaction_models_amount",
       "lib_src_models_interaction_models_balanceupdate",
@@ -576,6 +549,32 @@
       "lib_src_models_interaction_models_tojson",
       "lib_src_models_interaction_models_userid",
       "string"
+    ],
+    "14": [
+      "lib_src_interaction_interaction_manager",
+      "lib_src_interaction_interaction_manager_balancestream",
+      "lib_src_interaction_interaction_manager_balanceupdatedcontroller",
+      "lib_src_interaction_interaction_manager_bindstatenotifiers",
+      "lib_src_interaction_interaction_manager_bindstreams",
+      "lib_src_interaction_interaction_manager_chatcontroller",
+      "lib_src_interaction_interaction_manager_chatstream",
+      "lib_src_interaction_interaction_manager_dispose",
+      "lib_src_interaction_interaction_manager_giftreceivedcontroller",
+      "lib_src_interaction_interaction_manager_giftstream",
+      "lib_src_interaction_interaction_manager_hostcoinbalancenotifier",
+      "lib_src_interaction_interaction_manager_interactionmanager",
+      "lib_src_interaction_interaction_manager_latestgiftnotifier",
+      "lib_src_interaction_interaction_manager_onbalanceupdated",
+      "lib_src_interaction_interaction_manager_ongiftreceived",
+      "lib_src_interaction_interaction_manager_roomstate",
+      "lib_src_interaction_interaction_manager_sendchat",
+      "lib_src_interaction_interaction_manager_sendgift",
+      "lib_src_interaction_interaction_manager_signalingclient",
+      "lib_src_interaction_interaction_manager_syncinteractionnotifiers",
+      "lib_src_interaction_interaction_manager_userbalancenotifier",
+      "models_interaction_models_dart",
+      "roomstate",
+      "valuenotifier"
     ],
     "15": [
       "lib_src_widgets_omnicast_video_view",
@@ -735,24 +734,28 @@
       "statelesswidget"
     ],
     "23": [
-      "color"
+      "changenotifier",
+      "lib_src_state_room_state_roomstate"
     ],
     "24": [
-      "interactionmanager"
+      "color"
     ],
     "25": [
-      "models_room_event_models_dart"
+      "interactionmanager"
     ],
     "26": [
-      "pkmanager"
+      "models_room_event_models_dart"
     ],
     "27": [
-      "roommanager"
+      "pkmanager"
     ],
     "28": [
-      "src_models_room_event_models_dart"
+      "roommanager"
     ],
     "29": [
+      "src_models_room_event_models_dart"
+    ],
+    "30": [
       "userrole"
     ]
   },
@@ -760,10 +763,10 @@
     "0": 0.038461538461538464,
     "1": 0.0392156862745098,
     "2": 0.0392156862745098,
-    "3": 0.048625792811839326,
+    "3": 0.047474747474747475,
     "4": 0.04878048780487805,
     "5": 0.05405405405405406,
-    "6": 0.05405405405405406,
+    "6": 0.05555555555555555,
     "7": 0.058823529411764705,
     "8": 0.06060606060606061,
     "9": 0.0625,
@@ -771,7 +774,7 @@
     "11": 0.07407407407407407,
     "12": 0.07142857142857142,
     "13": 0.08,
-    "14": 0.08,
+    "14": 0.08333333333333333,
     "15": 0.08695652173913043,
     "16": 0.12987012987012986,
     "17": 0.09090909090909091,
@@ -786,18 +789,14 @@
     "26": 1.0,
     "27": 1.0,
     "28": 1.0,
-    "29": 1.0
+    "29": 1.0,
+    "30": 1.0
   },
   "gods": [
     {
       "id": "lib_src_signaling_signaling_client_signalingclient",
       "label": "SignalingClient",
-      "degree": 6
-    },
-    {
-      "id": "lib_src_state_room_state_roomstate",
-      "label": "RoomState",
-      "degree": 4
+      "degree": 5
     },
     {
       "id": "lib_src_media_media_controller_mediacontroller",
@@ -825,6 +824,11 @@
       "degree": 3
     },
     {
+      "id": "lib_src_state_room_state_roomstate",
+      "label": "RoomState",
+      "degree": 3
+    },
+    {
       "id": "lib_src_widgets_gift_overlay_manager_giftoverlaymanager",
       "label": "GiftOverlayManager",
       "degree": 3
@@ -844,11 +848,6 @@
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `SignalingClient` connect `seat_manager.dart` to `signaling_client.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `pk_manager.dart`, `interaction_manager.dart`?",
-      "why": "High betweenness centrality (0.020) - this node is a cross-community bridge."
-    },
-    {
-      "type": "bridge_node",
       "question": "Why does `PKState` connect `pk_score_progress_bar.dart` to `omnicast_pk_battle_view.dart`, `pk_models.dart`?",
       "why": "High betweenness centrality (0.019) - this node is a cross-community bridge."
     },
@@ -858,9 +857,14 @@
       "why": "High betweenness centrality (0.017) - this node is a cross-community bridge."
     },
     {
+      "type": "bridge_node",
+      "question": "Why does `SignalingClient` connect `seat_manager.dart` to `signaling_client.dart`, `pk_manager.dart`, `core/omnicast_client.dart`, `interaction_manager.dart`?",
+      "why": "High betweenness centrality (0.014) - this node is a cross-community bridge."
+    },
+    {
       "type": "isolated_nodes",
       "question": "What connects `_answerController`, `_channel`, `_channelSubscription` to the rest of the system?",
-      "why": "516 weakly-connected nodes found - possible documentation gaps or missing edges."
+      "why": "517 weakly-connected nodes found - possible documentation gaps or missing edges."
     },
     {
       "type": "low_cohesion",

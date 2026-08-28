@@ -53,7 +53,7 @@ class OmniCastParticipant {
   final bool isAudioMuted;
   final bool isVideoMuted;
   final DateTime joinedAt;
-  final Map<String, dynamic>? metadata;
+  final Map<String, dynamic> metadata;
 
   const OmniCastParticipant({
     required this.userId,
@@ -63,7 +63,7 @@ class OmniCastParticipant {
     this.isAudioMuted = false,
     this.isVideoMuted = false,
     required this.joinedAt,
-    this.metadata,
+    this.metadata = const {},
   });
 
   factory OmniCastParticipant.fromJson(Map<String, dynamic> json) {
@@ -73,6 +73,13 @@ class OmniCastParticipant {
       'co_host' || 'cohost' => UserRole.coHost,
       _ => UserRole.viewer,
     };
+
+    final rawMeta = json['metadata'];
+    final meta = rawMeta is Map<String, dynamic>
+        ? Map<String, dynamic>.from(rawMeta)
+        : (rawMeta is Map
+            ? Map<String, dynamic>.from(rawMeta)
+            : const <String, dynamic>{});
 
     return OmniCastParticipant(
       userId: json['user_id'] as String? ?? json['userId'] as String? ?? '',
@@ -84,7 +91,7 @@ class OmniCastParticipant {
       joinedAt: json['joined_at'] != null
           ? DateTime.tryParse(json['joined_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      metadata: meta,
     );
   }
 
@@ -96,7 +103,7 @@ class OmniCastParticipant {
         'is_audio_muted': isAudioMuted,
         'is_video_muted': isVideoMuted,
         'joined_at': joinedAt.toIso8601String(),
-        'metadata': ?metadata,
+        'metadata': metadata,
       };
 
   OmniCastParticipant copyWith({

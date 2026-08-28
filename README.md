@@ -18,12 +18,13 @@ An enterprise-grade, production-ready Flutter client library designed for buildi
 5. [🎥 Quick Start (Viewer & Host)](#-quick-start-viewer--host)
 6. [🖼️ Headless Video Rendering (`OmniCastVideoView`)](#️-headless-video-rendering-omnicastvideoview)
 7. [👥 Real-Time Viewer Tracking & Avatar Bar](#-real-time-viewer-tracking--avatar-bar)
-8. [🎛️ Media Quality, Simulcast & Dynacast](#️-media-quality-simulcast--dynacast)
-9. [🔋 Battery & Hardware Lifecycle Optimization](#-battery--hardware-lifecycle-optimization)
-10. [🎤 Multi-Guest Stage & Co-Hosting](#-multi-guest-stage--co-hosting)
-11. [🎁 Chat, Gifts & Animated Overlay](#-chat-gifts--animated-overlay)
-12. [⚔️ Host vs Host PK Battle System](#️-host-vs-host-pk-battle-system)
-13. [📱 Full Complete Working Screen Example](#-full-complete-working-screen-example)
+8. [🏷️ Custom Dynamic Metadata (VIP Badges, Levels, Frames)](#️-custom-dynamic-metadata-vip-badges-levels-frames)
+9. [🎛️ Media Quality, Simulcast & Dynacast](#️-media-quality-simulcast--dynacast)
+10. [🔋 Battery & Hardware Lifecycle Optimization](#-battery--hardware-lifecycle-optimization)
+11. [🎤 Multi-Guest Stage & Co-Hosting](#-multi-guest-stage--co-hosting)
+12. [🎁 Chat, Gifts & Animated Overlay](#-chat-gifts--animated-overlay)
+13. [⚔️ Host vs Host PK Battle System](#️-host-vs-host-pk-battle-system)
+14. [📱 Full Complete Working Screen Example](#-full-complete-working-screen-example)
 
 ---
 
@@ -231,6 +232,89 @@ class LiveViewerHeader extends StatelessWidget {
     );
   }
 }
+```
+
+---
+
+## 🏷️ Custom Dynamic Metadata (VIP Badges, Levels, Frames)
+
+The SFU engine and SDK support custom arbitrary JSON metadata on joining or publishing. This allows you to attach gamer levels, VIP statuses, animated avatar frames, or entrance effects.
+
+### 1. Send Metadata When Joining as a Viewer
+```dart
+await client.room.joinRoom(
+  roomId: 'room_101',
+  userId: 'user_777',
+  metadata: {
+    'level': 50,
+    'is_vip': true,
+    'badge': 'diamond',
+    'frame_color': '#FFD700',
+  },
+);
+```
+
+### 2. Send Metadata When Broadcasting as Host
+```dart
+await client.media.startAsHost(
+  roomId: 'room_101',
+  userId: 'host_42',
+  metadata: {
+    'verified': true,
+    'tag': 'Official Creator 🌟',
+  },
+);
+```
+
+### 3. Read Metadata & Render Custom VIP Badges / Levels in UI
+```dart
+ValueListenableBuilder<List<OmniCastParticipant>>(
+  valueListenable: client.room.activeViewersList,
+  builder: (context, viewers, _) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: viewers.length,
+      itemBuilder: (context, index) {
+        final viewer = viewers[index];
+        final isVip = viewer.metadata['is_vip'] == true;
+        final level = viewer.metadata['level'] ?? 1;
+
+        return Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            // User Avatar
+            CircleAvatar(
+              radius: 18,
+              backgroundImage: viewer.avatarUrl != null ? NetworkImage(viewer.avatarUrl!) : null,
+              child: viewer.avatarUrl == null ? Text(viewer.displayName?[0] ?? '?') : null,
+            ),
+
+            // VIP Badge Icon
+            if (isVip)
+              const Positioned(
+                top: 0,
+                right: 0,
+                child: Icon(Icons.verified, size: 14, color: Colors.amberAccent),
+              ),
+
+            // Level Tag
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              decoration: BoxDecoration(
+                color: isVip ? Colors.purple : Colors.blueGrey,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'Lv.$level',
+                style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  },
+)
 ```
 
 ---
