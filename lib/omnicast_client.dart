@@ -30,3 +30,6 @@ export 'src/models/signaling_message.dart';
 
 // UI Widgets
 export 'src/widgets/omnicast_video_view.dart';
+export 'src/widgets/omnicast_pk_battle_view.dart';
+export 'src/widgets/pk_score_progress_bar.dart';
+export 'src/widgets/gift_overlay_manager.dart';

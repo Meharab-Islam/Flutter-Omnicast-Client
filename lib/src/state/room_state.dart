@@ -50,6 +50,10 @@ class RoomState extends ChangeNotifier {
   List<CoHostInvite> get pendingInvites => List.unmodifiable(_pendingInvites);
 
   PKBattleInfo? get activePK => _activePK;
+  PKState get pkState => _activePK != null
+      ? PKState.fromBattleInfo(_activePK!, currentUserId: _userId)
+      : PKState.idle;
+
   bool get isInPKBattle =>
       _activePK != null &&
       (_activePK!.status == PKStatus.inProgress ||
@@ -179,13 +183,46 @@ class RoomState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Processes a gift event and updates balances.
+  /// Processes a gift event, updates host coin balance, and atomically bumps active PK scores.
   void processGift(GiftEvent event) {
     _recentGifts.add(event);
     if (_recentGifts.length > 50) {
       _recentGifts.removeRange(0, _recentGifts.length - 50);
     }
     _hostCoinBalance = event.hostTotalCoins;
+
+    // Atomically bump PK battle points if a PK is active
+    if (_activePK != null && isInPKBattle) {
+      final points = event.coinValue > 0 ? (event.coinValue * event.amount) : event.amount;
+      int newHostScore = _activePK!.hostScore;
+      int newOpponentScore = _activePK!.opponentScore;
+
+      if (event.targetUserId == _activePK!.hostUserId || event.targetUserId == _hostId) {
+        newHostScore += points;
+      } else if (event.targetUserId == _activePK!.opponentUserId) {
+        newOpponentScore += points;
+      } else {
+        // Default to host if no target explicitly specified
+        newHostScore += points;
+      }
+
+      _activePK = PKBattleInfo(
+        battleId: _activePK!.battleId,
+        hostRoomId: _activePK!.hostRoomId,
+        hostUserId: _activePK!.hostUserId,
+        opponentRoomId: _activePK!.opponentRoomId,
+        opponentUserId: _activePK!.opponentUserId,
+        opponentDisplayName: _activePK!.opponentDisplayName,
+        opponentAvatarUrl: _activePK!.opponentAvatarUrl,
+        status: _activePK!.status,
+        hostScore: newHostScore,
+        opponentScore: newOpponentScore,
+        durationSeconds: _activePK!.durationSeconds,
+        remainingSeconds: _activePK!.remainingSeconds,
+        startedAt: _activePK!.startedAt,
+      );
+    }
+
     notifyListeners();
   }
 

@@ -8,6 +8,117 @@ enum PKStatus {
   ended,
 }
 
+/// Reactive snapshot representing the current PK battle state.
+class PKState {
+  final bool isPKActive;
+  final String? battleId;
+  final String? hostRoomId;
+  final String? hostUserId;
+  final String? opponentRoomId;
+  final String? opponentUserId;
+  final String? opponentDisplayName;
+  final String? opponentAvatarUrl;
+  final int myScore;
+  final int opponentScore;
+  final int remainingSeconds;
+  final int durationSeconds;
+  final PKStatus status;
+  final bool isPunishmentPhase;
+
+  const PKState({
+    this.isPKActive = false,
+    this.battleId,
+    this.hostRoomId,
+    this.hostUserId,
+    this.opponentRoomId,
+    this.opponentUserId,
+    this.opponentDisplayName,
+    this.opponentAvatarUrl,
+    this.myScore = 0,
+    this.opponentScore = 0,
+    this.remainingSeconds = 300,
+    this.durationSeconds = 300,
+    this.status = PKStatus.idle,
+    this.isPunishmentPhase = false,
+  });
+
+  /// Idle / initial inactive state.
+  static const PKState idle = PKState();
+
+  /// Total combined points/coins accumulated in the battle.
+  int get totalScore => myScore + opponentScore;
+
+  /// Normalized host score ratio between 0.05 and 0.95 for visual progress bars.
+  double get hostScoreRatio {
+    if (totalScore == 0) return 0.5;
+    final ratio = myScore / totalScore;
+    return ratio.clamp(0.05, 0.95);
+  }
+
+  /// Normalized opponent score ratio.
+  double get opponentScoreRatio => 1.0 - hostScoreRatio;
+
+  bool get isWinning => myScore > opponentScore;
+  bool get isLosing => myScore < opponentScore;
+  bool get isTied => myScore == opponentScore;
+
+  Duration get remainingTime => Duration(seconds: remainingSeconds);
+
+  factory PKState.fromBattleInfo(PKBattleInfo info, {String? currentUserId}) {
+    final isHost = currentUserId == null || currentUserId == info.hostUserId;
+    return PKState(
+      isPKActive: info.status == PKStatus.inProgress || info.status == PKStatus.punishment,
+      battleId: info.battleId,
+      hostRoomId: info.hostRoomId,
+      hostUserId: info.hostUserId,
+      opponentRoomId: info.opponentRoomId,
+      opponentUserId: info.opponentUserId,
+      opponentDisplayName: info.opponentDisplayName,
+      opponentAvatarUrl: info.opponentAvatarUrl,
+      myScore: isHost ? info.hostScore : info.opponentScore,
+      opponentScore: isHost ? info.opponentScore : info.hostScore,
+      remainingSeconds: info.remainingSeconds,
+      durationSeconds: info.durationSeconds,
+      status: info.status,
+      isPunishmentPhase: info.status == PKStatus.punishment,
+    );
+  }
+
+  PKState copyWith({
+    bool? isPKActive,
+    String? battleId,
+    String? hostRoomId,
+    String? hostUserId,
+    String? opponentRoomId,
+    String? opponentUserId,
+    String? opponentDisplayName,
+    String? opponentAvatarUrl,
+    int? myScore,
+    int? opponentScore,
+    int? remainingSeconds,
+    int? durationSeconds,
+    PKStatus? status,
+    bool? isPunishmentPhase,
+  }) {
+    return PKState(
+      isPKActive: isPKActive ?? this.isPKActive,
+      battleId: battleId ?? this.battleId,
+      hostRoomId: hostRoomId ?? this.hostRoomId,
+      hostUserId: hostUserId ?? this.hostUserId,
+      opponentRoomId: opponentRoomId ?? this.opponentRoomId,
+      opponentUserId: opponentUserId ?? this.opponentUserId,
+      opponentDisplayName: opponentDisplayName ?? this.opponentDisplayName,
+      opponentAvatarUrl: opponentAvatarUrl ?? this.opponentAvatarUrl,
+      myScore: myScore ?? this.myScore,
+      opponentScore: opponentScore ?? this.opponentScore,
+      remainingSeconds: remainingSeconds ?? this.remainingSeconds,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      status: status ?? this.status,
+      isPunishmentPhase: isPunishmentPhase ?? this.isPunishmentPhase,
+    );
+  }
+}
+
 /// Information describing an active PK host battle across two rooms.
 class PKBattleInfo {
   final String battleId;
