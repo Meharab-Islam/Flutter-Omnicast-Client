@@ -1,30 +1,60 @@
-# 🚀 OmniCast Client SDK for Flutter
+# 🚀 OmniCast Client Flutter SDK
 
 [![pub package](https://img.shields.io/badge/pub-v0.0.1-blue.svg)](https://pub.dev/packages/omnicast_client)
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
 [![WebRTC](https://img.shields.io/badge/WebRTC-SFU-FF3E00?logo=webrtc)](https://webrtc.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A production-grade, enterprise Flutter client SDK built for high-scale interactive live-streaming platforms like **TikTok Live**, **Bigo Live**, and **Twitch**. Powered by the custom Go-based **OmniCast SFU Engine** (`pion/webrtc`).
+An enterprise-grade, production-ready Flutter client library designed for building massive real-time live streaming applications like **TikTok Live**, **Bigo Live**, and **Twitch**. Powered by the custom Go-based **OmniCast SFU Engine** (`pion/webrtc`).
 
 ---
 
-## 🌟 Key Features
+## 📑 Table of Contents
 
-- ⚡ **Ultra-Low Latency (<200ms)**: Sub-second global WebRTC streaming powered by unified-plan SFU routing.
-- 📱 **Modular Facade Architecture**: Dedicated sub-controllers for room lifecycle, media hardware, stage co-hosts, interactions, and PK battles.
-- 🎛️ **Simulcast & Dynacast**: Dynamic multi-layer video resolution switching (`'f'`, `'h'`, `'q'`) and automatic viewport-based bandwidth throttling.
-- 🔄 **Seamless Co-Host Upgrade**: Transition from Viewer to Co-Host with zero stream interruption via seamless in-place SDP renegotiation.
-- ⚔️ **Host PK Battle System**: Out-of-the-box cross-room host battles, side-by-side video rendering, real-time score updates, and battle timers.
-- 🎁 **Interactive Social Engine**: Built-in real-time chat, virtual gift animations, coin balance synchronization, and stage seat management.
-- 🖼️ **Zero-Boilerplate Video Views**: Plug-and-play `OmniCastVideoView` widget that automatically manages `RTCVideoRenderer` lifecycle and track binding.
+1. [🌟 High-Level Overview](#-high-level-overview)
+2. [🏗️ Architectural Design (Headless & Modular)](#️-architectural-design-headless--modular)
+3. [📦 Installation & Permissions](#-installation--permissions)
+4. [🔑 Initialization & Auth](#-initialization--auth)
+5. [🎥 Quick Start (Viewer & Host)](#-quick-start-viewer--host)
+6. [🖼️ Headless Video Rendering (`OmniCastVideoView`)](#️-headless-video-rendering-omnicastvideoview)
+7. [👥 Real-Time Viewer Tracking & Avatar Bar](#-real-time-viewer-tracking--avatar-bar)
+8. [🎛️ Media Quality, Simulcast & Dynacast](#️-media-quality-simulcast--dynacast)
+9. [🔋 Battery & Hardware Lifecycle Optimization](#-battery--hardware-lifecycle-optimization)
+10. [🎤 Multi-Guest Stage & Co-Hosting](#-multi-guest-stage--co-hosting)
+11. [🎁 Chat, Gifts & Animated Overlay](#-chat-gifts--animated-overlay)
+12. [⚔️ Host vs Host PK Battle System](#️-host-vs-host-pk-battle-system)
+13. [📱 Full Complete Working Screen Example](#-full-complete-working-screen-example)
 
 ---
 
-## 📦 Installation
+## 🌟 High-Level Overview
 
-Add `omnicast_client` to your `pubspec.yaml`:
+OmniCast Flutter SDK is built with two core philosophies:
+- **100% Headless UI Freedom**: The SDK provides state and controllers. You have 100% freedom over your design—no forced layouts, no rigid widgets.
+- **Extreme Hardware Performance**: Lazy WebRTC renderer allocation, aggressive memory cleanup, background battery saving, and isolate-based JSON parsing for 10,000+ participant rooms.
 
+```mermaid
+graph TD
+    App[Your Custom Flutter App UI] --> Facade[OmniCastClient Facade]
+    
+    Facade --> Room[client.room (RoomManager)]
+    Facade --> Media[client.media (MediaController)]
+    Facade --> Seats[client.seats (SeatManager)]
+    Facade --> Interaction[client.interaction (InteractionManager)]
+    Facade --> PK[client.pk (PKManager)]
+    Facade --> State[client.state (RoomState)]
+
+    Room --> SFU[Go WebRTC SFU Engine]
+    Media --> SFU
+    Seats --> SFU
+    PK --> SFU
+```
+
+---
+
+## 📦 Installation & Permissions
+
+### 1. Add dependency to `pubspec.yaml`
 ```yaml
 dependencies:
   flutter:
@@ -32,20 +62,18 @@ dependencies:
   omnicast_client: ^0.0.1
 ```
 
-Then install dependencies:
-
 ```bash
 flutter pub get
 ```
 
-### Platform Permissions
+### 2. Configure Native Permissions
 
 #### iOS (`ios/Runner/Info.plist`)
 ```xml
 <key>NSCameraUsageDescription</key>
-<string>Camera access is required for live streaming video.</string>
+<string>Camera access is required for broadcasting live video.</string>
 <key>NSMicrophoneUsageDescription</key>
-<string>Microphone access is required for live audio broadcasting.</string>
+<string>Microphone access is required for live audio streaming.</string>
 ```
 
 #### Android (`android/app/src/main/AndroidManifest.xml`)
@@ -58,59 +86,70 @@ flutter pub get
 
 ---
 
-## 🔑 Initialization
+## 🔑 Initialization & Auth
 
-Initialize the SDK instance globally or within your service locator (`GetIt`, `Provider`, `Riverpod`):
+Initialize the SDK once with your API credentials. The SDK will automatically establish a secure, heartbeat-monitored WebSocket connection:
 
 ```dart
 import 'package:omnicast_client/omnicast_client.dart';
 
 final client = await OmniCastClient.init(
-  apiKey: 'YOUR_OMNICAST_API_KEY',
-  apiSecret: 'YOUR_OMNICAST_API_SECRET',
+  apiKey: 'YOUR_API_KEY',
+  apiSecret: 'YOUR_API_SECRET',
   hostUrl: 'wss://sfu.omnicast.live/ws',
 );
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🎥 Quick Start (Viewer & Host)
 
-### 1. Join a Live Stream as a Viewer
+### 1. Join a Live Room as a Viewer
+Connects to the room with `recvonly` audio/video transceivers. Zero camera/microphone access is requested:
 
 ```dart
-// Connects with recvonly audio/video transceivers and subscribes to host stream
 await client.room.joinRoom(
   roomId: 'room_101',
   userId: 'viewer_user_88',
 );
 ```
 
-### 2. Start a Broadcast as a Host
+### 2. Start a Live Broadcast as a Host
+Captures hardware camera & mic, enables Simulcast, and begins publishing stream:
 
 ```dart
-// Captures camera & microphone, adds tracks, and publishes stream
 await client.room.createRoom(
   roomId: 'room_101',
   userId: 'host_user_42',
   options: const RoomOptions(
-    title: 'Late Night Music & Chat 🎸',
+    title: 'Acoustic Guitar Live 🎸',
     enableAudio: true,
     enableVideo: true,
     enableSimulcast: true,
+    enableDynacast: true,
     maxCoHosts: 4,
   ),
 );
 ```
 
----
-
-## 🎥 Rendering Video (`OmniCastVideoView`)
-
-Render live video feeds effortlessly. The widget automatically handles renderer initialization, stream binding, and leak-free disposal:
+### 3. Leave Room
+Cleanly stops hardware capture, shuts down PeerConnection, and cleans up state:
 
 ```dart
-// Render Local Camera Preview (Host / Co-Host)
+await client.room.leaveRoom();
+```
+
+---
+
+## 🖼️ Headless Video Rendering (`OmniCastVideoView`)
+
+The `OmniCastVideoView` widget is lightweight and un-opinionated. It has no forced borders, backgrounds, or aspect ratios.
+
+- **Lazy Renderer Allocation**: Allocates `RTCVideoRenderer` only when the widget is mounted in `initState`.
+- **Aggressive Disposal**: Clears `srcObject = null` and disposes the renderer immediately in `dispose()` to prevent VRAM memory leaks.
+
+```dart
+// 1. Render Local Camera (Host / Co-Host preview)
 OmniCastVideoView(
   mediaStreamManager: client.streamManager,
   userId: 'local', // or null
@@ -118,10 +157,10 @@ OmniCastVideoView(
   objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
 )
 
-// Render Remote Host or Co-Host Stream
+// 2. Render Remote Host or Guest Stream
 OmniCastVideoView(
   mediaStreamManager: client.streamManager,
-  userId: hostUserId, // ID of the host or peer
+  userId: hostUserId, // Remote peer ID
   objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
   placeholder: const Center(
     child: CircularProgressIndicator(),
@@ -131,176 +170,437 @@ OmniCastVideoView(
 
 ---
 
-## 🎛️ Advanced Modular Architecture
+## 👥 Real-Time Viewer Tracking & Avatar Bar
 
-`OmniCastClient` organizes all live streaming features into specialized sub-modules:
-
-### 1. Media Controls (`client.media`)
-
-Fine-tune local hardware capture, simulcast layers, and adaptive streaming:
+`client.room` provides real-time tracking for viewer counts and participant avatars with **50ms micro-batching debouncing** to prevent UI thread jank in 10,000+ viewer streams:
 
 ```dart
-// Hardware Mute Toggles
-client.media.setMicrophoneMuted(true);
-client.media.setCameraEnabled(false);
-await client.media.switchCamera();
+class LiveViewerHeader extends StatelessWidget {
+  final OmniCastClient client;
 
-// Simulcast Layer Selection: 'f' (full/1080p), 'h' (half/720p), 'q' (quarter/360p)
-client.media.setSimulcastLayer('h');
+  const LiveViewerHeader({super.key, required this.client});
 
-// Dynacast & Adaptive Bandwidth Optimization
-client.media.enableDynacast(true);
-client.media.enableAdaptiveStreaming(true);
-
-// Dynamically pause/resume offscreen remote video tracks to save bandwidth
-client.media.setRemoteTrackVisibility(remotePeerId, false);
-```
-
----
-
-### 2. Stage & Co-Hosting (`client.seats`)
-
-Seamlessly invite viewers onto the stage without breaking the WebRTC connection:
-
-```dart
-// Host: Invite viewer to stage
-client.seats.inviteToCoHost('viewer_user_88', seatIndex: 1);
-
-// Viewer: Accept invite & seamlessly upgrade to Co-Host
-await client.seats.acceptCoHostInvite(video: true, audio: true);
-
-// Host: Demote co-host back to viewer (keeps them in room)
-client.seats.demoteToViewer('cohost_user_88');
-
-// Host: Pin a specific co-host to the main spotlight stage
-client.seats.pinToMainStage('cohost_user_88');
-```
-
----
-
-### 3. Interactions & Virtual Gifts (`client.interaction`)
-
-Power your live chat and monetization loop:
-
-```dart
-// Send a live chat message
-client.interaction.sendChat('Hello everyone! Welcome to the stream 🎉');
-
-// Send virtual gifts
-client.interaction.sendGift(
-  giftId: 'super_rocket_99',
-  amount: 5,
-  giftName: 'Super Rocket 🚀',
-  coinValue: 100,
-);
-
-// Listen to incoming gifts
-client.interaction.onGiftReceived.listen((giftEvent) {
-  print('🎁 Gift received from ${giftEvent.senderName}: ${giftEvent.giftName} x${giftEvent.amount}');
-});
-
-// Listen to user coin balance updates
-client.interaction.onBalanceUpdated.listen((balanceUpdate) {
-  print('💰 New Coin Balance: ${balanceUpdate.newBalance}');
-});
-```
-
----
-
-### 4. PK Host Battles (`client.pk`)
-
-Challenge another live room host to a real-time split-screen battle:
-
-```dart
-// Host: Challenge an opponent host in another room
-client.pk.sendPKRequest(
-  targetRoomId: 'opponent_room_505',
-  targetHostId: 'opponent_host_99',
-  durationSeconds: 300, // 5 minute battle
-);
-
-// Opponent: Accept PK challenge
-client.pk.acceptPKRequest('pk_battle_id');
-
-// Listen to real-time score updates
-client.pk.onPKScoreUpdated.listen((scoreUpdate) {
-  print('⚔️ Host: ${scoreUpdate.hostScore} vs Opponent: ${scoreUpdate.opponentScore}');
-});
-
-// Listen to battle timer countdown ticks
-client.pk.onPKTimerTick.listen((timerTick) {
-  print('⏳ Remaining Time: ${timerTick.remainingSeconds}s (Punishment: ${timerTick.isPunishmentPhase})');
-});
-
-// End PK battle
-client.pk.endPK('pk_battle_id');
-```
-
----
-
-## 📊 Reactive State Management (`client.state`)
-
-`client.state` is a reactive `ChangeNotifier` (`RoomState`) that provides instant UI updates without manual stream boilerplate:
-
-```dart
-ListenableBuilder(
-  listenable: client.state,
-  builder: (context, _) {
-    final state = client.state;
-
-    return Column(
+  @override
+  Widget build(BuildContext context) {
+    return Row(
       children: [
-        // Live Header
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Room: ${state.roomId ?? "Offline"}'),
-            Text('👁️ ${state.viewersCount} Viewers'),
-            Text('🪙 ${state.hostCoinBalance} Coins'),
-          ],
+        // 1. Live Viewer Count Badge (Rebuilds atomically)
+        ValueListenableBuilder<int>(
+          valueListenable: client.room.totalViewerCount,
+          builder: (context, count, _) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text('👁️ $count', style: const TextStyle(color: Colors.white)),
+            );
+          },
         ),
 
-        // PK Battle Banner (Visible during active PK)
-        if (state.isInPKBattle)
-          Container(
-            color: Colors.redAccent,
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              '⚔️ PK BATTLE: ${state.activePK!.hostScore} - ${state.activePK!.opponentScore} | ${state.activePK!.remainingSeconds}s remaining',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
+        const SizedBox(width: 8),
 
-        // Chat List
+        // 2. Horizontal Avatar List (Top active viewers in memory)
         Expanded(
-          child: ListView.builder(
-            itemCount: state.chatHistory.length,
-            itemBuilder: (context, index) {
-              final chat = state.chatHistory[index];
-              return ListTile(
-                title: Text(chat.senderName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(chat.text),
-              );
-            },
+          child: SizedBox(
+            height: 36,
+            child: ValueListenableBuilder<List<OmniCastParticipant>>(
+              valueListenable: client.room.activeViewersList,
+              builder: (context, viewers, _) {
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: viewers.length,
+                  itemBuilder: (context, index) {
+                    final user = viewers[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
+                        child: user.avatarUrl == null ? Text(user.displayName?[0] ?? '?') : null,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ],
     );
-  },
+  }
+}
+```
+
+---
+
+## 🎛️ Media Quality, Simulcast & Dynacast
+
+`client.media` provides control over video resolutions, multi-layer simulcast, and adaptive bandwidth optimization.
+
+### 1. Video Resolution Presets (`VideoParameters`)
+```dart
+// Apply 1080p FHD preset
+await client.media.setVideoParameters(VideoParameters.presetFHD1080p);
+
+// Or 720p HD standard
+await client.media.setVideoParameters(VideoParameters.presetHD720p);
+
+// Or Custom Resolution & Framerate
+await client.media.setVideoParameters(
+  VideoParameters.custom(width: 1080, height: 1920, fps: 60, maxBitrate: 4500000),
+);
+```
+
+### 2. Multi-Layer Simulcast (`'f'`, `'h'`, `'q'`)
+When Simulcast is enabled, the broadcaster sends 3 spatial layers:
+- `'f'` (Full HD / 1080p)
+- `'h'` (Half HD / 720p)
+- `'q'` (Quarter / 360p)
+
+```dart
+// Viewer requests specific quality layer:
+client.media.setSimulcastLayer('h');
+```
+
+### 3. Dynacast (Smart Publisher Layer Muting)
+If no viewers in the room are watching the full 1080p (`'f'`) layer, Dynacast automatically pauses sending that layer upstream, saving up to **60% upload bandwidth** for the host:
+
+```dart
+client.media.enableDynacast(true);
+```
+
+---
+
+## 🔋 Battery & Hardware Lifecycle Optimization
+
+`MediaController` integrates Flutter's `WidgetsBindingObserver`. When your mobile app is sent to the background (user switches apps or locks screen), it automatically pauses the camera to prevent phone overheating and battery drain:
+
+```dart
+// Enabled by default (autoPauseOnBackground: true)
+// When app goes to background -> Pauses local camera track
+// When app returns to foreground -> Resumes camera track seamlessly
+```
+
+---
+
+## 🎤 Multi-Guest Stage & Co-Hosting
+
+Co-hosting uses **Seamless In-Place SDP Renegotiation**. Upgrading a viewer to co-host does **NOT** drop or recreate the WebRTC connection:
+
+```dart
+// Host invites viewer to stage
+client.seats.inviteToCoHost('viewer_user_99', seatIndex: 1);
+
+// Viewer accepts invitation and seamlessly turns on camera & mic
+await client.seats.acceptCoHostInvite(video: true, audio: true);
+
+// Host can demote guest back to viewer without kicking them from room
+client.seats.demoteToViewer('cohost_user_99');
+
+// Host can spotlight/pin a guest to the main stage for all viewers
+client.seats.pinToMainStage('cohost_user_99');
+```
+
+---
+
+## 🎁 Chat, Gifts & Animated Overlay
+
+### 1. Send Chat & Virtual Gifts
+```dart
+// Send chat
+client.interaction.sendChat('Hello everyone! Amazing stream ❤️');
+
+// Send gift
+client.interaction.sendGift(
+  giftId: 'super_rocket',
+  giftName: 'Super Rocket 🚀',
+  amount: 5,
+  coinValue: 100,
+);
+```
+
+### 2. Gift Banner Overlay Widget (`GiftOverlayManager`)
+Wrap your live stream in `GiftOverlayManager`. When gifts arrive, animated sliding banners with combo counters (`x5`) slide in and auto-dismiss after 3 seconds:
+
+```dart
+GiftOverlayManager(
+  giftStream: client.interaction.onGiftReceived,
+  displayDuration: const Duration(seconds: 3),
+  child: OmniCastVideoView(
+    mediaStreamManager: client.streamManager,
+    userId: hostId,
+  ),
 )
 ```
 
 ---
 
-## 🧹 Resource Cleanup
+## ⚔️ Host vs Host PK Battle System
 
-Always call `dispose()` when terminating the live streaming session:
+Connect two hosts from different rooms into a unified split-screen battle with real-time score tracking:
+
+### 1. Challenge & Accept PK
+```dart
+// Host A: Challenge Host B in another room
+client.pk.sendPKRequest(
+  targetRoomId: 'room_opponent_202',
+  targetHostId: 'host_opponent_99',
+  durationSeconds: 300, // 5 minute battle
+);
+
+// Host B: Accept challenge
+client.pk.acceptPKRequest('pk_battle_id');
+```
+
+### 2. Render Split-Screen PK View (`OmniCastPKBattleView`)
+```dart
+OmniCastPKBattleView(
+  mediaStreamManager: client.streamManager,
+  hostUserId: 'my_host_id',
+  opponentUserId: client.state.pkState.opponentUserId ?? '',
+  pkState: client.state.pkState,
+  hostDisplayName: 'Alice (Host)',
+  opponentDisplayName: 'Bob (Opponent)',
+)
+```
+
+### 3. Dynamic Animated Score Bar (`PKScoreProgressBar`)
+```dart
+PKScoreProgressBar(
+  pkState: client.state.pkState,
+  height: 28.0,
+  hostGradient: const LinearGradient(colors: [Color(0xFF00C6FF), Color(0xFF0072FF)]),
+  opponentGradient: const LinearGradient(colors: [Color(0xFFFF0844), Color(0xFFFFB199)]),
+)
+```
+
+---
+
+## 📱 Full Complete Working Screen Example
+
+Here is a full, copy-pasteable Flutter live streaming screen demonstrating video rendering, real-time viewer bar, chat list, and gift animations:
 
 ```dart
-@override
-void dispose() {
-  client.dispose();
-  super.dispose();
+import 'package:flutter/material.dart';
+import 'package:omnicast_client/omnicast_client.dart';
+
+class LiveStreamScreen extends StatefulWidget {
+  final String roomId;
+  final String userId;
+  final bool isHost;
+
+  const LiveStreamScreen({
+    super.key,
+    required this.roomId,
+    required this.userId,
+    this.isHost = false,
+  });
+
+  @override
+  State<LiveStreamScreen> createState() => _LiveStreamScreenState();
+}
+
+class _LiveStreamScreenState extends State<LiveStreamScreen> {
+  late final OmniCastClient client;
+  final TextEditingController _chatController = TextEditingController();
+  bool _isReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSDK();
+  }
+
+  Future<void> _initSDK() async {
+    // 1. Initialize SDK
+    client = await OmniCastClient.init(
+      apiKey: 'your_api_key',
+      apiSecret: 'your_api_secret',
+      hostUrl: 'wss://sfu.omnicast.live/ws',
+    );
+
+    // 2. Join or Host
+    if (widget.isHost) {
+      await client.room.createRoom(
+        roomId: widget.roomId,
+        userId: widget.userId,
+        options: const RoomOptions(enableSimulcast: true, enableDynacast: true),
+      );
+    } else {
+      await client.room.joinRoom(
+        roomId: widget.roomId,
+        userId: widget.userId,
+      );
+    }
+
+    if (mounted) setState(() => _isReady = true);
+  }
+
+  @override
+  void dispose() {
+    client.dispose();
+    _chatController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isReady) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GiftOverlayManager(
+        giftStream: client.interaction.onGiftReceived,
+        child: Stack(
+          children: [
+            // 1. Fullscreen Video (Local Host Camera or Remote Stream)
+            Positioned.fill(
+              child: OmniCastVideoView(
+                mediaStreamManager: client.streamManager,
+                userId: widget.isHost ? 'local' : (client.state.hostId ?? 'remote_peer'),
+                mirror: widget.isHost,
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+              ),
+            ),
+
+            // 2. Top Header: Viewers & Coins
+            Positioned(
+              top: 48,
+              left: 16,
+              right: 16,
+              child: Row(
+                children: [
+                  // Viewer count badge
+                  ValueListenableBuilder<int>(
+                    valueListenable: client.room.totalViewerCount,
+                    builder: (context, count, _) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text('👁️ $count', style: const TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Active Viewers Avatars
+                  Expanded(
+                    child: SizedBox(
+                      height: 32,
+                      child: ValueListenableBuilder<List<OmniCastParticipant>>(
+                        valueListenable: client.room.activeViewersList,
+                        builder: (context, viewers, _) => ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: viewers.length,
+                          itemBuilder: (context, i) => Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.indigoAccent,
+                              child: Text(viewers[i].displayName?[0] ?? '?', style: const TextStyle(fontSize: 12)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // 3. Bottom Chat List
+            Positioned(
+              left: 16,
+              right: 100,
+              bottom: 80,
+              height: 200,
+              child: StreamBuilder<ChatMessage>(
+                stream: client.interaction.chatStream,
+                builder: (context, snapshot) {
+                  final messages = client.state.chatHistory;
+                  return ListView.builder(
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final chat = messages[index];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black45,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(text: '${chat.senderName}: ', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amberAccent)),
+                              TextSpan(text: chat.text, style: const TextStyle(color: Colors.white)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+
+            // 4. Bottom Controls & Send Gift
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 20,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _chatController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Say something...',
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        filled: true,
+                        fillColor: Colors.black54,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      onSubmitted: (text) {
+                        if (text.trim().isNotEmpty) {
+                          client.interaction.sendChat(text.trim());
+                          _chatController.clear();
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Gift Button
+                  IconButton(
+                    icon: const Icon(Icons.card_giftcard, color: Colors.amberAccent, size: 28),
+                    onPressed: () {
+                      client.interaction.sendGift(
+                        giftId: 'rose_1',
+                        giftName: 'Rose 🌹',
+                        amount: 1,
+                        coinValue: 10,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 ```
 
