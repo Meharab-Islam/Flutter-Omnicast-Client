@@ -6,8 +6,11 @@ import '../models/room_models.dart';
 import '../models/seat_models.dart';
 import '../models/signaling_message.dart';
 
+/// Top-level function for offloading heavy JSON parsing to a background Dart Isolate.
+SignalingMessage? _parseJsonPayload(String raw) => SignalingMessage.tryDeserialize(raw);
+
 /// Manages WebSocket signaling connection, JSON framing, keep-alive heartbeats,
-/// and incoming/outgoing event routing for the OmniCast SFU engine.
+/// and incoming/outgoing event routing for the OmniCast SFU engine with Isolate parsing.
 class SignalingClient {
   WebSocketChannel? _channel;
   StreamSubscription? _channelSubscription;
@@ -105,12 +108,19 @@ class SignalingClient {
     }
   }
 
-  void _onDataReceived(dynamic rawData) {
+  void _onDataReceived(dynamic rawData) async {
     if (rawData is! String) return;
 
-    final msg = SignalingMessage.tryDeserialize(rawData);
+    SignalingMessage? msg;
+    // Performance optimization: offload large JSON payloads (>8KB) to background isolate
+    if (rawData.length > 8192) {
+      msg = await compute(_parseJsonPayload, rawData);
+    } else {
+      msg = SignalingMessage.tryDeserialize(rawData);
+    }
+
     if (msg == null) {
-      debugPrint('[SignalingClient] Failed to deserialize message: $rawData');
+      debugPrint('[SignalingClient] Failed to deserialize message');
       return;
     }
 

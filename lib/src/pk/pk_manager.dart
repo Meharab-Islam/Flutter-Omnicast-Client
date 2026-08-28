@@ -8,11 +8,18 @@ import '../webrtc/webrtc_manager.dart';
 
 /// Manages Host vs Host PK Battles: requesting challenges, cross-room track subscriptions,
 /// live score updates, battle countdown timer streams, and punishment phase transitions.
+/// Exposes both pure [Stream]s and atomic [ValueNotifier]s for headless UI integration.
 class PKManager {
   final SignalingClient _signalingClient;
   final WebRTCManager _webRTCManager;
   final RoomState _roomState;
 
+  // Granular atomic ValueNotifiers for headless UI composition
+  final ValueNotifier<PKState> pkStateNotifier = ValueNotifier<PKState>(PKState.idle);
+  final ValueNotifier<int> timerNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<bool> isPKActiveNotifier = ValueNotifier<bool>(false);
+
+  // Pure Streams
   final _pkStartedController = StreamController<PKBattleInfo>.broadcast();
   final _pkTimerController = StreamController<PKTimerTick>.broadcast();
   final _pkScoreController = StreamController<PKScoreUpdate>.broadcast();
@@ -27,11 +34,12 @@ class PKManager {
         _webRTCManager = webRTCManager,
         _roomState = roomState {
     _bindStreams();
+    _bindStateNotifiers();
   }
 
   WebRTCManager get webRTCManager => _webRTCManager;
-  PKState get currentState => _roomState.pkState;
-  bool get isPKActive => _roomState.isInPKBattle;
+  PKState get currentState => pkStateNotifier.value;
+  bool get isPKActive => isPKActiveNotifier.value;
 
   // Streams
   Stream<PKBattleInfo> get onPKStarted => _pkStartedController.stream;
@@ -39,6 +47,17 @@ class PKManager {
   Stream<PKScoreUpdate> get onPKScoreUpdated => _pkScoreController.stream;
   Stream<String> get onPKEnded => _pkEndedController.stream;
   Stream<SignalingMessage> get onPKRequested => _pkRequestedController.stream;
+
+  void _bindStateNotifiers() {
+    _roomState.addListener(_syncPKNotifiers);
+  }
+
+  void _syncPKNotifiers() {
+    final newState = _roomState.pkState;
+    pkStateNotifier.value = newState;
+    isPKActiveNotifier.value = newState.isPKActive;
+    timerNotifier.value = newState.remainingSeconds;
+  }
 
   void _bindStreams() {
     _signalingClient.onMessage.listen((msg) {
@@ -182,8 +201,13 @@ class PKManager {
     _roomState.addActiveRemoteUser(opponentUserId);
   }
 
-  /// Disposes internal controllers.
+  /// Disposes internal controllers and notifiers.
   Future<void> dispose() async {
+    _roomState.removeListener(_syncPKNotifiers);
+    pkStateNotifier.dispose();
+    timerNotifier.dispose();
+    isPKActiveNotifier.dispose();
+
     await _pkStartedController.close();
     await _pkTimerController.close();
     await _pkScoreController.close();

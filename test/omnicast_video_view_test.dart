@@ -5,7 +5,7 @@ import 'package:omnicast_client/omnicast_client.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('OmniCastVideoView Widget', () {
+  group('OmniCastVideoView Headless Widget', () {
     late MediaStreamManager mediaStreamManager;
 
     setUp(() {
@@ -33,7 +33,7 @@ void main() {
       expect(find.text('Connecting Video...'), findsOneWidget);
     });
 
-    testWidgets('renders default circular progress indicator if no placeholder given',
+    testWidgets('renders lightweight SizedBox.shrink when no placeholder is passed',
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -46,7 +46,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(SizedBox), findsWidgets);
     });
   });
 }

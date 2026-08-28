@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import '../models/signaling_message.dart';
 import '../signaling/signaling_client.dart';
 import '../webrtc/webrtc_manager.dart';
@@ -7,48 +7,82 @@ import 'media_stream_manager.dart';
 import 'video_parameters.dart';
 
 /// Controls local hardware media, video quality presets, simulcast layers,
-/// adaptive streaming subscriptions, and Dynacast upstream publisher throttling.
-class MediaController {
+/// adaptive streaming, Dynacast throttling, and automatic battery-saving lifecycle management.
+class MediaController with WidgetsBindingObserver {
   final MediaStreamManager _mediaStreamManager;
   final SignalingClient _signalingClient;
   final WebRTCManager _webRTCManager;
 
   bool _adaptiveStreamingEnabled = true;
   bool _dynacastEnabled = true;
-  String _currentSimulcastLayer = 'f'; // 'f' (high), 'h' (medium), 'q' (low)
+  final bool _autoPauseOnBackground;
+  bool _wasCameraEnabledBeforePause = false;
+
+  // Granular ValueNotifiers for headless UI reactivity
+  final ValueNotifier<bool> isMicrophoneMutedNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> isCameraEnabledNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<String> simulcastLayerNotifier = ValueNotifier<String>('f');
+
   StreamSubscription? _dynacastSubscription;
 
   MediaController({
     required MediaStreamManager mediaStreamManager,
     required SignalingClient signalingClient,
     required WebRTCManager webRTCManager,
+    bool autoPauseOnBackground = true,
   })  : _mediaStreamManager = mediaStreamManager,
         _signalingClient = signalingClient,
-        _webRTCManager = webRTCManager {
+        _webRTCManager = webRTCManager,
+        _autoPauseOnBackground = autoPauseOnBackground {
     _bindDynacastSignaling();
+    if (_autoPauseOnBackground) {
+      try {
+        WidgetsBinding.instance.addObserver(this);
+      } catch (_) {
+        // Fallback when WidgetsBinding is not yet initialized (e.g. CLI/pure tests)
+      }
+    }
   }
 
   MediaStreamManager get streamManager => _mediaStreamManager;
   WebRTCManager get webRTCManager => _webRTCManager;
   VideoParameters get currentParameters => _mediaStreamManager.currentParameters;
-  bool get isMicrophoneMuted => _mediaStreamManager.isAudioMuted;
-  bool get isCameraEnabled => !_mediaStreamManager.isVideoMuted;
+  bool get isMicrophoneMuted => isMicrophoneMutedNotifier.value;
+  bool get isCameraEnabled => isCameraEnabledNotifier.value;
   bool get adaptiveStreamingEnabled => _adaptiveStreamingEnabled;
   bool get dynacastEnabled => _dynacastEnabled;
-  String get currentSimulcastLayer => _currentSimulcastLayer;
+  String get currentSimulcastLayer => simulcastLayerNotifier.value;
+
+  /// App Lifecycle Optimization: Automatically pause camera on background to save battery & CPU.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_autoPauseOnBackground) return;
+
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      if (isCameraEnabled) {
+        _wasCameraEnabledBeforePause = true;
+        debugPrint('[MediaController Lifecycle] App paused -> Pausing local camera');
+        setCameraEnabled(false);
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      if (_wasCameraEnabledBeforePause) {
+        _wasCameraEnabledBeforePause = false;
+        debugPrint('[MediaController Lifecycle] App resumed -> Resuming local camera');
+        setCameraEnabled(true);
+      }
+    }
+  }
 
   /// Binds to SFU Dynacast layer consumption signals.
   void _bindDynacastSignaling() {
     _dynacastSubscription = _signalingClient.onMessage.listen((msg) {
       if (!_dynacastEnabled) return;
 
-      // Event triggered when SFU updates which publisher layers are currently consumed
       if (msg.event == 'dynacast_layer_update' || msg.event == 'publisher_layers_update') {
         if (msg.payload is Map<String, dynamic>) {
           final payload = msg.payload as Map<String, dynamic>;
           final subscribedLayers = payload['subscribed_layers'] as List<dynamic>? ?? [];
 
-          // If no viewers subscribe to 'f' layer, pause 'f' upstream to save upload bandwidth
           final hasFullSubscribers = subscribedLayers.contains('f');
           final hasHalfSubscribers = subscribedLayers.contains('h');
           final hasQuarterSubscribers = subscribedLayers.contains('q');
@@ -76,11 +110,13 @@ class MediaController {
   /// Enables or mutes the local microphone.
   void setMicrophoneMuted(bool muted) {
     _mediaStreamManager.toggleAudio(!muted);
+    isMicrophoneMutedNotifier.value = muted;
   }
 
   /// Enables or disables the local camera feed.
   void setCameraEnabled(bool enabled) {
     _mediaStreamManager.toggleVideo(enabled);
+    isCameraEnabledNotifier.value = enabled;
   }
 
   /// Switches between front and back camera.
@@ -92,7 +128,7 @@ class MediaController {
       debugPrint('[MediaController] Invalid simulcast layer: $layer (expected f, h, or q)');
       return;
     }
-    _currentSimulcastLayer = layer;
+    simulcastLayerNotifier.value = layer;
     _signalingClient.send(SignalingMessage(
       event: 'request_layer',
       roomId: '',
@@ -111,7 +147,6 @@ class MediaController {
   void enableDynacast(bool enable) {
     _dynacastEnabled = enable;
     if (!enable) {
-      // If Dynacast is disabled, reactivate all layers
       _webRTCManager.setPublisherLayerActive('f', true);
       _webRTCManager.setPublisherLayerActive('h', true);
       _webRTCManager.setPublisherLayerActive('q', true);
@@ -142,8 +177,16 @@ class MediaController {
     ));
   }
 
-  /// Disposes internal listeners.
+  /// Disposes internal listeners, observers, and atomic notifiers.
   void dispose() {
+    if (_autoPauseOnBackground) {
+      try {
+        WidgetsBinding.instance.removeObserver(this);
+      } catch (_) {}
+    }
     _dynacastSubscription?.cancel();
+    isMicrophoneMutedNotifier.dispose();
+    isCameraEnabledNotifier.dispose();
+    simulcastLayerNotifier.dispose();
   }
 }

@@ -274,7 +274,9 @@ class OmniCastClient {
 
     await _interactionManager.dispose();
     await _pkManager.dispose();
+    _mediaController.dispose();
     await _roomManager.leaveRoom();
+    _roomManager.dispose();
     await _webRTCManager.dispose();
     await _mediaStreamManager.dispose();
     await _signalingClient.dispose();

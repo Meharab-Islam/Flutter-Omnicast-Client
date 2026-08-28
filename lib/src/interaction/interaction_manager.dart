@@ -1,15 +1,23 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../models/interaction_models.dart';
 import '../models/signaling_message.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 
-/// Manages live interactions: sending/receiving chat messages, sending gifts,
-/// and streaming gift and coin balance updates.
+/// Manages live interactions (chat, gifts, balance updates) and exposes both
+/// pure [Stream]s and atomic [ValueNotifier]s for headless UI composition.
 class InteractionManager {
   final SignalingClient _signalingClient;
   final RoomState _roomState;
 
+  // Granular atomic ValueNotifiers for headless UI reactivity
+  final ValueNotifier<int> userBalanceNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> hostCoinBalanceNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<GiftEvent?> latestGiftNotifier = ValueNotifier<GiftEvent?>(null);
+
+  // Pure Streams
+  final _chatController = StreamController<ChatMessage>.broadcast();
   final _giftReceivedController = StreamController<GiftEvent>.broadcast();
   final _balanceUpdatedController = StreamController<BalanceUpdate>.broadcast();
 
@@ -19,13 +27,36 @@ class InteractionManager {
   })  : _signalingClient = signalingClient,
         _roomState = roomState {
     _bindStreams();
+    _bindStateNotifiers();
   }
 
+  // Pure Stream Getters
+  Stream<ChatMessage> get chatStream => _chatController.stream;
+  Stream<GiftEvent> get giftStream => _giftReceivedController.stream;
   Stream<GiftEvent> get onGiftReceived => _giftReceivedController.stream;
   Stream<BalanceUpdate> get onBalanceUpdated => _balanceUpdatedController.stream;
+  Stream<BalanceUpdate> get balanceStream => _balanceUpdatedController.stream;
+
+  void _bindStateNotifiers() {
+    _roomState.addListener(_syncInteractionNotifiers);
+  }
+
+  void _syncInteractionNotifiers() {
+    if (userBalanceNotifier.value != _roomState.userCoinBalance) {
+      userBalanceNotifier.value = _roomState.userCoinBalance;
+    }
+    if (hostCoinBalanceNotifier.value != _roomState.hostCoinBalance) {
+      hostCoinBalanceNotifier.value = _roomState.hostCoinBalance;
+    }
+  }
 
   void _bindStreams() {
+    _signalingClient.onChat.listen((chat) {
+      _chatController.add(chat);
+    });
+
     _signalingClient.onGift.listen((gift) {
+      latestGiftNotifier.value = gift;
       _giftReceivedController.add(gift);
       _roomState.processGift(gift);
     });
@@ -58,6 +89,7 @@ class InteractionManager {
       payload: msg.toJson(),
     ));
 
+    _chatController.add(msg);
     _roomState.addChatMessage(msg);
   }
 
@@ -92,8 +124,14 @@ class InteractionManager {
     ));
   }
 
-  /// Disposes internal controllers.
+  /// Disposes internal controllers and notifiers.
   Future<void> dispose() async {
+    _roomState.removeListener(_syncInteractionNotifiers);
+    userBalanceNotifier.dispose();
+    hostCoinBalanceNotifier.dispose();
+    latestGiftNotifier.dispose();
+
+    await _chatController.close();
     await _giftReceivedController.close();
     await _balanceUpdatedController.close();
   }

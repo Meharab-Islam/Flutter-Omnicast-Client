@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:omnicast_client/omnicast_client.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('VideoParameters Presets & Constraints', () {
     test('presetHD720p constraints match 1280x720 @ 30fps', () {
       const params = VideoParameters.presetHD720p;
