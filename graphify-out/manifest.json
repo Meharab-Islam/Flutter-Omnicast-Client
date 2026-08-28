@@ -6,16 +6,16 @@
     "semantic_hash": "94c6dec36fdc978b1754b1e6817038b5"
   },
   "test/omnicast_client_test.dart": {
-    "mtime": 1787891058.6893506,
-    "seen": 1787891077.127228,
-    "ast_hash": "4051cce630abb2940dfe44d1d58a8e55",
-    "semantic_hash": "4051cce630abb2940dfe44d1d58a8e55"
+    "mtime": 1787892466.578127,
+    "seen": 1787892475.321771,
+    "ast_hash": "855e99126a35a3437c3e62bf58cf8dd7",
+    "semantic_hash": "855e99126a35a3437c3e62bf58cf8dd7"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1787891308.5897746,
-    "seen": 1787891370.8809059,
-    "ast_hash": "2f760b7553730013dc75b89c149686e4",
-    "semantic_hash": "2f760b7553730013dc75b89c149686e4"
+    "mtime": 1787892404.0046673,
+    "seen": 1787892475.321463,
+    "ast_hash": "4847cae94a8700d828c9af878dbd8b83",
+    "semantic_hash": "4847cae94a8700d828c9af878dbd8b83"
   },
   "lib/src/media/media_stream_manager.dart": {
     "mtime": 1787891011.514537,
@@ -36,10 +36,10 @@
     "semantic_hash": "d17300e57da29eb0bcecfbb54730467d"
   },
   "lib/src/signaling/signaling_client.dart": {
-    "mtime": 1787891257.5458863,
-    "seen": 1787891370.8810759,
-    "ast_hash": "a302750d7ad29cb59c71baf5a7006048",
-    "semantic_hash": "a302750d7ad29cb59c71baf5a7006048"
+    "mtime": 1787892397.2957642,
+    "seen": 1787892475.321655,
+    "ast_hash": "f86ffa4034107958e566146f74429082",
+    "semantic_hash": "f86ffa4034107958e566146f74429082"
   },
   "lib/src/state/room_state.dart": {
     "mtime": 1787891455.9847312,
@@ -78,10 +78,10 @@
     "semantic_hash": "a41eaec52dd0236b9f25e2943a9ec46f"
   },
   "lib/src/core/omnicast_config.dart": {
-    "mtime": 1787890552.758653,
-    "seen": 1787890709.840999,
-    "ast_hash": "a6acf9c27706539f95e31e4a9133ad1f",
-    "semantic_hash": "a6acf9c27706539f95e31e4a9133ad1f"
+    "mtime": 1787892389.527145,
+    "seen": 1787892475.321464,
+    "ast_hash": "fa615b96c84391b10252f2620c9a6922",
+    "semantic_hash": "fa615b96c84391b10252f2620c9a6922"
   },
   "lib/src/interaction/interaction_manager.dart": {
     "mtime": 1787891299.1458297,
@@ -90,10 +90,10 @@
     "semantic_hash": "276e02e5707ff1e91c6b1b5cfb42f6ef"
   },
   "lib/src/media/media_controller.dart": {
-    "mtime": 1787892157.6680393,
-    "seen": 1787892204.368992,
-    "ast_hash": "b844b1018d39d5c874e3ee238a778d80",
-    "semantic_hash": "b844b1018d39d5c874e3ee238a778d80"
+    "mtime": 1787892420.3266618,
+    "seen": 1787892475.321484,
+    "ast_hash": "248fd6ea95e558207611e4f03385ae3a",
+    "semantic_hash": "248fd6ea95e558207611e4f03385ae3a"
   },
   "lib/src/models/interaction_models.dart": {
     "mtime": 1787890573.659098,
@@ -126,10 +126,10 @@
     "semantic_hash": "a41c6a77dcbd6cfc0114b960cc3b4945"
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1787892150.2053003,
-    "seen": 1787892204.3691578,
-    "ast_hash": "28e71824971bc3a8e6eaabcbbd87f10c",
-    "semantic_hash": "28e71824971bc3a8e6eaabcbbd87f10c"
+    "mtime": 1787892412.3911355,
+    "seen": 1787892475.3216379,
+    "ast_hash": "82bc64b26e2df1aabe74fa08f89aeb26",
+    "semantic_hash": "82bc64b26e2df1aabe74fa08f89aeb26"
   },
   "lib/src/seats/seat_manager.dart": {
     "mtime": 1787890682.2530243,

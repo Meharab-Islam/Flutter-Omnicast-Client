@@ -200,13 +200,18 @@ class RoomManager {
     activeViewersList.value = List.unmodifiable(currentList);
   }
 
-  /// Creates and starts a new live broadcasting room as Host.
+  /// Creates and starts a new live broadcasting room as Host using a secure JWT [token].
   Future<void> createRoom({
     required String roomId,
     required String userId,
+    required String token,
     RoomOptions options = const RoomOptions(),
     Map<String, dynamic>? metadata,
   }) async {
+    if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
+      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: token);
+    }
+
     _roomState.setSession(
       roomId: roomId,
       userId: userId,
@@ -236,6 +241,7 @@ class RoomManager {
       roomId: roomId,
       userId: userId,
       payload: {
+        'token': token,
         'options': options.toJson(),
         'sdp': offer.sdp,
         'type': offer.type,
@@ -244,12 +250,17 @@ class RoomManager {
     ));
   }
 
-  /// Joins an existing live room as a Viewer.
+  /// Joins an existing live room as a Viewer using a secure JWT [token].
   Future<void> joinRoom({
     required String roomId,
     required String userId,
+    required String token,
     Map<String, dynamic>? metadata,
   }) async {
+    if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
+      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: token);
+    }
+
     _roomState.setSession(
       roomId: roomId,
       userId: userId,
@@ -264,6 +275,7 @@ class RoomManager {
       roomId: roomId,
       userId: userId,
       payload: {
+        'token': token,
         'sdp': offer.sdp,
         'type': offer.type,
         'metadata': ?metadata,

@@ -4,20 +4,16 @@ import 'package:omnicast_client/omnicast_client.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('OmniCastConfig & Credentials', () {
-    test('generates valid signed auth token', () {
+  group('OmniCastConfig & Token Configuration', () {
+    test('creates valid token-based config without exposed secrets', () {
       const config = OmniCastConfig(
-        apiKey: 'test_api_key',
-        apiSecret: 'test_secret_123',
-        hostUrl: 'wss://sfu.omnicast.live/ws',
+        hostUrl: 'wss://omnilive.lolipoplive.top/ws',
+        heartbeatInterval: Duration(seconds: 15),
       );
 
-      final token = config.generateAuthToken(
-        userId: 'user_42',
-        roomId: 'room_101',
-      );
-
-      expect(token, isNotEmpty);
+      expect(config.hostUrl, 'wss://omnilive.lolipoplive.top/ws');
+      expect(config.heartbeatInterval, const Duration(seconds: 15));
+      expect(config.iceServers, isNotEmpty);
     });
   });
 

@@ -46,6 +46,8 @@ class SignalingClient {
   // Getters
   ClientConnectionState get connectionState => _connectionState;
   bool get isConnected => _connectionState == ClientConnectionState.connected;
+  String? get wsUrl => _wsUrl;
+  String? get token => _token;
 
   // Streams
   Stream<ClientConnectionState> get onConnectionStateChanged =>

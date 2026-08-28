@@ -107,14 +107,19 @@ class MediaController with WidgetsBindingObserver {
     }
   }
 
-  /// Starts local hardware media capture and publishes streams as Host with custom metadata.
+  /// Starts local hardware media capture and publishes streams as Host with custom metadata and JWT token.
   Future<void> startAsHost({
     required String roomId,
     required String userId,
+    required String token,
     Map<String, dynamic>? metadata,
     VideoParameters? videoParameters,
     bool enableSimulcast = true,
   }) async {
+    if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
+      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: token);
+    }
+
     final params = videoParameters ?? currentParameters;
     await _mediaStreamManager.openUserMedia(
       audio: true,
@@ -132,6 +137,7 @@ class MediaController with WidgetsBindingObserver {
       roomId: roomId,
       userId: userId,
       payload: {
+        'token': token,
         'sdp': offer.sdp,
         'type': offer.type,
         'simulcast': enableSimulcast,

@@ -63,17 +63,14 @@ class OmniCastClient {
     _bindInternalEventListeners();
   }
 
-  /// Initializes the [OmniCastClient] SDK using API credentials and SFU host URL.
+  /// Initializes the [OmniCastClient] SDK using SFU host URL and optional token.
   static Future<OmniCastClient> init({
-    required String apiKey,
-    required String apiSecret,
     required String hostUrl,
+    String? token,
     List<Map<String, dynamic>>? iceServers,
     Duration heartbeatInterval = const Duration(seconds: 15),
   }) async {
     final config = OmniCastConfig(
-      apiKey: apiKey,
-      apiSecret: apiSecret,
       hostUrl: hostUrl,
       iceServers: iceServers ??
           const [
@@ -84,7 +81,7 @@ class OmniCastClient {
     );
 
     final client = OmniCastClient._(config: config);
-    await client._signalingClient.connect(wsUrl: hostUrl);
+    await client._signalingClient.connect(wsUrl: hostUrl, token: token);
     return client;
   }
 
