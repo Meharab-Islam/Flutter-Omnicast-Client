@@ -121,10 +121,12 @@ void main() {
       final signaling = SignalingClient();
       final webRTC = WebRTCManager(mediaStreamManager: streamManager);
 
+      final roomState = RoomState();
       final controller = MediaController(
         mediaStreamManager: streamManager,
         signalingClient: signaling,
         webRTCManager: webRTC,
+        roomState: roomState,
         autoPauseOnBackground: true,
       );
 

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../interaction/interaction_manager.dart';
 import '../media/media_controller.dart';
 import '../media/media_stream_manager.dart';
+import '../media/global_media_config.dart';
 import '../models/room_models.dart';
 import '../models/seat_models.dart';
 import '../models/signaling_message.dart';
@@ -24,6 +26,7 @@ import 'omnicast_config.dart';
 /// - [state]: [RoomState] (reactive global state container)
 class OmniCastClient {
   final OmniCastConfig config;
+  final GlobalMediaConfig mediaConfig;
   final SignalingClient _signalingClient;
   final MediaStreamManager _mediaStreamManager;
   final WebRTCManager _webRTCManager;
@@ -41,6 +44,7 @@ class OmniCastClient {
 
   OmniCastClient._({
     required this.config,
+    this.mediaConfig = const GlobalMediaConfig(),
     SignalingClient? signalingClient,
     MediaStreamManager? mediaStreamManager,
     WebRTCManager? webRTCManager,
@@ -63,10 +67,12 @@ class OmniCastClient {
     _bindInternalEventListeners();
   }
 
-  /// Initializes the [OmniCastClient] SDK using SFU host URL and optional token.
+  /// Initializes the [OmniCastClient] SDK using SFU host URL, optional [GlobalMediaConfig], and token.
   static Future<OmniCastClient> init({
     required String hostUrl,
+    GlobalMediaConfig? mediaConfig,
     String? token,
+    bool autoConnect = true,
     List<Map<String, dynamic>>? iceServers,
     Duration heartbeatInterval = const Duration(seconds: 15),
   }) async {
@@ -80,8 +86,17 @@ class OmniCastClient {
       heartbeatInterval: heartbeatInterval,
     );
 
-    final client = OmniCastClient._(config: config);
-    await client._signalingClient.connect(wsUrl: hostUrl, token: token);
+    final client = OmniCastClient._(
+      config: config,
+      mediaConfig: mediaConfig ?? const GlobalMediaConfig(),
+    );
+    if (autoConnect) {
+      try {
+        await client._signalingClient.connect(wsUrl: hostUrl, token: token);
+      } catch (e) {
+        debugPrint('[OmniCastClient] Initial connection deferred or offline: $e');
+      }
+    }
     return client;
   }
 
@@ -96,6 +111,8 @@ class OmniCastClient {
       mediaStreamManager: _mediaStreamManager,
       signalingClient: _signalingClient,
       webRTCManager: _webRTCManager,
+      roomState: _roomState,
+      globalConfig: mediaConfig,
     );
 
     _seatManager = SeatManager(

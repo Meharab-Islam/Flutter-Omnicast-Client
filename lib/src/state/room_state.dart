@@ -11,6 +11,7 @@ class RoomState extends ChangeNotifier {
   String? _hostId;
   String? _userId;
   UserRole _role = UserRole.viewer;
+  RoomType _roomType = RoomType.video;
   ClientConnectionState _connectionState = ClientConnectionState.disconnected;
 
   int _viewersCount = 0;
@@ -33,6 +34,8 @@ class RoomState extends ChangeNotifier {
   String? get hostId => _hostId;
   String? get userId => _userId;
   UserRole get role => _role;
+  RoomType get roomType => _roomType;
+  bool get isAudioOnly => _roomType == RoomType.audio;
   ClientConnectionState get connectionState => _connectionState;
 
   int get viewersCount => _viewersCount;
@@ -64,16 +67,18 @@ class RoomState extends ChangeNotifier {
   bool get isViewer => _role == UserRole.viewer;
   bool get isInRoom => _roomId != null && _roomId!.isNotEmpty;
 
-  /// Sets up room session identity and role.
+  /// Sets up room session identity, role, and modality.
   void setSession({
     required String roomId,
     required String userId,
     required UserRole role,
+    RoomType roomType = RoomType.video,
     String? hostId,
   }) {
     _roomId = roomId;
     _userId = userId;
     _role = role;
+    _roomType = roomType;
     _hostId = hostId ?? (role == UserRole.host ? userId : null);
     notifyListeners();
   }
@@ -92,10 +97,21 @@ class RoomState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates room type (audio-only vs video).
+  void updateRoomType(RoomType type) {
+    if (_roomType == type) return;
+    _roomType = type;
+    notifyListeners();
+  }
+
   /// Synchronizes full room info on join or late-join (`room_info_sync`).
   void syncRoomInfo(Map<String, dynamic> data) {
     _roomId = data['room_id'] as String? ?? _roomId;
     _hostId = data['host_id'] as String? ?? _hostId;
+    final typeStr = data['room_type'] as String?;
+    if (typeStr != null) {
+      _roomType = typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video;
+    }
     _viewersCount = (data['viewers_count'] as num?)?.toInt() ??
         (data['viewer_count'] as num?)?.toInt() ??
         _viewersCount;

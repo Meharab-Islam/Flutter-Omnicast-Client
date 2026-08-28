@@ -57,10 +57,12 @@ void main() {
       final streamManager = MediaStreamManager();
       final webRTC = WebRTCManager(mediaStreamManager: streamManager);
 
+      final roomState = RoomState();
       final controller = MediaController(
         mediaStreamManager: streamManager,
         signalingClient: signaling,
         webRTCManager: webRTC,
+        roomState: roomState,
       );
 
       expect(controller.currentSimulcastLayer, 'f');

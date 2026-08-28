@@ -34,6 +34,7 @@ void main() {
         mediaStreamManager: mediaStreamManager,
         signalingClient: signalingClient,
         webRTCManager: webRTCManager,
+        roomState: roomState,
       );
 
       final seatManager = SeatManager(

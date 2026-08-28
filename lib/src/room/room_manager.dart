@@ -216,10 +216,19 @@ class RoomManager {
       roomId: roomId,
       userId: userId,
       role: UserRole.host,
+      roomType: options.roomType,
     );
 
-    // Open media & add tracks
-    if (options.enableAudio || options.enableVideo) {
+    // Open media & add tracks (Strict 0% video bandwidth enforcement for Audio-Only rooms)
+    if (options.isAudioOnly) {
+      await _webRTCManager.mediaStreamManager.openUserMedia(
+        audio: true,
+        video: false,
+      );
+      await _webRTCManager.addLocalMediaTracks(
+        enableSimulcast: false,
+      );
+    } else if (options.enableAudio || options.enableVideo) {
       await _webRTCManager.mediaStreamManager.openUserMedia(
         audio: options.enableAudio,
         video: options.enableVideo,

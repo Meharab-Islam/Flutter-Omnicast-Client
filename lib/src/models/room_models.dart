@@ -1,3 +1,9 @@
+/// Room broadcasting modality (Video vs. Audio-Only).
+enum RoomType {
+  video,
+  audio,
+}
+
 /// User role in a live room session.
 enum UserRole {
   viewer,
@@ -16,6 +22,7 @@ enum ClientConnectionState {
 /// Options passed when creating a new live broadcasting room.
 class RoomOptions {
   final String title;
+  final RoomType roomType;
   final bool enableAudio;
   final bool enableVideo;
   final bool enableSimulcast;
@@ -25,6 +32,7 @@ class RoomOptions {
 
   const RoomOptions({
     this.title = 'Live Stream',
+    this.roomType = RoomType.video,
     this.enableAudio = true,
     this.enableVideo = true,
     this.enableSimulcast = true,
@@ -33,15 +41,34 @@ class RoomOptions {
     this.metadata,
   });
 
+  bool get isAudioOnly => roomType == RoomType.audio;
+
   Map<String, dynamic> toJson() => {
         'title': title,
+        'room_type': roomType.name,
         'enable_audio': enableAudio,
-        'enable_video': enableVideo,
-        'enable_simulcast': enableSimulcast,
+        'enable_video': isAudioOnly ? false : enableVideo,
+        'enable_simulcast': isAudioOnly ? false : enableSimulcast,
         'enable_dynacast': enableDynacast,
         'max_co_hosts': maxCoHosts,
         'metadata': ?metadata,
       };
+
+  factory RoomOptions.fromJson(Map<String, dynamic> json) {
+    final typeStr = json['room_type'] as String? ?? 'video';
+    final roomType = typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video;
+
+    return RoomOptions(
+      title: json['title'] as String? ?? 'Live Stream',
+      roomType: roomType,
+      enableAudio: json['enable_audio'] as bool? ?? true,
+      enableVideo: roomType == RoomType.audio ? false : (json['enable_video'] as bool? ?? true),
+      enableSimulcast: roomType == RoomType.audio ? false : (json['enable_simulcast'] as bool? ?? true),
+      enableDynacast: json['enable_dynacast'] as bool? ?? true,
+      maxCoHosts: (json['max_co_hosts'] as num?)?.toInt() ?? 4,
+      metadata: json['metadata'] as Map<String, dynamic>?,
+    );
+  }
 }
 
 /// Information describing a participant / live viewer inside an OmniCast room.
