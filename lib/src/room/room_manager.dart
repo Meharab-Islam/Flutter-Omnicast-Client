@@ -7,15 +7,21 @@ import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
 
-/// Manages room lifecycle (create, join, leave, kick) and provides atomic [ValueNotifier]
-/// state providers for headless, granular UI reactivity.
+/// Manages room lifecycle, participant tracking, and provides granular [ValueNotifier]
+/// state providers with event batch throttling for high-scale rooms (10,000+ viewers).
 class RoomManager {
   final SignalingClient _signalingClient;
   final WebRTCManager _webRTCManager;
   final RoomState _roomState;
 
+  // Maximum active viewer avatar objects kept in UI memory
+  static const int maxViewersInMemory = 200;
+
   // Granular atomic ValueNotifiers for headless UI composition
-  final ValueNotifier<int> viewerCountNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> totalViewerCount = ValueNotifier<int>(0);
+  final ValueNotifier<List<OmniCastParticipant>> activeViewersList =
+      ValueNotifier<List<OmniCastParticipant>>(const []);
+
   final ValueNotifier<ClientConnectionState> connectionStateNotifier =
       ValueNotifier<ClientConnectionState>(ClientConnectionState.disconnected);
   final ValueNotifier<UserRole> roleNotifier =
@@ -23,8 +29,16 @@ class RoomManager {
   final ValueNotifier<List<StageSeat>> activeSeatsNotifier =
       ValueNotifier<List<StageSeat>>(const []);
   final ValueNotifier<String?> pinnedUserNotifier = ValueNotifier<String?>(null);
-  final ValueNotifier<List<Participant>> viewersNotifier =
-      ValueNotifier<List<Participant>>(const []);
+
+  // Backward compatibility alias getters
+  ValueNotifier<int> get viewerCountNotifier => totalViewerCount;
+  ValueNotifier<List<OmniCastParticipant>> get viewersNotifier => activeViewersList;
+
+  // Internal high-frequency event batching queue
+  final List<OmniCastParticipant> _pendingJoins = [];
+  final Set<String> _pendingLeaves = {};
+  Timer? _batchDebounceTimer;
+  StreamSubscription? _signalingSubscription;
 
   RoomManager({
     required SignalingClient signalingClient,
@@ -33,6 +47,7 @@ class RoomManager {
   })  : _signalingClient = signalingClient,
         _webRTCManager = webRTCManager,
         _roomState = roomState {
+    _bindSignalingEvents();
     _bindStateNotifiers();
   }
 
@@ -41,8 +56,8 @@ class RoomManager {
   }
 
   void _syncGranularNotifiers() {
-    if (viewerCountNotifier.value != _roomState.viewersCount) {
-      viewerCountNotifier.value = _roomState.viewersCount;
+    if (totalViewerCount.value != _roomState.viewersCount) {
+      totalViewerCount.value = _roomState.viewersCount;
     }
     if (connectionStateNotifier.value != _roomState.connectionState) {
       connectionStateNotifier.value = _roomState.connectionState;
@@ -54,7 +69,135 @@ class RoomManager {
       pinnedUserNotifier.value = _roomState.pinnedStageUserId;
     }
     activeSeatsNotifier.value = _roomState.activeSeats;
-    viewersNotifier.value = _roomState.viewers;
+    activeViewersList.value = _roomState.viewers;
+  }
+
+  /// Listens to real-time participant signaling events with high-performance debouncing.
+  void _bindSignalingEvents() {
+    _signalingSubscription = _signalingClient.onMessage.listen((msg) {
+      switch (msg.event) {
+        // 1. Initial Snapshot on Join
+        case SignalingEvents.roomInfoSync:
+          if (msg.payload is Map<String, dynamic>) {
+            _handleRoomInfoSync(msg.payload as Map<String, dynamic>);
+          }
+          break;
+
+        // 2. Real-time User Joined Event
+        case SignalingEvents.userJoined:
+          if (msg.payload is Map<String, dynamic>) {
+            final participant = OmniCastParticipant.fromJson(
+              msg.payload as Map<String, dynamic>,
+            );
+            _queueUserJoined(participant);
+          } else {
+            final participant = OmniCastParticipant(
+              userId: msg.userId,
+              joinedAt: DateTime.now(),
+            );
+            _queueUserJoined(participant);
+          }
+          break;
+
+        // 3. Real-time User Left Event
+        case SignalingEvents.userLeft:
+          final leftUserId = msg.payload is Map && msg.payload['user_id'] != null
+              ? msg.payload['user_id'].toString()
+              : msg.userId;
+          _queueUserLeft(leftUserId);
+          break;
+
+        // 4. Batch Viewer Count Sync
+        case SignalingEvents.viewerUpdate:
+          if (msg.payload is Map<String, dynamic>) {
+            final payload = msg.payload as Map<String, dynamic>;
+            final count = (payload['viewers_count'] as num?)?.toInt() ??
+                (payload['viewer_count'] as num?)?.toInt() ??
+                0;
+            totalViewerCount.value = count;
+            if (payload['viewers'] is List) {
+              final viewers = (payload['viewers'] as List)
+                  .map((e) => OmniCastParticipant.fromJson(e as Map<String, dynamic>))
+                  .take(maxViewersInMemory)
+                  .toList();
+              activeViewersList.value = viewers;
+            }
+          }
+          break;
+      }
+    });
+  }
+
+  void _handleRoomInfoSync(Map<String, dynamic> data) {
+    final count = (data['viewers_count'] as num?)?.toInt() ??
+        (data['viewer_count'] as num?)?.toInt() ??
+        0;
+    totalViewerCount.value = count;
+
+    if (data['viewers'] is List) {
+      final list = (data['viewers'] as List)
+          .map((e) => OmniCastParticipant.fromJson(e as Map<String, dynamic>))
+          .take(maxViewersInMemory)
+          .toList();
+      activeViewersList.value = list;
+    }
+  }
+
+  /// Queues user joined event with micro-batch throttle (50ms) to eliminate UI thread frame drops.
+  void _queueUserJoined(OmniCastParticipant participant) {
+    _roomState.addParticipant(participant);
+
+    _pendingLeaves.remove(participant.userId);
+    _pendingJoins.add(participant);
+
+    totalViewerCount.value++;
+    _scheduleBatchFlush();
+  }
+
+  /// Queues user left event with micro-batch throttle.
+  void _queueUserLeft(String userId) {
+    _roomState.removeParticipant(userId);
+
+    _pendingJoins.removeWhere((p) => p.userId == userId);
+    _pendingLeaves.add(userId);
+
+    if (totalViewerCount.value > 0) {
+      totalViewerCount.value--;
+    }
+    _scheduleBatchFlush();
+  }
+
+  void _scheduleBatchFlush() {
+    _batchDebounceTimer?.cancel();
+    _batchDebounceTimer = Timer(const Duration(milliseconds: 50), _flushParticipantBatch);
+  }
+
+  void _flushParticipantBatch() {
+    if (_pendingJoins.isEmpty && _pendingLeaves.isEmpty) return;
+
+    final currentList = List<OmniCastParticipant>.from(activeViewersList.value);
+
+    // Apply leaves
+    if (_pendingLeaves.isNotEmpty) {
+      currentList.removeWhere((p) => _pendingLeaves.contains(p.userId));
+      _pendingLeaves.clear();
+    }
+
+    // Apply joins (prepend latest)
+    if (_pendingJoins.isNotEmpty) {
+      for (final p in _pendingJoins.reversed) {
+        currentList.removeWhere((existing) => existing.userId == p.userId);
+        currentList.insert(0, p);
+      }
+      _pendingJoins.clear();
+    }
+
+    // Cap to maximum viewers in UI memory
+    if (currentList.length > maxViewersInMemory) {
+      currentList.removeRange(maxViewersInMemory, currentList.length);
+    }
+
+    activeViewersList.value = List.unmodifiable(currentList);
   }
 
   /// Creates and starts a new live broadcasting room as Host.
@@ -146,14 +289,17 @@ class RoomManager {
     ));
   }
 
-  /// Disposes granular notifiers.
+  /// Disposes granular notifiers, timers, and subscriptions.
   void dispose() {
+    _batchDebounceTimer?.cancel();
+    _signalingSubscription?.cancel();
     _roomState.removeListener(_syncGranularNotifiers);
-    viewerCountNotifier.dispose();
+
+    totalViewerCount.dispose();
+    activeViewersList.dispose();
     connectionStateNotifier.dispose();
     roleNotifier.dispose();
     activeSeatsNotifier.dispose();
     pinnedUserNotifier.dispose();
-    viewersNotifier.dispose();
   }
 }

@@ -1,58 +1,8 @@
 {
   "communities": {
     "0": [
+      "clientconnectionstate",
       "clientconnectionstate_get",
-      "lib_src_state_room_state",
-      "lib_src_state_room_state_activepk",
-      "lib_src_state_room_state_activeremoteuserids",
-      "lib_src_state_room_state_activeseats",
-      "lib_src_state_room_state_addactiveremoteuser",
-      "lib_src_state_room_state_addchatmessage",
-      "lib_src_state_room_state_addinvite",
-      "lib_src_state_room_state_addseatrequest",
-      "lib_src_state_room_state_chathistory",
-      "lib_src_state_room_state_connectionstate",
-      "lib_src_state_room_state_endpkbattle",
-      "lib_src_state_room_state_hostcoinbalance",
-      "lib_src_state_room_state_hostid",
-      "lib_src_state_room_state_iscohost",
-      "lib_src_state_room_state_ishost",
-      "lib_src_state_room_state_isinpkbattle",
-      "lib_src_state_room_state_isinroom",
-      "lib_src_state_room_state_isviewer",
-      "lib_src_state_room_state_pendinginvites",
-      "lib_src_state_room_state_pendingseatrequests",
-      "lib_src_state_room_state_pinnedstageuserid",
-      "lib_src_state_room_state_pkstate",
-      "lib_src_state_room_state_processgift",
-      "lib_src_state_room_state_recentgifts",
-      "lib_src_state_room_state_removeactiveremoteuser",
-      "lib_src_state_room_state_removeinvite",
-      "lib_src_state_room_state_removeseatrequest",
-      "lib_src_state_room_state_removestageseat",
-      "lib_src_state_room_state_reset",
-      "lib_src_state_room_state_role",
-      "lib_src_state_room_state_roomid",
-      "lib_src_state_room_state_setpinnedstageuser",
-      "lib_src_state_room_state_setsession",
-      "lib_src_state_room_state_syncroominfo",
-      "lib_src_state_room_state_updatebalance",
-      "lib_src_state_room_state_updateconnectionstate",
-      "lib_src_state_room_state_updatepkbattle",
-      "lib_src_state_room_state_updatepkscore",
-      "lib_src_state_room_state_updatepktimer",
-      "lib_src_state_room_state_updaterole",
-      "lib_src_state_room_state_updatestageseat",
-      "lib_src_state_room_state_updateviewers",
-      "lib_src_state_room_state_usercoinbalance",
-      "lib_src_state_room_state_userid",
-      "lib_src_state_room_state_viewers",
-      "lib_src_state_room_state_viewerscount",
-      "pkbattleinfo_get",
-      "set",
-      "userrole_get"
-    ],
-    "1": [
       "lib_src_signaling_signaling_client",
       "lib_src_signaling_signaling_client_answercontroller",
       "lib_src_signaling_signaling_client_channel",
@@ -104,7 +54,7 @@
       "package_web_socket_channel_web_socket_channel_dart",
       "websocketchannel"
     ],
-    "2": [
+    "1": [
       "lib_src_models_signaling_message",
       "lib_src_models_signaling_message_answer",
       "lib_src_models_signaling_message_balanceupdate",
@@ -152,60 +102,65 @@
       "lib_src_models_signaling_message_trackresume",
       "lib_src_models_signaling_message_trydeserialize",
       "lib_src_models_signaling_message_userid",
+      "lib_src_models_signaling_message_userjoined",
+      "lib_src_models_signaling_message_userleft",
       "lib_src_models_signaling_message_viewerupdate",
       "static_const_string"
     ],
-    "3": [
-      "datetime",
-      "lib_src_models_interaction_models",
-      "lib_src_models_interaction_models_amount",
-      "lib_src_models_interaction_models_balanceupdate",
-      "lib_src_models_interaction_models_chatmessage",
-      "lib_src_models_interaction_models_coinvalue",
-      "lib_src_models_interaction_models_delta",
-      "lib_src_models_interaction_models_fromjson",
-      "lib_src_models_interaction_models_giftevent",
-      "lib_src_models_interaction_models_gifticonurl",
-      "lib_src_models_interaction_models_giftid",
-      "lib_src_models_interaction_models_giftname",
-      "lib_src_models_interaction_models_hosttotalcoins",
-      "lib_src_models_interaction_models_id",
-      "lib_src_models_interaction_models_newbalance",
-      "lib_src_models_interaction_models_reason",
-      "lib_src_models_interaction_models_senderavatar",
-      "lib_src_models_interaction_models_senderid",
-      "lib_src_models_interaction_models_senderlevel",
-      "lib_src_models_interaction_models_sendername",
-      "lib_src_models_interaction_models_targetuserid",
-      "lib_src_models_interaction_models_text",
-      "lib_src_models_interaction_models_timestamp",
-      "lib_src_models_interaction_models_tojson",
-      "lib_src_models_interaction_models_userid",
-      "lib_src_models_room_models",
-      "lib_src_models_room_models_avatarurl",
-      "lib_src_models_room_models_clientconnectionstate",
-      "lib_src_models_room_models_displayname",
-      "lib_src_models_room_models_enableaudio",
-      "lib_src_models_room_models_enabledynacast",
-      "lib_src_models_room_models_enablesimulcast",
-      "lib_src_models_room_models_enablevideo",
-      "lib_src_models_room_models_fromjson",
-      "lib_src_models_room_models_isaudiomuted",
-      "lib_src_models_room_models_isvideomuted",
-      "lib_src_models_room_models_joinedat",
-      "lib_src_models_room_models_maxcohosts",
-      "lib_src_models_room_models_metadata",
-      "lib_src_models_room_models_participant",
-      "lib_src_models_room_models_role",
-      "lib_src_models_room_models_roomoptions",
-      "lib_src_models_room_models_title",
-      "lib_src_models_room_models_tojson",
-      "lib_src_models_room_models_userid",
-      "lib_src_models_room_models_userrole",
-      "map",
-      "string"
+    "2": [
+      "lib_src_state_room_state",
+      "lib_src_state_room_state_activepk",
+      "lib_src_state_room_state_activeremoteuserids",
+      "lib_src_state_room_state_activeseats",
+      "lib_src_state_room_state_addactiveremoteuser",
+      "lib_src_state_room_state_addchatmessage",
+      "lib_src_state_room_state_addinvite",
+      "lib_src_state_room_state_addparticipant",
+      "lib_src_state_room_state_addseatrequest",
+      "lib_src_state_room_state_chathistory",
+      "lib_src_state_room_state_connectionstate",
+      "lib_src_state_room_state_endpkbattle",
+      "lib_src_state_room_state_hostcoinbalance",
+      "lib_src_state_room_state_hostid",
+      "lib_src_state_room_state_iscohost",
+      "lib_src_state_room_state_ishost",
+      "lib_src_state_room_state_isinpkbattle",
+      "lib_src_state_room_state_isinroom",
+      "lib_src_state_room_state_isviewer",
+      "lib_src_state_room_state_pendinginvites",
+      "lib_src_state_room_state_pendingseatrequests",
+      "lib_src_state_room_state_pinnedstageuserid",
+      "lib_src_state_room_state_pkstate",
+      "lib_src_state_room_state_processgift",
+      "lib_src_state_room_state_recentgifts",
+      "lib_src_state_room_state_removeactiveremoteuser",
+      "lib_src_state_room_state_removeinvite",
+      "lib_src_state_room_state_removeparticipant",
+      "lib_src_state_room_state_removeseatrequest",
+      "lib_src_state_room_state_removestageseat",
+      "lib_src_state_room_state_reset",
+      "lib_src_state_room_state_role",
+      "lib_src_state_room_state_roomid",
+      "lib_src_state_room_state_setpinnedstageuser",
+      "lib_src_state_room_state_setsession",
+      "lib_src_state_room_state_syncroominfo",
+      "lib_src_state_room_state_updatebalance",
+      "lib_src_state_room_state_updateconnectionstate",
+      "lib_src_state_room_state_updatepkbattle",
+      "lib_src_state_room_state_updatepkscore",
+      "lib_src_state_room_state_updatepktimer",
+      "lib_src_state_room_state_updaterole",
+      "lib_src_state_room_state_updatestageseat",
+      "lib_src_state_room_state_updateviewers",
+      "lib_src_state_room_state_usercoinbalance",
+      "lib_src_state_room_state_userid",
+      "lib_src_state_room_state_viewers",
+      "lib_src_state_room_state_viewerscount",
+      "pkbattleinfo",
+      "pkbattleinfo_get",
+      "userrole_get"
     ],
-    "4": [
+    "3": [
       "alignment",
       "duration",
       "giftevent",
@@ -245,60 +200,13 @@
       "lib_src_widgets_omnicast_video_view_omnicastvideoview",
       "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
       "list",
-      "models_interaction_models_dart",
       "package_crypto_crypto_dart",
       "state",
       "statefulwidget",
       "streamsubscription",
       "timer"
     ],
-    "5": [
-      "axis",
-      "lib_src_widgets_omnicast_pk_battle_view",
-      "lib_src_widgets_omnicast_pk_battle_view_build",
-      "lib_src_widgets_omnicast_pk_battle_view_buildvideopane",
-      "lib_src_widgets_omnicast_pk_battle_view_hostdisplayname",
-      "lib_src_widgets_omnicast_pk_battle_view_hostplaceholder",
-      "lib_src_widgets_omnicast_pk_battle_view_hostuserid",
-      "lib_src_widgets_omnicast_pk_battle_view_mediastreammanager",
-      "lib_src_widgets_omnicast_pk_battle_view_objectfit",
-      "lib_src_widgets_omnicast_pk_battle_view_opponentdisplayname",
-      "lib_src_widgets_omnicast_pk_battle_view_opponentplaceholder",
-      "lib_src_widgets_omnicast_pk_battle_view_opponentuserid",
-      "lib_src_widgets_omnicast_pk_battle_view_pkstate",
-      "lib_src_widgets_omnicast_pk_battle_view_showprogressbar",
-      "lib_src_widgets_omnicast_pk_battle_view_spacing",
-      "lib_src_widgets_omnicast_pk_battle_view_splitaxis",
-      "lib_src_widgets_omnicast_video_view",
-      "lib_src_widgets_omnicast_video_view_build",
-      "lib_src_widgets_omnicast_video_view_checkadaptivestreaming",
-      "lib_src_widgets_omnicast_video_view_cleanuprenderer",
-      "lib_src_widgets_omnicast_video_view_createstate",
-      "lib_src_widgets_omnicast_video_view_didupdatewidget",
-      "lib_src_widgets_omnicast_video_view_dispose",
-      "lib_src_widgets_omnicast_video_view_enableadaptivestreaming",
-      "lib_src_widgets_omnicast_video_view_initializelazyrenderer",
-      "lib_src_widgets_omnicast_video_view_initstate",
-      "lib_src_widgets_omnicast_video_view_ismounted",
-      "lib_src_widgets_omnicast_video_view_lastadaptivelayer",
-      "lib_src_widgets_omnicast_video_view_mediacontroller",
-      "lib_src_widgets_omnicast_video_view_mediastreammanager",
-      "lib_src_widgets_omnicast_video_view_mirror",
-      "lib_src_widgets_omnicast_video_view_objectfit",
-      "lib_src_widgets_omnicast_video_view_placeholder",
-      "lib_src_widgets_omnicast_video_view_renderer",
-      "lib_src_widgets_omnicast_video_view_userid",
-      "media_media_controller_dart",
-      "media_media_stream_manager_dart",
-      "mediastreammanager",
-      "omnicast_video_view_dart",
-      "package_flutter_webrtc_flutter_webrtc_dart",
-      "pk_score_progress_bar_dart",
-      "rtcvideorenderer",
-      "rtcvideoviewobjectfit",
-      "widget"
-    ],
-    "6": [
+    "4": [
       "interaction_interaction_manager_dart",
       "interactionmanager_get",
       "lib_src_core_omnicast_client",
@@ -341,10 +249,48 @@
       "seats_seat_manager_dart",
       "signalingclient_get"
     ],
-    "7": [
+    "5": [
+      "changenotifier",
+      "lib_src_room_room_manager",
+      "lib_src_room_room_manager_activeseatsnotifier",
+      "lib_src_room_room_manager_activeviewerslist",
+      "lib_src_room_room_manager_batchdebouncetimer",
+      "lib_src_room_room_manager_bindsignalingevents",
+      "lib_src_room_room_manager_bindstatenotifiers",
+      "lib_src_room_room_manager_connectionstatenotifier",
+      "lib_src_room_room_manager_createroom",
+      "lib_src_room_room_manager_dispose",
+      "lib_src_room_room_manager_flushparticipantbatch",
+      "lib_src_room_room_manager_handleroominfosync",
+      "lib_src_room_room_manager_joinroom",
+      "lib_src_room_room_manager_kickuser",
+      "lib_src_room_room_manager_leaveroom",
+      "lib_src_room_room_manager_maxviewersinmemory",
+      "lib_src_room_room_manager_pendingjoins",
+      "lib_src_room_room_manager_pendingleaves",
+      "lib_src_room_room_manager_pinnedusernotifier",
+      "lib_src_room_room_manager_queueuserjoined",
+      "lib_src_room_room_manager_queueuserleft",
+      "lib_src_room_room_manager_rolenotifier",
+      "lib_src_room_room_manager_roommanager",
+      "lib_src_room_room_manager_roomstate",
+      "lib_src_room_room_manager_schedulebatchflush",
+      "lib_src_room_room_manager_signalingclient",
+      "lib_src_room_room_manager_signalingsubscription",
+      "lib_src_room_room_manager_syncgranularnotifiers",
+      "lib_src_room_room_manager_totalviewercount",
+      "lib_src_room_room_manager_viewercountnotifier",
+      "lib_src_room_room_manager_viewersnotifier",
+      "lib_src_room_room_manager_webrtcmanager",
+      "lib_src_state_room_state_roomstate",
+      "models_seat_models_dart",
+      "set",
+      "signalingclient",
+      "static_const_int"
+    ],
+    "6": [
       "double_get",
       "duration_get",
-      "int_get",
       "lib_src_models_pk_models",
       "lib_src_models_pk_models_battleid",
       "lib_src_models_pk_models_copywith",
@@ -381,7 +327,7 @@
       "lib_src_models_pk_models_totalscore",
       "static_const_pkstate"
     ],
-    "8": [
+    "7": [
       "lib_src_media_media_controller",
       "lib_src_media_media_controller_adaptivestreamingenabled",
       "lib_src_media_media_controller_autopauseonbackground",
@@ -417,7 +363,7 @@
       "string_get",
       "widgetsbindingobserver"
     ],
-    "9": [
+    "8": [
       "lib_src_webrtc_webrtc_manager",
       "lib_src_webrtc_webrtc_manager_addlocalmediatracks",
       "lib_src_webrtc_webrtc_manager_addremotecandidate",
@@ -450,10 +396,9 @@
       "rtcpeerconnection",
       "rtcpeerconnection_get",
       "rtcrtpsender",
-      "rtcrtpsender_get",
-      "typedef"
+      "rtcrtpsender_get"
     ],
-    "10": [
+    "9": [
       "lib_src_pk_pk_manager",
       "lib_src_pk_pk_manager_acceptpkrequest",
       "lib_src_pk_pk_manager_bindstatenotifiers",
@@ -487,8 +432,9 @@
       "pkstate_get",
       "webrtcmanager_get"
     ],
-    "11": [
+    "10": [
       "bool_get",
+      "datetime",
       "interaction_models_dart",
       "lib_src_models_room_event_models",
       "lib_src_models_seat_models",
@@ -517,6 +463,36 @@
       "seat_models_dart",
       "signaling_message_dart"
     ],
+    "11": [
+      "int_get",
+      "lib_src_models_room_models",
+      "lib_src_models_room_models_avatarurl",
+      "lib_src_models_room_models_clientconnectionstate",
+      "lib_src_models_room_models_copywith",
+      "lib_src_models_room_models_displayname",
+      "lib_src_models_room_models_enableaudio",
+      "lib_src_models_room_models_enabledynacast",
+      "lib_src_models_room_models_enablesimulcast",
+      "lib_src_models_room_models_enablevideo",
+      "lib_src_models_room_models_fromjson",
+      "lib_src_models_room_models_hashcode",
+      "lib_src_models_room_models_isaudiomuted",
+      "lib_src_models_room_models_isvideomuted",
+      "lib_src_models_room_models_joinedat",
+      "lib_src_models_room_models_maxcohosts",
+      "lib_src_models_room_models_metadata",
+      "lib_src_models_room_models_omnicastparticipant",
+      "lib_src_models_room_models_operator",
+      "lib_src_models_room_models_participant",
+      "lib_src_models_room_models_role",
+      "lib_src_models_room_models_roomoptions",
+      "lib_src_models_room_models_title",
+      "lib_src_models_room_models_tojson",
+      "lib_src_models_room_models_userid",
+      "lib_src_models_room_models_userrole",
+      "map",
+      "typedef"
+    ],
     "12": [
       "lib_src_media_media_stream_manager",
       "lib_src_media_media_stream_manager_attachremotestream",
@@ -542,6 +518,7 @@
       "lib_src_media_media_stream_manager_togglevideo",
       "mediastream",
       "mediastream_get",
+      "package_flutter_foundation_dart",
       "rtcvideorenderer_get",
       "video_parameters_dart",
       "videoparameters_get"
@@ -568,35 +545,88 @@
       "lib_src_interaction_interaction_manager_signalingclient",
       "lib_src_interaction_interaction_manager_syncinteractionnotifiers",
       "lib_src_interaction_interaction_manager_userbalancenotifier",
-      "package_flutter_foundation_dart",
+      "models_interaction_models_dart",
       "roomstate",
-      "stream"
-    ],
-    "14": [
-      "clientconnectionstate",
-      "lib_src_room_room_manager",
-      "lib_src_room_room_manager_activeseatsnotifier",
-      "lib_src_room_room_manager_bindstatenotifiers",
-      "lib_src_room_room_manager_connectionstatenotifier",
-      "lib_src_room_room_manager_createroom",
-      "lib_src_room_room_manager_dispose",
-      "lib_src_room_room_manager_joinroom",
-      "lib_src_room_room_manager_kickuser",
-      "lib_src_room_room_manager_leaveroom",
-      "lib_src_room_room_manager_pinnedusernotifier",
-      "lib_src_room_room_manager_rolenotifier",
-      "lib_src_room_room_manager_roommanager",
-      "lib_src_room_room_manager_roomstate",
-      "lib_src_room_room_manager_signalingclient",
-      "lib_src_room_room_manager_syncgranularnotifiers",
-      "lib_src_room_room_manager_viewercountnotifier",
-      "lib_src_room_room_manager_viewersnotifier",
-      "lib_src_room_room_manager_webrtcmanager",
-      "models_seat_models_dart",
-      "userrole",
+      "stream",
       "valuenotifier"
     ],
+    "14": [
+      "lib_src_models_interaction_models",
+      "lib_src_models_interaction_models_amount",
+      "lib_src_models_interaction_models_balanceupdate",
+      "lib_src_models_interaction_models_chatmessage",
+      "lib_src_models_interaction_models_coinvalue",
+      "lib_src_models_interaction_models_delta",
+      "lib_src_models_interaction_models_fromjson",
+      "lib_src_models_interaction_models_giftevent",
+      "lib_src_models_interaction_models_gifticonurl",
+      "lib_src_models_interaction_models_giftid",
+      "lib_src_models_interaction_models_giftname",
+      "lib_src_models_interaction_models_hosttotalcoins",
+      "lib_src_models_interaction_models_id",
+      "lib_src_models_interaction_models_newbalance",
+      "lib_src_models_interaction_models_reason",
+      "lib_src_models_interaction_models_senderavatar",
+      "lib_src_models_interaction_models_senderid",
+      "lib_src_models_interaction_models_senderlevel",
+      "lib_src_models_interaction_models_sendername",
+      "lib_src_models_interaction_models_targetuserid",
+      "lib_src_models_interaction_models_text",
+      "lib_src_models_interaction_models_timestamp",
+      "lib_src_models_interaction_models_tojson",
+      "lib_src_models_interaction_models_userid",
+      "string"
+    ],
     "15": [
+      "lib_src_widgets_omnicast_video_view",
+      "lib_src_widgets_omnicast_video_view_build",
+      "lib_src_widgets_omnicast_video_view_checkadaptivestreaming",
+      "lib_src_widgets_omnicast_video_view_cleanuprenderer",
+      "lib_src_widgets_omnicast_video_view_createstate",
+      "lib_src_widgets_omnicast_video_view_didupdatewidget",
+      "lib_src_widgets_omnicast_video_view_dispose",
+      "lib_src_widgets_omnicast_video_view_enableadaptivestreaming",
+      "lib_src_widgets_omnicast_video_view_initializelazyrenderer",
+      "lib_src_widgets_omnicast_video_view_initstate",
+      "lib_src_widgets_omnicast_video_view_ismounted",
+      "lib_src_widgets_omnicast_video_view_lastadaptivelayer",
+      "lib_src_widgets_omnicast_video_view_mediacontroller",
+      "lib_src_widgets_omnicast_video_view_mediastreammanager",
+      "lib_src_widgets_omnicast_video_view_mirror",
+      "lib_src_widgets_omnicast_video_view_objectfit",
+      "lib_src_widgets_omnicast_video_view_placeholder",
+      "lib_src_widgets_omnicast_video_view_renderer",
+      "lib_src_widgets_omnicast_video_view_userid",
+      "media_media_controller_dart",
+      "media_media_stream_manager_dart",
+      "rtcvideorenderer",
+      "widget"
+    ],
+    "16": [
+      "dart_async",
+      "dart_convert",
+      "package_flutter_material_dart",
+      "package_flutter_test_flutter_test_dart",
+      "package_flutter_widgets_dart",
+      "package_omnicast_client_omnicast_client_dart",
+      "test_headless_and_performance_test",
+      "test_headless_and_performance_test_main",
+      "test_omnicast_client_test",
+      "test_omnicast_client_test_main",
+      "test_omnicast_video_view_test",
+      "test_omnicast_video_view_test_main",
+      "test_pk_system_test",
+      "test_pk_system_test_main",
+      "test_room_state_test",
+      "test_room_state_test_main",
+      "test_signaling_message_test",
+      "test_signaling_message_test_main",
+      "test_video_parameters_test",
+      "test_video_parameters_test_main",
+      "test_viewer_tracking_test",
+      "test_viewer_tracking_test_main"
+    ],
+    "17": [
       "lib_omnicast_client",
       "src_core_omnicast_client_dart",
       "src_core_omnicast_config_dart",
@@ -620,50 +650,30 @@
       "src_widgets_omnicast_video_view_dart",
       "src_widgets_pk_score_progress_bar_dart"
     ],
-    "16": [
-      "dart_async",
-      "dart_convert",
-      "package_flutter_material_dart",
-      "package_flutter_test_flutter_test_dart",
-      "package_flutter_widgets_dart",
-      "package_omnicast_client_omnicast_client_dart",
-      "test_headless_and_performance_test",
-      "test_headless_and_performance_test_main",
-      "test_omnicast_client_test",
-      "test_omnicast_client_test_main",
-      "test_omnicast_video_view_test",
-      "test_omnicast_video_view_test_main",
-      "test_pk_system_test",
-      "test_pk_system_test_main",
-      "test_room_state_test",
-      "test_room_state_test_main",
-      "test_signaling_message_test",
-      "test_signaling_message_test_main",
-      "test_video_parameters_test",
-      "test_video_parameters_test_main"
-    ],
-    "17": [
-      "gradient",
-      "lib_src_models_pk_models_pkstate",
-      "lib_src_widgets_gift_overlay_manager_giftbannerwidget",
-      "lib_src_widgets_omnicast_pk_battle_view_omnicastpkbattleview",
-      "lib_src_widgets_pk_score_progress_bar",
-      "lib_src_widgets_pk_score_progress_bar_borderradius",
-      "lib_src_widgets_pk_score_progress_bar_build",
-      "lib_src_widgets_pk_score_progress_bar_formattimer",
-      "lib_src_widgets_pk_score_progress_bar_height",
-      "lib_src_widgets_pk_score_progress_bar_hostgradient",
-      "lib_src_widgets_pk_score_progress_bar_opponentgradient",
-      "lib_src_widgets_pk_score_progress_bar_pkscoreprogressbar",
-      "lib_src_widgets_pk_score_progress_bar_pkstate",
-      "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
-      "lib_src_widgets_pk_score_progress_bar_showtimer",
-      "lib_src_widgets_pk_score_progress_bar_timertextstyle",
-      "models_pk_models_dart",
-      "statelesswidget",
-      "textstyle"
-    ],
     "18": [
+      "axis",
+      "lib_src_widgets_omnicast_pk_battle_view",
+      "lib_src_widgets_omnicast_pk_battle_view_build",
+      "lib_src_widgets_omnicast_pk_battle_view_buildvideopane",
+      "lib_src_widgets_omnicast_pk_battle_view_hostdisplayname",
+      "lib_src_widgets_omnicast_pk_battle_view_hostplaceholder",
+      "lib_src_widgets_omnicast_pk_battle_view_hostuserid",
+      "lib_src_widgets_omnicast_pk_battle_view_mediastreammanager",
+      "lib_src_widgets_omnicast_pk_battle_view_objectfit",
+      "lib_src_widgets_omnicast_pk_battle_view_opponentdisplayname",
+      "lib_src_widgets_omnicast_pk_battle_view_opponentplaceholder",
+      "lib_src_widgets_omnicast_pk_battle_view_opponentuserid",
+      "lib_src_widgets_omnicast_pk_battle_view_pkstate",
+      "lib_src_widgets_omnicast_pk_battle_view_showprogressbar",
+      "lib_src_widgets_omnicast_pk_battle_view_spacing",
+      "lib_src_widgets_omnicast_pk_battle_view_splitaxis",
+      "mediastreammanager",
+      "omnicast_video_view_dart",
+      "package_flutter_webrtc_flutter_webrtc_dart",
+      "pk_score_progress_bar_dart",
+      "rtcvideoviewobjectfit"
+    ],
+    "19": [
       "int",
       "lib_src_media_video_parameters",
       "lib_src_media_video_parameters_copywith",
@@ -682,7 +692,7 @@
       "lib_src_media_video_parameters_width",
       "static_const_videoparameters"
     ],
-    "19": [
+    "20": [
       "lib_src_seats_seat_manager",
       "lib_src_seats_seat_manager_acceptcohostinvite",
       "lib_src_seats_seat_manager_demotetoviewer",
@@ -701,67 +711,93 @@
       "webrtc_webrtc_manager_dart",
       "webrtcmanager"
     ],
-    "20": [
-      "changenotifier",
-      "lib_src_state_room_state_roomstate"
-    ],
     "21": [
-      "color"
+      "gradient",
+      "lib_src_models_pk_models_pkstate",
+      "lib_src_widgets_pk_score_progress_bar",
+      "lib_src_widgets_pk_score_progress_bar_borderradius",
+      "lib_src_widgets_pk_score_progress_bar_build",
+      "lib_src_widgets_pk_score_progress_bar_formattimer",
+      "lib_src_widgets_pk_score_progress_bar_height",
+      "lib_src_widgets_pk_score_progress_bar_hostgradient",
+      "lib_src_widgets_pk_score_progress_bar_opponentgradient",
+      "lib_src_widgets_pk_score_progress_bar_pkstate",
+      "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
+      "lib_src_widgets_pk_score_progress_bar_showtimer",
+      "lib_src_widgets_pk_score_progress_bar_timertextstyle",
+      "models_pk_models_dart",
+      "textstyle"
     ],
     "22": [
-      "interactionmanager"
+      "lib_src_widgets_gift_overlay_manager_giftbannerwidget",
+      "lib_src_widgets_omnicast_pk_battle_view_omnicastpkbattleview",
+      "lib_src_widgets_pk_score_progress_bar_pkscoreprogressbar",
+      "statelesswidget"
     ],
     "23": [
-      "models_room_event_models_dart"
+      "color"
     ],
     "24": [
-      "pkmanager"
+      "interactionmanager"
     ],
     "25": [
-      "roommanager"
+      "models_room_event_models_dart"
     ],
     "26": [
-      "signalingclient"
+      "pkmanager"
     ],
     "27": [
+      "roommanager"
+    ],
+    "28": [
       "src_models_room_event_models_dart"
+    ],
+    "29": [
+      "userrole"
     ]
   },
   "cohesion": {
-    "0": 0.04,
-    "1": 0.04,
-    "2": 0.04081632653061224,
-    "3": 0.0425531914893617,
-    "4": 0.047474747474747475,
-    "5": 0.049682875264270614,
-    "6": 0.04878048780487805,
-    "7": 0.05263157894736842,
-    "8": 0.058823529411764705,
-    "9": 0.058823529411764705,
-    "10": 0.0625,
-    "11": 0.07142857142857142,
-    "12": 0.07407407407407407,
-    "13": 0.08333333333333333,
-    "14": 0.09090909090909091,
-    "15": 0.09090909090909091,
-    "16": 0.1368421052631579,
-    "17": 0.10526315789473684,
-    "18": 0.11764705882352941,
+    "0": 0.038461538461538464,
+    "1": 0.0392156862745098,
+    "2": 0.0392156862745098,
+    "3": 0.048625792811839326,
+    "4": 0.04878048780487805,
+    "5": 0.05405405405405406,
+    "6": 0.05405405405405406,
+    "7": 0.058823529411764705,
+    "8": 0.06060606060606061,
+    "9": 0.0625,
+    "10": 0.06896551724137931,
+    "11": 0.07407407407407407,
+    "12": 0.07142857142857142,
+    "13": 0.08,
+    "14": 0.08,
+    "15": 0.08695652173913043,
+    "16": 0.12987012987012986,
+    "17": 0.09090909090909091,
+    "18": 0.09523809523809523,
     "19": 0.11764705882352941,
-    "20": 1.0,
-    "21": 1.0,
-    "22": 1.0,
+    "20": 0.11764705882352941,
+    "21": 0.13333333333333333,
+    "22": 0.5,
     "23": 1.0,
     "24": 1.0,
     "25": 1.0,
     "26": 1.0,
-    "27": 1.0
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0
   },
   "gods": [
     {
       "id": "lib_src_signaling_signaling_client_signalingclient",
       "label": "SignalingClient",
-      "degree": 7
+      "degree": 6
+    },
+    {
+      "id": "lib_src_state_room_state_roomstate",
+      "label": "RoomState",
+      "degree": 4
     },
     {
       "id": "lib_src_media_media_controller_mediacontroller",
@@ -769,13 +805,23 @@
       "degree": 4
     },
     {
-      "id": "lib_src_models_pk_models_pkstate",
-      "label": "PKState",
+      "id": "lib_src_models_room_models_clientconnectionstate",
+      "label": "ClientConnectionState",
       "degree": 3
     },
     {
-      "id": "lib_src_state_room_state_roomstate",
-      "label": "RoomState",
+      "id": "lib_src_models_room_models_participant",
+      "label": "Participant",
+      "degree": 3
+    },
+    {
+      "id": "lib_src_models_room_models_userrole",
+      "label": "UserRole",
+      "degree": 3
+    },
+    {
+      "id": "lib_src_models_pk_models_pkstate",
+      "label": "PKState",
       "degree": 3
     },
     {
@@ -792,33 +838,18 @@
       "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
       "label": "OmniCastVideoView",
       "degree": 3
-    },
-    {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
-      "label": "_OmniCastVideoViewState",
-      "degree": 3
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkmanager",
-      "label": "PKManager",
-      "degree": 2
-    },
-    {
-      "id": "lib_src_media_media_stream_manager_mediastreammanager",
-      "label": "MediaStreamManager",
-      "degree": 2
     }
   ],
   "surprises": [],
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `SignalingClient` connect `seat_manager.dart` to `signaling_client.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `pk_manager.dart`, `interaction_manager.dart`, `room_manager.dart`?",
-      "why": "High betweenness centrality (0.026) - this node is a cross-community bridge."
+      "question": "Why does `SignalingClient` connect `seat_manager.dart` to `signaling_client.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `pk_manager.dart`, `interaction_manager.dart`?",
+      "why": "High betweenness centrality (0.020) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `PKState` connect `pk_score_progress_bar.dart` to `omnicast_video_view.dart`, `pk_models.dart`?",
+      "question": "Why does `PKState` connect `pk_score_progress_bar.dart` to `omnicast_pk_battle_view.dart`, `pk_models.dart`?",
       "why": "High betweenness centrality (0.019) - this node is a cross-community bridge."
     },
     {
@@ -828,23 +859,23 @@
     },
     {
       "type": "isolated_nodes",
-      "question": "What connects `_activePK`, `_activeRemoteUserIds`, `_activeSeats` to the rest of the system?",
-      "why": "496 weakly-connected nodes found - possible documentation gaps or missing edges."
-    },
-    {
-      "type": "low_cohesion",
-      "question": "Should `room_state.dart` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.04 - nodes in this community are weakly interconnected."
+      "question": "What connects `_answerController`, `_channel`, `_channelSubscription` to the rest of the system?",
+      "why": "516 weakly-connected nodes found - possible documentation gaps or missing edges."
     },
     {
       "type": "low_cohesion",
       "question": "Should `signaling_client.dart` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.04 - nodes in this community are weakly interconnected."
+      "why": "Cohesion score 0.038461538461538464 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
       "question": "Should `signaling_message.dart` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.04081632653061224 - nodes in this community are weakly interconnected."
+      "why": "Cohesion score 0.0392156862745098 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `room_state.dart` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.0392156862745098 - nodes in this community are weakly interconnected."
     }
   ]
 }

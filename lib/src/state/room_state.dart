@@ -169,7 +169,31 @@ class RoomState extends ChangeNotifier {
     _viewersCount = count;
     if (viewersList != null) {
       _viewers.clear();
-      _viewers.addAll(viewersList);
+      _viewers.addAll(viewersList.take(200));
+    }
+    notifyListeners();
+  }
+
+  /// Atomically adds a new participant (e.g. user_joined) and increments viewer count.
+  void addParticipant(OmniCastParticipant participant) {
+    final idx = _viewers.indexWhere((p) => p.userId == participant.userId);
+    if (idx >= 0) {
+      _viewers[idx] = participant;
+    } else {
+      _viewers.insert(0, participant);
+      if (_viewers.length > 200) {
+        _viewers.removeLast();
+      }
+      _viewersCount++;
+    }
+    notifyListeners();
+  }
+
+  /// Atomically removes a participant (e.g. user_left) and decrements viewer count.
+  void removeParticipant(String userId) {
+    _viewers.removeWhere((p) => p.userId == userId);
+    if (_viewersCount > 0) {
+      _viewersCount--;
     }
     notifyListeners();
   }

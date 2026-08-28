@@ -40,12 +40,12 @@ class RoomOptions {
         'enable_simulcast': enableSimulcast,
         'enable_dynacast': enableDynacast,
         'max_co_hosts': maxCoHosts,
-        if (metadata != null) 'metadata': metadata,
+        'metadata': ?metadata,
       };
 }
 
-/// Information describing a participant in the live stream.
-class Participant {
+/// Information describing a participant / live viewer inside an OmniCast room.
+class OmniCastParticipant {
   final String userId;
   final String? displayName;
   final String? avatarUrl;
@@ -53,8 +53,9 @@ class Participant {
   final bool isAudioMuted;
   final bool isVideoMuted;
   final DateTime joinedAt;
+  final Map<String, dynamic>? metadata;
 
-  const Participant({
+  const OmniCastParticipant({
     required this.userId,
     this.displayName,
     this.avatarUrl,
@@ -62,9 +63,10 @@ class Participant {
     this.isAudioMuted = false,
     this.isVideoMuted = false,
     required this.joinedAt,
+    this.metadata,
   });
 
-  factory Participant.fromJson(Map<String, dynamic> json) {
+  factory OmniCastParticipant.fromJson(Map<String, dynamic> json) {
     final roleStr = json['role'] as String? ?? 'viewer';
     final role = switch (roleStr.toLowerCase()) {
       'host' => UserRole.host,
@@ -72,16 +74,17 @@ class Participant {
       _ => UserRole.viewer,
     };
 
-    return Participant(
-      userId: json['user_id'] as String? ?? '',
-      displayName: json['display_name'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
+    return OmniCastParticipant(
+      userId: json['user_id'] as String? ?? json['userId'] as String? ?? '',
+      displayName: json['display_name'] as String? ?? json['name'] as String?,
+      avatarUrl: json['avatar_url'] as String? ?? json['avatar'] as String?,
       role: role,
       isAudioMuted: json['is_audio_muted'] as bool? ?? false,
       isVideoMuted: json['is_video_muted'] as bool? ?? false,
       joinedAt: json['joined_at'] != null
           ? DateTime.tryParse(json['joined_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
+      metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
 
@@ -93,5 +96,41 @@ class Participant {
         'is_audio_muted': isAudioMuted,
         'is_video_muted': isVideoMuted,
         'joined_at': joinedAt.toIso8601String(),
+        'metadata': ?metadata,
       };
+
+  OmniCastParticipant copyWith({
+    String? userId,
+    String? displayName,
+    String? avatarUrl,
+    UserRole? role,
+    bool? isAudioMuted,
+    bool? isVideoMuted,
+    DateTime? joinedAt,
+    Map<String, dynamic>? metadata,
+  }) {
+    return OmniCastParticipant(
+      userId: userId ?? this.userId,
+      displayName: displayName ?? this.displayName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      role: role ?? this.role,
+      isAudioMuted: isAudioMuted ?? this.isAudioMuted,
+      isVideoMuted: isVideoMuted ?? this.isVideoMuted,
+      joinedAt: joinedAt ?? this.joinedAt,
+      metadata: metadata ?? this.metadata,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is OmniCastParticipant &&
+          runtimeType == other.runtimeType &&
+          userId == other.userId;
+
+  @override
+  int get hashCode => userId.hashCode;
 }
+
+/// Backward compatibility alias for [OmniCastParticipant].
+typedef Participant = OmniCastParticipant;

@@ -90,9 +90,11 @@ abstract final class SignalingEvents {
   static const String ping = 'ping';
   static const String pong = 'pong';
 
-  // State Sync
+  // State Sync & Participants
   static const String roomInfoSync = 'room_info_sync';
   static const String viewerUpdate = 'viewer_update';
+  static const String userJoined = 'user_joined';
+  static const String userLeft = 'user_left';
 
   // Social & Interactive Events
   static const String chat = 'chat';
