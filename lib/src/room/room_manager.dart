@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../core/omnicast_config.dart';
 import '../models/room_models.dart';
 import '../models/seat_models.dart';
 import '../models/signaling_message.dart';
@@ -13,6 +14,7 @@ class RoomManager {
   final SignalingClient _signalingClient;
   final WebRTCManager _webRTCManager;
   final RoomState _roomState;
+  final OmniCastConfig? _config;
 
   // Maximum active viewer avatar objects kept in UI memory
   static const int maxViewersInMemory = 200;
@@ -44,9 +46,11 @@ class RoomManager {
     required SignalingClient signalingClient,
     required WebRTCManager webRTCManager,
     required RoomState roomState,
+    OmniCastConfig? config,
   })  : _signalingClient = signalingClient,
         _webRTCManager = webRTCManager,
-        _roomState = roomState {
+        _roomState = roomState,
+        _config = config {
     _bindSignalingEvents();
     _bindStateNotifiers();
   }
@@ -200,16 +204,33 @@ class RoomManager {
     activeViewersList.value = List.unmodifiable(currentList);
   }
 
-  /// Creates and starts a new live broadcasting room as Host using a secure JWT [token].
+  /// Creates and starts a new live broadcasting room as Host.
+  ///
+  /// If [token] is not provided, the SDK automatically generates one using the configured credentials.
   Future<void> createRoom({
     required String roomId,
     required String userId,
-    required String token,
+    String? token,
     RoomOptions options = const RoomOptions(),
     Map<String, dynamic>? metadata,
   }) async {
+    final mergedMetadata = {
+      ...?options.metadata,
+      ...?metadata,
+    };
+
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : (_config?.generateToken(
+              roomId: roomId,
+              userId: userId,
+              role: 'host',
+              metadata: mergedMetadata,
+            ) ??
+            '');
+
     if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
-      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: token);
+      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: effectiveToken);
     }
 
     _roomState.setSession(
@@ -240,17 +261,12 @@ class RoomManager {
 
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
-    final mergedMetadata = {
-      ...?options.metadata,
-      ...?metadata,
-    };
-
     _signalingClient.send(SignalingMessage(
       event: SignalingEvents.createRoom,
       roomId: roomId,
       userId: userId,
       payload: {
-        'token': token,
+        'token': effectiveToken,
         'options': options.toJson(),
         'sdp': offer.sdp,
         'type': offer.type,
@@ -259,15 +275,27 @@ class RoomManager {
     ));
   }
 
-  /// Joins an existing live room as a Viewer using a secure JWT [token].
+  /// Joins an existing live room as a Viewer.
+  ///
+  /// If [token] is not provided, the SDK automatically generates one using the configured credentials.
   Future<void> joinRoom({
     required String roomId,
     required String userId,
-    required String token,
+    String? token,
     Map<String, dynamic>? metadata,
   }) async {
+    final effectiveToken = (token != null && token.isNotEmpty)
+        ? token
+        : (_config?.generateToken(
+              roomId: roomId,
+              userId: userId,
+              role: 'viewer',
+              metadata: metadata,
+            ) ??
+            '');
+
     if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
-      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: token);
+      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: effectiveToken);
     }
 
     _roomState.setSession(
@@ -284,7 +312,7 @@ class RoomManager {
       roomId: roomId,
       userId: userId,
       payload: {
-        'token': token,
+        'token': effectiveToken,
         'sdp': offer.sdp,
         'type': offer.type,
         'metadata': ?metadata,

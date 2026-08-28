@@ -67,9 +67,13 @@ class OmniCastClient {
     _bindInternalEventListeners();
   }
 
-  /// Initializes the [OmniCastClient] SDK using SFU host URL, optional [GlobalMediaConfig], and token.
+  /// Initializes the [OmniCastClient] SDK using server credentials, SFU host URL, and media configuration.
   static Future<OmniCastClient> init({
     required String hostUrl,
+    String? apiUrl,
+    String? apiKey,
+    String? apiSecret,
+    String? jwtSecret,
     GlobalMediaConfig? mediaConfig,
     String? token,
     bool autoConnect = true,
@@ -78,6 +82,10 @@ class OmniCastClient {
   }) async {
     final config = OmniCastConfig(
       hostUrl: hostUrl,
+      apiUrl: apiUrl,
+      apiKey: apiKey,
+      apiSecret: apiSecret,
+      jwtSecret: jwtSecret,
       iceServers: iceServers ??
           const [
             {'urls': 'stun:stun.l.google.com:19302'},
@@ -105,6 +113,7 @@ class OmniCastClient {
       signalingClient: _signalingClient,
       webRTCManager: _webRTCManager,
       roomState: _roomState,
+      config: config,
     );
 
     _mediaController = MediaController(

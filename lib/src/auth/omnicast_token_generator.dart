@@ -4,20 +4,21 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 abstract final class OmniCastTokenGenerator {
   /// Generates a cryptographically signed JWT authentication token for a live room session.
   ///
-  /// Can be used on client development environments or backend services to issue tokens without
-  /// exposing API secrets to the primary SDK initialization facade.
+  /// Uses [jwtSecret] or [apiSecret] to sign the token with HMAC-SHA256.
   static String generate({
-    required String apiKey,
-    required String apiSecret,
+    String? apiKey,
+    String? apiSecret,
+    String? jwtSecret,
     required String roomId,
     required String userId,
     required String role,
     Map<String, dynamic>? metadata,
     Duration expiresIn = const Duration(hours: 24),
   }) {
+    final signingSecret = jwtSecret ?? apiSecret ?? 'default_secret';
     final jwt = JWT(
       {
-        'apiKey': apiKey,
+        if (apiKey != null && apiKey.isNotEmpty) 'apiKey': apiKey,
         'roomId': roomId,
         'userId': userId,
         'role': role,
@@ -28,7 +29,7 @@ abstract final class OmniCastTokenGenerator {
     );
 
     return jwt.sign(
-      SecretKey(apiSecret),
+      SecretKey(signingSecret),
       algorithm: JWTAlgorithm.HS256,
       expiresIn: expiresIn,
     );
