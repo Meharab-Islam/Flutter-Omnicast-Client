@@ -3,9 +3,10 @@
 /// Designed for high-scale interactive live streaming platforms (similar to TikTok Live & Bigo Live).
 library;
 
-// Core Facade & Configuration
+// Core Facade, Configuration & Auth Token Generator
 export 'src/core/omnicast_client.dart';
 export 'src/core/omnicast_config.dart';
+export 'src/auth/omnicast_token_generator.dart';
 
 // Sub-Module Controllers & Managers
 export 'src/room/room_manager.dart';

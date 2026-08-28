@@ -35,6 +35,7 @@ class SignalingClient {
   final _chatController = StreamController<ChatMessage>.broadcast();
   final _giftController = StreamController<GiftEvent>.broadcast();
   final _seatRequestController = StreamController<SeatRequest>.broadcast();
+  final _seatInviteController = StreamController<CoHostInvite>.broadcast();
   final _seatAcceptController = StreamController<SignalingMessage>.broadcast();
   final _seatRejectController = StreamController<SignalingMessage>.broadcast();
   final _seatLeaveController = StreamController<SignalingMessage>.broadcast();
@@ -61,6 +62,7 @@ class SignalingClient {
   Stream<ChatMessage> get onChat => _chatController.stream;
   Stream<GiftEvent> get onGift => _giftController.stream;
   Stream<SeatRequest> get onSeatRequest => _seatRequestController.stream;
+  Stream<CoHostInvite> get onSeatInvite => _seatInviteController.stream;
   Stream<SignalingMessage> get onSeatAccept => _seatAcceptController.stream;
   Stream<SignalingMessage> get onSeatReject => _seatRejectController.stream;
   Stream<SignalingMessage> get onSeatLeave => _seatLeaveController.stream;
@@ -186,6 +188,12 @@ class SignalingClient {
         }
         break;
 
+      case SignalingEvents.seatInvite:
+        if (msg.payload is Map<String, dynamic>) {
+          _seatInviteController.add(CoHostInvite.fromJson(msg.payload as Map<String, dynamic>));
+        }
+        break;
+
       case SignalingEvents.seatAccept:
         _seatAcceptController.add(msg);
         break;
@@ -303,6 +311,7 @@ class SignalingClient {
     await _chatController.close();
     await _giftController.close();
     await _seatRequestController.close();
+    await _seatInviteController.close();
     await _seatAcceptController.close();
     await _seatRejectController.close();
     await _seatLeaveController.close();
