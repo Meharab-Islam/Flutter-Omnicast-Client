@@ -36,19 +36,75 @@ OmniCast Flutter SDK is built with two core philosophies:
 
 ```mermaid
 graph TD
-    App["Your Custom Flutter App UI"] --> Facade["OmniCastClient Facade"]
-    
-    Facade --> Room["client.room (RoomManager)"]
-    Facade --> Media["client.media (MediaController)"]
-    Facade --> Seats["client.seats (SeatManager)"]
-    Facade --> Interaction["client.interaction (InteractionManager)"]
-    Facade --> PK["client.pk (PKManager)"]
-    Facade --> State["client.state (RoomState)"]
+    subgraph UI ["📱 Application Layer (Your Custom Flutter UI)"]
+        CustomUI["🎨 Custom Live Stream Widgets / Screens"]
+        VideoView["🖼️ OmniCastVideoView (Headless Lazy Renderer)"]
+        AvatarBar["👥 Horizontal Live Viewer Avatars"]
+        PKBattleStage["⚔️ OmniCastPKBattleView & Score Bar"]
+        GiftOverlay["🎁 GiftOverlayManager (Animated Banners)"]
+    end
 
-    Room --> SFU["Go WebRTC SFU Engine"]
-    Media --> SFU
-    Seats --> SFU
-    PK --> SFU
+    subgraph StateLayer ["⚡ Granular Reactive State Layer (Atomic Providers)"]
+        VN1["👁️ totalViewerCount (ValueNotifier)"]
+        VN2["👥 activeViewersList (ValueNotifier)"]
+        VN3["⚔️ pkStateNotifier (ValueNotifier)"]
+        VN4["🪙 userBalanceNotifier (ValueNotifier)"]
+        VN5["🎤 isMicrophoneMutedNotifier (ValueNotifier)"]
+    end
+
+    subgraph CoreSDK ["🚀 OmniCast Client SDK (Modular Facade)"]
+        Facade["OmniCastClient (Single Global Entrypoint)"]
+        
+        subgraph SubModules ["📦 Specialized Sub-Modules"]
+            Room["🏛️ client.room (RoomManager)<br/>• createRoom / joinRoom (JWT Token)<br/>• Real-Time Viewer Tracking (50ms Throttle)<br/>• Modalities: Video & Audio-Only"]
+            Media["🎛️ client.media (MediaController)<br/>• VideoParameters (1080p, 720p, Custom)<br/>• Simulcast Triple Layer ('f','h','q')<br/>• Dynacast Upstream Muting<br/>• Background Battery Auto-Pause"]
+            Seats["🎤 client.seats (SeatManager)<br/>• Co-Host Requests & Invitations<br/>• Seamless In-Place SDP Upgrade<br/>• Stage Demotion & Pinning"]
+            Interaction["🎁 client.interaction (InteractionManager)<br/>• High-Speed Chat Stream<br/>• Virtual Gifts & Coin Economy<br/>• Balance Sync"]
+            PK["⚔️ client.pk (PKManager)<br/>• Cross-Room Host Battles<br/>• Real-Time Score Sync<br/>• Countdown Timer & Punishment Phase"]
+        end
+    end
+
+    subgraph LowLevel ["🔧 Core Engine Controllers"]
+        Signaling["📡 SignalingClient<br/>• JSON Framing & Keep-Alive Heartbeats<br/>• Background Isolate Parsing (>8KB Payload)"]
+        WebRTC["🎥 WebRTCManager & MediaStreamManager<br/>• PeerConnection & Transceivers<br/>• Local Camera / Microphone Hardware<br/>• Remote Track Renderers"]
+    end
+
+    subgraph BackendEngine ["🌐 OmniCast Backend & SFU Engine (Go Pion)"]
+        WSServer["🔌 WebSocket Signaling Server (JWT Verified)"]
+        SFU["⚡ Go WebRTC SFU Cluster (pion/webrtc)<br/>• Selective Forwarding Unit (SFU)<br/>• Simulcast Layer Routing<br/>• Cross-Room Media Bridging"]
+    end
+
+    %% UI & Facade Connections
+    CustomUI -->|"Calls Methods"| Facade
+    VideoView -->|"Binds Track"| WebRTC
+    GiftOverlay -->|"Listens"| Interaction
+    
+    Facade --> Room
+    Facade --> Media
+    Facade --> Seats
+    Facade --> Interaction
+    Facade --> PK
+
+    %% State Bindings
+    Room -->|"Updates"| VN1 & VN2
+    PK -->|"Updates"| VN3
+    Interaction -->|"Updates"| VN4
+    Media -->|"Updates"| VN5
+
+    VN1 & VN2 -->|"ValueListenableBuilder"| AvatarBar
+    VN3 -->|"ValueListenableBuilder"| PKBattleStage
+    VN4 -->|"ValueListenableBuilder"| CustomUI
+    
+    %% Engine Bindings
+    Room --> Signaling
+    Seats --> Signaling
+    Interaction --> Signaling
+    PK --> Signaling
+    Media --> WebRTC
+
+    Signaling <-->|"wss://.../ws?token=JWT"| WSServer
+    WebRTC <-->|"WebRTC RTP / SRTP Streams"| SFU
+    WSServer <-->|"Control Channel"| SFU
 ```
 
 ---
