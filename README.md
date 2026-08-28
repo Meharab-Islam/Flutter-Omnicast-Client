@@ -5,7 +5,7 @@
 [![WebRTC](https://img.shields.io/badge/WebRTC-SFU-FF3E00?logo=webrtc)](https://webrtc.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An enterprise-grade, production-ready Flutter client library designed for building massive real-time live streaming applications like **TikTok Live**, **Bigo Live**, and **Twitch**. Powered by the **OmniCast Real-Time WebRTC SFU Engine**.
+An enterprise-grade, high-performance Flutter client SDK designed for building ultra-low-latency interactive live broadcasting, real-time video/audio streaming, multi-guest co-hosting, host-vs-host PK battles, and real-time social interactions (live chat, virtual gifts, dynamic participant metadata, and viewer tracking). Powered by the **OmniCast Real-Time WebRTC SFU Engine**.
 
 ---
 

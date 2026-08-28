@@ -1,6 +1,6 @@
 /// OmniCast Live Streaming & WebRTC SFU Client SDK for Flutter.
 ///
-/// Designed for high-scale interactive live streaming platforms (similar to TikTok Live & Bigo Live).
+/// Designed for high-scale interactive live broadcasting, WebRTC SFU media routing, multi-guest stages, and PK battles.
 library;
 
 // Core Facade, Configuration & Auth Token Generator
