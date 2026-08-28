@@ -795,14 +795,29 @@
       "degree": 6
     },
     {
+      "id": "lib_src_state_room_state_roomstate",
+      "label": "RoomState",
+      "degree": 4
+    },
+    {
       "id": "lib_src_media_media_controller_mediacontroller",
       "label": "MediaController",
       "degree": 4
     },
     {
-      "id": "lib_src_state_room_state_roomstate",
-      "label": "RoomState",
-      "degree": 4
+      "id": "lib_src_models_room_models_clientconnectionstate",
+      "label": "ClientConnectionState",
+      "degree": 3
+    },
+    {
+      "id": "lib_src_models_room_models_participant",
+      "label": "Participant",
+      "degree": 3
+    },
+    {
+      "id": "lib_src_models_room_models_userrole",
+      "label": "UserRole",
+      "degree": 3
     },
     {
       "id": "lib_src_models_pk_models_pkstate",
@@ -822,21 +837,6 @@
     {
       "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
       "label": "OmniCastVideoView",
-      "degree": 3
-    },
-    {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
-      "label": "_OmniCastVideoViewState",
-      "degree": 3
-    },
-    {
-      "id": "lib_src_models_room_models_userrole",
-      "label": "UserRole",
-      "degree": 3
-    },
-    {
-      "id": "lib_src_models_room_models_clientconnectionstate",
-      "label": "ClientConnectionState",
       "degree": 3
     }
   ],
