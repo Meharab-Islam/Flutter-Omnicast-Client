@@ -11,6 +11,7 @@ export 'src/core/omnicast_config.dart';
 export 'src/room/room_manager.dart';
 export 'src/media/media_controller.dart';
 export 'src/media/media_stream_manager.dart';
+export 'src/media/video_parameters.dart';
 export 'src/seats/seat_manager.dart';
 export 'src/interaction/interaction_manager.dart';
 export 'src/pk/pk_manager.dart';

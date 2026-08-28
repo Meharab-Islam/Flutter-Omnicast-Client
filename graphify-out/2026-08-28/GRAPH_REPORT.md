@@ -112,11 +112,11 @@ Nodes (14): _balanceUpdatedController, _bindStreams, dispose, _giftReceivedContr
 
 ### Community 15 - "room_manager.dart"
 Cohesion: 0.15
-Nodes (12): dart:async, createRoom, joinRoom, kickUser, leaveRoom, RoomManager, _roomState, _signalingClient (+4 more)
+Nodes (12): createRoom, joinRoom, kickUser, leaveRoom, RoomManager, _roomState, _signalingClient, _webRTCManager (+4 more)
 
 ### Community 16 - "seat_manager.dart"
 Cohesion: 0.15
-Nodes (12): acceptCoHostInvite, demoteToViewer, inviteToCoHost, pinToMainStage, _roomState, SeatManager, _signalingClient, upgradeToCoHost (+4 more)
+Nodes (12): dart:async, acceptCoHostInvite, demoteToViewer, inviteToCoHost, pinToMainStage, _roomState, SeatManager, _signalingClient (+4 more)
 
 ## Knowledge Gaps
 - **364 isolated node(s):** `_answerController`, `_channel`, `_channelSubscription`, `_chatController`, `_cleanupActiveConnection` (+359 more)
@@ -128,7 +128,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `RoomState` connect `RoomState` to `room_state.dart`, `core/omnicast_client.dart`, `pk_manager.dart`, `interaction_manager.dart`, `room_manager.dart`, `seat_manager.dart`?**
   _High betweenness centrality (0.040) - this node is a cross-community bridge._
-- **Why does `SignalingClient` connect `interaction_manager.dart` to `signaling_client.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `pk_manager.dart`, `room_manager.dart`, `seat_manager.dart`?**
+- **Why does `SignalingClient` connect `room_manager.dart` to `signaling_client.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `pk_manager.dart`, `interaction_manager.dart`, `seat_manager.dart`?**
   _High betweenness centrality (0.036) - this node is a cross-community bridge._
 - **Why does `ClientConnectionState` connect `room_models.dart` to `signaling_client.dart`, `room_state.dart`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._

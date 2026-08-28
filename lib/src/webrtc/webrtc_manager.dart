@@ -2,19 +2,24 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../media/media_stream_manager.dart';
+import '../media/video_parameters.dart';
 
 typedef OnLocalIceCandidateCallback = void Function(RTCIceCandidate candidate);
 typedef OnRemoteTrackCallback = void Function(MediaStreamTrack track, MediaStream stream);
 
 /// Manages [RTCPeerConnection] lifecycle, SDP offer/answer negotiations,
-/// dynamic transceivers, ICE exchange, and seamless renegotiation for OmniCast.
+/// dynamic transceivers, ICE exchange, simulcast encodings, and Dynacast layer control.
 class WebRTCManager {
   final MediaStreamManager mediaStreamManager;
   final Map<String, dynamic> rtcConfiguration;
 
   RTCPeerConnection? _peerConnection;
+  RTCRtpSender? _videoSender;
+  RTCRtpSender? _audioSender;
+
   bool _isDisposed = false;
   bool _isNegotiating = false;
+  bool _simulcastEnabled = false;
   final List<RTCIceCandidate> _queuedRemoteCandidates = [];
 
   // Callbacks
@@ -36,6 +41,9 @@ class WebRTCManager {
   RTCPeerConnection? get peerConnection => _peerConnection;
   bool get hasPeerConnection => _peerConnection != null;
   bool get isNegotiating => _isNegotiating;
+  bool get simulcastEnabled => _simulcastEnabled;
+  RTCRtpSender? get videoSender => _videoSender;
+  RTCRtpSender? get audioSender => _audioSender;
 
   /// Initializes a new [RTCPeerConnection] with standard configuration and sets up listeners.
   Future<RTCPeerConnection> initializePeerConnection() async {
@@ -91,16 +99,90 @@ class WebRTCManager {
     );
   }
 
-  /// Adds local media tracks from [MediaStreamManager] to the [RTCPeerConnection].
-  Future<void> addLocalMediaTracks() async {
+  /// Adds local media tracks to [RTCPeerConnection], optionally configuring Simulcast encodings.
+  Future<void> addLocalMediaTracks({bool enableSimulcast = true}) async {
     final pc = await initializePeerConnection();
     final localStream = mediaStreamManager.localStream;
     if (localStream == null) {
       throw StateError('Cannot add local media tracks: localStream is null');
     }
 
-    for (final track in localStream.getTracks()) {
-      await pc.addTrack(track, localStream);
+    _simulcastEnabled = enableSimulcast;
+
+    // Add audio track
+    final audioTracks = localStream.getAudioTracks();
+    if (audioTracks.isNotEmpty) {
+      _audioSender = await pc.addTrack(audioTracks.first, localStream);
+    }
+
+    // Add video track with Simulcast or Single encoding
+    final videoTracks = localStream.getVideoTracks();
+    if (videoTracks.isNotEmpty) {
+      final videoTrack = videoTracks.first;
+
+      if (enableSimulcast) {
+        // Multi-layer simulcast transceivers: 'f' (full), 'h' (half), 'q' (quarter)
+        final transceiver = await pc.addTransceiver(
+          track: videoTrack,
+          kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+          init: RTCRtpTransceiverInit(
+            direction: TransceiverDirection.SendRecv,
+            streams: [localStream],
+            sendEncodings: [
+              RTCRtpEncoding(
+                rid: 'f',
+                active: true,
+                scaleResolutionDownBy: 1.0,
+                maxBitrate: 2500000,
+                maxFramerate: 30,
+              ),
+              RTCRtpEncoding(
+                rid: 'h',
+                active: true,
+                scaleResolutionDownBy: 2.0,
+                maxBitrate: 800000,
+                maxFramerate: 30,
+              ),
+              RTCRtpEncoding(
+                rid: 'q',
+                active: true,
+                scaleResolutionDownBy: 4.0,
+                maxBitrate: 250000,
+                maxFramerate: 15,
+              ),
+            ],
+          ),
+        );
+        _videoSender = transceiver.sender;
+      } else {
+        // Standard single high-quality encoding
+        _videoSender = await pc.addTrack(videoTrack, localStream);
+      }
+    }
+  }
+
+  /// Dynacast: Dynamically pauses/resumes sending a specific simulcast layer upstream (e.g. 'f', 'h', 'q').
+  Future<void> setPublisherLayerActive(String rid, bool active) async {
+    if (_videoSender == null) return;
+
+    try {
+      final params = _videoSender!.parameters;
+      if (params.encodings == null || params.encodings!.isEmpty) return;
+
+      var updated = false;
+      for (final encoding in params.encodings!) {
+        if (encoding.rid == rid && encoding.active != active) {
+          encoding.active = active;
+          updated = true;
+          debugPrint('[WebRTCManager Dynacast] Set layer $rid active=$active');
+        }
+      }
+
+      if (updated) {
+        await _videoSender!.setParameters(params);
+      }
+    } catch (e) {
+      debugPrint('[WebRTCManager Dynacast] Error setting layer active: $e');
     }
   }
 
@@ -141,8 +223,6 @@ class WebRTCManager {
   }
 
   /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins).
-  ///
-  /// Sets remote description, creates answer, sets local description, and returns the answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(String sdp) async {
     final pc = await initializePeerConnection();
 
@@ -157,22 +237,25 @@ class WebRTCManager {
   }
 
   /// Seamlessly upgrades a Viewer to a Co-Host without tearing down the existing [RTCPeerConnection].
-  ///
-  /// Opens local hardware media, adds tracks to the existing peer connection,
-  /// and creates a new renegotiation offer.
   Future<RTCSessionDescription> upgradeViewerToCoHost({
     bool video = true,
     bool audio = true,
+    bool enableSimulcast = true,
+    VideoParameters? parameters,
   }) async {
     if (_peerConnection == null) {
       throw StateError('Cannot upgrade to co-host without an active PeerConnection');
     }
 
     // 1. Capture local camera/microphone
-    await mediaStreamManager.openUserMedia(video: video, audio: audio);
+    await mediaStreamManager.openUserMedia(
+      parameters: parameters,
+      video: video,
+      audio: audio,
+    );
 
-    // 2. Add local tracks to existing PeerConnection
-    await addLocalMediaTracks();
+    // 2. Add local tracks to existing PeerConnection with simulcast option
+    await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
     // 3. Create renegotiation offer
     return await createAndSetLocalOffer();
@@ -216,6 +299,8 @@ class WebRTCManager {
   /// Closes and cleans up the active [RTCPeerConnection].
   Future<void> closePeerConnection() async {
     _queuedRemoteCandidates.clear();
+    _videoSender = null;
+    _audioSender = null;
     if (_peerConnection != null) {
       await _peerConnection!.close();
       await _peerConnection!.dispose();

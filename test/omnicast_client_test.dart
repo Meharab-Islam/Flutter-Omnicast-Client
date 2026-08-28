@@ -37,6 +37,7 @@ void main() {
       final mediaController = MediaController(
         mediaStreamManager: mediaStreamManager,
         signalingClient: signalingClient,
+        webRTCManager: webRTCManager,
       );
 
       final seatManager = SeatManager(

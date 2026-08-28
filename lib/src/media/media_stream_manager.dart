@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'video_parameters.dart';
 
 /// Manages local media hardware (camera, microphone) and maintains a dynamic
 /// registry of [RTCVideoRenderer] instances for local preview and all remote peers.
@@ -9,6 +10,7 @@ class MediaStreamManager {
   final Map<String, RTCVideoRenderer> _remoteRenderers = {};
   final Map<String, MediaStream> _remoteStreams = {};
 
+  VideoParameters _currentParameters = VideoParameters.presetHD720p;
   bool _isAudioMuted = false;
   bool _isVideoMuted = false;
   bool _isDisposed = false;
@@ -16,6 +18,7 @@ class MediaStreamManager {
   // Getters
   MediaStream? get localStream => _localStream;
   RTCVideoRenderer? get localRenderer => _localRenderer;
+  VideoParameters get currentParameters => _currentParameters;
   Map<String, RTCVideoRenderer> get remoteRenderers =>
       Map.unmodifiable(_remoteRenderers);
   Map<String, MediaStream> get remoteStreams => Map.unmodifiable(_remoteStreams);
@@ -34,36 +37,38 @@ class MediaStreamManager {
     return renderer;
   }
 
-  /// Opens the device camera and microphone with configurable constraints.
+  /// Opens the device camera and microphone with custom [VideoParameters].
   Future<MediaStream> openUserMedia({
+    VideoParameters? parameters,
     bool video = true,
     bool audio = true,
-    int width = 1280,
-    int height = 720,
-    int frameRate = 30,
-    String facingMode = 'user',
+    int? width,
+    int? height,
+    int? frameRate,
+    String? facingMode,
   }) async {
     if (_isDisposed) {
       throw StateError('Cannot open user media on a disposed MediaStreamManager');
     }
 
+    if (parameters != null) {
+      _currentParameters = parameters;
+    } else if (width != null || height != null || frameRate != null || facingMode != null) {
+      _currentParameters = VideoParameters.custom(
+        width: width ?? _currentParameters.width,
+        height: height ?? _currentParameters.height,
+        fps: frameRate ?? _currentParameters.frameRate,
+        facingMode: facingMode ?? _currentParameters.facingMode,
+      );
+    }
+
     // Stop existing local stream if any
     await stopLocalMedia();
 
-    final Map<String, dynamic> mediaConstraints = {
-      'audio': audio,
-      'video': video
-          ? {
-              'mandatory': {
-                'minWidth': width.toString(),
-                'minHeight': height.toString(),
-                'minFrameRate': frameRate.toString(),
-              },
-              'facingMode': facingMode,
-              'optional': [],
-            }
-          : false,
-    };
+    final mediaConstraints = _currentParameters.toMediaConstraints(
+      video: video,
+      audio: audio,
+    );
 
     try {
       final stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);

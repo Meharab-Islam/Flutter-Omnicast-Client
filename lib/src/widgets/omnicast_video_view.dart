@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import '../media/media_controller.dart';
 import '../media/media_stream_manager.dart';
 
 /// A production Flutter UI widget that binds and renders live WebRTC video
-/// from [MediaStreamManager] for a local user or remote peer [userId].
+/// from [MediaStreamManager] for a local user or remote peer [userId], with
+/// built-in Adaptive Streaming support based on rendered widget dimensions.
 class OmniCastVideoView extends StatefulWidget {
   /// The [MediaStreamManager] holding local and remote video renderers.
   final MediaStreamManager mediaStreamManager;
+
+  /// Optional [MediaController] for sending adaptive streaming layer requests.
+  final MediaController? mediaController;
 
   /// The user ID to render. If null or `'local'`, renders the local camera feed.
   final String? userId;
@@ -17,15 +22,20 @@ class OmniCastVideoView extends StatefulWidget {
   /// The object fit strategy for rendering the video within its layout constraints.
   final RTCVideoViewObjectFit objectFit;
 
+  /// Whether to automatically adjust simulcast subscription layer based on widget dimensions.
+  final bool enableAdaptiveStreaming;
+
   /// Optional custom placeholder widget shown when the video track is loading or not available.
   final Widget? placeholder;
 
   const OmniCastVideoView({
     super.key,
     required this.mediaStreamManager,
+    this.mediaController,
     this.userId,
     this.mirror = false,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+    this.enableAdaptiveStreaming = true,
     this.placeholder,
   });
 
@@ -36,6 +46,7 @@ class OmniCastVideoView extends StatefulWidget {
 class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   RTCVideoRenderer? _renderer;
   bool _isLoading = true;
+  String? _currentRequestedLayer;
 
   @override
   void initState() {
@@ -73,18 +84,60 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
     }
   }
 
+  void _checkAdaptiveStreaming(BoxConstraints constraints) {
+    if (!widget.enableAdaptiveStreaming ||
+        widget.mediaController == null ||
+        widget.userId == null ||
+        widget.userId == 'local') {
+      return;
+    }
+
+    final width = constraints.maxWidth;
+    final height = constraints.maxHeight;
+
+    // Skip unconstrained or zero dimensions
+    if (width.isInfinite || height.isInfinite || width <= 0 || height <= 0) return;
+
+    final maxDimension = width > height ? width : height;
+    String targetLayer;
+
+    if (maxDimension <= 360) {
+      targetLayer = 'q'; // Low resolution for grid/mini view
+    } else if (maxDimension <= 720) {
+      targetLayer = 'h'; // Medium resolution for split-screen / co-hosts
+    } else {
+      targetLayer = 'f'; // Full resolution for focused / fullscreen
+    }
+
+    if (_currentRequestedLayer != targetLayer) {
+      _currentRequestedLayer = targetLayer;
+      widget.mediaController!.requestLayerForUser(
+        targetUserId: widget.userId!,
+        layer: targetLayer,
+      );
+      debugPrint(
+          '[OmniCastVideoView Adaptive] Requested layer $targetLayer for ${widget.userId} (${width.toInt()}x${height.toInt()})');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading || _renderer == null || _renderer!.srcObject == null) {
       return widget.placeholder ?? _defaultPlaceholder();
     }
 
-    return ClipRRect(
-      child: RTCVideoView(
-        _renderer!,
-        mirror: widget.mirror,
-        objectFit: widget.objectFit,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _checkAdaptiveStreaming(constraints);
+
+        return ClipRRect(
+          child: RTCVideoView(
+            _renderer!,
+            mirror: widget.mirror,
+            objectFit: widget.objectFit,
+          ),
+        );
+      },
     );
   }
 

@@ -98,6 +98,7 @@ class OmniCastClient {
     _mediaController = MediaController(
       mediaStreamManager: _mediaStreamManager,
       signalingClient: _signalingClient,
+      webRTCManager: _webRTCManager,
     );
 
     _seatManager = SeatManager(

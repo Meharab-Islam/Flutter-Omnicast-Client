@@ -1,27 +1,27 @@
 {
   "lib/omnicast_client.dart": {
-    "mtime": 1787890647.0511887,
-    "seen": 1787890709.8409972,
-    "ast_hash": "fc24d592ae773e35d72c352fa9780840",
-    "semantic_hash": "fc24d592ae773e35d72c352fa9780840"
+    "mtime": 1787891045.466986,
+    "seen": 1787891077.1269991,
+    "ast_hash": "1f127070e376f23ad384745fc40ce5d3",
+    "semantic_hash": "1f127070e376f23ad384745fc40ce5d3"
   },
   "test/omnicast_client_test.dart": {
-    "mtime": 1787890698.7122524,
-    "seen": 1787890709.841076,
-    "ast_hash": "6bdc05de77f3ab0ce711c514a791bea7",
-    "semantic_hash": "6bdc05de77f3ab0ce711c514a791bea7"
+    "mtime": 1787891058.6893506,
+    "seen": 1787891077.127228,
+    "ast_hash": "4051cce630abb2940dfe44d1d58a8e55",
+    "semantic_hash": "4051cce630abb2940dfe44d1d58a8e55"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1787890668.3076818,
-    "seen": 1787890709.840998,
-    "ast_hash": "ee07fcd8e2d51194177a4307bd686cbd",
-    "semantic_hash": "ee07fcd8e2d51194177a4307bd686cbd"
+    "mtime": 1787891042.1402733,
+    "seen": 1787891077.127,
+    "ast_hash": "bd13d90b692192c30d3e472bd45c3a66",
+    "semantic_hash": "bd13d90b692192c30d3e472bd45c3a66"
   },
   "lib/src/media/media_stream_manager.dart": {
-    "mtime": 1787890408.9046822,
-    "seen": 1787890502.4214349,
-    "ast_hash": "75b063d195c2109f6f9c25e4b65ba4cc",
-    "semantic_hash": "75b063d195c2109f6f9c25e4b65ba4cc"
+    "mtime": 1787891011.514537,
+    "seen": 1787891077.1270442,
+    "ast_hash": "cec00f9bf5a3e91ef95fb9cf458754a4",
+    "semantic_hash": "cec00f9bf5a3e91ef95fb9cf458754a4"
   },
   "lib/src/models/room_event_models.dart": {
     "mtime": 1787890662.660387,
@@ -48,16 +48,16 @@
     "semantic_hash": "0fb2322b35d070b22985b7d1a850855b"
   },
   "lib/src/webrtc/webrtc_manager.dart": {
-    "mtime": 1787890484.4511638,
-    "seen": 1787890502.421438,
-    "ast_hash": "83a8ed86667a514bc8a701bf215eb54e",
-    "semantic_hash": "83a8ed86667a514bc8a701bf215eb54e"
+    "mtime": 1787891066.7563787,
+    "seen": 1787891077.1272268,
+    "ast_hash": "0803f41da38420c52ea95c997d047c94",
+    "semantic_hash": "0803f41da38420c52ea95c997d047c94"
   },
   "lib/src/widgets/omnicast_video_view.dart": {
-    "mtime": 1787890429.4646876,
-    "seen": 1787890502.421438,
-    "ast_hash": "62834f5f63a527d365579b8bf3de3771",
-    "semantic_hash": "62834f5f63a527d365579b8bf3de3771"
+    "mtime": 1787891033.600409,
+    "seen": 1787891077.127228,
+    "ast_hash": "df4149092858cca277ca074f8599c482",
+    "semantic_hash": "df4149092858cca277ca074f8599c482"
   },
   "test/omnicast_video_view_test.dart": {
     "mtime": 1787890470.676374,
@@ -90,10 +90,10 @@
     "semantic_hash": "6daa3f28481ebbb37fd690666c2c2b53"
   },
   "lib/src/media/media_controller.dart": {
-    "mtime": 1787890609.861087,
-    "seen": 1787890709.8409998,
-    "ast_hash": "b3c073c90c62779211af5c87273de2df",
-    "semantic_hash": "b3c073c90c62779211af5c87273de2df"
+    "mtime": 1787891027.9032981,
+    "seen": 1787891077.1270442,
+    "ast_hash": "f5d7e03b3951a7631b57f1372355f3d2",
+    "semantic_hash": "f5d7e03b3951a7631b57f1372355f3d2"
   },
   "lib/src/models/interaction_models.dart": {
     "mtime": 1787890573.659098,
@@ -136,5 +136,17 @@
     "seen": 1787890709.841033,
     "ast_hash": "7c3432a4859127b7eb2c5d8f22382683",
     "semantic_hash": "7c3432a4859127b7eb2c5d8f22382683"
+  },
+  "lib/src/media/video_parameters.dart": {
+    "mtime": 1787891003.7898133,
+    "seen": 1787891077.1270452,
+    "ast_hash": "a9075a461798815340d8ae00931909f1",
+    "semantic_hash": "a9075a461798815340d8ae00931909f1"
+  },
+  "test/video_parameters_test.dart": {
+    "mtime": 1787891050.7352488,
+    "seen": 1787891077.12727,
+    "ast_hash": "5d4d8931ac805228a07acf009c73142d",
+    "semantic_hash": "5d4d8931ac805228a07acf009c73142d"
   }
 }
