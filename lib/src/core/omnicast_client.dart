@@ -122,6 +122,7 @@ class OmniCastClient {
       webRTCManager: _webRTCManager,
       roomState: _roomState,
       globalConfig: mediaConfig,
+      config: config,
     );
 
     _seatManager = SeatManager(

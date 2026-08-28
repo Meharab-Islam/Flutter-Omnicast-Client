@@ -229,8 +229,11 @@ class RoomManager {
             ) ??
             '');
 
-    if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
-      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: effectiveToken);
+    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
+    if (wsUrl != null) {
+      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
+        await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
+      }
     }
 
     _roomState.setSession(
@@ -294,8 +297,11 @@ class RoomManager {
             ) ??
             '');
 
-    if (!_signalingClient.isConnected && _signalingClient.wsUrl != null) {
-      await _signalingClient.connect(wsUrl: _signalingClient.wsUrl!, token: effectiveToken);
+    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
+    if (wsUrl != null) {
+      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
+        await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
+      }
     }
 
     _roomState.setSession(

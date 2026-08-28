@@ -166,57 +166,6 @@
       "static_const_string"
     ],
     "3": [
-      "changenotifier",
-      "global_media_config_dart",
-      "globalmediaconfig_get",
-      "lib_src_media_global_media_config",
-      "lib_src_media_global_media_config_autopauseonbackground",
-      "lib_src_media_global_media_config_defaultresolution",
-      "lib_src_media_global_media_config_enableadaptivestreaming",
-      "lib_src_media_global_media_config_enabledynacast",
-      "lib_src_media_global_media_config_enablesimulcast",
-      "lib_src_media_global_media_config_globalmediaconfig",
-      "lib_src_media_media_controller",
-      "lib_src_media_media_controller_adaptivestreamingenabled",
-      "lib_src_media_media_controller_autopauseonbackground",
-      "lib_src_media_media_controller_binddynacastsignaling",
-      "lib_src_media_media_controller_currentparameters",
-      "lib_src_media_media_controller_currentsimulcastlayer",
-      "lib_src_media_media_controller_didchangeapplifecyclestate",
-      "lib_src_media_media_controller_dispose",
-      "lib_src_media_media_controller_dynacastenabled",
-      "lib_src_media_media_controller_dynacastsubscription",
-      "lib_src_media_media_controller_enableadaptivestreaming",
-      "lib_src_media_media_controller_enabledynacast",
-      "lib_src_media_media_controller_globalconfig",
-      "lib_src_media_media_controller_iscameraenabled",
-      "lib_src_media_media_controller_iscameraenablednotifier",
-      "lib_src_media_media_controller_ismicrophonemuted",
-      "lib_src_media_media_controller_ismicrophonemutednotifier",
-      "lib_src_media_media_controller_mediastreammanager",
-      "lib_src_media_media_controller_requestlayerforuser",
-      "lib_src_media_media_controller_roomstate",
-      "lib_src_media_media_controller_setcameraenabled",
-      "lib_src_media_media_controller_setmicrophonemuted",
-      "lib_src_media_media_controller_setremotetrackvisibility",
-      "lib_src_media_media_controller_setsimulcastlayer",
-      "lib_src_media_media_controller_setvideoparameters",
-      "lib_src_media_media_controller_signalingclient",
-      "lib_src_media_media_controller_simulcastlayernotifier",
-      "lib_src_media_media_controller_startashost",
-      "lib_src_media_media_controller_streammanager",
-      "lib_src_media_media_controller_switchcamera",
-      "lib_src_media_media_controller_wascameraenabledbeforepause",
-      "lib_src_media_media_controller_webrtcmanager",
-      "lib_src_state_room_state_roomstate",
-      "media_stream_manager_dart",
-      "mediastreammanager_get",
-      "string_get",
-      "video_parameters_dart",
-      "videoparameters"
-    ],
-    "4": [
-      "globalmediaconfig",
       "interaction_interaction_manager_dart",
       "interactionmanager",
       "interactionmanager_get",
@@ -249,7 +198,6 @@
       "lib_src_core_omnicast_client_webrtc",
       "lib_src_core_omnicast_client_webrtcmanager",
       "media_global_media_config_dart",
-      "mediacontroller",
       "mediacontroller_get",
       "omnicast_config_dart",
       "pk_pk_manager_dart",
@@ -262,6 +210,49 @@
       "seatmanager_get",
       "seats_seat_manager_dart",
       "signalingclient_get"
+    ],
+    "4": [
+      "global_media_config_dart",
+      "globalmediaconfig",
+      "globalmediaconfig_get",
+      "lib_src_media_media_controller",
+      "lib_src_media_media_controller_adaptivestreamingenabled",
+      "lib_src_media_media_controller_autopauseonbackground",
+      "lib_src_media_media_controller_binddynacastsignaling",
+      "lib_src_media_media_controller_config",
+      "lib_src_media_media_controller_currentparameters",
+      "lib_src_media_media_controller_currentsimulcastlayer",
+      "lib_src_media_media_controller_didchangeapplifecyclestate",
+      "lib_src_media_media_controller_dispose",
+      "lib_src_media_media_controller_dynacastenabled",
+      "lib_src_media_media_controller_dynacastsubscription",
+      "lib_src_media_media_controller_enableadaptivestreaming",
+      "lib_src_media_media_controller_enabledynacast",
+      "lib_src_media_media_controller_globalconfig",
+      "lib_src_media_media_controller_iscameraenabled",
+      "lib_src_media_media_controller_iscameraenablednotifier",
+      "lib_src_media_media_controller_ismicrophonemuted",
+      "lib_src_media_media_controller_ismicrophonemutednotifier",
+      "lib_src_media_media_controller_mediacontroller",
+      "lib_src_media_media_controller_mediastreammanager",
+      "lib_src_media_media_controller_requestlayerforuser",
+      "lib_src_media_media_controller_roomstate",
+      "lib_src_media_media_controller_setcameraenabled",
+      "lib_src_media_media_controller_setmicrophonemuted",
+      "lib_src_media_media_controller_setremotetrackvisibility",
+      "lib_src_media_media_controller_setsimulcastlayer",
+      "lib_src_media_media_controller_setvideoparameters",
+      "lib_src_media_media_controller_signalingclient",
+      "lib_src_media_media_controller_simulcastlayernotifier",
+      "lib_src_media_media_controller_startashost",
+      "lib_src_media_media_controller_streammanager",
+      "lib_src_media_media_controller_switchcamera",
+      "lib_src_media_media_controller_wascameraenabledbeforepause",
+      "lib_src_media_media_controller_webrtcmanager",
+      "media_stream_manager_dart",
+      "mediastreammanager_get",
+      "string_get",
+      "widgetsbindingobserver"
     ],
     "5": [
       "clientconnectionstate",
@@ -298,8 +289,8 @@
       "lib_src_room_room_manager_viewercountnotifier",
       "lib_src_room_room_manager_viewersnotifier",
       "lib_src_room_room_manager_webrtcmanager",
+      "omnicastconfig",
       "set",
-      "signalingclient",
       "static_const_int",
       "userrole"
     ],
@@ -343,6 +334,44 @@
       "static_const_pkstate"
     ],
     "7": [
+      "lib_src_media_global_media_config",
+      "lib_src_media_global_media_config_autopauseonbackground",
+      "lib_src_media_global_media_config_defaultresolution",
+      "lib_src_media_global_media_config_enableadaptivestreaming",
+      "lib_src_media_global_media_config_enabledynacast",
+      "lib_src_media_global_media_config_enablesimulcast",
+      "lib_src_media_global_media_config_globalmediaconfig",
+      "lib_src_media_media_stream_manager",
+      "lib_src_media_media_stream_manager_attachremotestream",
+      "lib_src_media_media_stream_manager_currentparameters",
+      "lib_src_media_media_stream_manager_dispose",
+      "lib_src_media_media_stream_manager_getorcreateremoterenderer",
+      "lib_src_media_media_stream_manager_getrenderer",
+      "lib_src_media_media_stream_manager_haslocalstream",
+      "lib_src_media_media_stream_manager_initlocalrenderer",
+      "lib_src_media_media_stream_manager_isaudiomuted",
+      "lib_src_media_media_stream_manager_isdisposed",
+      "lib_src_media_media_stream_manager_isvideomuted",
+      "lib_src_media_media_stream_manager_localrenderer",
+      "lib_src_media_media_stream_manager_localstream",
+      "lib_src_media_media_stream_manager_mediastreammanager",
+      "lib_src_media_media_stream_manager_openusermedia",
+      "lib_src_media_media_stream_manager_remoterenderers",
+      "lib_src_media_media_stream_manager_remotestreams",
+      "lib_src_media_media_stream_manager_removeremoterenderer",
+      "lib_src_media_media_stream_manager_stoplocalmedia",
+      "lib_src_media_media_stream_manager_switchcamera",
+      "lib_src_media_media_stream_manager_toggleaudio",
+      "lib_src_media_media_stream_manager_togglevideo",
+      "mediastream",
+      "mediastream_get",
+      "package_flutter_foundation_dart",
+      "rtcvideorenderer_get",
+      "video_parameters_dart",
+      "videoparameters",
+      "videoparameters_get"
+    ],
+    "8": [
       "lib_src_pk_pk_manager",
       "lib_src_pk_pk_manager_acceptpkrequest",
       "lib_src_pk_pk_manager_bindstatenotifiers",
@@ -378,7 +407,7 @@
       "webrtcmanager",
       "webrtcmanager_get"
     ],
-    "8": [
+    "9": [
       "alignment",
       "giftevent",
       "lib_src_widgets_gift_overlay_manager",
@@ -413,7 +442,7 @@
       "streamsubscription",
       "timer"
     ],
-    "9": [
+    "10": [
       "lib_src_seats_seat_manager",
       "lib_src_seats_seat_manager_acceptcohostinvite",
       "lib_src_seats_seat_manager_acceptseatrequest",
@@ -448,7 +477,7 @@
       "models_room_models_dart",
       "models_seat_models_dart"
     ],
-    "10": [
+    "11": [
       "lib_src_webrtc_webrtc_manager",
       "lib_src_webrtc_webrtc_manager_addlocalmediatracks",
       "lib_src_webrtc_webrtc_manager_addremotecandidate",
@@ -483,7 +512,37 @@
       "rtcrtpsender",
       "rtcrtpsender_get"
     ],
-    "11": [
+    "12": [
+      "dart_async",
+      "dart_convert",
+      "package_flutter_material_dart",
+      "package_flutter_test_flutter_test_dart",
+      "package_flutter_widgets_dart",
+      "package_omnicast_client_omnicast_client_dart",
+      "test_global_media_and_audio_room_test",
+      "test_global_media_and_audio_room_test_main",
+      "test_headless_and_performance_test",
+      "test_headless_and_performance_test_main",
+      "test_omnicast_client_test",
+      "test_omnicast_client_test_main",
+      "test_omnicast_video_view_test",
+      "test_omnicast_video_view_test_main",
+      "test_pk_system_test",
+      "test_pk_system_test_main",
+      "test_room_state_test",
+      "test_room_state_test_main",
+      "test_signaling_message_test",
+      "test_signaling_message_test_main",
+      "test_token_and_cohost_test",
+      "test_token_and_cohost_test_main",
+      "test_token_query_connection_test",
+      "test_token_query_connection_test_main",
+      "test_video_parameters_test",
+      "test_video_parameters_test_main",
+      "test_viewer_tracking_test",
+      "test_viewer_tracking_test_main"
+    ],
+    "13": [
       "int_get",
       "lib_src_models_room_models",
       "lib_src_models_room_models_avatarurl",
@@ -502,9 +561,7 @@
       "lib_src_models_room_models_joinedat",
       "lib_src_models_room_models_maxcohosts",
       "lib_src_models_room_models_metadata",
-      "lib_src_models_room_models_omnicastparticipant",
       "lib_src_models_room_models_operator",
-      "lib_src_models_room_models_participant",
       "lib_src_models_room_models_role",
       "lib_src_models_room_models_roomoptions",
       "lib_src_models_room_models_roomtype",
@@ -515,37 +572,7 @@
       "map",
       "typedef"
     ],
-    "12": [
-      "bool_get",
-      "interaction_models_dart",
-      "lib_src_models_room_event_models",
-      "lib_src_models_seat_models",
-      "lib_src_models_seat_models_cohostinvite",
-      "lib_src_models_seat_models_createdat",
-      "lib_src_models_seat_models_fromjson",
-      "lib_src_models_seat_models_hostid",
-      "lib_src_models_seat_models_inviteid",
-      "lib_src_models_seat_models_islocked",
-      "lib_src_models_seat_models_ismuted",
-      "lib_src_models_seat_models_isoccupied",
-      "lib_src_models_seat_models_preferredseatindex",
-      "lib_src_models_seat_models_requestedat",
-      "lib_src_models_seat_models_requesteravatar",
-      "lib_src_models_seat_models_requesterid",
-      "lib_src_models_seat_models_requestername",
-      "lib_src_models_seat_models_seatindex",
-      "lib_src_models_seat_models_seatrequest",
-      "lib_src_models_seat_models_stageseat",
-      "lib_src_models_seat_models_targetuserid",
-      "lib_src_models_seat_models_tojson",
-      "lib_src_models_seat_models_user",
-      "lib_src_models_seat_models_userid",
-      "pk_models_dart",
-      "room_models_dart",
-      "seat_models_dart",
-      "signaling_message_dart"
-    ],
-    "13": [
+    "14": [
       "lib_src_interaction_interaction_manager",
       "lib_src_interaction_interaction_manager_balancestream",
       "lib_src_interaction_interaction_manager_balanceupdatedcontroller",
@@ -574,64 +601,7 @@
       "state_room_state_dart",
       "valuenotifier"
     ],
-    "14": [
-      "lib_src_media_media_stream_manager",
-      "lib_src_media_media_stream_manager_attachremotestream",
-      "lib_src_media_media_stream_manager_currentparameters",
-      "lib_src_media_media_stream_manager_dispose",
-      "lib_src_media_media_stream_manager_getorcreateremoterenderer",
-      "lib_src_media_media_stream_manager_getrenderer",
-      "lib_src_media_media_stream_manager_haslocalstream",
-      "lib_src_media_media_stream_manager_initlocalrenderer",
-      "lib_src_media_media_stream_manager_isaudiomuted",
-      "lib_src_media_media_stream_manager_isdisposed",
-      "lib_src_media_media_stream_manager_isvideomuted",
-      "lib_src_media_media_stream_manager_localrenderer",
-      "lib_src_media_media_stream_manager_localstream",
-      "lib_src_media_media_stream_manager_mediastreammanager",
-      "lib_src_media_media_stream_manager_openusermedia",
-      "lib_src_media_media_stream_manager_remoterenderers",
-      "lib_src_media_media_stream_manager_remotestreams",
-      "lib_src_media_media_stream_manager_removeremoterenderer",
-      "lib_src_media_media_stream_manager_stoplocalmedia",
-      "lib_src_media_media_stream_manager_switchcamera",
-      "lib_src_media_media_stream_manager_toggleaudio",
-      "lib_src_media_media_stream_manager_togglevideo",
-      "mediastream",
-      "mediastream_get",
-      "package_flutter_foundation_dart",
-      "rtcvideorenderer_get",
-      "videoparameters_get"
-    ],
     "15": [
-      "dart_async",
-      "dart_convert",
-      "package_flutter_material_dart",
-      "package_flutter_test_flutter_test_dart",
-      "package_flutter_widgets_dart",
-      "package_omnicast_client_omnicast_client_dart",
-      "test_global_media_and_audio_room_test",
-      "test_global_media_and_audio_room_test_main",
-      "test_headless_and_performance_test",
-      "test_headless_and_performance_test_main",
-      "test_omnicast_client_test",
-      "test_omnicast_client_test_main",
-      "test_omnicast_video_view_test",
-      "test_omnicast_video_view_test_main",
-      "test_pk_system_test",
-      "test_pk_system_test_main",
-      "test_room_state_test",
-      "test_room_state_test_main",
-      "test_signaling_message_test",
-      "test_signaling_message_test_main",
-      "test_token_and_cohost_test",
-      "test_token_and_cohost_test_main",
-      "test_video_parameters_test",
-      "test_video_parameters_test_main",
-      "test_viewer_tracking_test",
-      "test_viewer_tracking_test_main"
-    ],
-    "16": [
       "datetime",
       "lib_src_models_interaction_models",
       "lib_src_models_interaction_models_amount",
@@ -658,7 +628,7 @@
       "lib_src_models_interaction_models_tojson",
       "lib_src_models_interaction_models_userid"
     ],
-    "17": [
+    "16": [
       "lib_omnicast_client",
       "src_auth_omnicast_token_generator_dart",
       "src_core_omnicast_client_dart",
@@ -684,31 +654,7 @@
       "src_widgets_omnicast_video_view_dart",
       "src_widgets_pk_score_progress_bar_dart"
     ],
-    "18": [
-      "axis",
-      "lib_src_widgets_omnicast_pk_battle_view",
-      "lib_src_widgets_omnicast_pk_battle_view_build",
-      "lib_src_widgets_omnicast_pk_battle_view_buildvideopane",
-      "lib_src_widgets_omnicast_pk_battle_view_hostdisplayname",
-      "lib_src_widgets_omnicast_pk_battle_view_hostplaceholder",
-      "lib_src_widgets_omnicast_pk_battle_view_hostuserid",
-      "lib_src_widgets_omnicast_pk_battle_view_mediastreammanager",
-      "lib_src_widgets_omnicast_pk_battle_view_objectfit",
-      "lib_src_widgets_omnicast_pk_battle_view_opponentdisplayname",
-      "lib_src_widgets_omnicast_pk_battle_view_opponentplaceholder",
-      "lib_src_widgets_omnicast_pk_battle_view_opponentuserid",
-      "lib_src_widgets_omnicast_pk_battle_view_pkstate",
-      "lib_src_widgets_omnicast_pk_battle_view_showprogressbar",
-      "lib_src_widgets_omnicast_pk_battle_view_spacing",
-      "lib_src_widgets_omnicast_pk_battle_view_splitaxis",
-      "media_media_stream_manager_dart",
-      "omnicast_video_view_dart",
-      "package_flutter_webrtc_flutter_webrtc_dart",
-      "pk_score_progress_bar_dart",
-      "rtcvideoviewobjectfit",
-      "widget"
-    ],
-    "19": [
+    "17": [
       "lib_src_widgets_omnicast_video_view",
       "lib_src_widgets_omnicast_video_view_build",
       "lib_src_widgets_omnicast_video_view_checkadaptivestreaming",
@@ -729,8 +675,56 @@
       "lib_src_widgets_omnicast_video_view_renderer",
       "lib_src_widgets_omnicast_video_view_userid",
       "media_media_controller_dart",
+      "media_media_stream_manager_dart",
+      "rtcvideorenderer",
+      "widget"
+    ],
+    "18": [
+      "bool_get",
+      "lib_src_models_seat_models",
+      "lib_src_models_seat_models_cohostinvite",
+      "lib_src_models_seat_models_createdat",
+      "lib_src_models_seat_models_fromjson",
+      "lib_src_models_seat_models_hostid",
+      "lib_src_models_seat_models_inviteid",
+      "lib_src_models_seat_models_islocked",
+      "lib_src_models_seat_models_ismuted",
+      "lib_src_models_seat_models_isoccupied",
+      "lib_src_models_seat_models_preferredseatindex",
+      "lib_src_models_seat_models_requestedat",
+      "lib_src_models_seat_models_requesteravatar",
+      "lib_src_models_seat_models_requesterid",
+      "lib_src_models_seat_models_requestername",
+      "lib_src_models_seat_models_seatindex",
+      "lib_src_models_seat_models_seatrequest",
+      "lib_src_models_seat_models_stageseat",
+      "lib_src_models_seat_models_targetuserid",
+      "lib_src_models_seat_models_tojson",
+      "lib_src_models_seat_models_user",
+      "lib_src_models_seat_models_userid"
+    ],
+    "19": [
+      "axis",
+      "lib_src_widgets_omnicast_pk_battle_view",
+      "lib_src_widgets_omnicast_pk_battle_view_build",
+      "lib_src_widgets_omnicast_pk_battle_view_buildvideopane",
+      "lib_src_widgets_omnicast_pk_battle_view_hostdisplayname",
+      "lib_src_widgets_omnicast_pk_battle_view_hostplaceholder",
+      "lib_src_widgets_omnicast_pk_battle_view_hostuserid",
+      "lib_src_widgets_omnicast_pk_battle_view_mediastreammanager",
+      "lib_src_widgets_omnicast_pk_battle_view_objectfit",
+      "lib_src_widgets_omnicast_pk_battle_view_opponentdisplayname",
+      "lib_src_widgets_omnicast_pk_battle_view_opponentplaceholder",
+      "lib_src_widgets_omnicast_pk_battle_view_opponentuserid",
+      "lib_src_widgets_omnicast_pk_battle_view_pkstate",
+      "lib_src_widgets_omnicast_pk_battle_view_showprogressbar",
+      "lib_src_widgets_omnicast_pk_battle_view_spacing",
+      "lib_src_widgets_omnicast_pk_battle_view_splitaxis",
       "mediastreammanager",
-      "rtcvideorenderer"
+      "omnicast_video_view_dart",
+      "package_flutter_webrtc_flutter_webrtc_dart",
+      "pk_score_progress_bar_dart",
+      "rtcvideoviewobjectfit"
     ],
     "20": [
       "int",
@@ -787,37 +781,52 @@
       "textstyle"
     ],
     "23": [
+      "interaction_models_dart",
+      "lib_src_models_room_event_models",
+      "pk_models_dart",
+      "room_models_dart",
+      "seat_models_dart",
+      "signaling_message_dart"
+    ],
+    "24": [
       "lib_src_auth_omnicast_token_generator",
       "lib_src_auth_omnicast_token_generator_generate",
       "lib_src_auth_omnicast_token_generator_omnicasttokengenerator",
       "package_dart_jsonwebtoken_dart_jsonwebtoken_dart"
     ],
-    "24": [
+    "25": [
       "lib_src_widgets_gift_overlay_manager_giftbannerwidget",
       "lib_src_widgets_omnicast_pk_battle_view_omnicastpkbattleview",
       "lib_src_widgets_pk_score_progress_bar_pkscoreprogressbar",
       "statelesswidget"
     ],
-    "25": [
-      "lib_src_media_media_controller_mediacontroller",
-      "widgetsbindingobserver"
-    ],
     "26": [
-      "color"
+      "changenotifier",
+      "lib_src_state_room_state_roomstate"
     ],
     "27": [
-      "models_room_event_models_dart"
+      "lib_src_models_room_models_omnicastparticipant",
+      "lib_src_models_room_models_participant"
     ],
     "28": [
-      "omnicastconfig"
+      "color"
     ],
     "29": [
-      "package_crypto_crypto_dart"
+      "mediacontroller"
     ],
     "30": [
-      "roommanager"
+      "models_room_event_models_dart"
     ],
     "31": [
+      "package_crypto_crypto_dart"
+    ],
+    "32": [
+      "roommanager"
+    ],
+    "33": [
+      "signalingclient"
+    ],
+    "34": [
       "src_models_room_event_models_dart"
     ]
   },
@@ -825,51 +834,49 @@
     "0": 0.03636363636363636,
     "1": 0.03773584905660377,
     "2": 0.0392156862745098,
-    "3": 0.0425531914893617,
-    "4": 0.043478260869565216,
+    "3": 0.045454545454545456,
+    "4": 0.04878048780487805,
     "5": 0.05263157894736842,
     "6": 0.05405405405405406,
-    "7": 0.058823529411764705,
-    "8": 0.06439393939393939,
-    "9": 0.06060606060606061,
+    "7": 0.05555555555555555,
+    "8": 0.058823529411764705,
+    "9": 0.06439393939393939,
     "10": 0.06060606060606061,
-    "11": 0.06896551724137931,
-    "12": 0.07142857142857142,
-    "13": 0.07407407407407407,
+    "11": 0.06060606060606061,
+    "12": 0.10317460317460317,
+    "13": 0.07142857142857142,
     "14": 0.07407407407407407,
-    "15": 0.11076923076923077,
-    "16": 0.08,
-    "17": 0.08333333333333333,
+    "15": 0.08,
+    "16": 0.08333333333333333,
+    "17": 0.08695652173913043,
     "18": 0.09090909090909091,
-    "19": 0.09090909090909091,
+    "19": 0.09523809523809523,
     "20": 0.11764705882352941,
     "21": 0.125,
     "22": 0.13333333333333333,
-    "23": 0.5,
+    "23": 0.3333333333333333,
     "24": 0.5,
-    "25": 1.0,
+    "25": 0.5,
     "26": 1.0,
     "27": 1.0,
     "28": 1.0,
     "29": 1.0,
     "30": 1.0,
-    "31": 1.0
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0
   },
   "gods": [
     {
       "id": "lib_src_signaling_signaling_client_signalingclient",
       "label": "SignalingClient",
+      "degree": 7
+    },
+    {
+      "id": "lib_src_media_media_controller_mediacontroller",
+      "label": "MediaController",
       "degree": 4
-    },
-    {
-      "id": "lib_src_models_room_models_participant",
-      "label": "Participant",
-      "degree": 3
-    },
-    {
-      "id": "lib_src_core_omnicast_config_omnicastconfig",
-      "label": "OmniCastConfig",
-      "degree": 3
     },
     {
       "id": "lib_src_models_pk_models_pkstate",
@@ -877,13 +884,8 @@
       "degree": 3
     },
     {
-      "id": "lib_src_media_media_controller_mediacontroller",
-      "label": "MediaController",
-      "degree": 3
-    },
-    {
-      "id": "lib_src_state_room_state_roomstate",
-      "label": "RoomState",
+      "id": "lib_src_models_room_models_participant",
+      "label": "Participant",
       "degree": 3
     },
     {
@@ -905,14 +907,29 @@
       "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
       "label": "_OmniCastVideoViewState",
       "degree": 3
+    },
+    {
+      "id": "lib_src_models_room_models_clientconnectionstate",
+      "label": "ClientConnectionState",
+      "degree": 2
+    },
+    {
+      "id": "lib_src_models_room_models_roomtype",
+      "label": "RoomType",
+      "degree": 2
     }
   ],
   "surprises": [],
   "questions": [
     {
       "type": "bridge_node",
+      "question": "Why does `SignalingClient` connect `interaction_manager.dart` to `signaling_client.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `room_manager.dart`, `pk_manager.dart`, `seat_manager.dart`?",
+      "why": "High betweenness centrality (0.022) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
       "question": "Why does `VideoParameters` connect `video_parameters.dart` to `media_stream_manager.dart`?",
-      "why": "High betweenness centrality (0.018) - this node is a cross-community bridge."
+      "why": "High betweenness centrality (0.017) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
@@ -920,14 +937,9 @@
       "why": "High betweenness centrality (0.016) - this node is a cross-community bridge."
     },
     {
-      "type": "bridge_node",
-      "question": "Why does `SignalingClient` connect `interaction_manager.dart` to `seat_manager.dart`, `signaling_client.dart`, `pk_manager.dart`?",
-      "why": "High betweenness centrality (0.007) - this node is a cross-community bridge."
-    },
-    {
       "type": "isolated_nodes",
       "question": "What connects `_activePK`, `_activeRemoteUserIds`, `_activeSeats` to the rest of the system?",
-      "why": "560 weakly-connected nodes found - possible documentation gaps or missing edges."
+      "why": "564 weakly-connected nodes found - possible documentation gaps or missing edges."
     },
     {
       "type": "low_cohesion",

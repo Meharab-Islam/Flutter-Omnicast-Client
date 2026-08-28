@@ -90,6 +90,8 @@ class SignalingClient {
         uri = uri.replace(queryParameters: queryParams);
       }
 
+      debugPrint('[SignalingClient] Connecting to WebSocket: $uri');
+
       await _cleanupActiveConnection();
 
       final channel = WebSocketChannel.connect(uri);
@@ -105,6 +107,7 @@ class SignalingClient {
 
       _updateState(ClientConnectionState.connected);
       _startHeartbeat();
+      debugPrint('[SignalingClient] WebSocket successfully connected.');
     } catch (e) {
       debugPrint('[SignalingClient] Connection error: $e');
       _updateState(ClientConnectionState.disconnected);
