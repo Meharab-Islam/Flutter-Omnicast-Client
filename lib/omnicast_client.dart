@@ -1,0 +1,31 @@
+/// OmniCast Live Streaming & WebRTC SFU Client SDK for Flutter.
+///
+/// Designed for high-scale interactive live streaming platforms (similar to TikTok Live & Bigo Live).
+library;
+
+// Core Facade & Configuration
+export 'src/core/omnicast_client.dart';
+export 'src/core/omnicast_config.dart';
+
+// Sub-Module Controllers & Managers
+export 'src/room/room_manager.dart';
+export 'src/media/media_controller.dart';
+export 'src/media/media_stream_manager.dart';
+export 'src/seats/seat_manager.dart';
+export 'src/interaction/interaction_manager.dart';
+export 'src/pk/pk_manager.dart';
+export 'src/signaling/signaling_client.dart';
+export 'src/webrtc/webrtc_manager.dart';
+
+// Reactive State
+export 'src/state/room_state.dart';
+
+// Models
+export 'src/models/room_models.dart';
+export 'src/models/pk_models.dart';
+export 'src/models/interaction_models.dart';
+export 'src/models/seat_models.dart';
+export 'src/models/signaling_message.dart';
+
+// UI Widgets
+export 'src/widgets/omnicast_video_view.dart';
