@@ -19,10 +19,19 @@ void main() {
       expect(constraints['video']['frameRate']['ideal'], 24);
     });
 
-    test('WebRTCManager preferCodec prioritizes VP8 in m=video line', () {
+    test('WebRTCManager preferCodec prioritizes VP8 or VP9 in m=video line', () {
       const sampleSdp = 'v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 96 97 98\r\na=rtpmap:96 H264/90000\r\na=rtpmap:97 VP9/90000\r\na=rtpmap:98 VP8/90000\r\n';
-      final modifiedSdp = WebRTCManager.preferCodec(sampleSdp, 'VP8');
-      expect(modifiedSdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 98 96 97'));
+      final vp8Sdp = WebRTCManager.preferCodec(sampleSdp, 'VP8');
+      expect(vp8Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 98 96 97'));
+
+      final vp9Sdp = WebRTCManager.preferCodec(sampleSdp, 'VP9');
+      expect(vp9Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 97 96 98'));
+    });
+
+    test('WebRTCManager enableOpusDtx injects usedtx=1 into Opus fmtp line', () {
+      const sampleSdp = 'v=0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10\r\n';
+      final dtxSdp = WebRTCManager.enableOpusDtx(sampleSdp);
+      expect(dtxSdp, contains('a=fmtp:111 minptime=10;usedtx=1;useinbandfec=1'));
     });
 
     test('presetHD720p constraints match 1280x720 @ 30fps', () {

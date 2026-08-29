@@ -80,6 +80,39 @@ class WebRTCManager {
     return lines.join('\r\n');
   }
 
+  /// Modifies an SDP string to enable Opus DTX (Discontinuous Transmission) and FEC (Forward Error Correction).
+  /// Saves significant bandwidth and battery when the broadcaster/guest is silent.
+  static String enableOpusDtx(String sdp) {
+    final lines = sdp.split('\r\n');
+    final opusPayloadTypes = <String>[];
+
+    for (final line in lines) {
+      if (line.toLowerCase().contains('opus/48000')) {
+        final match = RegExp(r'a=rtpmap:(\d+)\s+opus', caseSensitive: false).firstMatch(line);
+        if (match != null) {
+          opusPayloadTypes.add(match.group(1)!);
+        }
+      }
+    }
+
+    for (var i = 0; i < lines.length; i++) {
+      for (final pt in opusPayloadTypes) {
+        if (lines[i].startsWith('a=fmtp:$pt')) {
+          var fmtp = lines[i];
+          if (!fmtp.contains('usedtx=')) {
+            fmtp += ';usedtx=1';
+          }
+          if (!fmtp.contains('useinbandfec=')) {
+            fmtp += ';useinbandfec=1';
+          }
+          lines[i] = fmtp;
+        }
+      }
+    }
+
+    return lines.join('\r\n');
+  }
+
   /// Initializes a new [RTCPeerConnection] with standard configuration and sets up listeners.
   Future<RTCPeerConnection> initializePeerConnection() async {
     if (_peerConnection != null) {
@@ -247,8 +280,9 @@ class WebRTCManager {
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      final vp8Sdp = preferCodec(offer.sdp ?? '', 'VP8');
-      final mungedOffer = RTCSessionDescription(vp8Sdp, offer.type);
+      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      processedSdp = enableOpusDtx(processedSdp);
+      final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
       await pc.setLocalDescription(mungedOffer);
       return mungedOffer;
     } finally {
@@ -267,7 +301,7 @@ class WebRTCManager {
     await _processQueuedCandidates();
   }
 
-  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8-preferred answer.
+  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(String sdp) async {
     final pc = await initializePeerConnection();
 
@@ -276,8 +310,9 @@ class WebRTCManager {
     await _processQueuedCandidates();
 
     final answer = await pc.createAnswer({});
-    final vp8Sdp = preferCodec(answer.sdp ?? '', 'VP8');
-    final mungedAnswer = RTCSessionDescription(vp8Sdp, answer.type);
+    var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
+    processedSdp = enableOpusDtx(processedSdp);
+    final mungedAnswer = RTCSessionDescription(processedSdp, answer.type);
     await pc.setLocalDescription(mungedAnswer);
 
     return mungedAnswer;
@@ -304,10 +339,11 @@ class WebRTCManager {
     // 2. Add local tracks to existing PeerConnection with simulcast option
     await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
-    // 3. Create renegotiation offer with VP8 preference
+    // 3. Create renegotiation offer with VP8 and Opus DTX preference
     final offer = await _peerConnection!.createOffer();
-    final vp8Sdp = preferCodec(offer.sdp ?? '', 'VP8');
-    final mungedOffer = RTCSessionDescription(vp8Sdp, offer.type);
+    var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+    processedSdp = enableOpusDtx(processedSdp);
+    final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
     await _peerConnection!.setLocalDescription(mungedOffer);
 
     return mungedOffer;

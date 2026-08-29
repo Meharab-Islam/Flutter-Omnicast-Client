@@ -6,6 +6,7 @@ import '../models/signaling_message.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
+import 'audio_level_detector.dart';
 import 'global_media_config.dart';
 import 'media_stream_manager.dart';
 import 'video_parameters.dart';
@@ -19,6 +20,7 @@ class MediaController with WidgetsBindingObserver {
   final RoomState _roomState;
   final GlobalMediaConfig _globalConfig;
   final OmniCastConfig? _config;
+  late final AudioLevelDetector _audioLevelDetector;
 
   bool _adaptiveStreamingEnabled = true;
   bool _dynacastEnabled = true;
@@ -49,6 +51,7 @@ class MediaController with WidgetsBindingObserver {
         _autoPauseOnBackground = globalConfig?.autoPauseOnBackground ?? autoPauseOnBackground {
     _adaptiveStreamingEnabled = _globalConfig.enableAdaptiveStreaming;
     _dynacastEnabled = _globalConfig.enableDynacast;
+    _audioLevelDetector = AudioLevelDetector(webRTCManager: _webRTCManager);
 
     _bindDynacastSignaling();
     if (_autoPauseOnBackground) {
@@ -63,12 +66,21 @@ class MediaController with WidgetsBindingObserver {
   MediaStreamManager get streamManager => _mediaStreamManager;
   WebRTCManager get webRTCManager => _webRTCManager;
   GlobalMediaConfig get globalConfig => _globalConfig;
+  AudioLevelDetector get audioDetector => _audioLevelDetector;
+  ValueNotifier<Map<String, double>> get audioLevelsNotifier => _audioLevelDetector.audioLevelsNotifier;
+  ValueNotifier<String?> get activeSpeakerNotifier => _audioLevelDetector.activeSpeakerNotifier;
   VideoParameters get currentParameters => _mediaStreamManager.currentParameters;
   bool get isMicrophoneMuted => isMicrophoneMutedNotifier.value;
   bool get isCameraEnabled => isCameraEnabledNotifier.value;
   bool get adaptiveStreamingEnabled => _adaptiveStreamingEnabled;
   bool get dynacastEnabled => _dynacastEnabled;
   String get currentSimulcastLayer => simulcastLayerNotifier.value;
+
+  /// Starts real-time WebRTC audio energy and active speaker detection.
+  void startAudioLevelDetection() => _audioLevelDetector.start();
+
+  /// Stops real-time audio energy detection.
+  void stopAudioLevelDetection() => _audioLevelDetector.stop();
 
   /// App Lifecycle Optimization: Automatically pause camera on background to save battery & CPU.
   @override
@@ -194,6 +206,18 @@ class MediaController with WidgetsBindingObserver {
   void setMicrophoneMuted(bool muted) {
     _mediaStreamManager.toggleAudio(!muted);
     isMicrophoneMutedNotifier.value = muted;
+
+    if (_roomState.isInRoom && _signalingClient.isConnected) {
+      _signalingClient.send(SignalingMessage(
+        event: 'track_muted',
+        roomId: _roomState.roomId ?? '',
+        userId: _roomState.userId ?? '',
+        payload: {
+          'kind': 'audio',
+          'muted': muted,
+        },
+      ));
+    }
   }
 
   /// Enables or disables the local camera feed (no-op if audio-only).
@@ -204,6 +228,18 @@ class MediaController with WidgetsBindingObserver {
     }
     _mediaStreamManager.toggleVideo(enabled);
     isCameraEnabledNotifier.value = enabled;
+
+    if (_roomState.isInRoom && _signalingClient.isConnected) {
+      _signalingClient.send(SignalingMessage(
+        event: 'track_muted',
+        roomId: _roomState.roomId ?? '',
+        userId: _roomState.userId ?? '',
+        payload: {
+          'kind': 'video',
+          'muted': !enabled,
+        },
+      ));
+    }
   }
 
   /// Switches between front and back camera.
@@ -277,6 +313,7 @@ class MediaController with WidgetsBindingObserver {
       } catch (_) {}
     }
     _dynacastSubscription?.cancel();
+    _audioLevelDetector.dispose();
     isMicrophoneMutedNotifier.dispose();
     isCameraEnabledNotifier.dispose();
     simulcastLayerNotifier.dispose();
