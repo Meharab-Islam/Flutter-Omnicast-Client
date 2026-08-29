@@ -4,12 +4,12 @@
 - cluster-only mode — file stats not available
 
 ## Summary
-- 895 nodes · 1091 edges · 36 communities (31 shown, 5 thin omitted)
+- 895 nodes · 1092 edges · 36 communities (31 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a248acb5`
+- Built from commit: `1801c8d1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,9 +24,9 @@
 - pk_models.dart
 - media_stream_manager.dart
 - omnicast_flying_hearts_overlay.dart
+- pk_manager.dart
 - seat_manager.dart
 - package:flutter_test/flutter_test.dart
-- pk_manager.dart
 - lib/omnicast_client.dart
 - data_channel_manager.dart
 - room_models.dart
@@ -52,7 +52,7 @@
 - VideoParameters
 
 ## God Nodes (most connected - your core abstractions)
-1. `SignalingClient` - 5 edges
+1. `SignalingClient` - 4 edges
 2. `MediaController` - 4 edges
 3. `WebRTCManager` - 4 edges
 4. `_OmniCastFlyingHeartsOverlayState` - 4 edges
@@ -85,11 +85,11 @@ Nodes (50): answer, balanceUpdate, candidate, chat, createRoom, event, fromJson,
 
 ### Community 3 - "core/omnicast_client.dart"
 Cohesion: 0.04
-Nodes (49): DataChannelManager, DataChannelManager get, GlobalMediaConfig, ../interaction/interaction_manager.dart, InteractionManager, InteractionManager get, _bindInternalEventListeners, config (+41 more)
+Nodes (48): DataChannelManager, DataChannelManager get, ../interaction/interaction_manager.dart, InteractionManager, InteractionManager get, _bindInternalEventListeners, config, dataChannel (+40 more)
 
 ### Community 4 - "media_controller.dart"
 Cohesion: 0.04
-Nodes (46): audio_level_detector.dart, AudioLevelDetector get, global_media_config.dart, GlobalMediaConfig get, activeSpeakerNotifier, _adaptiveStreamingEnabled, audioDetector, _audioLevelDetector (+38 more)
+Nodes (46): audio_level_detector.dart, AudioLevelDetector get, global_media_config.dart, GlobalMediaConfig, GlobalMediaConfig get, activeSpeakerNotifier, _adaptiveStreamingEnabled, audioDetector (+38 more)
 
 ### Community 5 - "room_manager.dart"
 Cohesion: 0.05
@@ -111,17 +111,17 @@ Nodes (34): autoPauseOnBackground, defaultResolution, enableAdaptiveStreaming, e
 Cohesion: 0.07
 Nodes (32): AnimationController, dart:math, ../datachannel/data_channel_manager.dart, Key, GiftOverlayManager, _GiftOverlayManagerState, build, controller (+24 more)
 
-### Community 10 - "seat_manager.dart"
+### Community 10 - "pk_manager.dart"
+Cohesion: 0.06
+Nodes (32): acceptPKRequest, _bindStateNotifiers, _bindStreams, currentState, dispose, endPK, isPKActive, isPKActiveNotifier (+24 more)
+
+### Community 11 - "seat_manager.dart"
 Cohesion: 0.06
 Nodes (32): acceptCoHostInvite, acceptSeatRequest, activeCoHostsList, activeSeatsNotifier, _bindSignalingListeners, _bindStateNotifiers, demoteToViewer, dispose (+24 more)
 
-### Community 11 - "package:flutter_test/flutter_test.dart"
+### Community 12 - "package:flutter_test/flutter_test.dart"
 Cohesion: 0.09
 Nodes (19): dart:async, dart:convert, package:flutter/material.dart, package:flutter_test/flutter_test.dart, package:flutter/widgets.dart, package:omnicast_client/omnicast_client.dart, main, main (+11 more)
-
-### Community 12 - "pk_manager.dart"
-Cohesion: 0.06
-Nodes (31): acceptPKRequest, _bindStateNotifiers, _bindStreams, currentState, dispose, endPK, isPKActive, isPKActiveNotifier (+23 more)
 
 ### Community 13 - "lib/omnicast_client.dart"
 Cohesion: 0.07
@@ -208,7 +208,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `MediaController` connect `omnicast_media_control_bar.dart` to `media_controller.dart`, `omnicast_video_view.dart`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **Why does `PKState` connect `pk_score_progress_bar.dart` to `omnicast_pk_battle_view.dart`, `pk_models.dart`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `_activePK`, `_activeRemoteUserIds`, `_activeSeats` to the rest of the system?**
   _662 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `room_state.dart` be split into smaller, more focused modules?**

@@ -94,6 +94,40 @@ class PKManager {
           }
           break;
 
+        case 'room_mode_changed':
+          if (msg.payload is Map<String, dynamic>) {
+            final payload = msg.payload as Map<String, dynamic>;
+            final mode = payload['mode'] as String? ?? 'solo';
+            if (mode == 'pk') {
+              final opponentId = payload['linked_host_id'] as String? ?? payload['opponent_user_id'] as String? ?? '';
+              final opponentRoomId = payload['linked_room_id'] as String? ?? payload['opponent_room_id'] as String? ?? '';
+              final battleId = payload['battle_id'] as String? ?? 'pk_${DateTime.now().millisecondsSinceEpoch}';
+
+              final battle = PKBattleInfo(
+                battleId: battleId,
+                hostRoomId: _roomState.roomId ?? '',
+                hostUserId: _roomState.userId ?? '',
+                opponentRoomId: opponentRoomId,
+                opponentUserId: opponentId,
+                status: PKStatus.inProgress,
+                hostScore: (payload['host_score'] as num?)?.toInt() ?? 0,
+                opponentScore: (payload['opponent_score'] as num?)?.toInt() ?? 0,
+                durationSeconds: (payload['duration_seconds'] as num?)?.toInt() ?? 300,
+                remainingSeconds: (payload['remaining_seconds'] as num?)?.toInt() ?? 300,
+                startedAt: DateTime.now(),
+              );
+              _roomState.updatePKBattle(battle);
+              _pkStartedController.add(battle);
+              if (opponentRoomId.isNotEmpty && opponentId.isNotEmpty) {
+                _subscribeToOpponentTracks(opponentRoomId, opponentId);
+              }
+            } else {
+              _roomState.endPKBattle();
+              _pkEndedController.add('room_mode_solo');
+            }
+          }
+          break;
+
         case 'pk_ended':
         case SignalingEvents.pkEnd:
           final battleId = msg.payload is Map

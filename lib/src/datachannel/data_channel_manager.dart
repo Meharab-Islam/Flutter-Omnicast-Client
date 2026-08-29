@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../models/interaction_models.dart';
+import '../models/pk_models.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
 
@@ -104,7 +105,7 @@ class DataChannelManager {
         }
 
         final Map<String, dynamic> json = jsonDecode(decodedText);
-        final type = json['type'] as String?;
+        final type = json['type'] as String? ?? json['event'] as String?;
 
         if (type == 'chat') {
           final msg = ChatMessage(
@@ -122,6 +123,37 @@ class DataChannelManager {
           final reaction = DataChannelReaction.fromJson(json);
           latestReactionNotifier.value = reaction;
           _reactionController.add(reaction);
+        } else if (type == 'room_mode_changed') {
+          final mode = json['mode'] as String? ?? 'solo';
+          if (mode == 'pk') {
+            final opponentId = json['linked_host_id'] as String? ?? json['opponent_user_id'] as String? ?? '';
+            final opponentRoomId = json['linked_room_id'] as String? ?? json['opponent_room_id'] as String? ?? '';
+            final battleId = json['battle_id'] as String? ?? 'pk_${DateTime.now().millisecondsSinceEpoch}';
+
+            final battle = PKBattleInfo(
+              battleId: battleId,
+              hostRoomId: _roomState.roomId ?? '',
+              hostUserId: _roomState.userId ?? '',
+              opponentRoomId: opponentRoomId,
+              opponentUserId: opponentId,
+              status: PKStatus.inProgress,
+              hostScore: (json['host_score'] as num?)?.toInt() ?? (json['host_a'] as num?)?.toInt() ?? 0,
+              opponentScore: (json['opponent_score'] as num?)?.toInt() ?? (json['host_b'] as num?)?.toInt() ?? 0,
+              durationSeconds: (json['duration_seconds'] as num?)?.toInt() ?? 300,
+              remainingSeconds: (json['remaining_seconds'] as num?)?.toInt() ?? 300,
+              startedAt: DateTime.now(),
+            );
+            _roomState.updatePKBattle(battle);
+          } else {
+            _roomState.endPKBattle();
+          }
+        } else if (type == 'pk_score_update') {
+          final score = PKScoreUpdate(
+            battleId: json['battle_id'] as String? ?? _roomState.activePK?.battleId ?? '',
+            hostScore: (json['host_score'] as num?)?.toInt() ?? (json['host_a'] as num?)?.toInt() ?? 0,
+            opponentScore: (json['opponent_score'] as num?)?.toInt() ?? (json['host_b'] as num?)?.toInt() ?? 0,
+          );
+          _roomState.updatePKScore(score);
         }
       } catch (e) {
         debugPrint('[DataChannel] Error parsing message: $e');
