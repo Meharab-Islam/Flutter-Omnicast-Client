@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../datachannel/data_channel_manager.dart';
 import '../interaction/interaction_manager.dart';
 import '../media/media_controller.dart';
 import '../media/media_stream_manager.dart';
@@ -23,6 +24,7 @@ import 'omnicast_config.dart';
 /// - [seats]: [SeatManager] (co-host invite/accept/upgrade, stage pinning, demotion)
 /// - [interaction]: [InteractionManager] (chats, gifts, balance streams)
 /// - [pk]: [PKManager] (host PK battles, timer ticks, score updates)
+/// - [dataChannel]: [DataChannelManager] (zero-latency in-room events)
 /// - [state]: [RoomState] (reactive global state container)
 class OmniCastClient {
   final OmniCastConfig config;
@@ -38,6 +40,7 @@ class OmniCastClient {
   late final SeatManager _seatManager;
   late final InteractionManager _interactionManager;
   late final PKManager _pkManager;
+  late final DataChannelManager _dataChannelManager;
 
   final List<StreamSubscription> _subscriptions = [];
   bool _isDisposed = false;
@@ -141,6 +144,11 @@ class OmniCastClient {
       webRTCManager: _webRTCManager,
       roomState: _roomState,
     );
+
+    _dataChannelManager = DataChannelManager(
+      webRTCManager: _webRTCManager,
+      roomState: _roomState,
+    );
   }
 
   // Sub-module Getters
@@ -149,6 +157,7 @@ class OmniCastClient {
   SeatManager get seats => _seatManager;
   InteractionManager get interaction => _interactionManager;
   PKManager get pk => _pkManager;
+  DataChannelManager get dataChannel => _dataChannelManager;
   RoomState get state => _roomState;
   MediaStreamManager get streamManager => _mediaStreamManager;
   SignalingClient get signaling => _signalingClient;
@@ -297,6 +306,7 @@ class OmniCastClient {
     _subscriptions.clear();
 
     await _interactionManager.dispose();
+    await _dataChannelManager.dispose();
     await _pkManager.dispose();
     _mediaController.dispose();
     await _roomManager.leaveRoom();
