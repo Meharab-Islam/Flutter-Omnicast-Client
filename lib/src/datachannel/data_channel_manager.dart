@@ -154,6 +154,21 @@ class DataChannelManager {
             opponentScore: (json['opponent_score'] as num?)?.toInt() ?? (json['host_b'] as num?)?.toInt() ?? 0,
           );
           _roomState.updatePKScore(score);
+        } else if (type == 'pk_gift_overlay') {
+          final event = GiftEvent(
+            giftId: json['gift_id'] as String? ?? 'gift_pk',
+            giftName: json['gift_name'] as String? ?? 'Rose',
+            coinValue: (json['coin_value'] as num?)?.toInt() ?? 10,
+            amount: (json['amount'] as num?)?.toInt() ?? 1,
+            senderId: json['sender_id'] as String? ?? 'user',
+            senderName: json['sender_name'] as String? ?? 'Viewer',
+            targetUserId: json['target_host_id'] as String? ?? _roomState.hostId ?? '',
+            hostTotalCoins: (json['host_total_coins'] as num?)?.toInt() ?? _roomState.hostCoinBalance,
+            timestamp: DateTime.fromMillisecondsSinceEpoch(
+              json['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+          _roomState.processGift(event);
         }
       } catch (e) {
         debugPrint('[DataChannel] Error parsing message: $e');

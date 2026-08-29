@@ -45,7 +45,7 @@ class OmniCastClient {
   final List<StreamSubscription> _subscriptions = [];
   bool _isDisposed = false;
 
-  OmniCastClient._({
+  OmniCastClient.custom({
     required this.config,
     this.mediaConfig = const GlobalMediaConfig(),
     SignalingClient? signalingClient,
@@ -69,6 +69,22 @@ class OmniCastClient {
     _initSubManagers();
     _bindInternalEventListeners();
   }
+
+  OmniCastClient._({
+    required OmniCastConfig config,
+    GlobalMediaConfig mediaConfig = const GlobalMediaConfig(),
+    SignalingClient? signalingClient,
+    MediaStreamManager? mediaStreamManager,
+    WebRTCManager? webRTCManager,
+    RoomState? roomState,
+  }) : this.custom(
+          config: config,
+          mediaConfig: mediaConfig,
+          signalingClient: signalingClient,
+          mediaStreamManager: mediaStreamManager,
+          webRTCManager: webRTCManager,
+          roomState: roomState,
+        );
 
   /// Initializes the [OmniCastClient] SDK using server credentials, SFU host URL, and media configuration.
   static Future<OmniCastClient> init({

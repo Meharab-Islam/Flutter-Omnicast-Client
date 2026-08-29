@@ -34,6 +34,7 @@ export 'src/models/signaling_message.dart';
 
 // UI Widgets
 export 'src/widgets/omnicast_video_view.dart';
+export 'src/widgets/omnicast_video_canvas.dart';
 export 'src/widgets/omnicast_pk_battle_view.dart';
 export 'src/widgets/pk_score_progress_bar.dart';
 export 'src/widgets/gift_overlay_manager.dart';
@@ -41,3 +42,4 @@ export 'src/widgets/omnicast_speaking_video_tile.dart';
 export 'src/widgets/omnicast_media_control_bar.dart';
 export 'src/widgets/omnicast_native_viewport_tracker.dart';
 export 'src/widgets/omnicast_flying_hearts_overlay.dart';
+export 'src/widgets/omnicast_gifting_bottom_sheet.dart';

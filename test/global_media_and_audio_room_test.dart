@@ -17,6 +17,7 @@ void main() {
     test('custom GlobalMediaConfig overrides defaults in OmniCastClient', () async {
       final client = await OmniCastClient.init(
         hostUrl: 'wss://omnilive.lolipoplive.top/ws',
+        autoConnect: false,
         mediaConfig: const GlobalMediaConfig(
           defaultResolution: VideoParameters.presetFHD1080p,
           enableSimulcast: false,

@@ -12,6 +12,7 @@ class RoomState extends ChangeNotifier {
   String? _userId;
   UserRole _role = UserRole.viewer;
   RoomType _roomType = RoomType.video;
+  RoomMode _roomMode = RoomMode.solo;
   ClientConnectionState _connectionState = ClientConnectionState.disconnected;
 
   int _viewersCount = 0;
@@ -29,12 +30,17 @@ class RoomState extends ChangeNotifier {
 
   PKBattleInfo? _activePK;
 
+  // Native Reactive ValueNotifiers for headless UI canvas binding
+  final ValueNotifier<RoomMode> roomModeNotifier = ValueNotifier<RoomMode>(RoomMode.solo);
+  final ValueNotifier<PkScore> pkScoreNotifier = ValueNotifier<PkScore>(const PkScore());
+
   // Getters
   String? get roomId => _roomId;
   String? get hostId => _hostId;
   String? get userId => _userId;
   UserRole get role => _role;
   RoomType get roomType => _roomType;
+  RoomMode get roomMode => _roomMode;
   bool get isAudioOnly => _roomType == RoomType.audio;
   ClientConnectionState get connectionState => _connectionState;
 
@@ -294,6 +300,10 @@ class RoomState extends ChangeNotifier {
     if (seat.userId != null && seat.userId != _userId) {
       _activeRemoteUserIds.add(seat.userId!);
     }
+    if (!isInPKBattle) {
+      _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
+      roomModeNotifier.value = _roomMode;
+    }
     notifyListeners();
   }
 
@@ -304,6 +314,10 @@ class RoomState extends ChangeNotifier {
       final removed = _activeSeats.removeAt(idx);
       if (removed.userId != null) {
         _activeRemoteUserIds.remove(removed.userId);
+      }
+      if (!isInPKBattle) {
+        _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
+        roomModeNotifier.value = _roomMode;
       }
       notifyListeners();
     }
@@ -341,6 +355,9 @@ class RoomState extends ChangeNotifier {
     if (pkInfo.opponentUserId.isNotEmpty) {
       _activeRemoteUserIds.add(pkInfo.opponentUserId);
     }
+    _roomMode = RoomMode.pk;
+    roomModeNotifier.value = RoomMode.pk;
+    pkScoreNotifier.value = PkScore(hostScore: pkInfo.hostScore, opponentScore: pkInfo.opponentScore);
     notifyListeners();
   }
 
@@ -362,6 +379,7 @@ class RoomState extends ChangeNotifier {
       remainingSeconds: _activePK!.remainingSeconds,
       startedAt: _activePK!.startedAt,
     );
+    pkScoreNotifier.value = PkScore(hostScore: scoreUpdate.hostScore, opponentScore: scoreUpdate.opponentScore);
     notifyListeners();
   }
 
@@ -391,6 +409,9 @@ class RoomState extends ChangeNotifier {
     if (_activePK != null) {
       _activeRemoteUserIds.remove(_activePK!.opponentUserId);
       _activePK = null;
+      _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
+      roomModeNotifier.value = _roomMode;
+      pkScoreNotifier.value = const PkScore();
       notifyListeners();
     }
   }
@@ -415,6 +436,9 @@ class RoomState extends ChangeNotifier {
     _hostId = null;
     _userId = null;
     _role = UserRole.viewer;
+    _roomMode = RoomMode.solo;
+    roomModeNotifier.value = RoomMode.solo;
+    pkScoreNotifier.value = const PkScore();
     _viewersCount = 0;
     _hostCoinBalance = 0;
     _userCoinBalance = 0;
@@ -428,5 +452,12 @@ class RoomState extends ChangeNotifier {
     _pendingInvites.clear();
     _activePK = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    roomModeNotifier.dispose();
+    pkScoreNotifier.dispose();
+    super.dispose();
   }
 }

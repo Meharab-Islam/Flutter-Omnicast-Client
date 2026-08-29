@@ -4,6 +4,36 @@ enum RoomType {
   audio,
 }
 
+/// High-level layout and broadcast state mode.
+enum RoomMode {
+  solo,
+  coHost,
+  pk,
+}
+
+/// Real-time Host vs Opponent PK Battle score points.
+class PkScore {
+  final int hostScore;
+  final int opponentScore;
+
+  const PkScore({
+    this.hostScore = 0,
+    this.opponentScore = 0,
+  });
+
+  double get hostRatio {
+    final total = hostScore + opponentScore;
+    if (total == 0) return 0.5;
+    return (hostScore / total).clamp(0.05, 0.95);
+  }
+
+  double get opponentRatio {
+    final total = hostScore + opponentScore;
+    if (total == 0) return 0.5;
+    return (opponentScore / total).clamp(0.05, 0.95);
+  }
+}
+
 /// User role in a live room session.
 enum UserRole {
   viewer,
