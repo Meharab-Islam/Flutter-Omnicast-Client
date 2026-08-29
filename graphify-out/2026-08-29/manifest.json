@@ -12,10 +12,10 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788017617.0807528,
-    "seen": 1788017654.3762,
-    "ast_hash": "40fc6589ac6c770f2bfb2573641e97d9",
-    "semantic_hash": "40fc6589ac6c770f2bfb2573641e97d9"
+    "mtime": 1788017835.6801813,
+    "seen": 1788017869.564796,
+    "ast_hash": "edf210a41217981c1471311586f08370",
+    "semantic_hash": "edf210a41217981c1471311586f08370"
   },
   "lib/src/media/media_stream_manager.dart": {
     "mtime": 1787914565.4688215,
@@ -48,10 +48,10 @@
     "semantic_hash": "9f65f0ea8fb5347139099e058c8c5f4a"
   },
   "lib/src/webrtc/webrtc_manager.dart": {
-    "mtime": 1788017100.7055912,
-    "seen": 1788017543.032833,
-    "ast_hash": "e9d4b491cfffc3686945c656e90c0755",
-    "semantic_hash": "e9d4b491cfffc3686945c656e90c0755"
+    "mtime": 1788017826.0125043,
+    "seen": 1788017869.565103,
+    "ast_hash": "967eccd5f049fa32d80a8b86cf09dfd7",
+    "semantic_hash": "967eccd5f049fa32d80a8b86cf09dfd7"
   },
   "lib/src/widgets/omnicast_video_view.dart": {
     "mtime": 1787891276.1920378,
@@ -138,16 +138,16 @@
     "semantic_hash": "0060330c96a275c9430d09b1cb765796"
   },
   "lib/src/media/video_parameters.dart": {
-    "mtime": 1787914552.809866,
-    "seen": 1787914636.366355,
-    "ast_hash": "5640f8646de83859c1b700ebd0d60fc1",
-    "semantic_hash": "5640f8646de83859c1b700ebd0d60fc1"
+    "mtime": 1788017774.1246367,
+    "seen": 1788017869.564918,
+    "ast_hash": "6a0765799c25bab9a3ff5fb29101395d",
+    "semantic_hash": "6a0765799c25bab9a3ff5fb29101395d"
   },
   "test/video_parameters_test.dart": {
-    "mtime": 1788017110.4619393,
-    "seen": 1788017543.0330229,
-    "ast_hash": "639e45028b41e3d997de54539a504eab",
-    "semantic_hash": "639e45028b41e3d997de54539a504eab"
+    "mtime": 1788017857.6176696,
+    "seen": 1788017869.565398,
+    "ast_hash": "55fc8429426096d34be615395c60bb78",
+    "semantic_hash": "55fc8429426096d34be615395c60bb78"
   },
   "lib/src/widgets/gift_overlay_manager.dart": {
     "mtime": 1787891174.6414073,

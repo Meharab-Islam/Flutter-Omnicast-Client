@@ -13,7 +13,8 @@ void main() {
       expect(params.maxBitrate, 800000);
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
-      expect(constraints['audio'], isTrue);
+      expect(constraints['audio'], isA<Map<String, dynamic>>());
+      expect(constraints['audio']['mandatory']['googNoiseSuppression'], 'true');
       expect(constraints['video']['width']['ideal'], 640);
       expect(constraints['video']['height']['ideal'], 480);
       expect(constraints['video']['frameRate']['ideal'], 24);
@@ -42,7 +43,7 @@ void main() {
       expect(params.maxBitrate, 2500000);
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
-      expect(constraints['audio'], isTrue);
+      expect(constraints['audio'], isA<Map<String, dynamic>>());
       expect(constraints['video']['mandatory']['minWidth'], '1280');
       expect(constraints['video']['mandatory']['minHeight'], '720');
       expect(constraints['video']['mandatory']['minFrameRate'], '30');

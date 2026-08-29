@@ -181,6 +181,18 @@ class OmniCastClient {
       }
     };
 
+    // 1.1 WebRTC ICE Disconnection Auto-Recovery
+    _webRTCManager.onIceRestartNeeded = () {
+      if (_roomState.isInRoom && _signalingClient.isConnected) {
+        debugPrint('[OmniCastClient] Requesting ICE Restart from SFU...');
+        _signalingClient.send(SignalingMessage(
+          event: 'ice_restart_request',
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+        ));
+      }
+    };
+
     // 2. WebRTC Remote Track -> MediaStreamManager & RoomState
     _webRTCManager.onRemoteTrack = (track, stream) async {
       final streamId = stream.id;

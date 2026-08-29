@@ -6,9 +6,10 @@ import '../media/video_parameters.dart';
 
 typedef OnLocalIceCandidateCallback = void Function(RTCIceCandidate candidate);
 typedef OnRemoteTrackCallback = void Function(MediaStreamTrack track, MediaStream stream);
+typedef OnIceRestartNeededCallback = void Function();
 
-/// Manages [RTCPeerConnection] lifecycle, SDP offer/answer negotiations, VP8 codec preference,
-/// dynamic transceivers, ICE exchange, simulcast encodings, and Dynacast layer control.
+/// Manages [RTCPeerConnection] initialization, simulcast/SVC transceivers,
+/// VP8/VP9 and Opus DTX SDP munging, ICE candidate queuing, and renegotiation.
 class WebRTCManager {
   final MediaStreamManager mediaStreamManager;
   final Map<String, dynamic> rtcConfiguration;
@@ -16,15 +17,17 @@ class WebRTCManager {
   RTCPeerConnection? _peerConnection;
   RTCRtpSender? _videoSender;
   RTCRtpSender? _audioSender;
-
-  bool _isDisposed = false;
   bool _isNegotiating = false;
   bool _simulcastEnabled = false;
+  bool _isDisposed = false;
+  Timer? _iceDisconnectTimer;
+
   final List<RTCIceCandidate> _queuedRemoteCandidates = [];
 
   // Callbacks
   OnLocalIceCandidateCallback? onLocalIceCandidate;
   OnRemoteTrackCallback? onRemoteTrack;
+  OnIceRestartNeededCallback? onIceRestartNeeded;
 
   WebRTCManager({
     required this.mediaStreamManager,
@@ -130,6 +133,20 @@ class WebRTCManager {
 
     pc.onIceConnectionState = (state) {
       debugPrint('[WebRTCManager] ICE Connection State: $state');
+      if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
+        _iceDisconnectTimer?.cancel();
+        _iceDisconnectTimer = Timer(const Duration(seconds: 3), () {
+          debugPrint('[WebRTCManager] ICE disconnected for >3s -> Triggering ICE Restart');
+          onIceRestartNeeded?.call();
+        });
+      } else if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
+          state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
+        _iceDisconnectTimer?.cancel();
+      } else if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
+        _iceDisconnectTimer?.cancel();
+        debugPrint('[WebRTCManager] ICE Failed -> Triggering Immediate ICE Restart');
+        onIceRestartNeeded?.call();
+      }
     };
 
     pc.onConnectionState = (state) {
@@ -189,7 +206,7 @@ class WebRTCManager {
       final videoTrack = videoTracks.first;
 
       if (enableSimulcast) {
-        // Multi-layer simulcast transceivers: 'f' (smooth 480p), 'h' (half), 'q' (quarter)
+        // Multi-layer simulcast/SVC transceivers: 'f' (smooth 480p), 'h' (half), 'q' (quarter)
         final transceiver = await pc.addTransceiver(
           track: videoTrack,
           kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
@@ -203,6 +220,7 @@ class WebRTCManager {
                 scaleResolutionDownBy: 1.0,
                 maxBitrate: 800000, // 800 kbps for smooth 480p / 24fps
                 maxFramerate: 24,
+                scalabilityMode: 'L1T3',
               ),
               RTCRtpEncoding(
                 rid: 'h',
@@ -210,6 +228,7 @@ class WebRTCManager {
                 scaleResolutionDownBy: 2.0,
                 maxBitrate: 350000, // 350 kbps for half layer
                 maxFramerate: 20,
+                scalabilityMode: 'L1T3',
               ),
               RTCRtpEncoding(
                 rid: 'q',
@@ -217,6 +236,7 @@ class WebRTCManager {
                 scaleResolutionDownBy: 4.0,
                 maxBitrate: 150000, // 150 kbps for quarter layer
                 maxFramerate: 15,
+                scalabilityMode: 'L1T3',
               ),
             ],
           ),
@@ -230,6 +250,7 @@ class WebRTCManager {
           if (params.encodings != null && params.encodings!.isNotEmpty) {
             params.encodings!.first.maxBitrate = 800000;
             params.encodings!.first.maxFramerate = 24;
+            params.encodings!.first.scalabilityMode = 'L1T3';
             await _videoSender!.setParameters(params);
           }
         } catch (_) {}
@@ -273,6 +294,32 @@ class WebRTCManager {
       'mandatory': {
         'OfferToReceiveAudio': offerToReceiveAudio,
         'OfferToReceiveVideo': offerToReceiveVideo,
+      },
+      'optional': [],
+    };
+
+    _isNegotiating = true;
+    try {
+      final offer = await pc.createOffer(constraints);
+      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      processedSdp = enableOpusDtx(processedSdp);
+      final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
+      await pc.setLocalDescription(mungedOffer);
+      return mungedOffer;
+    } finally {
+      _isNegotiating = false;
+    }
+  }
+
+  /// Creates an ICE Restart SDP Offer ({ 'IceRestart': true }) for seamless network handoffs.
+  Future<RTCSessionDescription> createIceRestartOffer() async {
+    final pc = await initializePeerConnection();
+
+    final constraints = <String, dynamic>{
+      'mandatory': {
+        'OfferToReceiveAudio': true,
+        'OfferToReceiveVideo': true,
+        'IceRestart': true,
       },
       'optional': [],
     };
@@ -389,6 +436,8 @@ class WebRTCManager {
 
   /// Closes and resets the active PeerConnection.
   Future<void> closePeerConnection() async {
+    _iceDisconnectTimer?.cancel();
+    _iceDisconnectTimer = null;
     if (_peerConnection != null) {
       await _peerConnection!.close();
       await _peerConnection!.dispose();

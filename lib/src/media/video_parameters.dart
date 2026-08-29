@@ -88,13 +88,27 @@ class VideoParameters {
   }
 
   /// Converts parameters to ideal/mandatory getUserMedia constraints map.
-  /// Prioritizes smoothness ({ideal: 640}, {ideal: 480}, {ideal: 24}) to prevent camera driver stalls.
+  /// Prioritizes smoothness ({ideal: 640}, {ideal: 480}, {ideal: 24}) to prevent camera driver stalls,
+  /// and enables hardware acoustic echo cancellation & noise suppression.
   Map<String, dynamic> toMediaConstraints({
     bool video = true,
     bool audio = true,
   }) {
     return {
-      'audio': audio,
+      'audio': audio
+          ? {
+              'mandatory': {
+                'googEchoCancellation': 'true',
+                'googAutoGainControl': 'true',
+                'googNoiseSuppression': 'true',
+                'googHighpassFilter': 'true',
+              },
+              'optional': [
+                {'googTypingNoiseDetection': 'true'},
+                {'googAudioMirroring': 'false'},
+              ],
+            }
+          : false,
       'video': video
           ? {
               'mandatory': {
