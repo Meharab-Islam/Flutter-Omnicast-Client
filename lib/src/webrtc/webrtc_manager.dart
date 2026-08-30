@@ -227,32 +227,32 @@ class WebRTCManager {
             direction: TransceiverDirection.SendRecv,
             streams: [localStream],
             sendEncodings: [
-              // High Layer (Full Resolution) - 1.2 Mbps max, 30fps
+              // High Layer (Full Resolution) - 500 Kbps max, 24fps
               RTCRtpEncoding(
                 rid: 'f',
                 active: true,
                 scaleResolutionDownBy: 1.0,
-                maxBitrate: 1200000, // 1.2 Mbps dynamic ceiling
-                minBitrate: 350000,
-                maxFramerate: 30,
+                maxBitrate: 500000, // 500 Kbps strict limit to fix macroblocking
+                minBitrate: 200000,
+                maxFramerate: 24,
                 scalabilityMode: 'L1T3',
               ),
-              // Medium Layer (Half Resolution) - 500 Kbps max, 24fps
+              // Medium Layer (Half Resolution) - 350 Kbps max, 20fps
               RTCRtpEncoding(
                 rid: 'h',
                 active: true,
                 scaleResolutionDownBy: 2.0,
-                maxBitrate: 500000, // 500 Kbps for half resolution
-                minBitrate: 150000,
-                maxFramerate: 24,
+                maxBitrate: 350000,
+                minBitrate: 100000,
+                maxFramerate: 20,
                 scalabilityMode: 'L1T3',
               ),
-              // Low Layer (Quarter Resolution) - 150 Kbps max, 15fps
+              // Low Layer (Quarter Resolution) - 120 Kbps max, 15fps
               RTCRtpEncoding(
                 rid: 'q',
                 active: true,
                 scaleResolutionDownBy: 4.0,
-                maxBitrate: 150000, // 150 Kbps for quarter resolution
+                maxBitrate: 120000,
                 minBitrate: 50000,
                 maxFramerate: 15,
                 scalabilityMode: 'L1T3',
@@ -262,7 +262,7 @@ class WebRTCManager {
         );
         _videoSender = transceiver.sender;
 
-        // Prefer hardware-accelerated codecs (H264 Baseline Profile / VP8)
+        // Force VP8 codec preference over H264 to fix Android device-level macroblocking & failure
         try {
           final capabilities = await getRtpSenderCapabilities('video');
           if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
@@ -270,35 +270,48 @@ class WebRTCManager {
             sortedCodecs.sort((a, b) {
               final mimeA = a.mimeType.toLowerCase();
               final mimeB = b.mimeType.toLowerCase();
-              int scoreA = mimeA.contains('h264') ? 0 : (mimeA.contains('vp8') ? 1 : 2);
-              int scoreB = mimeB.contains('h264') ? 0 : (mimeB.contains('vp8') ? 1 : 2);
+              int scoreA = mimeA.contains('vp8') ? 0 : (mimeA.contains('h264') ? 1 : 2);
+              int scoreB = mimeB.contains('vp8') ? 0 : (mimeB.contains('h264') ? 1 : 2);
               return scoreA.compareTo(scoreB);
             });
             await transceiver.setCodecPreferences(sortedCodecs);
           }
         } catch (_) {}
 
-        // Apply maintain-framerate degradation preference to prevent freezing
+        // Apply maintain-framerate degradation preference and enforce maxBitrate on sender
         try {
-          final params = _videoSender!.parameters;
+          final senders = await pc.getSenders();
+          final videoSender = senders.firstWhere(
+            (s) => s.track?.kind == 'video',
+            orElse: () => _videoSender ?? senders.first,
+          );
+          final params = videoSender.parameters;
           params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
-          await _videoSender!.setParameters(params);
+          if (params.encodings != null && params.encodings!.isNotEmpty) {
+            params.encodings![0].maxBitrate = 500000;
+          }
+          await videoSender.setParameters(params);
         } catch (e) {
           debugPrint('[WebRTCManager] Set degradationPreference notice: $e');
         }
       } else {
-        // Standard single stream with maintain-framerate degradation and 1200 kbps dynamic ceiling
+        // Standard single stream with maintain-framerate degradation and 500 kbps strict ceiling
         _videoSender = await pc.addTrack(videoTrack, localStream);
         try {
-          final params = _videoSender!.parameters;
+          final senders = await pc.getSenders();
+          final videoSender = senders.firstWhere(
+            (s) => s.track?.kind == 'video',
+            orElse: () => _videoSender ?? senders.first,
+          );
+          final params = videoSender.parameters;
           params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
           if (params.encodings != null && params.encodings!.isNotEmpty) {
-            params.encodings!.first.maxBitrate = 1200000;
-            params.encodings!.first.minBitrate = 350000;
-            params.encodings!.first.maxFramerate = 30;
-            params.encodings!.first.scalabilityMode = 'L1T3';
+            params.encodings![0].maxBitrate = 500000;
+            params.encodings![0].minBitrate = 200000;
+            params.encodings![0].maxFramerate = 24;
+            params.encodings![0].scalabilityMode = 'L1T3';
           }
-          await _videoSender!.setParameters(params);
+          await videoSender.setParameters(params);
         } catch (e) {
           debugPrint('[WebRTCManager] Set single-stream parameters notice: $e');
         }
@@ -328,6 +341,31 @@ class WebRTCManager {
       }
     } catch (e) {
       debugPrint('[WebRTCManager Dynacast] Error setting layer active: $e');
+    }
+  }
+
+  /// Strictly enforces maximum video bitrate limit on the video RTCRtpSender to prevent macroblocking and congestion.
+  Future<void> enforceMaxVideoBitrate({int maxBitrate = 500000}) async {
+    if (_peerConnection == null) return;
+    try {
+      final senders = await _peerConnection!.getSenders();
+      final videoSenders = senders.where((s) => s.track?.kind == 'video' || s == _videoSender);
+      for (final sender in videoSenders) {
+        final parameters = sender.parameters;
+        if (parameters.encodings != null && parameters.encodings!.isNotEmpty) {
+          for (final encoding in parameters.encodings!) {
+            encoding.maxBitrate = maxBitrate;
+            if (encoding.minBitrate != null && encoding.minBitrate! > maxBitrate) {
+              encoding.minBitrate = maxBitrate ~/ 2;
+            }
+          }
+          parameters.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
+          await sender.setParameters(parameters);
+          debugPrint('[WebRTCManager] Enforced maxVideoBitrate: $maxBitrate bps on sender');
+        }
+      }
+    } catch (e) {
+      debugPrint('[WebRTCManager] Error enforcing max video bitrate: $e');
     }
   }
 
