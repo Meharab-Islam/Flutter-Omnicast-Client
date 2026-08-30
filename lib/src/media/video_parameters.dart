@@ -102,11 +102,19 @@ class VideoParameters {
                 'googAutoGainControl': 'true',
                 'googNoiseSuppression': 'true',
                 'googHighpassFilter': 'true',
+                'googAudioMirroring': 'false',
               },
               'optional': [
+                {'googEchoCancellation2': 'true'},
+                {'googDAEchoCancellation': 'true'},
+                {'googAutoGainControl2': 'true'},
+                {'googNoiseSuppression2': 'true'},
                 {'googTypingNoiseDetection': 'true'},
-                {'googAudioMirroring': 'false'},
               ],
+              'echoCancellation': true,
+              'noiseSuppression': true,
+              'autoGainControl': true,
+              'highpassFilter': true,
             }
           : false,
       'video': video

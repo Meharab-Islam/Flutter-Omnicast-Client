@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../media/media_stream_manager.dart';
 import '../media/video_parameters.dart';
+import 'webrtc_stats_monitor.dart';
 
 typedef OnLocalIceCandidateCallback = void Function(RTCIceCandidate candidate);
 typedef OnRemoteTrackCallback = void Function(MediaStreamTrack track, MediaStream stream);
@@ -21,6 +22,7 @@ class WebRTCManager {
   bool _simulcastEnabled = false;
   bool _isDisposed = false;
   Timer? _iceDisconnectTimer;
+  late final WebRTCStatsMonitor _statsMonitor;
 
   final List<RTCIceCandidate> _queuedRemoteCandidates = [];
 
@@ -32,14 +34,18 @@ class WebRTCManager {
   WebRTCManager({
     required this.mediaStreamManager,
     Map<String, dynamic>? configuration,
-  }) : rtcConfiguration = configuration ??
+  })  : rtcConfiguration = configuration ??
             {
               'iceServers': [
                 {'urls': 'stun:stun.l.google.com:19302'},
                 {'urls': 'stun:stun1.l.google.com:19302'},
               ],
               'sdpSemantics': 'unified-plan',
-            };
+            } {
+    _statsMonitor = WebRTCStatsMonitor(
+      getPeerConnection: () async => _peerConnection,
+    );
+  }
 
   RTCPeerConnection? get peerConnection => _peerConnection;
   bool get hasPeerConnection => _peerConnection != null;
@@ -47,11 +53,13 @@ class WebRTCManager {
   bool get simulcastEnabled => _simulcastEnabled;
   RTCRtpSender? get videoSender => _videoSender;
   RTCRtpSender? get audioSender => _audioSender;
+  WebRTCStatsMonitor get statsMonitor => _statsMonitor;
 
   /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line.
   /// Eliminates Android hardware H.264 green/pink screen artifacts and packet loss decoder freezes.
   static String preferCodec(String sdp, String codec) {
-    final lines = sdp.split('\r\n');
+    final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
+    final lines = sdp.split(delimiter);
     final mVideoIndex = lines.indexWhere((l) => l.startsWith('m=video'));
     if (mVideoIndex == -1) return sdp;
 
@@ -80,13 +88,14 @@ class WebRTCManager {
     if (codecPayloads.isEmpty) return sdp;
 
     lines[mVideoIndex] = '${header.join(' ')} ${codecPayloads.join(' ')} ${otherPayloads.join(' ')}';
-    return lines.join('\r\n');
+    return lines.join(delimiter);
   }
 
   /// Modifies an SDP string to enable Opus DTX (Discontinuous Transmission) and FEC (Forward Error Correction).
   /// Saves significant bandwidth and battery when the broadcaster/guest is silent.
   static String enableOpusDtx(String sdp) {
-    final lines = sdp.split('\r\n');
+    final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
+    final lines = sdp.split(delimiter);
     final opusPayloadTypes = <String>[];
 
     for (final line in lines) {
@@ -113,7 +122,7 @@ class WebRTCManager {
       }
     }
 
-    return lines.join('\r\n');
+    return lines.join(delimiter);
   }
 
   /// Initializes a new [RTCPeerConnection] with standard configuration and sets up listeners.
@@ -469,6 +478,7 @@ class WebRTCManager {
 
   /// Closes and resets the active PeerConnection.
   Future<void> closePeerConnection() async {
+    _statsMonitor.stop();
     _iceDisconnectTimer?.cancel();
     _iceDisconnectTimer = null;
     if (_peerConnection != null) {
@@ -486,6 +496,7 @@ class WebRTCManager {
     if (_isDisposed) return;
     _isDisposed = true;
 
+    _statsMonitor.dispose();
     await closePeerConnection();
   }
 }

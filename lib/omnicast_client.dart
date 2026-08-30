@@ -22,6 +22,7 @@ export 'src/datachannel/data_channel_manager.dart';
 export 'src/pk/pk_manager.dart';
 export 'src/signaling/signaling_client.dart';
 export 'src/webrtc/webrtc_manager.dart';
+export 'src/webrtc/webrtc_stats_monitor.dart';
 
 // Reactive State
 export 'src/state/room_state.dart';

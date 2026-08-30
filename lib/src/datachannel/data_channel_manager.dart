@@ -235,6 +235,41 @@ class DataChannelManager {
     _reactionController.add(reaction);
   }
 
+  /// Sends a raw JSON event directly over the zero-latency DataChannel.
+  void sendDirectMessage(Map<String, dynamic> data) {
+    if (_dataChannel == null ||
+        _dataChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
+      return;
+    }
+    final payload = jsonEncode(data);
+    _dataChannel!.send(RTCDataChannelMessage(payload));
+  }
+
+  /// Sends raw binary bytes directly over the DataChannel.
+  void sendDirectBinary(Uint8List bytes) {
+    if (_dataChannel == null ||
+        _dataChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
+      return;
+    }
+    _dataChannel!.send(RTCDataChannelMessage.fromBinary(bytes));
+  }
+
+  /// Broadcasts a live gift event directly over the DataChannel to all peers.
+  void sendGift(GiftEvent gift) {
+    sendDirectMessage({
+      'type': 'gift',
+      'gift_id': gift.giftId,
+      'gift_name': gift.giftName,
+      'coin_value': gift.coinValue,
+      'amount': gift.amount,
+      'sender_id': gift.senderId,
+      'sender_name': gift.senderName,
+      'target_host_id': gift.targetUserId,
+      'host_total_coins': gift.hostTotalCoins,
+      'timestamp': gift.timestamp.millisecondsSinceEpoch,
+    });
+  }
+
   /// Closes and disposes internal streams and notifiers.
   Future<void> dispose() async {
     if (_isDisposed) return;
