@@ -7,6 +7,7 @@ library;
 export 'src/core/omnicast_client.dart';
 export 'src/core/omnicast_config.dart';
 export 'src/auth/omnicast_token_generator.dart';
+export 'src/api/omnicast_api.dart';
 
 // Sub-Module Controllers & Managers
 export 'src/room/room_manager.dart';

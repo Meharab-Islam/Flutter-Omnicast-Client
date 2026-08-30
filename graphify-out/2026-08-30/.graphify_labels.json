@@ -22,15 +22,15 @@
   "20": "omnicast_pk_battle_view.dart",
   "21": "omnicast_video_view.dart",
   "22": "omnicast_media_control_bar.dart",
-  "23": "omnicast_config.dart",
+  "23": "video_parameters.dart",
   "24": "omnicast_speaking_video_tile.dart",
   "25": "audio_level_detector.dart",
   "26": "omnicast_video_canvas.dart",
   "27": "🚀 OmniCast Client Flutter SDK",
-  "28": "omnicast_native_viewport_tracker.dart",
+  "28": "room_event_models.dart",
   "29": "StatelessWidget",
   "30": "omnicast_token_generator.dart",
   "31": "RoomState",
   "32": "CHANGELOG.md",
-  "33": "omnicast_api.dart"
+  "33": "Participant"
 }

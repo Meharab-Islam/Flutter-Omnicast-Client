@@ -198,3 +198,72 @@ class OmniCastParticipant {
 
 /// Backward compatibility alias for [OmniCastParticipant].
 typedef Participant = OmniCastParticipant;
+
+/// Represents an active live broadcasting room on the server.
+class RoomModel {
+  final String roomId;
+  final String title;
+  final String hostId;
+  final String hostName;
+  final String? hostAvatar;
+  final RoomType roomType;
+  final int viewerCount;
+  final DateTime createdAt;
+  final Map<String, dynamic> metadata;
+
+  const RoomModel({
+    required this.roomId,
+    required this.title,
+    required this.hostId,
+    required this.hostName,
+    this.hostAvatar,
+    this.roomType = RoomType.video,
+    this.viewerCount = 0,
+    required this.createdAt,
+    this.metadata = const {},
+  });
+
+  factory RoomModel.fromJson(Map<String, dynamic> json) {
+    final typeStr = json['room_type'] as String? ?? json['type'] as String? ?? 'video';
+
+    final rawMeta = json['metadata'];
+    final meta = rawMeta is Map<String, dynamic>
+        ? Map<String, dynamic>.from(rawMeta)
+        : (rawMeta is Map
+            ? Map<String, dynamic>.from(rawMeta)
+            : const <String, dynamic>{});
+
+    return RoomModel(
+      roomId: json['room_id'] as String? ?? json['roomId'] as String? ?? json['id'] as String? ?? '',
+      title: json['title'] as String? ?? json['room_title'] as String? ?? meta['title'] as String? ?? 'Live Broadcast',
+      hostId: json['host_id'] as String? ?? json['hostId'] as String? ?? 'Host',
+      hostName: json['host_name'] as String? ?? json['hostDisplayName'] as String? ?? meta['displayName'] as String? ?? 'Broadcaster',
+      hostAvatar: json['host_avatar'] as String? ?? json['avatarUrl'] as String? ?? meta['avatar'] as String?,
+      roomType: typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video,
+      viewerCount: (json['viewer_count'] as num?)?.toInt() ??
+          (json['viewers_count'] as num?)?.toInt() ??
+          (json['total_viewers'] as num?)?.toInt() ??
+          0,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      metadata: meta,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'room_id': roomId,
+        'title': title,
+        'host_id': hostId,
+        'host_name': hostName,
+        'host_avatar': hostAvatar,
+        'room_type': roomType.name,
+        'viewer_count': viewerCount,
+        'created_at': createdAt.toIso8601String(),
+        'metadata': metadata,
+      };
+}
+
+/// Backward compatibility alias for [RoomModel].
+typedef ActiveLiveRoom = RoomModel;
+

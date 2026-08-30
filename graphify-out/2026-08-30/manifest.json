@@ -1,8 +1,8 @@
 {
   "lib/omnicast_client.dart": {
-    "mtime": 1788088860.140621,
-    "seen": 1788088910.030897,
-    "ast_hash": "43b229d6445399cd6048c82aaf25397f",
+    "mtime": 1788018371.489834,
+    "seen": 1788018721.780745,
+    "ast_hash": "e2554da9e6c767d1c3e260c52738a0f9",
     "semantic_hash": ""
   },
   "test/omnicast_client_test.dart": {
@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788088897.7852535,
-    "seen": 1788088910.0309,
-    "ast_hash": "8a0792ca3e2ff67a20da45ffc93fac3c",
+    "mtime": 1788018513.3283029,
+    "seen": 1788018721.780747,
+    "ast_hash": "025b7e24e75eac09a066940c3670a693",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -108,9 +108,9 @@
     "semantic_hash": "e4fed8d621290b715dda6b58572e4b92"
   },
   "lib/src/models/room_models.dart": {
-    "mtime": 1788088818.055655,
-    "seen": 1788088910.030907,
-    "ast_hash": "44b332f07192af7378d28cc83e65a7bd",
+    "mtime": 1788017987.6262305,
+    "seen": 1788018721.7807539,
+    "ast_hash": "f12749659494757bd3e9fcbbe15035cc",
     "semantic_hash": ""
   },
   "lib/src/models/seat_models.dart": {
@@ -303,18 +303,6 @@
     "mtime": 1787893026.1460931,
     "seen": 1788018721.7807732,
     "ast_hash": "9de791aae2d62a712b665a8176167e1a",
-    "semantic_hash": ""
-  },
-  "lib/src/api/omnicast_api.dart": {
-    "mtime": 1788088823.5435236,
-    "seen": 1788088910.0308979,
-    "ast_hash": "dd36ddc089668b5284dd37334aeb34db",
-    "semantic_hash": ""
-  },
-  "test/omnicast_api_test.dart": {
-    "mtime": 1788088871.7967715,
-    "seen": 1788088910.03092,
-    "ast_hash": "86424ab16f8bcbda2ccbbff70125fcba",
     "semantic_hash": ""
   }
 }

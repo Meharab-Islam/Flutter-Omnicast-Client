@@ -1192,14 +1192,322 @@
       "source_location": null
     },
     {
-      "id": "signalingclient",
-      "label": "SignalingClient",
+      "id": "lib_src_pk_pk_manager",
+      "label": "pk_manager.dart",
       "_origin": "ast",
       "community": 10,
-      "community_name": "media_controller.dart",
+      "community_name": "pk_manager.dart",
       "file_type": "code",
-      "norm_label": "signalingclient",
-      "source_file": null,
+      "norm_label": "pk_manager.dart",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_acceptpkrequest",
+      "label": "acceptPKRequest",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "acceptpkrequest",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_bindstatenotifiers",
+      "label": "_bindStateNotifiers",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_bindstatenotifiers",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_bindstreams",
+      "label": "_bindStreams",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_bindstreams",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_currentstate",
+      "label": "currentState",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "currentstate",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_dispose",
+      "label": "dispose",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "dispose",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_endpk",
+      "label": "endPK",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "endpk",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_ispkactive",
+      "label": "isPKActive",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "ispkactive",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_ispkactivenotifier",
+      "label": "isPKActiveNotifier",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "ispkactivenotifier",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_onpkended",
+      "label": "onPKEnded",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "onpkended",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_onpkrequested",
+      "label": "onPKRequested",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "onpkrequested",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_onpkscoreupdated",
+      "label": "onPKScoreUpdated",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "onpkscoreupdated",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_onpkstarted",
+      "label": "onPKStarted",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "onpkstarted",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_onpktimertick",
+      "label": "onPKTimerTick",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "onpktimertick",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pkendedcontroller",
+      "label": "_pkEndedController",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_pkendedcontroller",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pkmanager",
+      "label": "PKManager",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkmanager",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pkrequestedcontroller",
+      "label": "_pkRequestedController",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_pkrequestedcontroller",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pkscorecontroller",
+      "label": "_pkScoreController",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_pkscorecontroller",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pkstartedcontroller",
+      "label": "_pkStartedController",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_pkstartedcontroller",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pkstatenotifier",
+      "label": "pkStateNotifier",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstatenotifier",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_pktimercontroller",
+      "label": "_pkTimerController",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_pktimercontroller",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_rejectpkrequest",
+      "label": "rejectPKRequest",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "rejectpkrequest",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_roomstate",
+      "label": "_roomState",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_roomstate",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_sendpkrequest",
+      "label": "sendPKRequest",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "sendpkrequest",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_signalingclient",
+      "label": "_signalingClient",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_signalingclient",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_subscribetoopponenttracks",
+      "label": "_subscribeToOpponentTracks",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_subscribetoopponenttracks",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_syncpknotifiers",
+      "label": "_syncPKNotifiers",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_syncpknotifiers",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_timernotifier",
+      "label": "timerNotifier",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "timernotifier",
+      "source_file": "lib/src/pk/pk_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_pk_pk_manager_webrtcmanager",
+      "label": "_webRTCManager",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_webrtcmanager",
+      "source_file": "lib/src/pk/pk_manager.dart",
       "source_location": null
     },
     {
@@ -1225,6 +1533,17 @@
       "source_location": null
     },
     {
+      "id": "signalingclient",
+      "label": "SignalingClient",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "signalingclient",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "webrtcmanager_get",
       "label": "WebRTCManager get",
       "_origin": "ast",
@@ -1233,296 +1552,6 @@
       "file_type": "code",
       "norm_label": "webrtcmanager get",
       "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager",
-      "label": "pk_manager.dart",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "pk_manager.dart",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_acceptpkrequest",
-      "label": "acceptPKRequest",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "acceptpkrequest",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_bindstatenotifiers",
-      "label": "_bindStateNotifiers",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_bindstatenotifiers",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_bindstreams",
-      "label": "_bindStreams",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_bindstreams",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_currentstate",
-      "label": "currentState",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "currentstate",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_dispose",
-      "label": "dispose",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "dispose",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_endpk",
-      "label": "endPK",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "endpk",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_ispkactive",
-      "label": "isPKActive",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "ispkactive",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_ispkactivenotifier",
-      "label": "isPKActiveNotifier",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "ispkactivenotifier",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_onpkended",
-      "label": "onPKEnded",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "onpkended",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_onpkrequested",
-      "label": "onPKRequested",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "onpkrequested",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_onpkscoreupdated",
-      "label": "onPKScoreUpdated",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "onpkscoreupdated",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_onpkstarted",
-      "label": "onPKStarted",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "onpkstarted",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_onpktimertick",
-      "label": "onPKTimerTick",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "onpktimertick",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkendedcontroller",
-      "label": "_pkEndedController",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_pkendedcontroller",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkmanager",
-      "label": "PKManager",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "pkmanager",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkrequestedcontroller",
-      "label": "_pkRequestedController",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_pkrequestedcontroller",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkscorecontroller",
-      "label": "_pkScoreController",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_pkscorecontroller",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkstartedcontroller",
-      "label": "_pkStartedController",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_pkstartedcontroller",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pkstatenotifier",
-      "label": "pkStateNotifier",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "pkstatenotifier",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_pktimercontroller",
-      "label": "_pkTimerController",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_pktimercontroller",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_rejectpkrequest",
-      "label": "rejectPKRequest",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "rejectpkrequest",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_roomstate",
-      "label": "_roomState",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_roomstate",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_sendpkrequest",
-      "label": "sendPKRequest",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "sendpkrequest",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_signalingclient",
-      "label": "_signalingClient",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_signalingclient",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_subscribetoopponenttracks",
-      "label": "_subscribeToOpponentTracks",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_subscribetoopponenttracks",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_syncpknotifiers",
-      "label": "_syncPKNotifiers",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_syncpknotifiers",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_timernotifier",
-      "label": "timerNotifier",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "timernotifier",
-      "source_file": "lib/src/pk/pk_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_pk_pk_manager_webrtcmanager",
-      "label": "_webRTCManager",
-      "_origin": "ast",
-      "community": 10,
-      "file_type": "code",
-      "norm_label": "_webrtcmanager",
-      "source_file": "lib/src/pk/pk_manager.dart",
       "source_location": null
     },
     {
@@ -2571,6 +2600,292 @@
       "source_location": null
     },
     {
+      "id": "lib_src_datachannel_data_channel_manager",
+      "label": "data_channel_manager.dart",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "data_channel_manager.dart",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_attachincomingchannel",
+      "label": "attachIncomingChannel",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "attachincomingchannel",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_binddatachannel",
+      "label": "_bindDataChannel",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_binddatachannel",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_chatcontroller",
+      "label": "_chatController",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_chatcontroller",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_createpublisherchannel",
+      "label": "createPublisherChannel",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "createpublisherchannel",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_datachannel",
+      "label": "_dataChannel",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_datachannel",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_datachannelmanager",
+      "label": "DataChannelManager",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "datachannelmanager",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_datachannelreaction",
+      "label": "DataChannelReaction",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "datachannelreaction",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_dispose",
+      "label": "dispose",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "dispose",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_emoji",
+      "label": "emoji",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "emoji",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_fromjson",
+      "label": "fromJson",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "fromjson",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_ischannelopen",
+      "label": "isChannelOpen",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "ischannelopen",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_ischannelopennotifier",
+      "label": "isChannelOpenNotifier",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "ischannelopennotifier",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_isdisposed",
+      "label": "_isDisposed",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_isdisposed",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_latestreactionnotifier",
+      "label": "latestReactionNotifier",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "latestreactionnotifier",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_onchatmessage",
+      "label": "onChatMessage",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "onchatmessage",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_onreactionreceived",
+      "label": "onReactionReceived",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "onreactionreceived",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_reactioncontroller",
+      "label": "_reactionController",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_reactioncontroller",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_roomstate",
+      "label": "_roomState",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_roomstate",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_sendchat",
+      "label": "sendChat",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "sendchat",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_sendreaction",
+      "label": "sendReaction",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "sendreaction",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_timestamp",
+      "label": "timestamp",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "timestamp",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_tojson",
+      "label": "toJson",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "tojson",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_userid",
+      "label": "userId",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "userid",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_webrtcmanager",
+      "label": "_webRTCManager",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_webrtcmanager",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_datachannel_data_channel_manager_xoffset",
+      "label": "xOffset",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "xoffset",
+      "source_file": "lib/src/datachannel/data_channel_manager.dart",
+      "source_location": null
+    },
+    {
       "id": "rtcdatachannel",
       "label": "RTCDataChannel?",
       "_origin": "ast",
@@ -2578,6 +2893,17 @@
       "community_name": "data_channel_manager.dart",
       "file_type": "code",
       "norm_label": "rtcdatachannel?",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "state_room_state_dart",
+      "label": "../state/room_state.dart",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "../state/room_state.dart",
       "source_file": null,
       "source_location": null
     },
@@ -2601,277 +2927,6 @@
       "file_type": "code",
       "norm_label": "webrtcmanager",
       "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "state_room_state_dart",
-      "label": "../state/room_state.dart",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "interaction_manager.dart",
-      "file_type": "code",
-      "norm_label": "../state/room_state.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager",
-      "label": "data_channel_manager.dart",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "data_channel_manager.dart",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_attachincomingchannel",
-      "label": "attachIncomingChannel",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "attachincomingchannel",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_binddatachannel",
-      "label": "_bindDataChannel",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_binddatachannel",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_chatcontroller",
-      "label": "_chatController",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_chatcontroller",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_createpublisherchannel",
-      "label": "createPublisherChannel",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "createpublisherchannel",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_datachannel",
-      "label": "_dataChannel",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_datachannel",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_datachannelmanager",
-      "label": "DataChannelManager",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "datachannelmanager",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_datachannelreaction",
-      "label": "DataChannelReaction",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "datachannelreaction",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_dispose",
-      "label": "dispose",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "dispose",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_emoji",
-      "label": "emoji",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "emoji",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_fromjson",
-      "label": "fromJson",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "fromjson",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_ischannelopen",
-      "label": "isChannelOpen",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "ischannelopen",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_ischannelopennotifier",
-      "label": "isChannelOpenNotifier",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "ischannelopennotifier",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_isdisposed",
-      "label": "_isDisposed",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_isdisposed",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_latestreactionnotifier",
-      "label": "latestReactionNotifier",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "latestreactionnotifier",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_onchatmessage",
-      "label": "onChatMessage",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "onchatmessage",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_onreactionreceived",
-      "label": "onReactionReceived",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "onreactionreceived",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_reactioncontroller",
-      "label": "_reactionController",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_reactioncontroller",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_roomstate",
-      "label": "_roomState",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_roomstate",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_sendchat",
-      "label": "sendChat",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "sendchat",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_sendreaction",
-      "label": "sendReaction",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "sendreaction",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_timestamp",
-      "label": "timestamp",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "timestamp",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_tojson",
-      "label": "toJson",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "tojson",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_userid",
-      "label": "userId",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "userid",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_webrtcmanager",
-      "label": "_webRTCManager",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "_webrtcmanager",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_datachannel_data_channel_manager_xoffset",
-      "label": "xOffset",
-      "_origin": "ast",
-      "community": 14,
-      "file_type": "code",
-      "norm_label": "xoffset",
-      "source_file": "lib/src/datachannel/data_channel_manager.dart",
       "source_location": null
     },
     {
@@ -4052,17 +4107,6 @@
       "source_location": null
     },
     {
-      "id": "roomstate",
-      "label": "RoomState",
-      "_origin": "ast",
-      "community": 19,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "roomstate",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "lib_src_interaction_interaction_manager",
       "label": "interaction_manager.dart",
       "_origin": "ast",
@@ -4312,6 +4356,17 @@
       "community_name": "interaction_manager.dart",
       "file_type": "code",
       "norm_label": "../models/signaling_message.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "roomstate",
+      "label": "RoomState",
+      "_origin": "ast",
+      "community": 19,
+      "community_name": "interaction_manager.dart",
+      "file_type": "code",
+      "norm_label": "roomstate",
       "source_file": null,
       "source_location": null
     },
@@ -7275,17 +7330,6 @@
       "source_location": null
     },
     {
-      "id": "globalmediaconfig",
-      "label": "GlobalMediaConfig",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "core/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "globalmediaconfig",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "audio_level_detector_dart",
       "label": "audio_level_detector.dart",
       "_origin": "ast",
@@ -7315,6 +7359,17 @@
       "community_name": "media_controller.dart",
       "file_type": "code",
       "norm_label": "global_media_config.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "globalmediaconfig",
+      "label": "GlobalMediaConfig",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "globalmediaconfig",
       "source_file": null,
       "source_location": null
     },

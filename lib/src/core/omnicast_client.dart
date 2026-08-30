@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../api/omnicast_api.dart';
 import '../datachannel/data_channel_manager.dart';
 import '../interaction/interaction_manager.dart';
 import '../media/media_controller.dart';
@@ -19,6 +20,7 @@ import 'omnicast_config.dart';
 /// The central production SDK Facade for OmniCast Live & WebRTC SFU engine.
 ///
 /// Exposes modular sub-managers:
+/// - [api]: [OmniCastApi] (getLiveRooms, REST endpoints)
 /// - [room]: [RoomManager] (createRoom, joinRoom, leaveRoom, kickUser)
 /// - [media]: [MediaController] (mute/camera toggles, simulcast layer, dynacast)
 /// - [seats]: [SeatManager] (co-host invite/accept/upgrade, stage pinning, demotion)
@@ -27,6 +29,9 @@ import 'omnicast_config.dart';
 /// - [dataChannel]: [DataChannelManager] (zero-latency in-room events)
 /// - [state]: [RoomState] (reactive global state container)
 class OmniCastClient {
+  /// Global singleton accessor for the initialized [OmniCastClient] instance.
+  static OmniCastClient? instance;
+
   final OmniCastConfig config;
   final GlobalMediaConfig mediaConfig;
   final SignalingClient _signalingClient;
@@ -35,6 +40,7 @@ class OmniCastClient {
   final RoomState _roomState;
 
   // Sub-module managers
+  late final OmniCastApi _api;
   late final RoomManager _roomManager;
   late final MediaController _mediaController;
   late final SeatManager _seatManager;
@@ -66,6 +72,7 @@ class OmniCastClient {
                 'sdpSemantics': 'unified-plan',
               },
             ) {
+    instance = this;
     _initSubManagers();
     _bindInternalEventListeners();
   }
@@ -117,6 +124,7 @@ class OmniCastClient {
       config: config,
       mediaConfig: mediaConfig ?? const GlobalMediaConfig(),
     );
+    instance = client;
     if (autoConnect) {
       try {
         await client._signalingClient.connect(wsUrl: hostUrl, token: token);
@@ -128,6 +136,8 @@ class OmniCastClient {
   }
 
   void _initSubManagers() {
+    _api = OmniCastApi(config: config);
+
     _roomManager = RoomManager(
       signalingClient: _signalingClient,
       webRTCManager: _webRTCManager,
@@ -168,6 +178,7 @@ class OmniCastClient {
   }
 
   // Sub-module Getters
+  OmniCastApi get api => _api;
   RoomManager get room => _roomManager;
   MediaController get media => _mediaController;
   SeatManager get seats => _seatManager;
@@ -342,6 +353,10 @@ class OmniCastClient {
     await _webRTCManager.dispose();
     await _mediaStreamManager.dispose();
     await _signalingClient.dispose();
+    _api.dispose();
     _roomState.dispose();
+    if (instance == this) {
+      instance = null;
+    }
   }
 }
