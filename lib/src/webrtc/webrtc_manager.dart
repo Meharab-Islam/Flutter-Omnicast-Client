@@ -227,30 +227,33 @@ class WebRTCManager {
             direction: TransceiverDirection.SendRecv,
             streams: [localStream],
             sendEncodings: [
+              // High Layer (Full Resolution) - 1.2 Mbps max, 30fps
               RTCRtpEncoding(
                 rid: 'f',
                 active: true,
                 scaleResolutionDownBy: 1.0,
-                maxBitrate: 1100000, // 1100 kbps dynamic ceiling (prevents network choking & packet queue lag)
-                minBitrate: 350000,  // 350 kbps floor
+                maxBitrate: 1200000, // 1.2 Mbps dynamic ceiling
+                minBitrate: 350000,
                 maxFramerate: 30,
                 scalabilityMode: 'L1T3',
               ),
+              // Medium Layer (Half Resolution) - 500 Kbps max, 24fps
               RTCRtpEncoding(
                 rid: 'h',
                 active: true,
                 scaleResolutionDownBy: 2.0,
-                maxBitrate: 450000, // 450 kbps for half resolution
+                maxBitrate: 500000, // 500 Kbps for half resolution
                 minBitrate: 150000,
                 maxFramerate: 24,
                 scalabilityMode: 'L1T3',
               ),
+              // Low Layer (Quarter Resolution) - 150 Kbps max, 15fps
               RTCRtpEncoding(
                 rid: 'q',
                 active: true,
                 scaleResolutionDownBy: 4.0,
-                maxBitrate: 180000, // 180 kbps for quarter resolution
-                minBitrate: 60000,
+                maxBitrate: 150000, // 150 Kbps for quarter resolution
+                minBitrate: 50000,
                 maxFramerate: 15,
                 scalabilityMode: 'L1T3',
               ),
@@ -284,13 +287,13 @@ class WebRTCManager {
           debugPrint('[WebRTCManager] Set degradationPreference notice: $e');
         }
       } else {
-        // Standard single stream with maintain-framerate degradation and 1100 kbps dynamic ceiling
+        // Standard single stream with maintain-framerate degradation and 1200 kbps dynamic ceiling
         _videoSender = await pc.addTrack(videoTrack, localStream);
         try {
           final params = _videoSender!.parameters;
           params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
           if (params.encodings != null && params.encodings!.isNotEmpty) {
-            params.encodings!.first.maxBitrate = 1100000;
+            params.encodings!.first.maxBitrate = 1200000;
             params.encodings!.first.minBitrate = 350000;
             params.encodings!.first.maxFramerate = 30;
             params.encodings!.first.scalabilityMode = 'L1T3';
