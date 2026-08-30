@@ -31,8 +31,14 @@ class MediaController with WidgetsBindingObserver {
   final ValueNotifier<bool> isMicrophoneMutedNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<bool> isCameraEnabledNotifier = ValueNotifier<bool>(true);
   final ValueNotifier<String> simulcastLayerNotifier = ValueNotifier<String>('f');
+  final ValueNotifier<bool> isHostCameraOffNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> isHostMicrophoneMutedNotifier = ValueNotifier<bool>(false);
+
+  /// Callback triggered when remote host changes their audio/video state.
+  void Function(String type, bool isMuted)? onHostMediaStateChanged;
 
   StreamSubscription? _dynacastSubscription;
+  StreamSubscription? _mediaStateSubscription;
 
   MediaController({
     required MediaStreamManager mediaStreamManager,
@@ -54,6 +60,7 @@ class MediaController with WidgetsBindingObserver {
     _audioLevelDetector = AudioLevelDetector(webRTCManager: _webRTCManager);
 
     _bindDynacastSignaling();
+    _bindMediaStateSignaling();
     if (_autoPauseOnBackground) {
       try {
         WidgetsBinding.instance.addObserver(this);
@@ -202,6 +209,12 @@ class MediaController with WidgetsBindingObserver {
     ));
   }
 
+  /// Toggles or sets microphone mute state (Host/Co-host control).
+  void toggleMute(bool isMuted) => setMicrophoneMuted(isMuted);
+
+  /// Toggles or sets camera enabled/disabled state (Host/Co-host control).
+  void toggleCamera(bool isOff) => setCameraEnabled(!isOff);
+
   /// Enables or mutes the local microphone.
   void setMicrophoneMuted(bool muted) {
     _mediaStreamManager.toggleAudio(!muted);
@@ -209,10 +222,11 @@ class MediaController with WidgetsBindingObserver {
 
     if (_roomState.isInRoom && _signalingClient.isConnected) {
       _signalingClient.send(SignalingMessage(
-        event: 'track_muted',
+        event: 'media_state_changed',
         roomId: _roomState.roomId ?? '',
         userId: _roomState.userId ?? '',
         payload: {
+          'type': 'audio',
           'kind': 'audio',
           'muted': muted,
         },
@@ -231,15 +245,35 @@ class MediaController with WidgetsBindingObserver {
 
     if (_roomState.isInRoom && _signalingClient.isConnected) {
       _signalingClient.send(SignalingMessage(
-        event: 'track_muted',
+        event: 'media_state_changed',
         roomId: _roomState.roomId ?? '',
         userId: _roomState.userId ?? '',
         payload: {
+          'type': 'video',
           'kind': 'video',
           'muted': !enabled,
         },
       ));
     }
+  }
+
+  /// Listens for remote media state change events from the host/co-hosts.
+  void _bindMediaStateSignaling() {
+    _mediaStateSubscription = _signalingClient.onMediaStateChanged.listen((msg) {
+      final payload = msg.payload;
+      if (payload is Map<String, dynamic>) {
+        final type = payload['type'] as String? ?? payload['kind'] as String? ?? '';
+        final isMuted = (payload['muted'] as bool?) ?? false;
+
+        if (type == 'video') {
+          isHostCameraOffNotifier.value = isMuted;
+        } else if (type == 'audio') {
+          isHostMicrophoneMutedNotifier.value = isMuted;
+        }
+
+        onHostMediaStateChanged?.call(type, isMuted);
+      }
+    });
   }
 
   /// Switches between front and back camera.
@@ -313,9 +347,12 @@ class MediaController with WidgetsBindingObserver {
       } catch (_) {}
     }
     _dynacastSubscription?.cancel();
+    _mediaStateSubscription?.cancel();
     _audioLevelDetector.dispose();
     isMicrophoneMutedNotifier.dispose();
     isCameraEnabledNotifier.dispose();
     simulcastLayerNotifier.dispose();
+    isHostCameraOffNotifier.dispose();
+    isHostMicrophoneMutedNotifier.dispose();
   }
 }

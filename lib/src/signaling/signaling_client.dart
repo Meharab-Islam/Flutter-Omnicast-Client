@@ -39,6 +39,9 @@ class SignalingClient {
   final _seatAcceptController = StreamController<SignalingMessage>.broadcast();
   final _seatRejectController = StreamController<SignalingMessage>.broadcast();
   final _seatLeaveController = StreamController<SignalingMessage>.broadcast();
+  final _mediaStateController = StreamController<SignalingMessage>.broadcast();
+  final _roomCreatedController = StreamController<RoomModel>.broadcast();
+  final _roomClosedController = StreamController<String>.broadcast();
 
   SignalingClient({
     this.heartbeatInterval = const Duration(seconds: 15),
@@ -66,6 +69,9 @@ class SignalingClient {
   Stream<SignalingMessage> get onSeatAccept => _seatAcceptController.stream;
   Stream<SignalingMessage> get onSeatReject => _seatRejectController.stream;
   Stream<SignalingMessage> get onSeatLeave => _seatLeaveController.stream;
+  Stream<SignalingMessage> get onMediaStateChanged => _mediaStateController.stream;
+  Stream<RoomModel> get onRoomCreated => _roomCreatedController.stream;
+  Stream<String> get onRoomClosed => _roomClosedController.stream;
 
   /// Connects to the OmniCast WebSocket signaling server.
   Future<void> connect({required String wsUrl, String? token}) async {
@@ -209,6 +215,28 @@ class SignalingClient {
         _seatLeaveController.add(msg);
         break;
 
+      case SignalingEvents.mediaStateChanged:
+      case SignalingEvents.trackMuted:
+        _mediaStateController.add(msg);
+        break;
+
+      case SignalingEvents.roomCreated:
+        if (msg.payload is Map<String, dynamic>) {
+          _roomCreatedController.add(RoomModel.fromJson(msg.payload as Map<String, dynamic>));
+        }
+        break;
+
+      case SignalingEvents.roomClosed:
+        final closedRoomId = msg.roomId.isNotEmpty
+            ? msg.roomId
+            : (msg.payload is Map<String, dynamic>
+                ? (msg.payload['room_id'] as String? ?? '')
+                : (msg.payload is String ? msg.payload as String : ''));
+        if (closedRoomId.isNotEmpty) {
+          _roomClosedController.add(closedRoomId);
+        }
+        break;
+
       case SignalingEvents.ping:
         // Automatically reply with pong
         send(SignalingMessage(
@@ -229,6 +257,12 @@ class SignalingClient {
     }
   }
 
+  /// Injects a raw JSON or message payload directly (useful for tests and synthetic messages).
+  @visibleForTesting
+  Future<void> handleRawMessage(dynamic rawData) async {
+    _onDataReceived(rawData);
+  }
+
   void _onError(dynamic error) {
     debugPrint('[SignalingClient] Stream error: $error');
     _updateState(ClientConnectionState.disconnected);
@@ -239,8 +273,16 @@ class SignalingClient {
     _updateState(ClientConnectionState.disconnected);
   }
 
+  void _updateState(ClientConnectionState state) {
+    if (_connectionState == state) return;
+    _connectionState = state;
+    _stateController.add(state);
+  }
+
   void _startHeartbeat() {
     _heartbeatTimer?.cancel();
+    if (heartbeatInterval <= Duration.zero) return;
+
     _heartbeatTimer = Timer.periodic(heartbeatInterval, (_) {
       if (isConnected) {
         send(SignalingMessage(
@@ -270,14 +312,6 @@ class SignalingClient {
     }
   }
 
-  void _updateState(ClientConnectionState newState) {
-    if (_connectionState == newState) return;
-    _connectionState = newState;
-    if (!_stateController.isClosed) {
-      _stateController.add(newState);
-    }
-  }
-
   Future<void> _cleanupActiveConnection() async {
     _heartbeatTimer?.cancel();
     _heartbeatTimer = null;
@@ -286,7 +320,9 @@ class SignalingClient {
     _channelSubscription = null;
 
     if (_channel != null) {
-      await _channel!.sink.close();
+      try {
+        await _channel!.sink.close();
+      } catch (_) {}
       _channel = null;
     }
   }
@@ -318,5 +354,8 @@ class SignalingClient {
     await _seatAcceptController.close();
     await _seatRejectController.close();
     await _seatLeaveController.close();
+    await _mediaStateController.close();
+    await _roomCreatedController.close();
+    await _roomClosedController.close();
   }
 }

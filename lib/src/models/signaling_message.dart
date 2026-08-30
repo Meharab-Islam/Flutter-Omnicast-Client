@@ -120,6 +120,10 @@ abstract final class SignalingEvents {
   static const String pkEnd = 'pk_end';
 
   // Media & Dynacast Controls
+  static const String mediaStateChanged = 'media_state_changed';
+  static const String trackMuted = 'track_muted';
+  static const String roomCreated = 'room_created';
+  static const String roomClosed = 'room_closed';
   static const String layerSelect = 'layer_select';
   static const String trackPause = 'track_pause';
   static const String trackResume = 'track_resume';

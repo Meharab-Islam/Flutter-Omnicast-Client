@@ -190,6 +190,11 @@ class OmniCastClient {
   SignalingClient get signaling => _signalingClient;
   WebRTCManager get webrtc => _webRTCManager;
 
+  // Real-time Global Room & Media Event Streams
+  Stream<RoomModel> get onRoomCreated => _signalingClient.onRoomCreated;
+  Stream<String> get onRoomClosed => _signalingClient.onRoomClosed;
+  Stream<SignalingMessage> get onMediaStateChanged => _signalingClient.onMediaStateChanged;
+
   /// Binds internal signaling and WebRTC event subscriptions.
   void _bindInternalEventListeners() {
     // 1. WebRTC Local ICE Candidates -> Signaling Server
