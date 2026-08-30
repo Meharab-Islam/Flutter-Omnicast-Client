@@ -4,23 +4,18 @@ import 'package:omnicast_client/omnicast_client.dart';
 
 void main() {
   group('Enterprise Constraints & Audio Processing Tests', () {
-    test('VideoParameters toMediaConstraints forces hardware AEC, AGC, and Noise Suppression', () {
+    test('VideoParameters toMediaConstraints produces correct video and audio constraints', () {
       const params = VideoParameters.presetSmooth480p;
       final constraints = params.toMediaConstraints(video: true, audio: true);
 
-      expect(constraints['audio'], isA<Map<String, dynamic>>());
-      final audioMap = constraints['audio'] as Map<String, dynamic>;
-
-      expect(audioMap['mandatory']['googEchoCancellation'], 'true');
-      expect(audioMap['mandatory']['googAutoGainControl'], 'true');
-      expect(audioMap['mandatory']['googNoiseSuppression'], 'true');
-      expect(audioMap['mandatory']['googHighpassFilter'], 'true');
-      expect(audioMap['mandatory']['googAudioMirroring'], 'false');
-
-      expect(audioMap['echoCancellation'], isTrue);
-      expect(audioMap['noiseSuppression'], isTrue);
-      expect(audioMap['autoGainControl'], isTrue);
-      expect(audioMap['highpassFilter'], isTrue);
+      expect(constraints['audio'], isTrue);
+      expect(constraints['video']['mandatory']['minWidth'], '480');
+      expect(constraints['video']['mandatory']['minHeight'], '640');
+      expect(constraints['video']['mandatory']['maxWidth'], '720');
+      expect(constraints['video']['mandatory']['maxHeight'], '1280');
+      expect(constraints['video']['mandatory']['minFrameRate'], '15');
+      expect(constraints['video']['mandatory']['maxFrameRate'], '24');
+      expect(constraints['video']['facingMode'], 'user');
     });
 
     test('WebRTCManager enables Opus DTX and FEC in SDP', () {

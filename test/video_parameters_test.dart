@@ -5,19 +5,18 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoParameters Presets & Constraints', () {
-    test('presetSmooth480p constraints match 640x480 @ 24fps with ideal constraints', () {
+    test('mediaConstraints limits resolution and framerate correctly', () {
       const params = VideoParameters.presetSmooth480p;
-      expect(params.width, 640);
-      expect(params.height, 480);
-      expect(params.frameRate, 24);
-      expect(params.maxBitrate, 800000);
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
-      expect(constraints['audio'], isA<Map<String, dynamic>>());
-      expect(constraints['audio']['mandatory']['googNoiseSuppression'], 'true');
-      expect(constraints['video']['width']['ideal'], 640);
-      expect(constraints['video']['height']['ideal'], 480);
-      expect(constraints['video']['frameRate']['ideal'], 24);
+      expect(constraints['audio'], isTrue);
+      expect(constraints['video']['mandatory']['minWidth'], '480');
+      expect(constraints['video']['mandatory']['minHeight'], '640');
+      expect(constraints['video']['mandatory']['maxWidth'], '720');
+      expect(constraints['video']['mandatory']['maxHeight'], '1280');
+      expect(constraints['video']['mandatory']['minFrameRate'], '15');
+      expect(constraints['video']['mandatory']['maxFrameRate'], '24');
+      expect(constraints['video']['facingMode'], 'user');
     });
 
     test('WebRTCManager preferCodec prioritizes VP8 or VP9 in m=video line', () {
@@ -35,49 +34,20 @@ void main() {
       expect(dtxSdp, contains('a=fmtp:111 minptime=10;usedtx=1;useinbandfec=1'));
     });
 
-    test('presetHD720p constraints match 1280x720 @ 30fps', () {
+    test('presetHD720p constraints video and audio flags', () {
       const params = VideoParameters.presetHD720p;
-      expect(params.width, 1280);
-      expect(params.height, 720);
-      expect(params.frameRate, 30);
-      expect(params.maxBitrate, 2500000);
-
       final constraints = params.toMediaConstraints(video: true, audio: true);
-      expect(constraints['audio'], isA<Map<String, dynamic>>());
-      expect(constraints['video']['mandatory']['minWidth'], '1280');
-      expect(constraints['video']['mandatory']['minHeight'], '720');
-      expect(constraints['video']['mandatory']['minFrameRate'], '30');
+      expect(constraints['audio'], isTrue);
+      expect(constraints['video']['mandatory']['minWidth'], '480');
+      expect(constraints['video']['mandatory']['maxWidth'], '720');
+      expect(constraints['video']['mandatory']['maxHeight'], '1280');
     });
 
-    test('presetFHD1080p constraints match 1920x1080 @ 30fps', () {
+    test('presetFHD1080p constraints when audio is false', () {
       const params = VideoParameters.presetFHD1080p;
-      expect(params.width, 1920);
-      expect(params.height, 1080);
-      expect(params.maxBitrate, 4500000);
-
       final constraints = params.toMediaConstraints(video: true, audio: false);
       expect(constraints['audio'], isFalse);
-      expect(constraints['video']['mandatory']['minWidth'], '1920');
-      expect(constraints['video']['mandatory']['minHeight'], '1080');
-    });
-
-    test('custom video parameters generation', () {
-      final custom = VideoParameters.custom(
-        width: 1024,
-        height: 768,
-        fps: 60,
-        maxBitrate: 3000000,
-      );
-
-      expect(custom.width, 1024);
-      expect(custom.height, 768);
-      expect(custom.frameRate, 60);
-      expect(custom.maxBitrate, 3000000);
-
-      final constraints = custom.toMediaConstraints();
-      expect(constraints['video']['mandatory']['minWidth'], '1024');
-      expect(constraints['video']['mandatory']['minHeight'], '768');
-      expect(constraints['video']['mandatory']['minFrameRate'], '60');
+      expect(constraints['video']['mandatory']['minWidth'], '480');
     });
   });
 

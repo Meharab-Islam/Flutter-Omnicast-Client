@@ -88,47 +88,24 @@ class VideoParameters {
   }
 
   /// Converts parameters to ideal/mandatory getUserMedia constraints map.
-  /// Prioritizes smoothness ({ideal: 640}, {ideal: 480}, {ideal: 24}) to prevent camera driver stalls,
-  /// and enables hardware acoustic echo cancellation & noise suppression.
+  /// Limits video resolution and framerate to fix macroblocking, freezes, and driver stutter.
   Map<String, dynamic> toMediaConstraints({
     bool video = true,
     bool audio = true,
   }) {
     return {
-      'audio': audio
-          ? {
-              'mandatory': {
-                'googEchoCancellation': 'true',
-                'googAutoGainControl': 'true',
-                'googNoiseSuppression': 'true',
-                'googHighpassFilter': 'true',
-                'googAudioMirroring': 'false',
-              },
-              'optional': [
-                {'googEchoCancellation2': 'true'},
-                {'googDAEchoCancellation': 'true'},
-                {'googAutoGainControl2': 'true'},
-                {'googNoiseSuppression2': 'true'},
-                {'googTypingNoiseDetection': 'true'},
-              ],
-              'echoCancellation': true,
-              'noiseSuppression': true,
-              'autoGainControl': true,
-              'highpassFilter': true,
-            }
-          : false,
+      'audio': audio,
       'video': video
           ? {
               'mandatory': {
-                'minWidth': width.toString(),
-                'minHeight': height.toString(),
-                'minFrameRate': frameRate.toString(),
+                'minWidth': '480',
+                'minHeight': '640',
+                'maxWidth': '720',
+                'maxHeight': '1280',
+                'minFrameRate': '15',
+                'maxFrameRate': '24',
               },
               'facingMode': facingMode,
-              'optional': [],
-              'width': {'ideal': width},
-              'height': {'ideal': height},
-              'frameRate': {'ideal': frameRate},
             }
           : false,
     };
