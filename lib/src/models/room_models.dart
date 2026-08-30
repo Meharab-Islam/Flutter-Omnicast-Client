@@ -224,29 +224,114 @@ class RoomModel {
   });
 
   factory RoomModel.fromJson(Map<String, dynamic> json) {
-    final typeStr = json['room_type'] as String? ?? json['type'] as String? ?? 'video';
+    // 1. Extract nested metadata or options if present
+    final meta = json['metadata'] is Map<String, dynamic>
+        ? json['metadata'] as Map<String, dynamic>
+        : (json['options'] is Map<String, dynamic>
+            ? json['options'] as Map<String, dynamic>
+            : <String, dynamic>{});
 
-    final rawMeta = json['metadata'];
-    final meta = rawMeta is Map<String, dynamic>
-        ? Map<String, dynamic>.from(rawMeta)
-        : (rawMeta is Map
-            ? Map<String, dynamic>.from(rawMeta)
-            : const <String, dynamic>{});
+    // 2. Extract host sub-object if present
+    final hostMap = json['host'] is Map<String, dynamic>
+        ? json['host'] as Map<String, dynamic>
+        : (json['owner'] is Map<String, dynamic>
+            ? json['owner'] as Map<String, dynamic>
+            : <String, dynamic>{});
+
+    // 3. Room ID (Supports snake_case, camelCase, id, name)
+    final roomId = json['room_id']?.toString() ??
+        json['roomId']?.toString() ??
+        json['id']?.toString() ??
+        json['channel_id']?.toString() ??
+        json['name']?.toString() ??
+        '';
+
+    // 4. Stream Title
+    final title = json['room_name']?.toString() ??
+        json['title']?.toString() ??
+        json['room_title']?.toString() ??
+        json['roomTitle']?.toString() ??
+        meta['title']?.toString() ??
+        json['name']?.toString() ??
+        (roomId.isNotEmpty ? roomId : 'Live Broadcast');
+
+    // 5. Host ID & Name
+    final hostId = json['host_id']?.toString() ??
+        json['hostId']?.toString() ??
+        json['user_id']?.toString() ??
+        json['userId']?.toString() ??
+        hostMap['id']?.toString() ??
+        hostMap['user_id']?.toString() ??
+        'Host';
+
+    final hostName = json['host_name']?.toString() ??
+        json['hostDisplayName']?.toString() ??
+        json['host_display_name']?.toString() ??
+        meta['displayName']?.toString() ??
+        meta['display_name']?.toString() ??
+        meta['name']?.toString() ??
+        hostMap['display_name']?.toString() ??
+        hostMap['name']?.toString() ??
+        (hostId.isNotEmpty ? hostId : 'Broadcaster');
+
+    // 6. Host Avatar
+    final hostAvatar = json['host_avatar']?.toString() ??
+        json['hostAvatar']?.toString() ??
+        json['avatar_url']?.toString() ??
+        json['avatarUrl']?.toString() ??
+        json['avatar']?.toString() ??
+        meta['avatar']?.toString() ??
+        meta['avatar_url']?.toString() ??
+        hostMap['avatar']?.toString() ??
+        hostMap['avatar_url']?.toString();
+
+    // 7. Room Type (Video vs Audio)
+    final typeStr = json['room_type']?.toString() ??
+        json['roomType']?.toString() ??
+        json['type']?.toString() ??
+        meta['room_type']?.toString() ??
+        'video';
+    final roomType =
+        typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video;
+
+    // 8. Viewer Count (Supports int, double, string number, or viewers/participants list length)
+    int viewerCount = 0;
+    if (json['viewer_count'] != null) {
+      viewerCount = int.tryParse(json['viewer_count'].toString()) ?? 0;
+    } else if (json['viewers_count'] != null) {
+      viewerCount = int.tryParse(json['viewers_count'].toString()) ?? 0;
+    } else if (json['total_viewers'] != null) {
+      viewerCount = int.tryParse(json['total_viewers'].toString()) ?? 0;
+    } else if (json['viewerCount'] != null) {
+      viewerCount = int.tryParse(json['viewerCount'].toString()) ?? 0;
+    } else if (json['viewers'] is List) {
+      viewerCount = (json['viewers'] as List).length;
+    } else if (json['participants'] is List) {
+      viewerCount = (json['participants'] as List).length;
+    }
+
+    // 9. Created At
+    DateTime createdAt = DateTime.now();
+    final rawDate = json['created_at'] ?? json['createdAt'] ?? json['timestamp'];
+    if (rawDate != null) {
+      if (rawDate is int) {
+        createdAt = rawDate > 1000000000000
+            ? DateTime.fromMillisecondsSinceEpoch(rawDate)
+            : DateTime.fromMillisecondsSinceEpoch(rawDate * 1000);
+      } else {
+        createdAt = DateTime.tryParse(rawDate.toString()) ?? DateTime.now();
+      }
+    }
 
     return RoomModel(
-      roomId: json['room_id'] as String? ?? json['roomId'] as String? ?? json['id'] as String? ?? '',
-      title: json['title'] as String? ?? json['room_title'] as String? ?? meta['title'] as String? ?? 'Live Broadcast',
-      hostId: json['host_id'] as String? ?? json['hostId'] as String? ?? 'Host',
-      hostName: json['host_name'] as String? ?? json['hostDisplayName'] as String? ?? meta['displayName'] as String? ?? 'Broadcaster',
-      hostAvatar: json['host_avatar'] as String? ?? json['avatarUrl'] as String? ?? meta['avatar'] as String?,
-      roomType: typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video,
-      viewerCount: (json['viewer_count'] as num?)?.toInt() ??
-          (json['viewers_count'] as num?)?.toInt() ??
-          (json['total_viewers'] as num?)?.toInt() ??
-          0,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+      roomId: roomId,
+      title: title,
+      hostId: hostId,
+      hostName: hostName,
+      hostAvatar: hostAvatar,
+      roomType: roomType,
+      viewerCount: viewerCount,
+      createdAt: createdAt,
       metadata: meta,
     );
   }

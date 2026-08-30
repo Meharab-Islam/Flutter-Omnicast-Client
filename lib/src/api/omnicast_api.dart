@@ -66,33 +66,44 @@ class OmniCastApi {
 
       debugPrint('[OmniCastApi] Response status: ${response.statusCode}');
 
+      // ignore: avoid_print
+      print('Raw Rooms Response: ${response.body}');
+
       if (response.statusCode == 200) {
         final body = response.body.trim();
         if (body.isEmpty || body == 'null') return [];
 
-        final decoded = jsonDecode(body);
-        List roomList = [];
+        try {
+          final decoded = jsonDecode(body);
+          List roomList = [];
 
-        if (decoded is List) {
-          roomList = decoded;
-        } else if (decoded is Map<String, dynamic>) {
-          if (decoded['rooms'] is List) {
-            roomList = decoded['rooms'] as List;
-          } else if (decoded['rooms'] is Map<String, dynamic>) {
-            roomList = (decoded['rooms'] as Map<String, dynamic>).values.toList();
-          } else if (decoded['data'] is List) {
-            roomList = decoded['data'] as List;
-          } else if (decoded['active_rooms'] is List) {
-            roomList = decoded['active_rooms'] as List;
-          } else if (decoded['result'] is List) {
-            roomList = decoded['result'] as List;
+          if (decoded is List) {
+            roomList = decoded;
+          } else if (decoded is Map<String, dynamic>) {
+            if (decoded['rooms'] is List) {
+              roomList = decoded['rooms'] as List;
+            } else if (decoded['rooms'] is Map<String, dynamic>) {
+              roomList = (decoded['rooms'] as Map<String, dynamic>).values.toList();
+            } else if (decoded['data'] is List) {
+              roomList = decoded['data'] as List;
+            } else if (decoded['active_rooms'] is List) {
+              roomList = decoded['active_rooms'] as List;
+            } else if (decoded['result'] is List) {
+              roomList = decoded['result'] as List;
+            }
           }
-        }
 
-        return roomList
-            .whereType<Map<String, dynamic>>()
-            .map((item) => RoomModel.fromJson(item))
-            .toList();
+          final rooms = roomList
+              .whereType<Map<String, dynamic>>()
+              .map((item) => RoomModel.fromJson(item))
+              .toList();
+
+          return rooms;
+        } catch (e) {
+          // ignore: avoid_print
+          print('JSON Parsing Error: $e');
+          rethrow;
+        }
       } else if (response.statusCode == 404 || response.statusCode == 204) {
         return [];
       } else {
