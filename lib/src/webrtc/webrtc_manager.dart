@@ -144,15 +144,18 @@ class WebRTCManager {
       debugPrint('[WebRTCManager] ICE Connection State: $state');
       if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
         _iceDisconnectTimer?.cancel();
-        _iceDisconnectTimer = Timer(const Duration(seconds: 3), () {
-          debugPrint('[WebRTCManager] ICE disconnected for >3s -> Triggering ICE Restart');
+        // 1-2s seamless ICE restart window during WiFi <-> Cellular handoffs
+        _iceDisconnectTimer = Timer(const Duration(milliseconds: 1500), () {
+          debugPrint('[WebRTCManager] ICE disconnected for >1.5s -> Triggering seamless ICE Restart');
           onIceRestartNeeded?.call();
         });
       } else if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
           state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
         _iceDisconnectTimer?.cancel();
+        _iceDisconnectTimer = null;
       } else if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
         _iceDisconnectTimer?.cancel();
+        _iceDisconnectTimer = null;
         debugPrint('[WebRTCManager] ICE Failed -> Triggering Immediate ICE Restart');
         onIceRestartNeeded?.call();
       }
