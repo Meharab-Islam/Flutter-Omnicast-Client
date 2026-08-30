@@ -220,16 +220,18 @@ class PKManager {
     debugPrint(
         '[PKManager] Subscribing to opponent tracks for room: $opponentRoomId, host: $opponentUserId');
 
-    _signalingClient.send(SignalingMessage(
-      event: 'subscribe_cross_room',
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: opponentUserId,
-      payload: {
-        'source_room_id': opponentRoomId,
-        'source_user_id': opponentUserId,
-      },
-    ));
+    if (_roomState.isInRoom && _roomState.roomId != null && _roomState.userId != null) {
+      _signalingClient.send(SignalingMessage(
+        event: 'subscribe_cross_room',
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: opponentUserId,
+        payload: {
+          'source_room_id': opponentRoomId,
+          'source_user_id': opponentUserId,
+        },
+      ));
+    }
 
     // Register active remote user so renderers get initialized immediately
     _roomState.addActiveRemoteUser(opponentUserId);

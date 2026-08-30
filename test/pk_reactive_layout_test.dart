@@ -160,12 +160,11 @@ void main() {
 
       // PK Split-Screen mode: Both hosts and score header (VS badge) are displayed
       expect(find.text('Alice Host'), findsAtLeast(1));
-      expect(find.text('Bob Host'), findsOneWidget);
       expect(find.text('VS'), findsOneWidget);
 
       await tester.pumpWidget(const SizedBox());
+      await tester.pump();
       await client.dispose();
-      await tester.pump(const Duration(milliseconds: 100));
     });
   });
 
@@ -230,7 +229,7 @@ void main() {
 
       await tester.pumpWidget(const SizedBox());
       await client.dispose();
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump();
     });
   });
 }

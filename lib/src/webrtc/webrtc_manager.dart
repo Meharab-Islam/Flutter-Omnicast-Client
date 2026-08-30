@@ -184,7 +184,8 @@ class WebRTCManager {
     );
   }
 
-  /// Adds local media tracks to [RTCPeerConnection], configuring bandwidth-friendly VP8/bitrate encodings.
+  /// Adds local media tracks to [RTCPeerConnection], configuring hardware-friendly H264/VP8 codecs,
+  /// dynamic bitrate adaptation (1000-1200 kbps max), and maintain-framerate degradation preference for zero lag.
   Future<void> addLocalMediaTracks({bool enableSimulcast = true}) async {
     final pc = await initializePeerConnection();
     final localStream = mediaStreamManager.localStream;
@@ -200,13 +201,13 @@ class WebRTCManager {
       _audioSender = await pc.addTrack(audioTracks.first, localStream);
     }
 
-    // Add video track with mobile bandwidth optimization (Max 800 kbps, 24fps)
+    // Add video track with mobile dynamic bitrate & zero-lag framerate preference
     final videoTracks = localStream.getVideoTracks();
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
 
       if (enableSimulcast) {
-        // Multi-layer simulcast/SVC transceivers: 'f' (smooth 480p), 'h' (half), 'q' (quarter)
+        // Multi-layer simulcast/SVC transceivers: 'f' (smooth 720p/480p @ 1100 kbps), 'h' (half @ 450 kbps), 'q' (quarter @ 180 kbps)
         final transceiver = await pc.addTransceiver(
           track: videoTrack,
           kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
@@ -218,23 +219,26 @@ class WebRTCManager {
                 rid: 'f',
                 active: true,
                 scaleResolutionDownBy: 1.0,
-                maxBitrate: 800000, // 800 kbps for smooth 480p / 24fps
-                maxFramerate: 24,
+                maxBitrate: 1100000, // 1100 kbps dynamic ceiling (prevents network choking & packet queue lag)
+                minBitrate: 350000,  // 350 kbps floor
+                maxFramerate: 30,
                 scalabilityMode: 'L1T3',
               ),
               RTCRtpEncoding(
                 rid: 'h',
                 active: true,
                 scaleResolutionDownBy: 2.0,
-                maxBitrate: 350000, // 350 kbps for half layer
-                maxFramerate: 20,
+                maxBitrate: 450000, // 450 kbps for half resolution
+                minBitrate: 150000,
+                maxFramerate: 24,
                 scalabilityMode: 'L1T3',
               ),
               RTCRtpEncoding(
                 rid: 'q',
                 active: true,
                 scaleResolutionDownBy: 4.0,
-                maxBitrate: 150000, // 150 kbps for quarter layer
+                maxBitrate: 180000, // 180 kbps for quarter resolution
+                minBitrate: 60000,
                 maxFramerate: 15,
                 scalabilityMode: 'L1T3',
               ),
@@ -242,18 +246,47 @@ class WebRTCManager {
           ),
         );
         _videoSender = transceiver.sender;
+
+        // Prefer hardware-accelerated codecs (H264 Baseline Profile / VP8)
+        try {
+          final capabilities = await getRtpSenderCapabilities('video');
+          if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
+            final sortedCodecs = List<RTCRtpCodecCapability>.from(capabilities.codecs!);
+            sortedCodecs.sort((a, b) {
+              final mimeA = a.mimeType.toLowerCase();
+              final mimeB = b.mimeType.toLowerCase();
+              int scoreA = mimeA.contains('h264') ? 0 : (mimeA.contains('vp8') ? 1 : 2);
+              int scoreB = mimeB.contains('h264') ? 0 : (mimeB.contains('vp8') ? 1 : 2);
+              return scoreA.compareTo(scoreB);
+            });
+            await transceiver.setCodecPreferences(sortedCodecs);
+          }
+        } catch (_) {}
+
+        // Apply maintain-framerate degradation preference to prevent freezing
+        try {
+          final params = _videoSender!.parameters;
+          params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
+          await _videoSender!.setParameters(params);
+        } catch (e) {
+          debugPrint('[WebRTCManager] Set degradationPreference notice: $e');
+        }
       } else {
-        // Standard single stream (Max 800 kbps)
+        // Standard single stream with maintain-framerate degradation and 1100 kbps dynamic ceiling
         _videoSender = await pc.addTrack(videoTrack, localStream);
         try {
           final params = _videoSender!.parameters;
+          params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
           if (params.encodings != null && params.encodings!.isNotEmpty) {
-            params.encodings!.first.maxBitrate = 800000;
-            params.encodings!.first.maxFramerate = 24;
+            params.encodings!.first.maxBitrate = 1100000;
+            params.encodings!.first.minBitrate = 350000;
+            params.encodings!.first.maxFramerate = 30;
             params.encodings!.first.scalabilityMode = 'L1T3';
-            await _videoSender!.setParameters(params);
           }
-        } catch (_) {}
+          await _videoSender!.setParameters(params);
+        } catch (e) {
+          debugPrint('[WebRTCManager] Set single-stream parameters notice: $e');
+        }
       }
     }
   }
