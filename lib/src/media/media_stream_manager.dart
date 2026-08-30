@@ -178,9 +178,13 @@ class MediaStreamManager {
   Future<void> stopLocalMedia() async {
     if (_localStream != null) {
       for (final track in _localStream!.getTracks()) {
-        await track.stop();
+        try {
+          await track.stop().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+        } catch (_) {}
       }
-      await _localStream!.dispose();
+      try {
+        await _localStream!.dispose().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+      } catch (_) {}
       _localStream = null;
     }
     if (_localRenderer != null) {
@@ -196,7 +200,9 @@ class MediaStreamManager {
     await stopLocalMedia();
 
     if (_localRenderer != null) {
-      await _localRenderer!.dispose();
+      try {
+        await _localRenderer!.dispose().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+      } catch (_) {}
       _localRenderer = null;
     }
 

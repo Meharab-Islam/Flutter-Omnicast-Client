@@ -1,8 +1,8 @@
 {
   "lib/omnicast_client.dart": {
-    "mtime": 1788088860.140621,
-    "seen": 1788088910.030897,
-    "ast_hash": "43b229d6445399cd6048c82aaf25397f",
+    "mtime": 1788102919.6186066,
+    "seen": 1788102991.577931,
+    "ast_hash": "a4182f23184804d796a4c680770a0589",
     "semantic_hash": ""
   },
   "test/omnicast_client_test.dart": {
@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788088897.7852535,
-    "seen": 1788088910.0309,
-    "ast_hash": "8a0792ca3e2ff67a20da45ffc93fac3c",
+    "mtime": 1788103080.1051192,
+    "seen": 1788103125.861998,
+    "ast_hash": "de2a7d40e028e2bc948fedf1fb0f3b90",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "lib/src/webrtc/webrtc_manager.dart": {
-    "mtime": 1788102612.7568672,
-    "seen": 1788102831.639906,
-    "ast_hash": "d0cf900204c3c6f73715e1a072b29941",
+    "mtime": 1788103362.211404,
+    "seen": 1788103387.11098,
+    "ast_hash": "7e52ef90e37bae227f9dc814a7c1b7ce",
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_video_view.dart": {
@@ -138,10 +138,10 @@
     "semantic_hash": "0060330c96a275c9430d09b1cb765796"
   },
   "lib/src/media/video_parameters.dart": {
-    "mtime": 1788017774.1246367,
-    "seen": 1788017869.564918,
-    "ast_hash": "6a0765799c25bab9a3ff5fb29101395d",
-    "semantic_hash": "6a0765799c25bab9a3ff5fb29101395d"
+    "mtime": 1788102873.7233827,
+    "seen": 1788102991.577939,
+    "ast_hash": "ff07d1dd5577bd2c1f5fffbfa859a272",
+    "semantic_hash": ""
   },
   "test/video_parameters_test.dart": {
     "mtime": 1788017857.6176696,
@@ -240,9 +240,9 @@
     "semantic_hash": "3ac43dc99ef099ea20fd12f929991966"
   },
   "lib/src/datachannel/data_channel_manager.dart": {
-    "mtime": 1788018354.2203164,
-    "seen": 1788018721.7807481,
-    "ast_hash": "fc1614ed351b73ae1a276b86f68b5ccf",
+    "mtime": 1788102882.4048605,
+    "seen": 1788102991.5779352,
+    "ast_hash": "5a1ea9e7b06ac8fa2f3dc3369a5af39c",
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_flying_hearts_overlay.dart": {
@@ -315,6 +315,18 @@
     "mtime": 1788088871.7967715,
     "seen": 1788088910.03092,
     "ast_hash": "86424ab16f8bcbda2ccbbff70125fcba",
+    "semantic_hash": ""
+  },
+  "lib/src/webrtc/webrtc_stats_monitor.dart": {
+    "mtime": 1788102865.4812107,
+    "seen": 1788102991.5779462,
+    "ast_hash": "7480fcebed6b6382c65a6b8e7d9129e3",
+    "semantic_hash": ""
+  },
+  "test/enterprise_optimization_test.dart": {
+    "mtime": 1788102927.204865,
+    "seen": 1788102991.577953,
+    "ast_hash": "74fda48deece801e0b1ad20dba534b23",
     "semantic_hash": ""
   }
 }

@@ -360,16 +360,19 @@ class OmniCastClient {
     _isDisposed = true;
 
     for (final sub in _subscriptions) {
-      await sub.cancel();
+      try {
+        sub.cancel();
+      } catch (_) {}
     }
     _subscriptions.clear();
 
-    await _interactionManager.dispose();
-    await _dataChannelManager.dispose();
-    await _pkManager.dispose();
-    _mediaController.dispose();
-    await _roomManager.leaveRoom();
     _roomManager.dispose();
+    _mediaController.dispose();
+    _seatManager.dispose();
+    await _pkManager.dispose();
+    await _dataChannelManager.dispose();
+    await _interactionManager.dispose();
+
     await _webRTCManager.dispose();
     await _mediaStreamManager.dispose();
     await _signalingClient.dispose();

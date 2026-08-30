@@ -488,8 +488,12 @@ class WebRTCManager {
     _iceDisconnectTimer?.cancel();
     _iceDisconnectTimer = null;
     if (_peerConnection != null) {
-      await _peerConnection!.close();
-      await _peerConnection!.dispose();
+      try {
+        await _peerConnection!.close().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+      } catch (_) {}
+      try {
+        await _peerConnection!.dispose().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+      } catch (_) {}
       _peerConnection = null;
     }
     _queuedRemoteCandidates.clear();

@@ -228,8 +228,8 @@ void main() {
       expect(find.text('Support Rival Bob'), findsOneWidget);
 
       await tester.pumpWidget(const SizedBox());
-      await client.dispose();
       await tester.pump();
+      await client.dispose();
     });
   });
 }
