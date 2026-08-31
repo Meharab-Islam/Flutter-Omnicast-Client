@@ -272,35 +272,29 @@ class WebRTCManager {
             direction: TransceiverDirection.SendRecv,
             streams: [localStream],
             sendEncodings: [
-              // High Layer (Full Resolution) - 500 Kbps max, 24fps
+              // High Layer (Full Resolution) - 600 Kbps max, 24fps
               RTCRtpEncoding(
                 rid: 'f',
                 active: true,
                 scaleResolutionDownBy: 1.0,
-                maxBitrate: 500000, // 500 Kbps strict limit to fix macroblocking
-                minBitrate: 200000,
+                maxBitrate: 600000,
                 maxFramerate: 24,
-                scalabilityMode: 'L1T3',
               ),
-              // Medium Layer (Half Resolution) - 350 Kbps max, 20fps
+              // Medium Layer (Half Resolution) - 250 Kbps max, 20fps
               RTCRtpEncoding(
                 rid: 'h',
                 active: true,
                 scaleResolutionDownBy: 2.0,
-                maxBitrate: 350000,
-                minBitrate: 100000,
+                maxBitrate: 250000,
                 maxFramerate: 20,
-                scalabilityMode: 'L1T3',
               ),
-              // Low Layer (Quarter Resolution) - 120 Kbps max, 15fps
+              // Low Layer (Quarter Resolution) - 100 Kbps max, 15fps
               RTCRtpEncoding(
                 rid: 'q',
                 active: true,
                 scaleResolutionDownBy: 4.0,
-                maxBitrate: 120000,
-                minBitrate: 50000,
+                maxBitrate: 100000,
                 maxFramerate: 15,
-                scalabilityMode: 'L1T3',
               ),
             ],
           ),
