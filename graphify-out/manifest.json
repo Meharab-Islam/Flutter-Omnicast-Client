@@ -138,9 +138,9 @@
     "semantic_hash": "0060330c96a275c9430d09b1cb765796"
   },
   "lib/src/media/video_parameters.dart": {
-    "mtime": 1788154527.7259877,
-    "seen": 1788154592.9583979,
-    "ast_hash": "c12f69ee58aa9aae96f8f8f5fcc8de75",
+    "mtime": 1788154952.3672516,
+    "seen": 1788154993.4139771,
+    "ast_hash": "2082a648f39019c89fec3d094901ba32",
     "semantic_hash": ""
   },
   "test/video_parameters_test.dart": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "test/enterprise_optimization_test.dart": {
-    "mtime": 1788154561.812809,
-    "seen": 1788154592.958412,
-    "ast_hash": "258a41f4763a1e5513306da9d590ca71",
+    "mtime": 1788154963.2077453,
+    "seen": 1788154993.413991,
+    "ast_hash": "3ada377b399cde952a3da1930b5c4217",
     "semantic_hash": ""
   },
   "test/media_and_lobby_events_test.dart": {
