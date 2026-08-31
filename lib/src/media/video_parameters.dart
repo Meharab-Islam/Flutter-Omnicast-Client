@@ -114,17 +114,11 @@ class VideoParameters {
           ? {
               'mandatory': {
                 'minWidth': '480',
-                'minHeight': '480',
-                'maxWidth': '640',
-                'maxHeight': '640',
+                'minHeight': '640',
                 'minFrameRate': '15',
                 'maxFrameRate': '24',
               },
               'facingMode': facingMode,
-              'optional': [],
-              'width': {'ideal': 640, 'max': 640},
-              'height': {'ideal': 480, 'max': 480},
-              'frameRate': {'ideal': 24, 'max': 24},
             }
           : false,
     };

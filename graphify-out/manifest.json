@@ -138,15 +138,15 @@
     "semantic_hash": "0060330c96a275c9430d09b1cb765796"
   },
   "lib/src/media/video_parameters.dart": {
-    "mtime": 1788154952.3672516,
-    "seen": 1788154993.4139771,
-    "ast_hash": "2082a648f39019c89fec3d094901ba32",
+    "mtime": 1788156365.949419,
+    "seen": 1788156444.438646,
+    "ast_hash": "e709dfc8dbb0eccd28ddedc11c68e215",
     "semantic_hash": ""
   },
   "test/video_parameters_test.dart": {
-    "mtime": 1788154551.812992,
-    "seen": 1788154592.9584188,
-    "ast_hash": "00d361434e531d00e3f6d4adbb15fd44",
+    "mtime": 1788156414.6934564,
+    "seen": 1788156444.438668,
+    "ast_hash": "d5c3bbc7789cd920323f020aca551972",
     "semantic_hash": ""
   },
   "lib/src/widgets/gift_overlay_manager.dart": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "test/enterprise_optimization_test.dart": {
-    "mtime": 1788154963.2077453,
-    "seen": 1788154993.413991,
-    "ast_hash": "3ada377b399cde952a3da1930b5c4217",
+    "mtime": 1788156390.6777196,
+    "seen": 1788156444.4386601,
+    "ast_hash": "22c94ecb7c61dfb53041e5757bbb7ec3",
     "semantic_hash": ""
   },
   "test/media_and_lobby_events_test.dart": {

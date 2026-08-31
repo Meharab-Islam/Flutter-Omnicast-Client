@@ -5,20 +5,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoParameters Presets & Constraints', () {
-    test('mediaConstraints limits resolution to 640x480 and caps framerate at 24fps', () {
+    test('mediaConstraints limits resolution to 480x640 portrait and caps framerate at 24fps', () {
       const params = VideoParameters.presetSmooth480p;
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
       expect(constraints['audio'], isA<Map<String, dynamic>>());
       expect(constraints['video']['mandatory']['minWidth'], '480');
-      expect(constraints['video']['mandatory']['minHeight'], '480');
-      expect(constraints['video']['mandatory']['maxWidth'], '640');
-      expect(constraints['video']['mandatory']['maxHeight'], '640');
+      expect(constraints['video']['mandatory']['minHeight'], '640');
       expect(constraints['video']['mandatory']['minFrameRate'], '15');
       expect(constraints['video']['mandatory']['maxFrameRate'], '24');
-      expect(constraints['video']['width']['ideal'], 640);
-      expect(constraints['video']['height']['ideal'], 480);
-      expect(constraints['video']['frameRate']['ideal'], 24);
       expect(constraints['video']['facingMode'], 'user');
     });
 
@@ -62,8 +57,8 @@ void main() {
       final constraints = params.toMediaConstraints(video: true, audio: true);
       expect(constraints['audio'], isA<Map<String, dynamic>>());
       expect(constraints['video']['mandatory']['minWidth'], '480');
-      expect(constraints['video']['mandatory']['maxWidth'], '640');
-      expect(constraints['video']['mandatory']['maxHeight'], '640');
+      expect(constraints['video']['mandatory']['minHeight'], '640');
+      expect(constraints['video']['facingMode'], 'user');
     });
 
     test('presetFHD1080p constraints when audio is false', () {
@@ -71,6 +66,7 @@ void main() {
       final constraints = params.toMediaConstraints(video: true, audio: false);
       expect(constraints['audio'], isFalse);
       expect(constraints['video']['mandatory']['minWidth'], '480');
+      expect(constraints['video']['mandatory']['minHeight'], '640');
     });
   });
 

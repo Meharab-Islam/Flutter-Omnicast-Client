@@ -23,14 +23,9 @@ void main() {
       expect(audioMap['googTypingNoiseDetection'], isTrue);
 
       expect(constraints['video']['mandatory']['minWidth'], '480');
-      expect(constraints['video']['mandatory']['minHeight'], '480');
-      expect(constraints['video']['mandatory']['maxWidth'], '640');
-      expect(constraints['video']['mandatory']['maxHeight'], '640');
+      expect(constraints['video']['mandatory']['minHeight'], '640');
       expect(constraints['video']['mandatory']['minFrameRate'], '15');
       expect(constraints['video']['mandatory']['maxFrameRate'], '24');
-      expect(constraints['video']['width']['ideal'], 640);
-      expect(constraints['video']['height']['ideal'], 480);
-      expect(constraints['video']['frameRate']['ideal'], 24);
       expect(constraints['video']['facingMode'], 'user');
     });
 
