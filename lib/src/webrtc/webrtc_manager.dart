@@ -201,6 +201,22 @@ class WebRTCManager {
 
     pc.onConnectionState = (state) {
       debugPrint('[WebRTCManager] PeerConnection State: $state');
+      if (state == RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
+        _iceDisconnectTimer?.cancel();
+        // 1.5s seamless ICE restart window
+        _iceDisconnectTimer = Timer(const Duration(milliseconds: 1500), () {
+          debugPrint('[WebRTCManager] Connection state disconnected for >1.5s -> Triggering seamless ICE Restart');
+          onIceRestartNeeded?.call();
+        });
+      } else if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+        _iceDisconnectTimer?.cancel();
+        _iceDisconnectTimer = null;
+      } else if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
+        _iceDisconnectTimer?.cancel();
+        _iceDisconnectTimer = null;
+        debugPrint('[WebRTCManager] Connection state Failed -> Triggering Immediate ICE Restart');
+        onIceRestartNeeded?.call();
+      }
     };
 
     pc.onTrack = (RTCTrackEvent event) {
