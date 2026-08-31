@@ -8,7 +8,7 @@ void main() {
     test('default GlobalMediaConfig has standard Smooth480p and enabled features', () {
       const config = GlobalMediaConfig();
       expect(config.defaultResolution, VideoParameters.presetSmooth480p);
-      expect(config.enableSimulcast, isTrue);
+      expect(config.enableSimulcast, isFalse);
       expect(config.enableDynacast, isTrue);
       expect(config.enableAdaptiveStreaming, isTrue);
       expect(config.autoPauseOnBackground, isTrue);

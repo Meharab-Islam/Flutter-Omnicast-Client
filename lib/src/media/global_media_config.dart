@@ -21,7 +21,7 @@ class GlobalMediaConfig {
 
   const GlobalMediaConfig({
     this.defaultResolution = VideoParameters.presetSmooth480p,
-    this.enableSimulcast = true,
+    this.enableSimulcast = false,
     this.enableDynacast = true,
     this.enableAdaptiveStreaming = true,
     this.autoPauseOnBackground = true,

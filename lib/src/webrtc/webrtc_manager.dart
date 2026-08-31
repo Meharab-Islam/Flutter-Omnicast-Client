@@ -263,97 +263,48 @@ class WebRTCManager {
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
 
-      if (enableSimulcast) {
-        // Multi-layer simulcast/SVC transceivers: 'f' (smooth 720p/480p @ 1100 kbps), 'h' (half @ 450 kbps), 'q' (quarter @ 180 kbps)
-        final transceiver = await pc.addTransceiver(
-          track: videoTrack,
-          kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-          init: RTCRtpTransceiverInit(
-            direction: TransceiverDirection.SendRecv,
-            streams: [localStream],
-            sendEncodings: [
-              // High Layer (Full Resolution) - 600 Kbps max, 24fps
-              RTCRtpEncoding(
-                rid: 'f',
-                active: true,
-                scaleResolutionDownBy: 1.0,
-                maxBitrate: 600000,
-                maxFramerate: 24,
-              ),
-              // Medium Layer (Half Resolution) - 250 Kbps max, 20fps
-              RTCRtpEncoding(
-                rid: 'h',
-                active: true,
-                scaleResolutionDownBy: 2.0,
-                maxBitrate: 250000,
-                maxFramerate: 20,
-              ),
-              // Low Layer (Quarter Resolution) - 100 Kbps max, 15fps
-              RTCRtpEncoding(
-                rid: 'q',
-                active: true,
-                scaleResolutionDownBy: 4.0,
-                maxBitrate: 100000,
-                maxFramerate: 15,
-              ),
-            ],
-          ),
+      // Add single, highly-stable video track (Simulcast encodings completely removed to eliminate Android keyframe/smearing bugs)
+      _videoSender = await pc.addTrack(videoTrack, localStream);
+
+      // Force H264 hardware-accelerated codec preference over VP8 to fix Android artifacts
+      try {
+        final transceivers = await pc.getTransceivers();
+        final videoTransceiver = transceivers.firstWhere(
+          (t) => t.sender.track?.kind == 'video' || t.sender == _videoSender,
         );
-        _videoSender = transceiver.sender;
-
-        // Force H264 hardware-accelerated codec preference over VP8 to fix Android artifacts
-        try {
-          final capabilities = await getRtpSenderCapabilities('video');
-          if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
-            final sortedCodecs = List<RTCRtpCodecCapability>.from(capabilities.codecs!);
-            sortedCodecs.sort((a, b) {
-              final mimeA = a.mimeType.toLowerCase();
-              final mimeB = b.mimeType.toLowerCase();
-              int scoreA = mimeA.contains('h264') ? 0 : (mimeA.contains('vp8') ? 1 : 2);
-              int scoreB = mimeB.contains('h264') ? 0 : (mimeB.contains('vp8') ? 1 : 2);
-              return scoreA.compareTo(scoreB);
-            });
-            await transceiver.setCodecPreferences(sortedCodecs);
-          }
-        } catch (_) {}
-
-        // Apply maintain-framerate degradation preference and enforce maxBitrate on sender
-        try {
-          final senders = await pc.getSenders();
-          final videoSender = senders.firstWhere(
-            (s) => s.track?.kind == 'video',
-            orElse: () => _videoSender ?? senders.first,
-          );
-          final params = videoSender.parameters;
-          params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
-          if (params.encodings != null && params.encodings!.isNotEmpty) {
-            params.encodings![0].maxBitrate = 500000;
-          }
-          await videoSender.setParameters(params);
-        } catch (e) {
-          debugPrint('[WebRTCManager] Set degradationPreference notice: $e');
+        final capabilities = await getRtpSenderCapabilities('video');
+        if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
+          final sortedCodecs = List<RTCRtpCodecCapability>.from(capabilities.codecs!);
+          sortedCodecs.sort((a, b) {
+            final mimeA = a.mimeType.toLowerCase();
+            final mimeB = b.mimeType.toLowerCase();
+            int scoreA = mimeA.contains('h264') ? 0 : (mimeA.contains('vp8') ? 1 : 2);
+            int scoreB = mimeB.contains('h264') ? 0 : (mimeB.contains('vp8') ? 1 : 2);
+            return scoreA.compareTo(scoreB);
+          });
+          await videoTransceiver.setCodecPreferences(sortedCodecs);
         }
-      } else {
-        // Standard single stream with maintain-framerate degradation and 500 kbps strict ceiling
-        _videoSender = await pc.addTrack(videoTrack, localStream);
-        try {
-          final senders = await pc.getSenders();
-          final videoSender = senders.firstWhere(
-            (s) => s.track?.kind == 'video',
-            orElse: () => _videoSender ?? senders.first,
-          );
-          final params = videoSender.parameters;
-          params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
-          if (params.encodings != null && params.encodings!.isNotEmpty) {
-            params.encodings![0].maxBitrate = 500000;
-            params.encodings![0].minBitrate = 150000;
-            params.encodings![0].maxFramerate = 24;
-            params.encodings![0].scalabilityMode = 'L1T3';
-          }
-          await videoSender.setParameters(params);
-        } catch (e) {
-          debugPrint('[WebRTCManager] Set single-stream parameters notice: $e');
+      } catch (_) {}
+
+      // Apply single global maxBitrate: 800000 (800 kbps) and MAINTAIN_FRAMERATE
+      try {
+        final senders = await pc.getSenders();
+        final videoSender = senders.firstWhere(
+          (s) => s.track?.kind == 'video',
+          orElse: () => _videoSender ?? senders.first,
+        );
+        final params = videoSender.parameters;
+        params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
+        if (params.encodings != null && params.encodings!.isNotEmpty) {
+          params.encodings![0].maxBitrate = 800000;
+          params.encodings![0].minBitrate = 200000;
+          params.encodings![0].maxFramerate = 24;
+          params.encodings![0].scalabilityMode = 'L1T3';
         }
+        await videoSender.setParameters(params);
+        debugPrint('[WebRTCManager] Configured single video track with maxBitrate: 800 kbps');
+      } catch (e) {
+        debugPrint('[WebRTCManager] Set single-stream parameters notice: $e');
       }
     }
   }
