@@ -58,8 +58,8 @@ class WebRTCManager {
   RTCRtpSender? get audioSender => _audioSender;
   WebRTCStatsMonitor get statsMonitor => _statsMonitor;
 
-  /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line.
-  /// Strictly prioritizes VP8 for flawless packet loss recovery, PLI keyframe handling, and zero macroblocking.
+  /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line
+  /// and strips out H264 to prevent buggy Android hardware encoder fallback.
   static String preferCodec(String sdp, String codec) {
     final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
     final lines = sdp.split(delimiter);
@@ -84,7 +84,11 @@ class WebRTCManager {
       if (rtpmap.isNotEmpty) {
         codecPayloads.add(pt);
       } else {
-        otherPayloads.add(pt);
+        // When forcing VP8, strip out H264 payload types to completely prevent Android hardware encoder crashes
+        final isH264 = lines.any((l) => l.toLowerCase().startsWith('a=rtpmap:$pt h264'));
+        if (!isH264 || codec.toLowerCase() == 'h264') {
+          otherPayloads.add(pt);
+        }
       }
     }
 

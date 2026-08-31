@@ -33,7 +33,7 @@ void main() {
       expect(h264Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 98 96 97'));
 
       final vp8Sdp = WebRTCManager.preferCodec(sampleSdp, 'VP8');
-      expect(vp8Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 96 97 98'));
+      expect(vp8Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 96 97'));
     });
 
     test('WebRTCManager setInitialBitrate injects b=AS and x-google bitrates', () {
