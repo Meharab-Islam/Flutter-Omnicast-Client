@@ -4,11 +4,24 @@ import 'package:omnicast_client/omnicast_client.dart';
 
 void main() {
   group('Enterprise Constraints & Audio Processing Tests', () {
-    test('VideoParameters toMediaConstraints produces correct video and audio constraints', () {
+    test('VideoParameters toMediaConstraints produces Google V2 DSP audio filters', () {
       const params = VideoParameters.presetSmooth480p;
       final constraints = params.toMediaConstraints(video: true, audio: true);
 
       expect(constraints['audio'], isA<Map<String, dynamic>>());
+      final audioMap = constraints['audio'] as Map<String, dynamic>;
+      expect(audioMap['echoCancellation'], isTrue);
+      expect(audioMap['noiseSuppression'], isTrue);
+      expect(audioMap['autoGainControl'], isTrue);
+      expect(audioMap['googEchoCancellation'], isTrue);
+      expect(audioMap['googEchoCancellation2'], isTrue);
+      expect(audioMap['googNoiseSuppression'], isTrue);
+      expect(audioMap['googNoiseSuppression2'], isTrue);
+      expect(audioMap['googAutoGainControl'], isTrue);
+      expect(audioMap['googAutoGainControl2'], isTrue);
+      expect(audioMap['googHighpassFilter'], isTrue);
+      expect(audioMap['googTypingNoiseDetection'], isTrue);
+
       expect(constraints['video']['mandatory']['minWidth'], '480');
       expect(constraints['video']['mandatory']['minHeight'], '640');
       expect(constraints['video']['mandatory']['maxWidth'], '720');
