@@ -88,13 +88,27 @@ class VideoParameters {
   }
 
   /// Converts parameters to ideal/mandatory getUserMedia constraints map.
-  /// Limits video resolution and framerate to fix macroblocking, freezes, and driver stutter.
+  /// Strictly caps framerate (min: 15, ideal: 24, max: 30) and disables CPU-heavy software processing
+  /// to eliminate latency, encoder throttling, and freezing.
   Map<String, dynamic> toMediaConstraints({
     bool video = true,
     bool audio = true,
   }) {
     return {
-      'audio': audio,
+      'audio': audio
+          ? {
+              'mandatory': {
+                'googEchoCancellation': 'false',
+                'googAutoGainControl': 'false',
+                'googNoiseSuppression': 'false',
+                'googHighpassFilter': 'false',
+                'googAudioMirroring': 'false',
+              },
+              'echoCancellation': false,
+              'noiseSuppression': false,
+              'autoGainControl': false,
+            }
+          : false,
       'video': video
           ? {
               'mandatory': {
@@ -103,9 +117,11 @@ class VideoParameters {
                 'maxWidth': '720',
                 'maxHeight': '1280',
                 'minFrameRate': '15',
-                'maxFrameRate': '24',
+                'maxFrameRate': '30',
               },
               'facingMode': facingMode,
+              'optional': [],
+              'frameRate': {'ideal': 24, 'max': 30},
             }
           : false,
     };

@@ -8,13 +8,14 @@ void main() {
       const params = VideoParameters.presetSmooth480p;
       final constraints = params.toMediaConstraints(video: true, audio: true);
 
-      expect(constraints['audio'], isTrue);
+      expect(constraints['audio'], isA<Map<String, dynamic>>());
       expect(constraints['video']['mandatory']['minWidth'], '480');
       expect(constraints['video']['mandatory']['minHeight'], '640');
       expect(constraints['video']['mandatory']['maxWidth'], '720');
       expect(constraints['video']['mandatory']['maxHeight'], '1280');
       expect(constraints['video']['mandatory']['minFrameRate'], '15');
-      expect(constraints['video']['mandatory']['maxFrameRate'], '24');
+      expect(constraints['video']['mandatory']['maxFrameRate'], '30');
+      expect(constraints['video']['frameRate']['ideal'], 24);
       expect(constraints['video']['facingMode'], 'user');
     });
 

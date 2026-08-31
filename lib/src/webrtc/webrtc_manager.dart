@@ -41,6 +41,9 @@ class WebRTCManager {
                 {'urls': 'stun:stun1.l.google.com:19302'},
               ],
               'sdpSemantics': 'unified-plan',
+              'iceTransportPolicy': 'all',
+              'bundlePolicy': 'max-bundle',
+              'rtcpMuxPolicy': 'require',
             } {
     _statsMonitor = WebRTCStatsMonitor(
       getPeerConnection: () async => _peerConnection,
@@ -199,6 +202,17 @@ class WebRTCManager {
     pc.onTrack = (RTCTrackEvent event) {
       debugPrint(
           '[WebRTCManager] onTrack: kind=${event.track.kind}, streams=${event.streams.length}, id=${event.track.id}');
+
+      // Force immediate zero-latency playout on incoming remote tracks (bypasses jitter buffer delay)
+      try {
+        // ignore: avoid_dynamic_calls
+        (event.track as dynamic).playoutDelayHint = 0.0;
+      } catch (_) {}
+      try {
+        // ignore: avoid_dynamic_calls
+        (event.receiver as dynamic)?.playoutDelayHint = 0.0;
+      } catch (_) {}
+
       if (event.streams.isNotEmpty) {
         final stream = event.streams.first;
         onRemoteTrack?.call(event.track, stream);

@@ -5911,6 +5911,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
+      "label": "OmniCastVideoView",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "omnicast_video_view.dart",
+      "file_type": "code",
+      "norm_label": "omnicastvideoview",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
+      "label": "_OmniCastVideoViewState",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "omnicast_video_view.dart",
+      "file_type": "code",
+      "norm_label": "_omnicastvideoviewstate",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_widgets_omnicast_video_view_placeholder",
       "label": "placeholder",
       "_origin": "ast",
@@ -8533,28 +8555,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
-      "label": "OmniCastVideoView",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "_OmniCastFlyingHeartsOverlayState",
-      "file_type": "code",
-      "norm_label": "omnicastvideoview",
-      "source_file": "lib/src/widgets/omnicast_video_view.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
-      "label": "_OmniCastVideoViewState",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "_OmniCastFlyingHeartsOverlayState",
-      "file_type": "code",
-      "norm_label": "_omnicastvideoviewstate",
-      "source_file": "lib/src/widgets/omnicast_video_view.dart",
-      "source_location": null
-    },
-    {
       "id": "state",
       "label": "State",
       "_origin": "ast",
@@ -10344,17 +10344,6 @@
       "community_name": "webrtc_manager.dart",
       "file_type": "code",
       "norm_label": "rtcconfiguration",
-      "source_file": "lib/src/webrtc/webrtc_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_webrtc_webrtc_manager_setinitialbitrate",
-      "label": "setInitialBitrate",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "webrtc_manager.dart",
-      "file_type": "code",
-      "norm_label": "setinitialbitrate",
       "source_file": "lib/src/webrtc/webrtc_manager.dart",
       "source_location": null
     },
@@ -21212,17 +21201,6 @@
     },
     {
       "source": "lib_src_webrtc_webrtc_manager",
-      "target": "lib_src_webrtc_webrtc_manager_setinitialbitrate",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/src/webrtc/webrtc_manager.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "lib_src_webrtc_webrtc_manager",
       "target": "lib_src_webrtc_webrtc_manager_setpublisherlayeractive",
       "relation": "defines",
       "_origin": "ast",
@@ -26173,5 +26151,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4ac3720667b8b89ce4dd621a2f476a91f9855d2c"
+  "built_at_commit": "00ab7679ad2fd185afa7c58a26111a943a9cb70b"
 }

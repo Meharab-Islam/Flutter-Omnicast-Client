@@ -5,18 +5,29 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoParameters Presets & Constraints', () {
-    test('mediaConstraints limits resolution and framerate correctly', () {
+    test('mediaConstraints limits resolution and caps framerate at 30 (ideal 24)', () {
       const params = VideoParameters.presetSmooth480p;
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
-      expect(constraints['audio'], isTrue);
+      expect(constraints['audio'], isA<Map<String, dynamic>>());
       expect(constraints['video']['mandatory']['minWidth'], '480');
       expect(constraints['video']['mandatory']['minHeight'], '640');
       expect(constraints['video']['mandatory']['maxWidth'], '720');
       expect(constraints['video']['mandatory']['maxHeight'], '1280');
       expect(constraints['video']['mandatory']['minFrameRate'], '15');
-      expect(constraints['video']['mandatory']['maxFrameRate'], '24');
+      expect(constraints['video']['mandatory']['maxFrameRate'], '30');
+      expect(constraints['video']['frameRate']['ideal'], 24);
       expect(constraints['video']['facingMode'], 'user');
+    });
+
+    test('WebRTCManager default rtcConfiguration sets unrestricted UDP iceTransportPolicy', () {
+      final streamManager = MediaStreamManager();
+      final webRTC = WebRTCManager(mediaStreamManager: streamManager);
+      expect(webRTC.rtcConfiguration['iceTransportPolicy'], 'all');
+      expect(webRTC.rtcConfiguration['bundlePolicy'], 'max-bundle');
+      expect(webRTC.rtcConfiguration['rtcpMuxPolicy'], 'require');
+      streamManager.dispose();
+      webRTC.dispose();
     });
 
     test('WebRTCManager preferCodec prioritizes H264 or VP8 in m=video line', () {
@@ -47,7 +58,7 @@ void main() {
     test('presetHD720p constraints video and audio flags', () {
       const params = VideoParameters.presetHD720p;
       final constraints = params.toMediaConstraints(video: true, audio: true);
-      expect(constraints['audio'], isTrue);
+      expect(constraints['audio'], isA<Map<String, dynamic>>());
       expect(constraints['video']['mandatory']['minWidth'], '480');
       expect(constraints['video']['mandatory']['maxWidth'], '720');
       expect(constraints['video']['mandatory']['maxHeight'], '1280');
