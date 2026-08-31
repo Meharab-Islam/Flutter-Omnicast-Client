@@ -263,10 +263,10 @@ class WebRTCManager {
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
 
-      // Add single, highly-stable video track (Simulcast encodings completely removed to eliminate Android keyframe/smearing bugs)
+      // Add single, highly-stable video track directly (VP8 software/native codec)
       _videoSender = await pc.addTrack(videoTrack, localStream);
 
-      // Force H264 hardware-accelerated codec preference over VP8 to fix Android artifacts
+      // Force VP8 codec preference over H264/VP9 for rock-solid packet loss & PLI resilience
       try {
         final transceivers = await pc.getTransceivers();
         final videoTransceiver = transceivers.firstWhere(
@@ -278,15 +278,15 @@ class WebRTCManager {
           sortedCodecs.sort((a, b) {
             final mimeA = a.mimeType.toLowerCase();
             final mimeB = b.mimeType.toLowerCase();
-            int scoreA = mimeA.contains('h264') ? 0 : (mimeA.contains('vp8') ? 1 : 2);
-            int scoreB = mimeB.contains('h264') ? 0 : (mimeB.contains('vp8') ? 1 : 2);
+            int scoreA = mimeA.contains('vp8') ? 0 : (mimeA.contains('vp9') ? 1 : 2);
+            int scoreB = mimeB.contains('vp8') ? 0 : (mimeB.contains('vp9') ? 1 : 2);
             return scoreA.compareTo(scoreB);
           });
           await videoTransceiver.setCodecPreferences(sortedCodecs);
         }
       } catch (_) {}
 
-      // Apply single global maxBitrate: 800000 (800 kbps) and MAINTAIN_FRAMERATE
+      // Apply single global maxBitrate: 600000 (600 kbps) and MAINTAIN_FRAMERATE
       try {
         final senders = await pc.getSenders();
         final videoSender = senders.firstWhere(
@@ -296,13 +296,13 @@ class WebRTCManager {
         final params = videoSender.parameters;
         params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
         if (params.encodings != null && params.encodings!.isNotEmpty) {
-          params.encodings![0].maxBitrate = 800000;
-          params.encodings![0].minBitrate = 200000;
+          params.encodings![0].maxBitrate = 600000;
+          params.encodings![0].minBitrate = 150000;
           params.encodings![0].maxFramerate = 24;
           params.encodings![0].scalabilityMode = 'L1T3';
         }
         await videoSender.setParameters(params);
-        debugPrint('[WebRTCManager] Configured single video track with maxBitrate: 800 kbps');
+        debugPrint('[WebRTCManager] Configured clean VP8 video track with maxBitrate: 600 kbps');
       } catch (e) {
         debugPrint('[WebRTCManager] Set single-stream parameters notice: $e');
       }
@@ -335,7 +335,7 @@ class WebRTCManager {
   }
 
   /// Strictly enforces maximum video bitrate limit on the video RTCRtpSender to prevent macroblocking and congestion.
-  Future<void> enforceMaxVideoBitrate({int maxBitrate = 500000}) async {
+  Future<void> enforceMaxVideoBitrate({int maxBitrate = 600000}) async {
     if (_peerConnection == null) return;
     try {
       final senders = await _peerConnection!.getSenders();
@@ -359,7 +359,7 @@ class WebRTCManager {
     }
   }
 
-  /// Creates an SDP Offer, prioritizes H264 codec, disables VAD, and sets initial bitrate.
+  /// Creates an SDP Offer, prioritizes VP8 codec, disables VAD, and sets initial bitrate.
   Future<RTCSessionDescription> createAndSetLocalOffer({
     bool offerToReceiveAudio = true,
     bool offerToReceiveVideo = true,
@@ -380,8 +380,8 @@ class WebRTCManager {
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      var processedSdp = preferCodec(offer.sdp ?? '', 'H264');
-      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
+      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
       processedSdp = enableOpusDtx(processedSdp);
       final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
       await pc.setLocalDescription(mungedOffer);
@@ -410,8 +410,8 @@ class WebRTCManager {
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      var processedSdp = preferCodec(offer.sdp ?? '', 'H264');
-      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
+      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
       processedSdp = enableOpusDtx(processedSdp);
       final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
       await pc.setLocalDescription(mungedOffer);
@@ -432,7 +432,7 @@ class WebRTCManager {
     await _processQueuedCandidates();
   }
 
-  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with H264/DTX answer.
+  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(String sdp) async {
     final pc = await initializePeerConnection();
 
@@ -445,8 +445,8 @@ class WebRTCManager {
         'voiceActivityDetection': false,
       },
     });
-    var processedSdp = preferCodec(answer.sdp ?? '', 'H264');
-    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
+    var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
+    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
     processedSdp = enableOpusDtx(processedSdp);
     final mungedAnswer = RTCSessionDescription(processedSdp, answer.type);
     await pc.setLocalDescription(mungedAnswer);
@@ -458,7 +458,7 @@ class WebRTCManager {
   Future<RTCSessionDescription> upgradeViewerToCoHost({
     bool video = true,
     bool audio = true,
-    bool enableSimulcast = true,
+    bool enableSimulcast = false,
     VideoParameters? parameters,
   }) async {
     if (_peerConnection == null) {
@@ -472,17 +472,17 @@ class WebRTCManager {
       audio: audio,
     );
 
-    // 2. Add local tracks to existing PeerConnection with simulcast option
+    // 2. Add local tracks to existing PeerConnection
     await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
-    // 3. Create renegotiation offer with H264 and Opus DTX preference
+    // 3. Create renegotiation offer with VP8 and Opus DTX preference
     final offer = await _peerConnection!.createOffer({
       'mandatory': {
         'voiceActivityDetection': false,
       },
     });
-    var processedSdp = preferCodec(offer.sdp ?? '', 'H264');
-    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
+    var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
     processedSdp = enableOpusDtx(processedSdp);
     final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
     await _peerConnection!.setLocalDescription(mungedOffer);
