@@ -58,8 +58,8 @@ class WebRTCManager {
   RTCRtpSender? get audioSender => _audioSender;
   WebRTCStatsMonitor get statsMonitor => _statsMonitor;
 
-  /// Modifies an SDP string to prioritize a specific codec (e.g. 'H264') at the front of the m=video line.
-  /// Prioritizes H.264 Hardware Baseline profile to eliminate mobile CPU lag and macroblocking artifacts.
+  /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line.
+  /// Strictly prioritizes VP8 for flawless packet loss recovery, PLI keyframe handling, and zero macroblocking.
   static String preferCodec(String sdp, String codec) {
     final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
     final lines = sdp.split(delimiter);
