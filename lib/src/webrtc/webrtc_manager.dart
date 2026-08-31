@@ -55,8 +55,8 @@ class WebRTCManager {
   RTCRtpSender? get audioSender => _audioSender;
   WebRTCStatsMonitor get statsMonitor => _statsMonitor;
 
-  /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line.
-  /// Eliminates Android hardware H.264 green/pink screen artifacts and packet loss decoder freezes.
+  /// Modifies an SDP string to prioritize a specific codec (e.g. 'H264') at the front of the m=video line.
+  /// Prioritizes H.264 Hardware Baseline profile to eliminate mobile CPU lag and macroblocking artifacts.
   static String preferCodec(String sdp, String codec) {
     final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
     final lines = sdp.split(delimiter);
@@ -89,6 +89,37 @@ class WebRTCManager {
 
     lines[mVideoIndex] = '${header.join(' ')} ${codecPayloads.join(' ')} ${otherPayloads.join(' ')}';
     return lines.join(delimiter);
+  }
+
+  /// Injects initial starting bitrate (500 kbps) and max bitrate constraints directly into SDP
+  /// to eliminate the initial bandwidth burst and allow smooth TWCC ramp-up.
+  static String setInitialBitrate(String sdp, {int startKbps = 500, int minKbps = 150, int maxKbps = 800}) {
+    final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
+    final lines = sdp.split(delimiter);
+    final mVideoIndex = lines.indexWhere((l) => l.startsWith('m=video'));
+    if (mVideoIndex == -1) return sdp;
+
+    // 1. Insert b=AS / b=TIAS under m=video line
+    final newLines = <String>[];
+    for (var i = 0; i < lines.length; i++) {
+      newLines.add(lines[i]);
+      if (i == mVideoIndex) {
+        newLines.add('b=AS:$startKbps');
+        newLines.add('b=TIAS:${startKbps * 1000}');
+      }
+    }
+
+    // 2. Append x-google bitrates to video fmtp lines
+    for (var i = 0; i < newLines.length; i++) {
+      final line = newLines[i];
+      if (line.startsWith('a=fmtp:')) {
+        if (!line.contains('x-google-start-bitrate=')) {
+          newLines[i] = '$line;x-google-start-bitrate=$startKbps;x-google-min-bitrate=$minKbps;x-google-max-bitrate=$maxKbps';
+        }
+      }
+    }
+
+    return newLines.join(delimiter);
   }
 
   /// Modifies an SDP string to enable Opus DTX (Discontinuous Transmission) and FEC (Forward Error Correction).
@@ -262,7 +293,7 @@ class WebRTCManager {
         );
         _videoSender = transceiver.sender;
 
-        // Force VP8 codec preference over H264 to fix Android device-level macroblocking & failure
+        // Force H264 hardware-accelerated codec preference over VP8 to fix Android artifacts
         try {
           final capabilities = await getRtpSenderCapabilities('video');
           if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
@@ -270,8 +301,8 @@ class WebRTCManager {
             sortedCodecs.sort((a, b) {
               final mimeA = a.mimeType.toLowerCase();
               final mimeB = b.mimeType.toLowerCase();
-              int scoreA = mimeA.contains('vp8') ? 0 : (mimeA.contains('h264') ? 1 : 2);
-              int scoreB = mimeB.contains('vp8') ? 0 : (mimeB.contains('h264') ? 1 : 2);
+              int scoreA = mimeA.contains('h264') ? 0 : (mimeA.contains('vp8') ? 1 : 2);
+              int scoreB = mimeB.contains('h264') ? 0 : (mimeB.contains('vp8') ? 1 : 2);
               return scoreA.compareTo(scoreB);
             });
             await transceiver.setCodecPreferences(sortedCodecs);
@@ -307,7 +338,7 @@ class WebRTCManager {
           params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
           if (params.encodings != null && params.encodings!.isNotEmpty) {
             params.encodings![0].maxBitrate = 500000;
-            params.encodings![0].minBitrate = 200000;
+            params.encodings![0].minBitrate = 150000;
             params.encodings![0].maxFramerate = 24;
             params.encodings![0].scalabilityMode = 'L1T3';
           }
@@ -369,7 +400,7 @@ class WebRTCManager {
     }
   }
 
-  /// Creates an SDP Offer, prioritizes VP8 codec, and sets it as the local description.
+  /// Creates an SDP Offer, prioritizes H264 codec, disables VAD, and sets initial bitrate.
   Future<RTCSessionDescription> createAndSetLocalOffer({
     bool offerToReceiveAudio = true,
     bool offerToReceiveVideo = true,
@@ -380,14 +411,18 @@ class WebRTCManager {
       'mandatory': {
         'OfferToReceiveAudio': offerToReceiveAudio,
         'OfferToReceiveVideo': offerToReceiveVideo,
+        'voiceActivityDetection': false,
       },
-      'optional': [],
+      'optional': [
+        {'VoiceActivityDetection': false},
+      ],
     };
 
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      var processedSdp = preferCodec(offer.sdp ?? '', 'H264');
+      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
       processedSdp = enableOpusDtx(processedSdp);
       final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
       await pc.setLocalDescription(mungedOffer);
@@ -406,14 +441,18 @@ class WebRTCManager {
         'OfferToReceiveAudio': true,
         'OfferToReceiveVideo': true,
         'IceRestart': true,
+        'voiceActivityDetection': false,
       },
-      'optional': [],
+      'optional': [
+        {'VoiceActivityDetection': false},
+      ],
     };
 
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      var processedSdp = preferCodec(offer.sdp ?? '', 'H264');
+      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
       processedSdp = enableOpusDtx(processedSdp);
       final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
       await pc.setLocalDescription(mungedOffer);
@@ -434,7 +473,7 @@ class WebRTCManager {
     await _processQueuedCandidates();
   }
 
-  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
+  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with H264/DTX answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(String sdp) async {
     final pc = await initializePeerConnection();
 
@@ -442,8 +481,13 @@ class WebRTCManager {
     await pc.setRemoteDescription(remoteDescription);
     await _processQueuedCandidates();
 
-    final answer = await pc.createAnswer({});
-    var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
+    final answer = await pc.createAnswer({
+      'mandatory': {
+        'voiceActivityDetection': false,
+      },
+    });
+    var processedSdp = preferCodec(answer.sdp ?? '', 'H264');
+    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
     processedSdp = enableOpusDtx(processedSdp);
     final mungedAnswer = RTCSessionDescription(processedSdp, answer.type);
     await pc.setLocalDescription(mungedAnswer);
@@ -472,9 +516,14 @@ class WebRTCManager {
     // 2. Add local tracks to existing PeerConnection with simulcast option
     await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
-    // 3. Create renegotiation offer with VP8 and Opus DTX preference
-    final offer = await _peerConnection!.createOffer();
-    var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+    // 3. Create renegotiation offer with H264 and Opus DTX preference
+    final offer = await _peerConnection!.createOffer({
+      'mandatory': {
+        'voiceActivityDetection': false,
+      },
+    });
+    var processedSdp = preferCodec(offer.sdp ?? '', 'H264');
+    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
     processedSdp = enableOpusDtx(processedSdp);
     final mungedOffer = RTCSessionDescription(processedSdp, offer.type);
     await _peerConnection!.setLocalDescription(mungedOffer);
