@@ -281,6 +281,19 @@ class MediaController with WidgetsBindingObserver {
             (payload['is_camera_off'] as bool?) ??
             (type == 'video' ? isMuted : false);
 
+        // If the host force-muted or disabled the camera of this local user
+        if (msg.targetUser == _roomState.userId ||
+            (payload['target_user'] == _roomState.userId &&
+                payload['forced_by_host'] == true)) {
+          if (type == 'audio') {
+            _mediaStreamManager.toggleAudio(!isMuted);
+            isMicrophoneMutedNotifier.value = isMuted;
+          } else if (type == 'video') {
+            _mediaStreamManager.toggleVideo(!isCameraOff);
+            isCameraEnabledNotifier.value = !isCameraOff;
+          }
+        }
+
         if (targetUserId == _roomState.hostId || targetUserId.isEmpty || _roomState.hostId == null) {
           if (type == 'video') {
             isHostCameraOffNotifier.value = isCameraOff;

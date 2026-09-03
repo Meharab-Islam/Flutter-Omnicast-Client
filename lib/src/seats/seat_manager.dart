@@ -99,6 +99,33 @@ class SeatManager {
         _seatRejectController.add(msg);
       }),
     );
+
+    // 5. Seat kick / demote response (host demotes co-host to viewer)
+    _subscriptions.add(
+      _signalingClient.onMessage.listen((msg) async {
+        if (msg.event == SignalingEvents.seatKick || msg.event == 'seat_demote') {
+          final targetUser = msg.targetUser ??
+              (msg.payload is Map ? msg.payload['target_user'] : null);
+          if (targetUser == _roomState.userId && _roomState.isCoHost) {
+            debugPrint('[SeatManager] Co-host demoted to viewer -> Teardown local tracks and switch to viewer');
+            await _webRTCManager.mediaStreamManager.stopLocalMedia();
+            _roomState.updateRole(UserRole.viewer);
+            await _webRTCManager.setupViewerTransceivers();
+            final offer = await _webRTCManager.createAndSetLocalOffer();
+            _signalingClient.send(SignalingMessage(
+              event: SignalingEvents.joinRoom,
+              roomId: _roomState.roomId!,
+              userId: _roomState.userId!,
+              payload: {
+                'sdp': offer.sdp,
+                'type': offer.type,
+                'renegotiate': true,
+              },
+            ));
+          }
+        }
+      }),
+    );
   }
 
   /// Viewer action: Requests to join the broadcast stage as a Co-Host.
@@ -262,6 +289,50 @@ class SeatManager {
       roomId: _roomState.roomId!,
       userId: _roomState.userId!,
       targetUser: targetUserId,
+    ));
+  }
+
+  /// Host action alias: Demotes a co-host back to a viewer seat without kicking them from the room.
+  void kickFromStage(String targetUserId) => demoteToViewer(targetUserId);
+
+  /// Host action: Remotely mutes or unmutes a co-host's microphone track.
+  void muteCoHost(String targetUserId, {bool mute = true}) {
+    if (!_roomState.isInRoom || !_roomState.isHost) return;
+
+    _signalingClient.send(SignalingMessage(
+      event: SignalingEvents.mediaStateChanged,
+      roomId: _roomState.roomId!,
+      userId: _roomState.userId!,
+      targetUser: targetUserId,
+      payload: {
+        'target_user': targetUserId,
+        'type': 'audio',
+        'kind': 'audio',
+        'muted': mute,
+        'is_muted': mute,
+        'forced_by_host': true,
+      },
+    ));
+  }
+
+  /// Host action: Remotely disables a co-host's camera track.
+  void disableCoHostCamera(String targetUserId) {
+    if (!_roomState.isInRoom || !_roomState.isHost) return;
+
+    _signalingClient.send(SignalingMessage(
+      event: SignalingEvents.mediaStateChanged,
+      roomId: _roomState.roomId!,
+      userId: _roomState.userId!,
+      targetUser: targetUserId,
+      payload: {
+        'target_user': targetUserId,
+        'type': 'video',
+        'kind': 'video',
+        'muted': true,
+        'camera_off': true,
+        'is_camera_off': true,
+        'forced_by_host': true,
+      },
     ));
   }
 
