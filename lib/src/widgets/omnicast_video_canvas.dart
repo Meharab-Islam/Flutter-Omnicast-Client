@@ -13,6 +13,12 @@ class OmniCastVideoCanvas extends StatelessWidget {
   final String? opponentName;
   final String? opponentAvatarUrl;
 
+  /// Whether the local host camera should be mirrored. Defaults to true.
+  final bool mirrorLocal;
+
+  /// Whether remote guest/opponent cameras should be mirrored. Defaults to false (never mirrored).
+  final bool mirrorRemote;
+
   const OmniCastVideoCanvas({
     super.key,
     required this.client,
@@ -20,6 +26,8 @@ class OmniCastVideoCanvas extends StatelessWidget {
     this.hostAvatarUrl,
     this.opponentName = 'Opponent',
     this.opponentAvatarUrl,
+    this.mirrorLocal = true,
+    this.mirrorRemote = false,
   });
 
   @override
@@ -73,6 +81,7 @@ class OmniCastVideoCanvas extends StatelessWidget {
       renderer: renderer,
       isCameraEnabled: client.media.isCameraEnabled,
       isMicMuted: client.media.isMicrophoneMuted,
+      mirror: isHost ? mirrorLocal : mirrorRemote,
       audioDetector: client.media.audioDetector,
     );
   }
@@ -103,6 +112,7 @@ class OmniCastVideoCanvas extends StatelessWidget {
               renderer: hostRenderer,
               isCameraEnabled: client.media.isCameraEnabled,
               isMicMuted: client.media.isMicrophoneMuted,
+              mirror: client.state.isHost ? mirrorLocal : mirrorRemote,
               audioDetector: client.media.audioDetector,
             ),
           ),
@@ -120,6 +130,7 @@ class OmniCastVideoCanvas extends StatelessWidget {
               renderer: opponentRenderer,
               isCameraEnabled: true,
               isMicMuted: false,
+              mirror: mirrorRemote,
               audioDetector: client.media.audioDetector,
             ),
           ),
@@ -158,6 +169,7 @@ class OmniCastVideoCanvas extends StatelessWidget {
           renderer: renderer,
           isCameraEnabled: isLocal ? client.media.isCameraEnabled : true,
           isMicMuted: isLocal ? client.media.isMicrophoneMuted : seat.isMuted,
+          mirror: isLocal ? mirrorLocal : mirrorRemote,
           audioDetector: client.media.audioDetector,
         );
       },

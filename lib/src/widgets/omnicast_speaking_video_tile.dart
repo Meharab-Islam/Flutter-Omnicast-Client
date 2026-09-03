@@ -15,6 +15,10 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
   final AudioLevelDetector audioDetector;
   final VoidCallback? onTap;
 
+  /// Whether to mirror the video rendering.
+  /// If null (default), only mirrors local camera (`userId == 'local'`), never remote streams.
+  final bool? mirror;
+
   const OmniCastSpeakingVideoTile({
     super.key,
     required this.userId,
@@ -24,12 +28,15 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
     required this.renderer,
     this.isCameraEnabled = true,
     this.isMicMuted = false,
+    this.mirror,
     required this.audioDetector,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveMirror = mirror ?? (userId == 'local' || trackId == 'local');
+
     return GestureDetector(
       onTap: onTap,
       child: ValueListenableBuilder<Map<String, double>>(
@@ -66,6 +73,7 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
                   SizedBox.expand(
                     child: RTCVideoView(
                       renderer!,
+                      mirror: effectiveMirror,
                       objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                     ),
                   )

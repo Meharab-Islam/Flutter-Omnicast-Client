@@ -18,8 +18,11 @@ class OmniCastVideoView extends StatefulWidget {
   /// Optional [MediaController] to dispatch adaptive streaming layer requests.
   final MediaController? mediaController;
 
-  /// Whether to mirror the video rendering (typically true for local front camera).
-  final bool mirror;
+  /// Whether to mirror the video rendering.
+  /// If null (default), automatically mirrors only for local camera (`userId == null` or `'local'`)
+  /// and NEVER mirrors for remote video streams (`userId != 'local'`).
+  /// Pass `false` explicitly to disable mirroring, or `true` to enable it.
+  final bool? mirror;
 
   /// The object fit strategy for rendering the video (cover, contain, fill).
   final RTCVideoViewObjectFit objectFit;
@@ -38,7 +41,7 @@ class OmniCastVideoView extends StatefulWidget {
     required this.mediaStreamManager,
     this.userId,
     this.mediaController,
-    this.mirror = false,
+    this.mirror,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
     this.enableAdaptiveStreaming = false,
     this.placeholder,
@@ -53,6 +56,12 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   RTCVideoRenderer? _renderer;
   bool _isMounted = false;
   String? _lastAdaptiveLayer;
+
+  bool get _effectiveMirror {
+    if (widget.mirror != null) return widget.mirror!;
+    final isLocal = widget.userId == null || widget.userId == 'local';
+    return isLocal; // Local front camera = true, Remote streams = false (never mirrored)
+  }
 
   @override
   void initState() {
@@ -156,7 +165,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
           _checkAdaptiveStreaming(constraints);
           return RTCVideoView(
             _renderer!,
-            mirror: widget.mirror,
+            mirror: _effectiveMirror,
             objectFit: widget.objectFit,
           );
         },
@@ -165,7 +174,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
 
     return RTCVideoView(
       _renderer!,
-      mirror: widget.mirror,
+      mirror: _effectiveMirror,
       objectFit: widget.objectFit,
     );
   }
