@@ -25,7 +25,7 @@
   "23": "webrtc_stats_monitor.dart",
   "24": "omnicast_speaking_video_tile.dart",
   "25": "audio_level_detector.dart",
-  "26": "omnicast_video_canvas.dart",
+  "26": "omnicast_gifting_bottom_sheet.dart",
   "27": "🚀 OmniCast Client Flutter SDK",
   "28": "StatelessWidget",
   "29": "⚔️ OmniCast SDK: PK Battle Integration Guide",
@@ -36,5 +36,9 @@
   "34": "👢 OmniCast SDK: Participant Kick & Ejection Guide",
   "35": "_OmniCastFlyingHeartsOverlayState",
   "36": "omnicast_native_viewport_tracker.dart",
-  "40": "handleRawMessage"
+  "37": "🎙️ OmniCast SDK: Co-Host & Stage Moderation Guide",
+  "38": "👥 OmniCast SDK: Viewers & Metadata Integration Guide",
+  "39": "🚀 OmniCast SDK: Complete Developer & Media Rendering Guide",
+  "40": "handleRawMessage",
+  "41": "omnicast_video_canvas.dart"
 }

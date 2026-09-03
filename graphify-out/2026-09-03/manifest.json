@@ -90,9 +90,9 @@
     "semantic_hash": "276e02e5707ff1e91c6b1b5cfb42f6ef"
   },
   "lib/src/media/media_controller.dart": {
-    "mtime": 1788421297.0972683,
-    "seen": 1788421680.931654,
-    "ast_hash": "bcc0e2bb7031bc377d6cd96b6bbcdc52",
+    "mtime": 1788422404.4641912,
+    "seen": 1788422467.487436,
+    "ast_hash": "6d3e1eda9c833f6ec2d6092c30f712b9",
     "semantic_hash": ""
   },
   "lib/src/models/interaction_models.dart": {
@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {
-    "mtime": 1788421215.9399998,
-    "seen": 1788421680.93166,
-    "ast_hash": "cbfe1bd1997b3d7f3e1434e517fbab07",
+    "mtime": 1788422427.903761,
+    "seen": 1788422467.487442,
+    "ast_hash": "8bec897527a2396a770b8abd762a72b1",
     "semantic_hash": ""
   },
   "lib/src/media/video_parameters.dart": {
@@ -264,9 +264,9 @@
     "semantic_hash": "c0eacf0ddf4bafa2ff5f18ed75879a19"
   },
   "lib/src/widgets/omnicast_gifting_bottom_sheet.dart": {
-    "mtime": 1788018383.2908614,
-    "seen": 1788018721.78076,
-    "ast_hash": "1123dc3eba705014dfeb146bb05acf32",
+    "mtime": 1788422248.0054853,
+    "seen": 1788422467.487446,
+    "ast_hash": "0baa6d50f263dde791633ac3367897fa",
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_video_canvas.dart": {
@@ -333,6 +333,30 @@
     "mtime": 1788103597.3289187,
     "seen": 1788103664.994448,
     "ast_hash": "6b32f8f438bd0e0de295b7827cb6d945",
+    "semantic_hash": ""
+  },
+  "KICK_PARTICIPANT_GUIDE.md": {
+    "mtime": 1788421946.7921913,
+    "seen": 1788422113.783494,
+    "ast_hash": "45d150530304fac4ee477b749f56fb0f",
+    "semantic_hash": ""
+  },
+  "PK_BATTLE_INTEGRATION_GUIDE.md": {
+    "mtime": 1788422080.950531,
+    "seen": 1788422113.783495,
+    "ast_hash": "639e1f4b1ac1ef1cc328bc11ba32da48",
+    "semantic_hash": ""
+  },
+  "COHOST_AND_MODERATION_GUIDE.md": {
+    "mtime": 1788422440.6701117,
+    "seen": 1788422467.4874618,
+    "ast_hash": "619059765d57b19e6123b6e7fd7a3ee3",
+    "semantic_hash": ""
+  },
+  "VIEWERS_METADATA_GUIDE.md": {
+    "mtime": 1788422206.5400689,
+    "seen": 1788422467.487465,
+    "ast_hash": "59cee23550bd31669b83b3d5e5041f0a",
     "semantic_hash": ""
   }
 }

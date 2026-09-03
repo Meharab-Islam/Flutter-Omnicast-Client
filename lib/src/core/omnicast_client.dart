@@ -196,7 +196,17 @@ class OmniCastClient {
   Stream<String> get onRoomClosedByHost => _roomManager.onRoomClosedByHost;
   Stream<KickedEvent> get onKickedFromRoom => _roomManager.onKickedFromRoom;
   Stream<String> get onUserKicked => _roomManager.onUserKicked;
+  Stream<OmniCastParticipant> get onParticipantJoined => _roomManager.onParticipantJoined;
+  Stream<String> get onParticipantLeft => _roomManager.onParticipantLeft;
+  Stream<OmniCastParticipant> get onUserJoined => _roomManager.onUserJoined;
+  Stream<String> get onUserLeft => _roomManager.onUserLeft;
   Stream<SignalingMessage> get onMediaStateChanged => _signalingClient.onMediaStateChanged;
+
+  // Real-time Reactive ValueListenable Notifiers for UI Composition
+  ValueNotifier<List<OmniCastParticipant>> get viewersNotifier => _roomManager.activeViewersList;
+  ValueNotifier<List<OmniCastParticipant>> get activeViewersList => _roomManager.activeViewersList;
+  ValueNotifier<int> get viewerCountNotifier => _roomManager.totalViewerCount;
+  ValueNotifier<int> get totalViewerCount => _roomManager.totalViewerCount;
 
   /// Host action: Kicks/ejects a participant out of the live room.
   void kickUser(String targetUserId, {String? reason}) =>

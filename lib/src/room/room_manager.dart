@@ -79,6 +79,8 @@ class RoomManager {
   final _roomClosedByHostController = StreamController<String>.broadcast();
   final _kickedFromRoomController = StreamController<KickedEvent>.broadcast();
   final _userKickedController = StreamController<String>.broadcast();
+  final _participantJoinedController = StreamController<OmniCastParticipant>.broadcast();
+  final _participantLeftController = StreamController<String>.broadcast();
 
   /// Stream emitting when the room is terminated/closed by the host.
   Stream<String> get onRoomClosedByHost => _roomClosedByHostController.stream;
@@ -88,6 +90,16 @@ class RoomManager {
 
   /// Stream emitting the userId whenever any user in the room is kicked.
   Stream<String> get onUserKicked => _userKickedController.stream;
+
+  /// Stream emitting whenever a new participant joins the live broadcast room.
+  Stream<OmniCastParticipant> get onParticipantJoined => _participantJoinedController.stream;
+
+  /// Stream emitting the userId whenever a participant leaves the live broadcast room.
+  Stream<String> get onParticipantLeft => _participantLeftController.stream;
+
+  /// Stream aliases for seamless developer experience
+  Stream<OmniCastParticipant> get onUserJoined => _participantJoinedController.stream;
+  Stream<String> get onUserLeft => _participantLeftController.stream;
 
   /// Listens to real-time participant signaling events with high-performance debouncing.
   void _bindSignalingEvents() {
@@ -234,6 +246,7 @@ class RoomManager {
     _pendingJoins.add(participant);
 
     totalViewerCount.value++;
+    _participantJoinedController.add(participant);
     _scheduleBatchFlush();
   }
 
@@ -247,6 +260,7 @@ class RoomManager {
     if (totalViewerCount.value > 0) {
       totalViewerCount.value--;
     }
+    _participantLeftController.add(userId);
     _scheduleBatchFlush();
   }
 
@@ -465,6 +479,8 @@ class RoomManager {
     _roomClosedByHostController.close();
     _kickedFromRoomController.close();
     _userKickedController.close();
+    _participantJoinedController.close();
+    _participantLeftController.close();
 
     totalViewerCount.dispose();
     activeViewersList.dispose();
