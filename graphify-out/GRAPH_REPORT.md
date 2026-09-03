@@ -1,16 +1,16 @@
 # Graph Report - omnicast_client  (2026-09-03)
 
 ## Corpus Check
-- 59 files · ~35,503 words
+- 59 files · ~35,406 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1200 nodes · 1458 edges · 42 communities (39 shown, 3 thin omitted)
+- 1203 nodes · 1461 edges · 42 communities (39 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d39aea8d`
+- Built from commit: `0263ab59`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -61,17 +61,18 @@
 ## God Nodes (most connected - your core abstractions)
 1. `🚀 OmniCast Client Flutter SDK` - 16 edges
 2. `RoomState` - 9 edges
-3. `WebRTCManager` - 8 edges
-4. `🎙️ OmniCast SDK: Co-Host & Stage Moderation Guide` - 8 edges
-5. `🚀 OmniCast SDK: Complete Developer & Media Rendering Guide` - 8 edges
-6. `👢 OmniCast SDK: Participant Kick & Ejection Guide` - 8 edges
-7. `⚔️ OmniCast SDK: PK Battle Integration Guide` - 8 edges
-8. `👥 OmniCast SDK: Viewers & Metadata Integration Guide` - 8 edges
+3. `👥 OmniCast SDK: Viewers & Metadata Integration Guide` - 9 edges
+4. `WebRTCManager` - 8 edges
+5. `🎙️ OmniCast SDK: Co-Host & Stage Moderation Guide` - 8 edges
+6. `🚀 OmniCast SDK: Complete Developer & Media Rendering Guide` - 8 edges
+7. `👢 OmniCast SDK: Participant Kick & Ejection Guide` - 8 edges
+8. `⚔️ OmniCast SDK: PK Battle Integration Guide` - 8 edges
 9. `SignalingClient` - 7 edges
 10. `MediaController` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
-- None detected - all connections are within the same source files.
+- `OmniCastGiftingBottomSheet` --inherits--> `StatefulWidget`  [EXTRACTED]
+  lib/src/widgets/omnicast_gifting_bottom_sheet.dart → None  _Bridges community 35 → community 26_
 
 ## Import Cycles
 - None detected.
@@ -184,7 +185,7 @@ Nodes (14): activeSpeakerNotifier, audioLevelsNotifier, dispose, _isDisposed, po
 
 ### Community 26 - "omnicast_gifting_bottom_sheet.dart"
 Cohesion: 0.11
-Nodes (17): ../core/omnicast_client.dart, Function?, OmniCastClient, build, client, coinPrice, createState, emoji (+9 more)
+Nodes (19): ../core/omnicast_client.dart, Function?, OmniCastClient, build, client, coinPrice, createState, emoji (+11 more)
 
 ### Community 27 - "🚀 OmniCast Client Flutter SDK"
 Cohesion: 0.06
@@ -211,8 +212,8 @@ Cohesion: 0.11
 Nodes (18): 1. Architecture Overview, 2. Signaling JSON Protocol Contract, 3. SDK API Reference, 4. Data Models, 5. Flutter UI Integration Guide, 6. Under-The-Hood Lifecycle & Cleanup, A. Action Methods (`OmniCastClient` & `RoomManager`), A. Target User Handling (Viewer/Co-Host) (+10 more)
 
 ### Community 35 - "_OmniCastFlyingHeartsOverlayState"
-Cohesion: 0.24
-Nodes (11): GiftOverlayManager, _GiftOverlayManagerState, OmniCastFlyingHeartsOverlay, _OmniCastFlyingHeartsOverlayState, OmniCastGiftingBottomSheet, _OmniCastGiftingBottomSheetState, OmniCastVideoView, _OmniCastVideoViewState (+3 more)
+Cohesion: 0.28
+Nodes (9): GiftOverlayManager, _GiftOverlayManagerState, OmniCastFlyingHeartsOverlay, _OmniCastFlyingHeartsOverlayState, OmniCastVideoView, _OmniCastVideoViewState, State, StatefulWidget (+1 more)
 
 ### Community 36 - "omnicast_native_viewport_tracker.dart"
 Cohesion: 0.14
@@ -223,8 +224,8 @@ Cohesion: 0.11
 Nodes (18): 1. Architecture & Flow, 1. Waiting List Sheet (Host Screen), 2. Co-Host Stage Management Bottom Sheet (Moderation Controls), 2. Lifecycle: Viewer Request & Host Acceptance, 3. Lifecycle: Host Invites Viewer to Stage, 4. Host & Admin Moderation Controls, 5. Waiting List & Reactive Notifiers, 6. Ready-to-Use Flutter UI Examples (+10 more)
 
 ### Community 38 - "👥 OmniCast SDK: Viewers & Metadata Integration Guide"
-Cohesion: 0.17
-Nodes (11): 1. Overview & State Access Points, 2. Data Model: `OmniCastParticipant`, 3. Passing Metadata When Joining a Room, 4. Real-Time Lifecycle & State Sync, 5. Flutter UI Integration Examples, 6. Best Practices & Performance Tuning, A. Real-Time Viewers Modal Bottom Sheet, B. Horizontal Top-Bar Live Avatars Row (+3 more)
+Cohesion: 0.13
+Nodes (14): 1. Overview & State Access Points, 2. Data Model: `OmniCastParticipant`, 3. Passing Metadata When Joining a Room, 4. Real-Time Lifecycle & State Sync, 5. The Easiest Way: 1-Line Pre-Built Viewers Bottom Sheet, 6. Building Custom UI Elements, 7. Best Practices & Performance Tuning, A. Horizontal Top-Bar Live Avatars Row (+6 more)
 
 ### Community 39 - "🚀 OmniCast SDK: Complete Developer & Media Rendering Guide"
 Cohesion: 0.10
@@ -235,7 +236,7 @@ Cohesion: 0.11
 Nodes (17): PkScore, RoomMode, build, _buildCoHostStage, _buildPKScoreHeader, _buildPKSplitScreen, _buildSoloScreen, child (+9 more)
 
 ## Knowledge Gaps
-- **899 isolated node(s):** `config`, `_client`, `getLiveRooms`, `dispose`, `OmniCastTokenGenerator` (+894 more)
+- **901 isolated node(s):** `config`, `_client`, `getLiveRooms`, `dispose`, `OmniCastTokenGenerator` (+896 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -249,7 +250,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `MediaStreamManager` connect `omnicast_pk_battle_view.dart` to `core/omnicast_client.dart`, `media_controller.dart`, `webrtc_manager.dart`, `media_stream_manager.dart`, `omnicast_video_view.dart`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **What connects `config`, `_client`, `getLiveRooms` to the rest of the system?**
-  _899 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _901 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `room_state.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.03076923076923077 - nodes in this community are weakly interconnected._
 - **Should `signaling_client.dart` be split into smaller, more focused modules?**

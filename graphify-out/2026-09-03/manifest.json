@@ -1,7 +1,7 @@
 {
   "lib/omnicast_client.dart": {
-    "mtime": 1788102919.6186066,
-    "seen": 1788102991.577931,
+    "mtime": 1788428877.123667,
+    "seen": 1788428919.2105339,
     "ast_hash": "a4182f23184804d796a4c680770a0589",
     "semantic_hash": ""
   },
@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788421832.6247728,
-    "seen": 1788421883.8580658,
-    "ast_hash": "1b46a133187d1e2e28b3417380c13f2e",
+    "mtime": 1788428770.9444962,
+    "seen": 1788428801.451561,
+    "ast_hash": "0a06e1de20449b29e8a453731f41d127",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1788421819.6722713,
-    "seen": 1788421883.858075,
-    "ast_hash": "01e47efce5f1a72461057aa4eb715ae5",
+    "mtime": 1788428758.4706032,
+    "seen": 1788428801.45157,
+    "ast_hash": "94f4c4b44764864d3caee3e9a5b8b2a6",
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {

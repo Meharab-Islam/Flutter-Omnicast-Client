@@ -6527,28 +6527,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
-      "label": "OmniCastVideoView",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "omnicast_video_view.dart",
-      "file_type": "code",
-      "norm_label": "omnicastvideoview",
-      "source_file": "lib/src/widgets/omnicast_video_view.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
-      "label": "_OmniCastVideoViewState",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "omnicast_video_view.dart",
-      "file_type": "code",
-      "norm_label": "_omnicastvideoviewstate",
-      "source_file": "lib/src/widgets/omnicast_video_view.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_widgets_omnicast_video_view_placeholder",
       "label": "placeholder",
       "_origin": "ast",
@@ -7583,28 +7561,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
-      "label": "OmniCastGiftingBottomSheet",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "omnicast_gifting_bottom_sheet.dart",
-      "file_type": "code",
-      "norm_label": "omnicastgiftingbottomsheet",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
-      "label": "_OmniCastGiftingBottomSheetState",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "omnicast_gifting_bottom_sheet.dart",
-      "file_type": "code",
-      "norm_label": "_omnicastgiftingbottomsheetstate",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_ongiftsent",
       "label": "onGiftSent",
       "_origin": "ast",
@@ -8531,6 +8487,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_core_omnicast_client_activeviewerslist",
+      "label": "activeViewersList",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "activeviewerslist",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_core_omnicast_client_api",
       "label": "_api",
       "_origin": "ast",
@@ -8751,6 +8718,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_core_omnicast_client_onparticipantjoined",
+      "label": "onParticipantJoined",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "onparticipantjoined",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_core_omnicast_client_onparticipantleft",
+      "label": "onParticipantLeft",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "onparticipantleft",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_core_omnicast_client_onroomclosed",
       "label": "onRoomClosed",
       "_origin": "ast",
@@ -8784,6 +8773,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_core_omnicast_client_onuserjoined",
+      "label": "onUserJoined",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "onuserjoined",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_core_omnicast_client_onuserkicked",
       "label": "onUserKicked",
       "_origin": "ast",
@@ -8791,6 +8791,17 @@
       "community_name": "core/omnicast_client.dart",
       "file_type": "code",
       "norm_label": "onuserkicked",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_core_omnicast_client_onuserleft",
+      "label": "onUserLeft",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "onuserleft",
       "source_file": "lib/src/core/omnicast_client.dart",
       "source_location": null
     },
@@ -8923,6 +8934,39 @@
       "community_name": "core/omnicast_client.dart",
       "file_type": "code",
       "norm_label": "_subscriptions",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_core_omnicast_client_totalviewercount",
+      "label": "totalViewerCount",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "totalviewercount",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_core_omnicast_client_viewercountnotifier",
+      "label": "viewerCountNotifier",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "viewercountnotifier",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_core_omnicast_client_viewersnotifier",
+      "label": "viewersNotifier",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "viewersnotifier",
       "source_file": "lib/src/core/omnicast_client.dart",
       "source_location": null
     },
@@ -9561,6 +9605,50 @@
       "file_type": "code",
       "norm_label": "_omnicastflyingheartsoverlaystate",
       "source_file": "lib/src/widgets/omnicast_flying_hearts_overlay.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
+      "label": "OmniCastGiftingBottomSheet",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "_OmniCastFlyingHeartsOverlayState",
+      "file_type": "code",
+      "norm_label": "omnicastgiftingbottomsheet",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
+      "label": "_OmniCastGiftingBottomSheetState",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "_OmniCastFlyingHeartsOverlayState",
+      "file_type": "code",
+      "norm_label": "_omnicastgiftingbottomsheetstate",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
+      "label": "OmniCastVideoView",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "_OmniCastFlyingHeartsOverlayState",
+      "file_type": "code",
+      "norm_label": "omnicastvideoview",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
+      "label": "_OmniCastVideoViewState",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "_OmniCastFlyingHeartsOverlayState",
+      "file_type": "code",
+      "norm_label": "_omnicastvideoviewstate",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
       "source_location": null
     },
     {
@@ -11387,6 +11475,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_room_room_manager_onparticipantjoined",
+      "label": "onParticipantJoined",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "onparticipantjoined",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_room_room_manager_onparticipantleft",
+      "label": "onParticipantLeft",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "onparticipantleft",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_room_room_manager_onroomclosedbyhost",
       "label": "onRoomClosedByHost",
       "_origin": "ast",
@@ -11398,6 +11508,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_room_room_manager_onuserjoined",
+      "label": "onUserJoined",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "onuserjoined",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_room_room_manager_onuserkicked",
       "label": "onUserKicked",
       "_origin": "ast",
@@ -11405,6 +11526,39 @@
       "community_name": "room_manager.dart",
       "file_type": "code",
       "norm_label": "onuserkicked",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_room_room_manager_onuserleft",
+      "label": "onUserLeft",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "onuserleft",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_room_room_manager_participantjoinedcontroller",
+      "label": "_participantJoinedController",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "_participantjoinedcontroller",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_room_room_manager_participantleftcontroller",
+      "label": "_participantLeftController",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "_participantleftcontroller",
       "source_file": "lib/src/room/room_manager.dart",
       "source_location": null
     },
@@ -13628,6 +13782,18 @@
     {
       "source": "lib_src_core_omnicast_client",
       "target": "stream",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "variable_type",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "valuenotifier",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -17372,6 +17538,17 @@
     },
     {
       "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_activeviewerslist",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
       "target": "lib_src_core_omnicast_client_api",
       "relation": "defines",
       "_origin": "ast",
@@ -17603,6 +17780,28 @@
     },
     {
       "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_onparticipantjoined",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_onparticipantleft",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
       "target": "lib_src_core_omnicast_client_onroomclosed",
       "relation": "defines",
       "_origin": "ast",
@@ -17636,7 +17835,29 @@
     },
     {
       "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_onuserjoined",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
       "target": "lib_src_core_omnicast_client_onuserkicked",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_onuserleft",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -17769,6 +17990,39 @@
     {
       "source": "lib_src_core_omnicast_client",
       "target": "lib_src_core_omnicast_client_subscriptions",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_totalviewercount",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_viewercountnotifier",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_viewersnotifier",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -22003,6 +22257,28 @@
     },
     {
       "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_onparticipantjoined",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_onparticipantleft",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
       "target": "lib_src_room_room_manager_onroomclosedbyhost",
       "relation": "defines",
       "_origin": "ast",
@@ -22014,7 +22290,51 @@
     },
     {
       "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_onuserjoined",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
       "target": "lib_src_room_room_manager_onuserkicked",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_onuserleft",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_participantjoinedcontroller",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_participantleftcontroller",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -29285,5 +29605,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9146a18c9bdb63610f4d0dd684b0419ca83ea4af"
+  "built_at_commit": "d39aea8d6f40e15ed09a68f95b5c488a7b30d425"
 }

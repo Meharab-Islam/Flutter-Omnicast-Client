@@ -94,8 +94,18 @@ class OmniCastClient {
         );
 
   /// Initializes the [OmniCastClient] SDK using server credentials, SFU host URL, and media configuration.
+  ///
+  /// Developers can simply provide their server domain (e.g. `testlive.lolipoplive.top`) and credentials:
+  /// ```dart
+  /// await OmniCastClient.init(
+  ///   serverUrl: 'testlive.lolipoplive.top',
+  ///   apiKey: 'dev_api_key_123',
+  ///   apiSecret: 'my_secret_key_456',
+  /// );
+  /// ```
   static Future<OmniCastClient> init({
-    required String hostUrl,
+    String? serverUrl,
+    String? hostUrl,
     String? apiUrl,
     String? apiKey,
     String? apiSecret,
@@ -105,8 +115,14 @@ class OmniCastClient {
     bool autoConnect = true,
     List<Map<String, dynamic>>? iceServers,
     Duration heartbeatInterval = const Duration(seconds: 15),
+    Duration reconnectDelay = const Duration(seconds: 3),
+    int maxReconnectAttempts = 5,
+    bool? isSecure,
+    String wsPath = '/ws',
+    String apiPath = '/api',
   }) async {
-    final config = OmniCastConfig(
+    final config = OmniCastConfig.fromServer(
+      serverUrl: serverUrl,
       hostUrl: hostUrl,
       apiUrl: apiUrl,
       apiKey: apiKey,
@@ -118,6 +134,11 @@ class OmniCastClient {
             {'urls': 'stun:stun1.l.google.com:19302'},
           ],
       heartbeatInterval: heartbeatInterval,
+      reconnectDelay: reconnectDelay,
+      maxReconnectAttempts: maxReconnectAttempts,
+      isSecure: isSecure,
+      wsPath: wsPath,
+      apiPath: apiPath,
     );
 
     final client = OmniCastClient._(
@@ -127,13 +148,48 @@ class OmniCastClient {
     instance = client;
     if (autoConnect) {
       try {
-        await client._signalingClient.connect(wsUrl: hostUrl, token: token);
+        await client._signalingClient.connect(wsUrl: config.hostUrl, token: token);
       } catch (e) {
         debugPrint('[OmniCastClient] Initial connection deferred or offline: $e');
       }
     }
     return client;
   }
+
+  /// Creates and starts a new live broadcasting room as Host.
+  /// Automatically generates JWT auth token from credentials configured at SDK initialization.
+  Future<void> createRoom({
+    required String roomId,
+    required String userId,
+    String? token,
+    RoomOptions options = const RoomOptions(),
+    Map<String, dynamic>? metadata,
+  }) =>
+      _roomManager.createRoom(
+        roomId: roomId,
+        userId: userId,
+        token: token,
+        options: options,
+        metadata: metadata,
+      );
+
+  /// Joins an existing broadcasting room as a Viewer.
+  /// Automatically generates JWT auth token from credentials configured at SDK initialization.
+  Future<void> joinRoom({
+    required String roomId,
+    required String userId,
+    String? token,
+    Map<String, dynamic>? metadata,
+  }) =>
+      _roomManager.joinRoom(
+        roomId: roomId,
+        userId: userId,
+        token: token,
+        metadata: metadata,
+      );
+
+  /// Leaves the current room session, tears down peer connections, and stops local media tracks.
+  Future<void> leaveRoom() => _roomManager.leaveRoom();
 
   void _initSubManagers() {
     _api = OmniCastApi(config: config);
