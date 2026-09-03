@@ -298,43 +298,52 @@ class RoomManager {
   }
 
   void _handleRoomInfoSync(Map<String, dynamic> data) {
-    final count = (data['viewers_count'] as num?)?.toInt() ??
-        (data['viewer_count'] as num?)?.toInt() ??
-        0;
-    totalViewerCount.value = count;
+    final root = data['data'] is Map<String, dynamic>
+        ? data['data'] as Map<String, dynamic>
+        : (data['room'] is Map<String, dynamic>
+            ? data['room'] as Map<String, dynamic>
+            : (data['active_room'] is Map<String, dynamic>
+                ? data['active_room'] as Map<String, dynamic>
+                : data));
 
-    if (data['viewers'] is List) {
-      final list = (data['viewers'] as List)
+    final count = (root['viewers_count'] as num?)?.toInt() ??
+        (root['viewer_count'] as num?)?.toInt() ??
+        (root['total_viewers'] as num?)?.toInt() ??
+        (root['count'] as num?)?.toInt();
+
+    final viewersRaw = root['viewers'] ?? root['participants'] ?? root['members'];
+    List<OmniCastParticipant>? parsedList;
+
+    if (viewersRaw is List) {
+      parsedList = viewersRaw
           .whereType<Map>()
           .map((e) => OmniCastParticipant.fromJson(Map<String, dynamic>.from(e)))
           .take(maxViewersInMemory)
           .toList();
-      activeViewersList.value = list;
+      activeViewersList.value = List.unmodifiable(parsedList);
     }
+
+    final effectiveCount = count ?? (parsedList != null ? parsedList.length : totalViewerCount.value);
+    totalViewerCount.value = effectiveCount;
+    _roomState.updateViewers(count: effectiveCount, viewersList: parsedList);
   }
 
   /// Queues user joined event with immediate in-memory reactivity and micro-batch throttle.
   void _queueUserJoined(OmniCastParticipant participant) {
-    _roomState.addParticipant(participant);
-
     _pendingLeaves.remove(participant.userId);
     _pendingJoins.add(participant);
 
-    totalViewerCount.value++;
+    _roomState.addParticipant(participant);
     _participantJoinedController.add(participant);
     _flushParticipantBatch();
   }
 
   /// Queues user left event with immediate in-memory reactivity.
   void _queueUserLeft(String userId) {
-    _roomState.removeParticipant(userId);
-
     _pendingJoins.removeWhere((p) => p.userId == userId);
     _pendingLeaves.add(userId);
 
-    if (totalViewerCount.value > 0) {
-      totalViewerCount.value--;
-    }
+    _roomState.removeParticipant(userId);
     _participantLeftController.add(userId);
     _flushParticipantBatch();
   }
@@ -365,6 +374,7 @@ class RoomManager {
     }
 
     activeViewersList.value = List.unmodifiable(currentList);
+    totalViewerCount.value = currentList.length;
   }
 
   /// Creates and starts a new live broadcasting room as Host.
