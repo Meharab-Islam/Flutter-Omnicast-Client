@@ -9,23 +9,26 @@ Comprehensive guide on accessing, tracking, and rendering **Real-Time Viewers, A
 2. [Data Model: `OmniCastParticipant`](#2-data-model-omnicastparticipant)
 3. [Passing Metadata When Joining a Room](#3-passing-metadata-when-joining-a-room)
 4. [Real-Time Lifecycle & State Sync](#4-real-time-lifecycle--state-sync)
-5. [Flutter UI Integration Examples](#5-flutter-ui-integration-examples)
-   - [A. Real-Time Viewers Modal Bottom Sheet (With VIP & Levels)](#a-real-time-viewers-modal-bottom-sheet)
-   - [B. Horizontal Top-Bar Live Avatars Row](#b-horizontal-top-bar-live-avatars-row)
-   - [C. Total Live Viewer Counter Badge](#c-total-live-viewer-counter-badge)
-6. [Best Practices & Performance Tuning](#6-best-practices--performance-tuning)
+5. [The Easiest Way: 1-Line Pre-Built Viewers Bottom Sheet](#5-the-easiest-way-1-line-pre-built-viewers-bottom-sheet)
+6. [Building Custom UI Elements](#6-building-custom-ui-elements)
+   - [A. Horizontal Top-Bar Live Avatars Row](#a-horizontal-top-bar-live-avatars-row)
+   - [B. Total Live Viewer Counter Badge](#b-total-live-viewer-counter-badge)
+   - [C. Real-Time Join/Leave Toast Notifications (Streams)](#c-real-time-joinleave-toast-notifications-streams)
+7. [Best Practices & Performance Tuning](#7-best-practices--performance-tuning)
 
 ---
 
 ## 1. Overview & State Access Points
 
-The SDK continuously keeps the participant and viewer list synchronized in real time with the SFU server. Developers can consume this data through 3 reactive access points:
+The SDK continuously keeps the participant and viewer list synchronized in real time with the SFU server. Developers can access this data directly from the `client` object:
 
-| Access Point | Type | Purpose |
+| Access Point | Type | Description |
 | :--- | :--- | :--- |
-| `client.room.activeViewersList` | `ValueNotifier<List<OmniCastParticipant>>` | **Recommended for UI.** Highly optimized reactive list with micro-batch debouncing (50ms) to eliminate frame drops. |
+| `client.activeViewersList` / `client.viewersNotifier` | `ValueNotifier<List<OmniCastParticipant>>` | **Recommended for UI.** Highly optimized reactive list with micro-batch debouncing (50ms) to eliminate frame drops. |
+| `client.totalViewerCount` / `client.viewerCountNotifier` | `ValueNotifier<int>` | Total number of viewers currently in the room (can exceed in-memory list size). |
+| `client.onParticipantJoined` / `client.onUserJoined` | `Stream<OmniCastParticipant>` | Stream emitting whenever a new participant joins the room. |
+| `client.onParticipantLeft` / `client.onUserLeft` | `Stream<String>` | Stream emitting the `userId` of any user who leaves. |
 | `client.state.viewers` | `List<Participant>` | Snapshot list of current viewers stored in global `RoomState`. |
-| `client.room.totalViewerCount` | `ValueNotifier<int>` | Total number of viewers currently in the room (can exceed in-memory list size). |
 
 ---
 
@@ -86,184 +89,56 @@ sequenceDiagram
     SFU-->>Host: Event: user_joined (New viewer's metadata attached)
     SFU-->>ExistingViewers: Event: user_joined (Debounced micro-batch)
     
-    Note over Host,ExistingViewers: client.room.activeViewersList automatically updates<br/>client.room.totalViewerCount increments by 1
+    Note over Host,ExistingViewers: client.activeViewersList automatically updates<br/>client.totalViewerCount increments by 1<br/>client.onParticipantJoined fires
 
     NewViewer->>SFU: leaveRoom() / disconnect
     SFU-->>Host: Event: user_left
     SFU-->>ExistingViewers: Event: user_left
-    Note over Host,ExistingViewers: Viewer removed from activeViewersList & count decrements
+    Note over Host,ExistingViewers: Viewer removed from activeViewersList & count decrements<br/>client.onParticipantLeft fires
 ```
 
 ---
 
-## 5. Flutter UI Integration Examples
+## 5. The Easiest Way: 1-Line Pre-Built Viewers Bottom Sheet
 
-### A. Real-Time Viewers Modal Bottom Sheet
-
-A complete modal displaying viewer avatars, level badges, VIP icons, and host moderation actions:
+Instead of writing 300+ lines of custom dialog code, use the SDK's built-in **`OmniCastViewersBottomSheet`**:
 
 ```dart
-import 'package:flutter/material.dart';
-import 'package:omnicast_client/omnicast_client.dart';
+// Open complete active viewers sheet in 1 single line of code!
+OmniCastViewersBottomSheet.show(context, client: _client);
+```
 
-void showViewersListModal(BuildContext context, OmniCastClient client) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: const Color(0xFF0F172A),
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    builder: (ctx) {
-      return ValueListenableBuilder<List<OmniCastParticipant>>(
-        valueListenable: client.room.activeViewersList,
-        builder: (context, viewers, _) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header: Title & Total Count
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.people_alt_rounded, color: Colors.indigoAccent, size: 22),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Live Viewers (${viewers.length})',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white54),
-                      onPressed: () => Navigator.pop(ctx),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const Divider(color: Colors.white10, height: 1),
-                const SizedBox(height: 8),
+### 🌟 What `OmniCastViewersBottomSheet` handles automatically:
+1. **Real-time auto updates:** When new users join or leave, the list updates live.
+2. **Metadata rendering:** Displays avatars, display names, `Lv.99` badges, and golden VIP badges automatically.
+3. **Host-only Kick Button:** Automatically detects if the current user is Host (`client.state.isHost`) and shows the red **Kick** button only to the host.
+4. **Interactive Ejection Dialog:** Includes a built-in reason selection popup (e.g. *Violated community guidelines*, *Spamming*, etc.) and executes `client.kickUser()` on confirmation.
 
-                // Viewers List with Metadata
-                Expanded(
-                  child: viewers.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No viewers in this room yet.',
-                            style: TextStyle(color: Colors.white38),
-                          ),
-                        )
-                      : ListView.separated(
-                          itemCount: viewers.length,
-                          separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
-                          itemBuilder: (context, index) {
-                            final viewer = viewers[index];
-                            final meta = viewer.metadata;
-                            final level = meta['level'] ?? 1;
-                            final isVip = meta['is_vip'] == true || meta['vip'] == true;
-                            final badge = meta['badge'] as String?;
-
-                            return ListTile(
-                              contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                              leading: Stack(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage: NetworkImage(
-                                      viewer.avatarUrl ??
-                                          'https://api.dicebear.com/7.x/bottts/png?seed=${viewer.userId}',
-                                    ),
-                                  ),
-                                  if (isVip)
-                                    const Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Icon(Icons.stars_rounded, color: Colors.amber, size: 16),
-                                    ),
-                                ],
-                              ),
-                              title: Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      viewer.displayName ?? viewer.userId,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-
-                                  // Level Badge
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [Colors.purpleAccent, Colors.deepPurple],
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      'Lv.$level',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Text(
-                                badge ?? 'ID: ${viewer.userId}',
-                                style: TextStyle(
-                                  color: badge != null ? Colors.amberAccent : Colors.white38,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              trailing: client.state.isHost && viewer.userId != client.state.userId
-                                  ? IconButton(
-                                      icon: const Icon(Icons.person_remove_rounded, color: Colors.redAccent, size: 20),
-                                      tooltip: 'Kick Participant',
-                                      onPressed: () {
-                                        client.kickUser(viewer.userId, reason: 'Removed by host');
-                                        Navigator.pop(ctx);
-                                      },
-                                    )
-                                  : null,
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+### Optional Customization:
+```dart
+OmniCastViewersBottomSheet.show(
+  context,
+  client: _client,
+  title: 'Live Room Viewers',
+  enableHostKick: true,
+  onUserKicked: (participant, reason) {
+    debugPrint('User ${participant.userId} was kicked for: $reason');
+  },
+);
 ```
 
 ---
 
-### B. Horizontal Top-Bar Live Avatars Row
+## 6. Building Custom UI Elements
+
+### A. Horizontal Top-Bar Live Avatars Row
 
 Place this inside your live room top navigation overlay to display circular avatars of currently watching viewers:
 
 ```dart
 Widget buildLiveViewerAvatarsRow(BuildContext context, OmniCastClient client) {
   return ValueListenableBuilder<List<OmniCastParticipant>>(
-    valueListenable: client.room.activeViewersList,
+    valueListenable: client.activeViewersList,
     builder: (context, viewers, _) {
       if (viewers.isEmpty) return const SizedBox.shrink();
 
@@ -277,7 +152,7 @@ Widget buildLiveViewerAvatarsRow(BuildContext context, OmniCastClient client) {
             return Padding(
               padding: const EdgeInsets.only(right: 6.0),
               child: GestureDetector(
-                onTap: () => showViewersListModal(context, client),
+                onTap: () => OmniCastViewersBottomSheet.show(context, client: client),
                 child: CircleAvatar(
                   radius: 16,
                   backgroundImage: NetworkImage(
@@ -296,46 +171,80 @@ Widget buildLiveViewerAvatarsRow(BuildContext context, OmniCastClient client) {
 
 ---
 
-### C. Total Live Viewer Counter Badge
+### B. Total Live Viewer Counter Badge
 
 ```dart
-Widget buildLiveViewerCountBadge(OmniCastClient client) {
-  return ValueListenableBuilder<int>(
-    valueListenable: client.room.totalViewerCount,
-    builder: (context, count, _) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.remove_red_eye_rounded, color: Colors.white70, size: 14),
-            const SizedBox(width: 4),
-            Text(
-              '$count',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+Widget buildLiveViewerCountBadge(BuildContext context, OmniCastClient client) {
+  return GestureDetector(
+    onTap: () => OmniCastViewersBottomSheet.show(context, client: client),
+    child: ValueListenableBuilder<int>(
+      valueListenable: client.totalViewerCount,
+      builder: (context, count, _) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.remove_red_eye_rounded, color: Colors.white70, size: 14),
+              const SizedBox(width: 4),
+              Text(
+                '$count',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
+            ],
+          ),
+        );
+      },
+    ),
   );
 }
 ```
 
 ---
 
-## 6. Best Practices & Performance Tuning
+### C. Real-Time Join/Leave Toast Notifications (Streams)
+
+```dart
+@override
+void initState() {
+  super.initState();
+
+  // 1. Listen for new participants joining
+  _client.onParticipantJoined.listen((participant) {
+    final name = participant.displayName ?? participant.userId;
+    final level = participant.metadata['level'] ?? 1;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('👋 $name (Lv.$level) joined the room!'),
+        duration: const Duration(seconds: 2),
+        backgroundColor: const Color(0xFF1E293B),
+      ),
+    );
+  });
+
+  // 2. Listen for participants leaving
+  _client.onParticipantLeft.listen((leftUserId) {
+    debugPrint('User $leftUserId left the broadcast');
+  });
+}
+```
+
+---
+
+## 7. Best Practices & Performance Tuning
 
 1. **Micro-Batching Protection:** The SDK automatically buffers high-frequency user joins and leaves within a 50ms window. This guarantees steady 60 FPS even during sudden traffic spikes (e.g. 500 users joining simultaneously).
-2. **In-Memory Capping:** To protect mobile RAM, the active viewers list in memory is capped at 200 items, while `totalViewerCount` continues tracking unlimited viewer numbers (10k+).
+2. **In-Memory Capping:** To protect mobile RAM, the active viewers list in memory is capped at 200 items, while `totalViewerCount` continues tracking unlimited viewer numbers (10,000+).
 3. **Null-Safety on Metadata:** Always access metadata keys safely using fallback operators:
    ```dart
    final level = viewer.metadata['level'] as int? ?? 1;
