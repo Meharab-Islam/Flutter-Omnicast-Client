@@ -98,6 +98,7 @@ abstract final class SignalingEvents {
 
   // Social & Interactive Events
   static const String chat = 'chat';
+  static const String gift = 'gift';
   static const String giftProcessed = 'gift_processed';
   static const String balanceUpdate = 'balance_update';
 

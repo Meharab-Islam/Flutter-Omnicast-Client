@@ -26,6 +26,7 @@ class SignalingClient {
 
   // Stream Controllers
   final _stateController = StreamController<ClientConnectionState>.broadcast();
+  final _reconnectedController = StreamController<void>.broadcast();
   final _messageController = StreamController<SignalingMessage>.broadcast();
   final _offerController = StreamController<SignalingMessage>.broadcast();
   final _answerController = StreamController<SignalingMessage>.broadcast();
@@ -43,8 +44,14 @@ class SignalingClient {
   final _roomCreatedController = StreamController<RoomModel>.broadcast();
   final _roomClosedController = StreamController<String>.broadcast();
 
+  // Reconnection state
+  bool autoReconnect;
+  Timer? _reconnectTimer;
+  int _reconnectAttempts = 0;
+
   SignalingClient({
     this.heartbeatInterval = const Duration(seconds: 15),
+    this.autoReconnect = true,
   });
 
   // Getters
@@ -56,6 +63,7 @@ class SignalingClient {
   // Streams
   Stream<ClientConnectionState> get onConnectionStateChanged =>
       _stateController.stream;
+  Stream<void> get onReconnected => _reconnectedController.stream;
   Stream<SignalingMessage> get onMessage => _messageController.stream;
   Stream<SignalingMessage> get onOffer => _offerController.stream;
   Stream<SignalingMessage> get onAnswer => _answerController.stream;
@@ -81,6 +89,7 @@ class SignalingClient {
 
     _wsUrl = wsUrl;
     _token = token;
+    _reconnectAttempts = 0;
 
     await _establishConnection();
   }
@@ -179,6 +188,7 @@ class SignalingClient {
         }
         break;
 
+      case SignalingEvents.gift:
       case SignalingEvents.giftProcessed:
         if (msg.payload is Map<String, dynamic>) {
           _giftController.add(GiftEvent.fromJson(msg.payload as Map<String, dynamic>));
@@ -263,14 +273,46 @@ class SignalingClient {
     _onDataReceived(rawData);
   }
 
+  void _scheduleReconnect() {
+    if (_isDisposed || !autoReconnect || _wsUrl == null) return;
+    if (_reconnectTimer != null && _reconnectTimer!.isActive) return;
+
+    _reconnectAttempts++;
+    final delaySeconds = (_reconnectAttempts <= 1)
+        ? 1
+        : (_reconnectAttempts == 2
+            ? 2
+            : (_reconnectAttempts == 3 ? 3 : 5));
+    final delay = Duration(seconds: delaySeconds);
+
+    debugPrint(
+        '[SignalingClient] Network lost -> Scheduling auto-reconnect attempt #$_reconnectAttempts in ${delay.inSeconds}s');
+
+    _reconnectTimer = Timer(delay, () async {
+      if (_isDisposed || isConnected || _wsUrl == null) return;
+      try {
+        debugPrint('[SignalingClient] Reconnecting WebSocket...');
+        await _establishConnection();
+        _reconnectAttempts = 0;
+        _reconnectedController.add(null);
+        debugPrint('[SignalingClient] WebSocket successfully reconnected!');
+      } catch (e) {
+        debugPrint('[SignalingClient] Auto-reconnect retry failed ($e), retrying...');
+        _scheduleReconnect();
+      }
+    });
+  }
+
   void _onError(dynamic error) {
     debugPrint('[SignalingClient] Stream error: $error');
     _updateState(ClientConnectionState.disconnected);
+    _scheduleReconnect();
   }
 
   void _onDone() {
     debugPrint('[SignalingClient] Connection closed');
     _updateState(ClientConnectionState.disconnected);
+    _scheduleReconnect();
   }
 
   void _updateState(ClientConnectionState state) {
@@ -329,6 +371,9 @@ class SignalingClient {
 
   /// Disconnects the signaling client without destroying stream controllers.
   Future<void> disconnect() async {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _reconnectAttempts = 0;
     await _cleanupActiveConnection();
     _updateState(ClientConnectionState.disconnected);
   }
@@ -341,6 +386,7 @@ class SignalingClient {
     await disconnect();
 
     await _stateController.close();
+    await _reconnectedController.close();
     await _messageController.close();
     await _offerController.close();
     await _answerController.close();

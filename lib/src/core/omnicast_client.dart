@@ -215,30 +215,65 @@ class OmniCastClient {
 
     // 1.1 WebRTC ICE Disconnection Auto-Recovery & Seamless Network Handoff (1-2s trigger)
     _webRTCManager.onIceRestartNeeded = () async {
-      if (_roomState.isInRoom && _signalingClient.isConnected) {
-        debugPrint('[OmniCastClient] Requesting seamless ICE Restart from SFU...');
-        try {
-          final restartOffer = await _webRTCManager.createIceRestartOffer();
-          _signalingClient.send(SignalingMessage(
-            event: 'ice_restart_offer',
-            roomId: _roomState.roomId!,
-            userId: _roomState.userId!,
-            payload: {
-              'sdp': restartOffer.sdp,
-              'type': restartOffer.type,
-              'ice_restart': true,
-            },
-          ));
-        } catch (e) {
-          debugPrint('[OmniCastClient] Fallback to ice_restart_request: $e');
-          _signalingClient.send(SignalingMessage(
-            event: 'ice_restart_request',
-            roomId: _roomState.roomId!,
-            userId: _roomState.userId!,
-          ));
+      if (_roomState.isInRoom) {
+        if (_signalingClient.isConnected) {
+          debugPrint('[OmniCastClient] Requesting seamless ICE Restart from SFU...');
+          try {
+            final restartOffer = await _webRTCManager.createIceRestartOffer();
+            final eventName = _roomState.isHost ? SignalingEvents.createRoom : SignalingEvents.joinRoom;
+            _signalingClient.send(SignalingMessage(
+              event: eventName,
+              roomId: _roomState.roomId!,
+              userId: _roomState.userId!,
+              payload: {
+                'token': _signalingClient.token,
+                'sdp': restartOffer.sdp,
+                'type': restartOffer.type,
+                'ice_restart': true,
+                'reconnect': true,
+              },
+            ));
+          } catch (e) {
+            debugPrint('[OmniCastClient] Fallback to ice_restart_request: $e');
+            _signalingClient.send(SignalingMessage(
+              event: 'ice_restart_request',
+              roomId: _roomState.roomId!,
+              userId: _roomState.userId!,
+            ));
+          }
+        } else {
+          debugPrint('[OmniCastClient] ICE Restart needed but signaling is disconnected; auto-reconnect will recover session upon reconnection.');
         }
       }
     };
+
+    // 1.2 Network Restoration & Signaling Auto-Reconnect Session Recovery
+    _subscriptions.add(
+      _signalingClient.onReconnected.listen((_) async {
+        if (_roomState.isInRoom) {
+          debugPrint(
+              '[OmniCastClient] Network restored & Signaling reconnected! Restoring session & triggering ICE restart for room: ${_roomState.roomId}');
+          try {
+            final restartOffer = await _webRTCManager.createIceRestartOffer();
+            final eventName = _roomState.isHost ? SignalingEvents.createRoom : SignalingEvents.joinRoom;
+            _signalingClient.send(SignalingMessage(
+              event: eventName,
+              roomId: _roomState.roomId!,
+              userId: _roomState.userId!,
+              payload: {
+                'token': _signalingClient.token,
+                'sdp': restartOffer.sdp,
+                'type': restartOffer.type,
+                'reconnect': true,
+                'ice_restart': true,
+              },
+            ));
+          } catch (e) {
+            debugPrint('[OmniCastClient] Auto-reconnect session recovery error: $e');
+          }
+        }
+      }),
+    );
 
     // 2. WebRTC Remote Track -> MediaStreamManager & RoomState
     _webRTCManager.onRemoteTrack = (track, stream) async {
