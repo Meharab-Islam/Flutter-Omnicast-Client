@@ -47,3 +47,4 @@ export 'src/widgets/omnicast_flying_hearts_overlay.dart';
 export 'src/widgets/omnicast_gifting_bottom_sheet.dart';
 export 'src/widgets/omnicast_viewers_bottom_sheet.dart';
 export 'src/utils/omnicast_logger.dart';
+export 'package:permission_handler/permission_handler.dart';

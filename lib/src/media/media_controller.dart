@@ -10,6 +10,7 @@ import 'audio_level_detector.dart';
 import 'global_media_config.dart';
 import 'media_stream_manager.dart';
 import 'video_parameters.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../utils/omnicast_logger.dart';
 
 /// Controls local hardware media, video quality presets, simulcast layers,
@@ -387,10 +388,19 @@ class MediaController with WidgetsBindingObserver {
 
   /// Built-in hardware permission requester for Camera and Microphone.
   ///
-  /// Automatically prompts the operating system (Android & iOS) to grant camera and audio access
-  /// without requiring external permission_handler plugins or causing Gradle build issues.
+  /// Automatically prompts the operating system (Android & iOS) to grant camera and audio access.
   Future<bool> requestPermissions({bool camera = true, bool microphone = true}) async {
     try {
+      final permissions = <Permission>[];
+      if (camera) permissions.add(Permission.camera);
+      if (microphone) permissions.add(Permission.microphone);
+
+      if (permissions.isNotEmpty) {
+        final statuses = await permissions.request();
+        final allGranted = statuses.values.every((s) => s.isGranted);
+        if (!allGranted) return false;
+      }
+
       final stream = await _mediaStreamManager.openUserMedia(
         video: camera,
         audio: microphone,
