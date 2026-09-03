@@ -33,14 +33,12 @@ void main() {
       expect(h264Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 98 96 97'));
 
       final vp8Sdp = WebRTCManager.preferCodec(sampleSdp, 'VP8');
-      expect(vp8Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 96 97'));
+      expect(vp8Sdp, contains('m=video 9 UDP/TLS/RTP/SAVPF 96 97 98'));
     });
 
-    test('WebRTCManager setInitialBitrate injects b=AS and x-google bitrates', () {
+    test('WebRTCManager setInitialBitrate injects x-google bitrates into fmtp', () {
       const sampleSdp = 'v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 96\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 level-asymmetry-allowed=1\r\n';
       final bitratedSdp = WebRTCManager.setInitialBitrate(sampleSdp, startKbps: 500, minKbps: 150, maxKbps: 800);
-      expect(bitratedSdp, contains('b=AS:500'));
-      expect(bitratedSdp, contains('b=TIAS:500000'));
       expect(bitratedSdp, contains('x-google-start-bitrate=500'));
       expect(bitratedSdp, contains('x-google-min-bitrate=150'));
       expect(bitratedSdp, contains('x-google-max-bitrate=800'));
