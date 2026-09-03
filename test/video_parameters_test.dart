@@ -5,13 +5,13 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('VideoParameters Presets & Constraints', () {
-    test('mediaConstraints limits resolution to 480x640 portrait and caps framerate at 24fps', () {
+    test('mediaConstraints limits resolution and caps framerate', () {
       const params = VideoParameters.presetSmooth480p;
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
       expect(constraints['audio'], isA<Map<String, dynamic>>());
-      expect(constraints['video']['mandatory']['minWidth'], '480');
-      expect(constraints['video']['mandatory']['minHeight'], '640');
+      expect(constraints['video']['mandatory']['minWidth'], '640');
+      expect(constraints['video']['mandatory']['minHeight'], '480');
       expect(constraints['video']['mandatory']['minFrameRate'], '15');
       expect(constraints['video']['mandatory']['maxFrameRate'], '24');
       expect(constraints['video']['facingMode'], 'user');
@@ -54,8 +54,8 @@ void main() {
       const params = VideoParameters.presetHD720p;
       final constraints = params.toMediaConstraints(video: true, audio: true);
       expect(constraints['audio'], isA<Map<String, dynamic>>());
-      expect(constraints['video']['mandatory']['minWidth'], '480');
-      expect(constraints['video']['mandatory']['minHeight'], '640');
+      expect(constraints['video']['mandatory']['minWidth'], '1280');
+      expect(constraints['video']['mandatory']['minHeight'], '720');
       expect(constraints['video']['facingMode'], 'user');
     });
 
@@ -63,8 +63,8 @@ void main() {
       const params = VideoParameters.presetFHD1080p;
       final constraints = params.toMediaConstraints(video: true, audio: false);
       expect(constraints['audio'], isFalse);
-      expect(constraints['video']['mandatory']['minWidth'], '480');
-      expect(constraints['video']['mandatory']['minHeight'], '640');
+      expect(constraints['video']['mandatory']['minWidth'], '1920');
+      expect(constraints['video']['mandatory']['minHeight'], '1080');
     });
   });
 

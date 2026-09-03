@@ -1,3 +1,4 @@
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'video_parameters.dart';
 import '../utils/omnicast_logger.dart';
@@ -65,29 +66,49 @@ class MediaStreamManager {
     // Stop existing local stream if any
     await stopLocalMedia();
 
+    // Request permissions proactively if needed
+    try {
+      if (video) {
+        await Permission.camera.request();
+      }
+      if (audio) {
+        await Permission.microphone.request();
+      }
+    } catch (_) {}
+
     final mediaConstraints = _currentParameters.toMediaConstraints(
       video: video,
       audio: audio,
     );
 
+    MediaStream stream;
     try {
-      final stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      _localStream = stream;
-
-      // Initialize local renderer if needed and attach stream
-      if (_localRenderer == null) {
-        await initLocalRenderer();
-      }
-      _localRenderer!.srcObject = stream;
-
-      _isAudioMuted = !audio;
-      _isVideoMuted = !video;
-
-      return stream;
+      stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     } catch (e) {
-      OmniCastLogger.error('[MediaStreamManager] Failed to open user media: $e');
-      rethrow;
+      OmniCastLogger.error('[MediaStreamManager] Primary getUserMedia failed ($e), attempting baseline fallback constraints');
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          'audio': audio,
+          'video': video ? {'facingMode': _currentParameters.facingMode} : false,
+        });
+      } catch (fallbackError) {
+        OmniCastLogger.error('[MediaStreamManager] Fallback getUserMedia failed: $fallbackError');
+        rethrow;
+      }
     }
+
+    _localStream = stream;
+
+    // Initialize local renderer if needed and attach stream
+    if (_localRenderer == null) {
+      await initLocalRenderer();
+    }
+    _localRenderer!.srcObject = stream;
+
+    _isAudioMuted = !audio;
+    _isVideoMuted = !video;
+
+    return stream;
   }
 
   /// Toggles front/back camera if a video track exists on the local stream.
