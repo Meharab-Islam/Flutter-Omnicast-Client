@@ -23,6 +23,7 @@ class OmniCastGiftingBottomSheet extends StatefulWidget {
   final OmniCastClient client;
   final List<VirtualGiftItem> gifts;
   final VoidCallback? onGiftSent;
+  final Function? onSendGift;
 
   const OmniCastGiftingBottomSheet({
     super.key,
@@ -35,6 +36,7 @@ class OmniCastGiftingBottomSheet extends StatefulWidget {
       VirtualGiftItem(id: 'dragon', name: 'Dragon', emoji: '🐉', coinPrice: 500),
     ],
     this.onGiftSent,
+    this.onSendGift,
   });
 
   /// Static helper to open the modal bottom sheet smoothly.
@@ -270,6 +272,27 @@ class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet>
                   targetUserId: targetHostId,
                   amount: 1,
                 );
+
+                if (widget.onSendGift != null) {
+                  try {
+                    (widget.onSendGift as dynamic)(
+                      gift.id,
+                      gift.name,
+                      gift.coinPrice,
+                      1,
+                    );
+                  } catch (_) {
+                    try {
+                      (widget.onSendGift as dynamic)(
+                        gift.id,
+                        gift.name,
+                        gift.coinPrice,
+                        1,
+                        targetUserId: targetHostId,
+                      );
+                    } catch (_) {}
+                  }
+                }
 
                 Navigator.of(context).pop();
                 widget.onGiftSent?.call();

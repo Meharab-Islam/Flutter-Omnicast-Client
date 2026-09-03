@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788420862.9674742,
-    "seen": 1788420937.828467,
-    "ast_hash": "a741c98e4cdb5bb33d4f23ce3f8c60a9",
+    "mtime": 1788421832.6247728,
+    "seen": 1788421883.8580658,
+    "ast_hash": "1b46a133187d1e2e28b3417380c13f2e",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -30,9 +30,9 @@
     "semantic_hash": "bf6cbab236d01503ef8fcc0a737e0f11"
   },
   "lib/src/models/signaling_message.dart": {
-    "mtime": 1788420650.2020383,
-    "seen": 1788420765.136375,
-    "ast_hash": "c1218d7ce0f8ded7226db4f0fe698ab2",
+    "mtime": 1788421787.7310252,
+    "seen": 1788421883.8580742,
+    "ast_hash": "a34f415a76f7a9f2516c2ee450203b0c",
     "semantic_hash": ""
   },
   "lib/src/signaling/signaling_client.dart": {
@@ -108,9 +108,9 @@
     "semantic_hash": "e4fed8d621290b715dda6b58572e4b92"
   },
   "lib/src/models/room_models.dart": {
-    "mtime": 1788103579.0539112,
-    "seen": 1788103664.994432,
-    "ast_hash": "f46923edf0a1b4ca3278d9a18527c5a6",
+    "mtime": 1788421780.1579487,
+    "seen": 1788421883.858073,
+    "ast_hash": "a52a5507612dd698ee4a5b1cd0a013bc",
     "semantic_hash": ""
   },
   "lib/src/models/seat_models.dart": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1788420844.056352,
-    "seen": 1788420937.828477,
-    "ast_hash": "9852d2692ef6b49ea019341697123d40",
+    "mtime": 1788421819.6722713,
+    "seen": 1788421883.858075,
+    "ast_hash": "01e47efce5f1a72461057aa4eb715ae5",
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {
@@ -333,6 +333,18 @@
     "mtime": 1788103597.3289187,
     "seen": 1788103664.994448,
     "ast_hash": "6b32f8f438bd0e0de295b7827cb6d945",
+    "semantic_hash": ""
+  },
+  "KICK_PARTICIPANT_GUIDE.md": {
+    "mtime": 1788421946.7921913,
+    "seen": 1788422113.783494,
+    "ast_hash": "45d150530304fac4ee477b749f56fb0f",
+    "semantic_hash": ""
+  },
+  "PK_BATTLE_INTEGRATION_GUIDE.md": {
+    "mtime": 1788422080.950531,
+    "seen": 1788422113.783495,
+    "ast_hash": "639e1f4b1ac1ef1cc328bc11ba32da48",
     "semantic_hash": ""
   }
 }
