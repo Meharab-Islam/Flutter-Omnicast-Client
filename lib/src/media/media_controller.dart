@@ -11,6 +11,7 @@ import 'global_media_config.dart';
 import 'media_stream_manager.dart';
 import 'video_parameters.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/omnicast_logger.dart';
 
 /// Controls local hardware media, video quality presets, simulcast layers,
@@ -78,6 +79,14 @@ class MediaController with WidgetsBindingObserver {
   AudioLevelDetector get audioDetector => _audioLevelDetector;
   ValueNotifier<Map<String, double>> get audioLevelsNotifier => _audioLevelDetector.audioLevelsNotifier;
   ValueNotifier<String?> get activeSpeakerNotifier => _audioLevelDetector.activeSpeakerNotifier;
+  RTCVideoRenderer? get localRenderer => _mediaStreamManager.localRenderer;
+  Future<RTCVideoRenderer> initLocalRenderer() => _mediaStreamManager.initLocalRenderer();
+  RTCVideoRenderer? getRenderer(String? userId) {
+    if (userId == null || userId == 'local' || userId == _roomState.userId) {
+      return _mediaStreamManager.localRenderer;
+    }
+    return _mediaStreamManager.getRenderer(userId);
+  }
   VideoParameters get currentParameters => _mediaStreamManager.currentParameters;
   bool get isMicrophoneMuted => isMicrophoneMutedNotifier.value;
   bool get isCameraEnabled => isCameraEnabledNotifier.value;

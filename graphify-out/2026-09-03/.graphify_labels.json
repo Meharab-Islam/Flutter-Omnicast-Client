@@ -44,9 +44,6 @@
   "42": "🚪 OmniCast SDK: Room Management & Participant Ejection Guide",
   "43": "🔄 OmniCast SDK: Late-Join State Synchronization Guide",
   "44": "🎪 OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
-  "45": "omnicast_gifting_bottom_sheet.dart",
   "46": "RoomState",
-  "47": "omnicast_viewers_bottom_sheet.dart",
-  "48": "🍎 iOS Setup & Permissions Configuration Guide for OmniCast SDK",
-  "49": "pk_score_progress_bar.dart"
+  "48": "🍎 iOS Setup & Permissions Configuration Guide for OmniCast SDK"
 }

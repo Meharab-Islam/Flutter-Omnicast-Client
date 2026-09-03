@@ -15,6 +15,7 @@ import '../seats/seat_manager.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/omnicast_logger.dart';
 import 'omnicast_config.dart';
 
@@ -258,6 +259,8 @@ class OmniCastClient {
   MediaStreamManager get streamManager => _mediaStreamManager;
   SignalingClient get signaling => _signalingClient;
   WebRTCManager get webrtc => _webRTCManager;
+  RTCVideoRenderer? get localRenderer => _mediaController.localRenderer;
+  RTCVideoRenderer? getRenderer(String? userId) => _mediaController.getRenderer(userId);
 
   // Real-time Global Room & Media Event Streams
   Stream<RoomModel> get onRoomCreated => _signalingClient.onRoomCreated;
