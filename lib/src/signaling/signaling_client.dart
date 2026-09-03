@@ -237,10 +237,14 @@ class SignalingClient {
         break;
 
       case SignalingEvents.roomClosed:
+      case 'room_ended':
+      case 'end_room':
+      case 'host_left':
+      case 'room_terminated':
         final closedRoomId = msg.roomId.isNotEmpty
             ? msg.roomId
             : (msg.payload is Map<String, dynamic>
-                ? (msg.payload['room_id'] as String? ?? '')
+                ? (msg.payload['room_id'] as String? ?? msg.payload['roomId'] as String? ?? '')
                 : (msg.payload is String ? msg.payload as String : ''));
         if (closedRoomId.isNotEmpty) {
           _roomClosedController.add(closedRoomId);

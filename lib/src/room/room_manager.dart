@@ -76,6 +76,11 @@ class RoomManager {
     activeViewersList.value = _roomState.viewers;
   }
 
+  final _roomClosedByHostController = StreamController<String>.broadcast();
+
+  /// Stream emitting when the room is terminated/closed by the host.
+  Stream<String> get onRoomClosedByHost => _roomClosedByHostController.stream;
+
   /// Listens to real-time participant signaling events with high-performance debouncing.
   void _bindSignalingEvents() {
     _signalingSubscription = _signalingClient.onMessage.listen((msg) {
@@ -128,8 +133,33 @@ class RoomManager {
             }
           }
           break;
+
+        // 5. Host Terminated Room / Room Closed Event
+        case SignalingEvents.roomClosed:
+        case 'room_ended':
+        case 'end_room':
+        case 'host_left':
+        case 'room_terminated':
+          final closedRoomId = msg.roomId.isNotEmpty
+              ? msg.roomId
+              : (msg.payload is Map<String, dynamic>
+                  ? (msg.payload['room_id'] as String? ?? msg.payload['roomId'] as String? ?? '')
+                  : (msg.payload is String ? msg.payload as String : ''));
+          if (_roomState.isInRoom && (closedRoomId.isEmpty || closedRoomId == _roomState.roomId)) {
+            _handleHostClosedRoom(closedRoomId.isNotEmpty ? closedRoomId : (_roomState.roomId ?? ''));
+          }
+          break;
       }
     });
+  }
+
+  Future<void> _handleHostClosedRoom(String roomId) async {
+    debugPrint(
+        '[RoomManager] Host closed room $roomId -> Forcefully ejecting participants & clearing WebRTC resources');
+    _roomClosedByHostController.add(roomId);
+    await _webRTCManager.closePeerConnection();
+    await _webRTCManager.mediaStreamManager.stopLocalMedia();
+    _roomState.reset();
   }
 
   void _handleRoomInfoSync(Map<String, dynamic> data) {
@@ -327,6 +357,7 @@ class RoomManager {
   }
 
   /// Leaves the current room session and resets resources.
+  /// Leaves the current room session and resets resources.
   Future<void> leaveRoom() async {
     if (_roomState.isInRoom) {
       _signalingClient.send(SignalingMessage(
@@ -339,6 +370,23 @@ class RoomManager {
     await _webRTCManager.closePeerConnection();
     await _webRTCManager.mediaStreamManager.stopLocalMedia();
     _roomState.reset();
+  }
+
+  /// Host action: Explicitly terminates the live stream and forcefully ejects all viewers.
+  Future<void> closeRoom() async {
+    if (_roomState.isInRoom) {
+      _signalingClient.send(SignalingMessage(
+        event: SignalingEvents.roomClosed,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {
+          'room_id': _roomState.roomId!,
+          'reason': 'host_closed',
+        },
+      ));
+    }
+
+    await leaveRoom();
   }
 
   /// Host action: Kicks a specific user out of the room.
@@ -358,6 +406,7 @@ class RoomManager {
     _batchDebounceTimer?.cancel();
     _signalingSubscription?.cancel();
     _roomState.removeListener(_syncGranularNotifiers);
+    _roomClosedByHostController.close();
 
     totalViewerCount.dispose();
     activeViewersList.dispose();
