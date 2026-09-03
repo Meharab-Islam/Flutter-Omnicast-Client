@@ -115,6 +115,24 @@ class OmniCastApi {
     }
   }
 
+  /// Fetches a single room's details including active viewers (`GET /rooms/{roomId}`).
+  Future<Map<String, dynamic>?> getRoom(String roomId, {Duration timeout = const Duration(seconds: 5)}) async {
+    final baseUrl = baseApiUrl;
+    final urlString = baseUrl.endsWith('/api') ? '$baseUrl/rooms/$roomId' : '$baseUrl/rooms/$roomId';
+    final uri = Uri.parse(urlString);
+
+    try {
+      final response = await _client.get(uri, headers: defaultHeaders).timeout(timeout);
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   /// Disposes the underlying HTTP client.
   void dispose() {
     _client.close();

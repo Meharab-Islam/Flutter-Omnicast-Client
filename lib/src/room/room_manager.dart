@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import '../api/omnicast_api.dart';
 import '../core/omnicast_config.dart';
 import '../models/room_models.dart';
 import '../models/seat_models.dart';
 import '../models/signaling_message.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
+import '../utils/omnicast_logger.dart';
 import '../webrtc/webrtc_manager.dart';
 
 /// Manages room lifecycle, participant tracking, and provides granular [ValueNotifier]
@@ -15,15 +17,15 @@ class RoomManager {
   final WebRTCManager _webRTCManager;
   final RoomState _roomState;
   final OmniCastConfig? _config;
+  late final OmniCastApi _api;
 
   // Maximum active viewer avatar objects kept in UI memory
   static const int maxViewersInMemory = 200;
 
-  // Granular atomic ValueNotifiers for headless UI composition
+  // Granular Notifiers for Headless UI Integration
   final ValueNotifier<int> totalViewerCount = ValueNotifier<int>(0);
   final ValueNotifier<List<OmniCastParticipant>> activeViewersList =
       ValueNotifier<List<OmniCastParticipant>>(const []);
-
   final ValueNotifier<ClientConnectionState> connectionStateNotifier =
       ValueNotifier<ClientConnectionState>(ClientConnectionState.disconnected);
   final ValueNotifier<UserRole> roleNotifier =
@@ -40,6 +42,7 @@ class RoomManager {
   final List<OmniCastParticipant> _pendingJoins = [];
   final Set<String> _pendingLeaves = {};
   Timer? _batchDebounceTimer;
+  Timer? _roomSyncTimer;
   StreamSubscription? _signalingSubscription;
 
   RoomManager({
@@ -47,10 +50,12 @@ class RoomManager {
     required WebRTCManager webRTCManager,
     required RoomState roomState,
     OmniCastConfig? config,
+    OmniCastApi? api,
   })  : _signalingClient = signalingClient,
         _webRTCManager = webRTCManager,
         _roomState = roomState,
-        _config = config {
+        _config = config,
+        _api = api ?? OmniCastApi(config: config ?? const OmniCastConfig(hostUrl: '')) {
     _bindSignalingEvents();
     _bindStateNotifiers();
   }
@@ -363,6 +368,25 @@ class RoomManager {
       roomType: options.roomType,
     );
 
+    // Initial Host Participant in Viewers List
+    final hostParticipant = OmniCastParticipant(
+      userId: userId,
+      displayName: mergedMetadata['displayName'] as String? ??
+          mergedMetadata['user_name'] as String? ??
+          mergedMetadata['name'] as String? ??
+          userId,
+      avatarUrl: mergedMetadata['avatarUrl'] as String? ??
+          mergedMetadata['avatar'] as String?,
+      role: UserRole.host,
+      joinedAt: DateTime.now(),
+      metadata: mergedMetadata,
+    );
+    _roomState.addParticipant(hostParticipant);
+    activeViewersList.value = [hostParticipant];
+    totalViewerCount.value = 1;
+
+    _startRoomStateSync();
+
     // 1. Open media hardware & add tracks immediately so local camera preview starts without waiting for network!
     try {
       if (options.isAudioOnly) {
@@ -383,7 +407,7 @@ class RoomManager {
         );
       }
     } catch (e) {
-      debugPrint('[RoomManager] Media open deferred or headless: $e');
+      OmniCastLogger.error('[RoomManager] Media open deferred or headless: $e');
     }
 
     // 2. Connect signaling WebSocket and publish room session
@@ -393,7 +417,7 @@ class RoomManager {
         try {
           await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
         } catch (e) {
-          debugPrint('[RoomManager] WebSocket connection deferred or offline: $e');
+          OmniCastLogger.error('[RoomManager] WebSocket connection deferred or offline: $e');
         }
       }
     }
@@ -409,7 +433,7 @@ class RoomManager {
         'options': options.toJson(),
         'sdp': offer.sdp,
         'type': offer.type,
-        'metadata': ?mergedMetadata.isEmpty ? null : mergedMetadata,
+        'metadata': mergedMetadata.isEmpty ? null : mergedMetadata,
       },
     ));
   }
@@ -446,6 +470,29 @@ class RoomManager {
       role: UserRole.viewer,
     );
 
+    // Initial Joining Viewer in Viewers List
+    final joinParticipant = OmniCastParticipant(
+      userId: userId,
+      displayName: metadata?['displayName'] as String? ??
+          metadata?['user_name'] as String? ??
+          metadata?['name'] as String? ??
+          userId,
+      avatarUrl: metadata?['avatarUrl'] as String? ??
+          metadata?['avatar'] as String?,
+      role: UserRole.viewer,
+      joinedAt: DateTime.now(),
+      metadata: metadata ?? const {},
+    );
+    _roomState.addParticipant(joinParticipant);
+    final currentList = List<OmniCastParticipant>.from(activeViewersList.value);
+    if (!currentList.any((p) => p.userId == userId)) {
+      currentList.insert(0, joinParticipant);
+      activeViewersList.value = currentList;
+      totalViewerCount.value = currentList.length;
+    }
+
+    _startRoomStateSync();
+
     await _webRTCManager.setupViewerTransceivers();
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
@@ -457,14 +504,55 @@ class RoomManager {
         'token': effectiveToken,
         'sdp': offer.sdp,
         'type': offer.type,
-        'metadata': ?metadata,
+        'metadata': metadata,
       },
     ));
   }
 
-  /// Leaves the current room session and resets resources.
+  /// Periodically synchronizes room state, active seats, and viewers from backend.
+  void _startRoomStateSync() {
+    _roomSyncTimer?.cancel();
+    _roomSyncTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (_roomState.isInRoom) {
+        _syncRoomStateFromApi();
+      }
+    });
+    // Fast initial sync after 800ms
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (_roomState.isInRoom) {
+        _syncRoomStateFromApi();
+      }
+    });
+  }
+
+  Future<void> _syncRoomStateFromApi() async {
+    final rId = _roomState.roomId;
+    if (rId == null || rId.isEmpty) return;
+
+    try {
+      // 1. Send WebSocket sync request
+      if (_signalingClient.isConnected) {
+        _signalingClient.send(SignalingMessage(
+          event: 'get_room_info',
+          roomId: rId,
+          userId: _roomState.userId ?? '',
+          payload: {'roomId': rId, 'room_id': rId},
+        ));
+      }
+
+      // 2. Query REST API snapshot
+      final roomData = await _api.getRoom(rId);
+      if (roomData != null) {
+        _handleRoomInfoSync(roomData);
+      }
+    } catch (_) {}
+  }
+
   /// Leaves the current room session and resets resources.
   Future<void> leaveRoom() async {
+    _roomSyncTimer?.cancel();
+    _roomSyncTimer = null;
+
     if (_roomState.isInRoom) {
       _signalingClient.send(SignalingMessage(
         event: SignalingEvents.leaveRoom,
