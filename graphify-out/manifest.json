@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788434027.7080972,
-    "seen": 1788434196.064435,
-    "ast_hash": "cbaae365ed0301ce9ff05e275372d654",
+    "mtime": 1788434280.449623,
+    "seen": 1788434306.5036988,
+    "ast_hash": "03e57bd8cdeb45bae0bddf3e80e331ba",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -300,9 +300,9 @@
     "semantic_hash": ""
   },
   "pubspec.yaml": {
-    "mtime": 1788434151.9185178,
-    "seen": 1788434196.0644732,
-    "ast_hash": "4df3e906c6cebf6be4bf0b2408f24614",
+    "mtime": 1788434556.6471248,
+    "seen": 1788434585.9041228,
+    "ast_hash": "260b20ca79c6bd8940830da40d5c6819",
     "semantic_hash": ""
   },
   "lib/src/api/omnicast_api.dart": {

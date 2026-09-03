@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'video_parameters.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Manages local media hardware (camera, microphone) and maintains a dynamic
 /// registry of [RTCVideoRenderer] instances for local preview and all remote peers.
@@ -85,7 +85,7 @@ class MediaStreamManager {
 
       return stream;
     } catch (e) {
-      debugPrint('[MediaStreamManager] Failed to open user media: $e');
+      OmniCastLogger.error('[MediaStreamManager] Failed to open user media: $e');
       rethrow;
     }
   }

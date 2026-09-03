@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Rating describing WebRTC network stream quality.
 enum NetworkQualityRating {
@@ -197,7 +198,7 @@ class WebRTCStatsMonitor {
       _statsStreamController.add(stats);
       return stats;
     } catch (e) {
-      debugPrint('[WebRTCStatsMonitor] Error polling getStats: $e');
+      OmniCastLogger.error('[WebRTCStatsMonitor] Error polling getStats: $e');
       return null;
     }
   }

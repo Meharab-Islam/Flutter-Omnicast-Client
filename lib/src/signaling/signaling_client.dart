@@ -170,7 +170,7 @@ class SignalingClient {
     }
 
     if (msg == null) {
-      debugPrint('[SignalingClient] Failed to deserialize message');
+      OmniCastLogger.error('[SignalingClient] Failed to deserialize message');
       return;
     }
 
@@ -294,7 +294,7 @@ class SignalingClient {
         break;
 
       default:
-        debugPrint('[SignalingClient] Event received: ${msg.event}');
+        OmniCastLogger.log('[SignalingClient] Event received: ${msg.event}');
         break;
     }
   }
@@ -317,32 +317,32 @@ class SignalingClient {
             : (_reconnectAttempts == 3 ? 3 : 5));
     final delay = Duration(seconds: delaySeconds);
 
-    debugPrint(
+    OmniCastLogger.log(
         '[SignalingClient] Network lost -> Scheduling auto-reconnect attempt #$_reconnectAttempts in ${delay.inSeconds}s');
 
     _reconnectTimer = Timer(delay, () async {
       if (_isDisposed || isConnected || _wsUrl == null) return;
       try {
-        debugPrint('[SignalingClient] Reconnecting WebSocket...');
+        OmniCastLogger.log('[SignalingClient] Reconnecting WebSocket...');
         await _establishConnection();
         _reconnectAttempts = 0;
         _reconnectedController.add(null);
-        debugPrint('[SignalingClient] WebSocket successfully reconnected!');
+        OmniCastLogger.log('[SignalingClient] WebSocket successfully reconnected!');
       } catch (e) {
-        debugPrint('[SignalingClient] Auto-reconnect retry failed ($e), retrying...');
+        OmniCastLogger.error('[SignalingClient] Auto-reconnect retry failed ($e), retrying...');
         _scheduleReconnect();
       }
     });
   }
 
   void _onError(dynamic error) {
-    debugPrint('[SignalingClient] Stream error: $error');
+    OmniCastLogger.error('[SignalingClient] Stream error: $error');
     _updateState(ClientConnectionState.disconnected);
     _scheduleReconnect();
   }
 
   void _onDone() {
-    debugPrint('[SignalingClient] Connection closed');
+    OmniCastLogger.log('[SignalingClient] Connection closed');
     _updateState(ClientConnectionState.disconnected);
     _scheduleReconnect();
   }
@@ -372,7 +372,7 @@ class SignalingClient {
   /// Sends a strongly-typed signaling message over the WebSocket channel.
   bool send(SignalingMessage message) {
     if (_channel == null || !isConnected) {
-      debugPrint('[SignalingClient] Cannot send, client is not connected.');
+      OmniCastLogger.log('[SignalingClient] Cannot send, client is not connected.');
       return false;
     }
 
@@ -381,7 +381,7 @@ class SignalingClient {
       _channel!.sink.add(jsonPayload);
       return true;
     } catch (e) {
-      debugPrint('[SignalingClient] Send error: $e');
+      OmniCastLogger.error('[SignalingClient] Send error: $e');
       return false;
     }
   }

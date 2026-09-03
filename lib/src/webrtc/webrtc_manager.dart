@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../media/media_stream_manager.dart';
 import '../media/video_parameters.dart';
@@ -315,10 +314,10 @@ class WebRTCManager {
             params.encodings![0].scalabilityMode = 'L1T3';
           }
           await videoSender.setParameters(params);
-          debugPrint('[WebRTCManager] Configured clean VP8 video track with maxBitrate: 600 kbps');
+          OmniCastLogger.log('[WebRTCManager] Configured clean VP8 video track with maxBitrate: 600 kbps');
         }
       } catch (e) {
-        debugPrint('[WebRTCManager] Set single-stream parameters notice: $e');
+        OmniCastLogger.error('[WebRTCManager] Set single-stream parameters notice: $e');
       }
     }
   }
@@ -336,7 +335,7 @@ class WebRTCManager {
         if (encoding.rid == rid && encoding.active != active) {
           encoding.active = active;
           updated = true;
-          debugPrint('[WebRTCManager Dynacast] Set layer $rid active=$active');
+          OmniCastLogger.log('[WebRTCManager Dynacast] Set layer $rid active=$active');
         }
       }
 
@@ -344,7 +343,7 @@ class WebRTCManager {
         await _videoSender!.setParameters(params);
       }
     } catch (e) {
-      debugPrint('[WebRTCManager Dynacast] Error setting layer active: $e');
+      OmniCastLogger.error('[WebRTCManager Dynacast] Error setting layer active: $e');
     }
   }
 
@@ -365,11 +364,11 @@ class WebRTCManager {
           }
           parameters.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
           await sender.setParameters(parameters);
-          debugPrint('[WebRTCManager] Enforced maxVideoBitrate: $maxBitrate bps on sender');
+          OmniCastLogger.log('[WebRTCManager] Enforced maxVideoBitrate: $maxBitrate bps on sender');
         }
       }
     } catch (e) {
-      debugPrint('[WebRTCManager] Error enforcing max video bitrate: $e');
+      OmniCastLogger.error('[WebRTCManager] Error enforcing max video bitrate: $e');
     }
   }
 

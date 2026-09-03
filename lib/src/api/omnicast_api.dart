@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../core/omnicast_config.dart';
 import '../models/room_models.dart';
+import '../utils/omnicast_logger.dart';
 
 /// REST API service for interacting with the OmniCast backend (fetching live rooms, server status, etc.).
 class OmniCastApi {
@@ -56,18 +56,13 @@ class OmniCastApi {
     final urlString = baseUrl.endsWith('/api') ? '$baseUrl/rooms' : '$baseUrl/rooms';
     final uri = Uri.parse(urlString);
 
-    debugPrint('[OmniCastApi] Fetching active rooms from: $uri');
-
     try {
       final response = await _client.get(
         uri,
         headers: defaultHeaders,
       ).timeout(timeout);
 
-      debugPrint('[OmniCastApi] Response status: ${response.statusCode}');
-
-      // ignore: avoid_print
-      print('Raw Rooms Response: ${response.body}');
+      OmniCastLogger.log('[OmniCastApi] Raw Rooms Response: ${response.body}');
 
       if (response.statusCode == 200) {
         final body = response.body.trim();
@@ -100,8 +95,7 @@ class OmniCastApi {
 
           return rooms;
         } catch (e) {
-          // ignore: avoid_print
-          print('JSON Parsing Error: $e');
+          OmniCastLogger.error('[OmniCastApi] JSON Parsing Error: $e');
           rethrow;
         }
       } else if (response.statusCode == 404 || response.statusCode == 204) {
@@ -110,7 +104,7 @@ class OmniCastApi {
         throw Exception('OmniCastApi.getLiveRooms failed: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      debugPrint('[OmniCastApi] Error fetching live rooms: $e');
+      OmniCastLogger.error('[OmniCastApi] Error fetching live rooms: $e');
       rethrow;
     }
   }

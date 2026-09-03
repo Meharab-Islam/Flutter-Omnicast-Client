@@ -6,6 +6,7 @@ import '../models/signaling_message.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Manages stage seats, viewer seat requests, host invitations, seamless WebRTC upgrades
 /// without connection teardown, stage demotions, and main stage pinning.
@@ -87,7 +88,7 @@ class SeatManager {
 
         // If this current user was the viewer whose request was accepted by host
         if (msg.targetUser == _roomState.userId && _roomState.isViewer) {
-          debugPrint('[SeatManager] Seat request accepted by host -> Triggering seamless WebRTC upgrade');
+          OmniCastLogger.log('[SeatManager] Seat request accepted by host -> Triggering seamless WebRTC upgrade');
           await upgradeToCoHost();
         }
       }),
@@ -107,7 +108,7 @@ class SeatManager {
           final targetUser = msg.targetUser ??
               (msg.payload is Map ? msg.payload['target_user'] : null);
           if (targetUser == _roomState.userId && _roomState.isCoHost) {
-            debugPrint('[SeatManager] Co-host demoted to viewer -> Teardown local tracks and switch to viewer');
+            OmniCastLogger.log('[SeatManager] Co-host demoted to viewer -> Teardown local tracks and switch to viewer');
             await _webRTCManager.mediaStreamManager.stopLocalMedia();
             _roomState.updateRole(UserRole.viewer);
             await _webRTCManager.setupViewerTransceivers();

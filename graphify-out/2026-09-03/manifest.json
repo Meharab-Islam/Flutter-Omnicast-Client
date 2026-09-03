@@ -1,8 +1,8 @@
 {
   "lib/omnicast_client.dart": {
-    "mtime": 1788432687.39004,
-    "seen": 1788432789.589548,
-    "ast_hash": "fe8fa1b11d737eb449d9914d46608fa0",
+    "mtime": 1788434104.173843,
+    "seen": 1788434196.0644321,
+    "ast_hash": "9e8a94bbe87a33cb2d5acfe70c0873e1",
     "semantic_hash": ""
   },
   "test/omnicast_client_test.dart": {
@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788433682.8670552,
-    "seen": 1788433734.911715,
-    "ast_hash": "56fd803b19922fdf2a32c40efe8f39cd",
+    "mtime": 1788434027.7080972,
+    "seen": 1788434196.064435,
+    "ast_hash": "cbaae365ed0301ce9ff05e275372d654",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -90,9 +90,9 @@
     "semantic_hash": "276e02e5707ff1e91c6b1b5cfb42f6ef"
   },
   "lib/src/media/media_controller.dart": {
-    "mtime": 1788422404.4641912,
-    "seen": 1788422467.487436,
-    "ast_hash": "6d3e1eda9c833f6ec2d6092c30f712b9",
+    "mtime": 1788434114.6464243,
+    "seen": 1788434196.064438,
+    "ast_hash": "99d4e8982e789e237a02ac3721b21a2b",
     "semantic_hash": ""
   },
   "lib/src/models/interaction_models.dart": {
@@ -300,9 +300,9 @@
     "semantic_hash": ""
   },
   "pubspec.yaml": {
-    "mtime": 1787893026.1460931,
-    "seen": 1788018721.7807732,
-    "ast_hash": "9de791aae2d62a712b665a8176167e1a",
+    "mtime": 1788434151.9185178,
+    "seen": 1788434196.0644732,
+    "ast_hash": "4df3e906c6cebf6be4bf0b2408f24614",
     "semantic_hash": ""
   },
   "lib/src/api/omnicast_api.dart": {
@@ -399,6 +399,12 @@
     "mtime": 1788433717.637782,
     "seen": 1788433734.911746,
     "ast_hash": "4aced46d6c82754469d73561140ed8b3",
+    "semantic_hash": ""
+  },
+  "IOS_SETUP_GUIDE.md": {
+    "mtime": 1788434180.2869446,
+    "seen": 1788434196.064468,
+    "ast_hash": "5b2c71c56eef86aed01043d3230c0533",
     "semantic_hash": ""
   }
 }

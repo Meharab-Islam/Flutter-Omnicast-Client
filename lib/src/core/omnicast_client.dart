@@ -160,7 +160,7 @@ class OmniCastClient {
       try {
         await client._signalingClient.connect(wsUrl: config.hostUrl, token: token);
       } catch (e) {
-        debugPrint('[OmniCastClient] Initial connection deferred or offline: $e');
+        OmniCastLogger.error('[OmniCastClient] Initial connection deferred or offline: $e');
       }
     }
     return client;
@@ -369,7 +369,7 @@ class OmniCastClient {
     _webRTCManager.onIceRestartNeeded = () async {
       if (_roomState.isInRoom) {
         if (_signalingClient.isConnected) {
-          debugPrint('[OmniCastClient] Requesting seamless ICE Restart from SFU...');
+          OmniCastLogger.log('[OmniCastClient] Requesting seamless ICE Restart from SFU...');
           try {
             final restartOffer = await _webRTCManager.createIceRestartOffer();
             final eventName = _roomState.isHost ? SignalingEvents.createRoom : SignalingEvents.joinRoom;
@@ -386,7 +386,7 @@ class OmniCastClient {
               },
             ));
           } catch (e) {
-            debugPrint('[OmniCastClient] Fallback to ice_restart_request: $e');
+            OmniCastLogger.error('[OmniCastClient] Fallback to ice_restart_request: $e');
             _signalingClient.send(SignalingMessage(
               event: 'ice_restart_request',
               roomId: _roomState.roomId!,
@@ -394,7 +394,7 @@ class OmniCastClient {
             ));
           }
         } else {
-          debugPrint('[OmniCastClient] ICE Restart needed but signaling is disconnected; auto-reconnect will recover session upon reconnection.');
+          OmniCastLogger.log('[OmniCastClient] ICE Restart needed but signaling is disconnected; auto-reconnect will recover session upon reconnection.');
         }
       }
     };
@@ -403,7 +403,7 @@ class OmniCastClient {
     _subscriptions.add(
       _signalingClient.onReconnected.listen((_) async {
         if (_roomState.isInRoom) {
-          debugPrint(
+          OmniCastLogger.log(
               '[OmniCastClient] Network restored & Signaling reconnected! Restoring session & triggering ICE restart for room: ${_roomState.roomId}');
           try {
             final restartOffer = await _webRTCManager.createIceRestartOffer();
@@ -421,7 +421,7 @@ class OmniCastClient {
               },
             ));
           } catch (e) {
-            debugPrint('[OmniCastClient] Auto-reconnect session recovery error: $e');
+            OmniCastLogger.error('[OmniCastClient] Auto-reconnect session recovery error: $e');
           }
         }
       }),

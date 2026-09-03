@@ -244,7 +244,7 @@ class RoomManager {
 
     // If the local user is the one who was kicked:
     if (_roomState.userId == targetUserId) {
-      debugPrint(
+      OmniCastLogger.log(
           '[RoomManager] Local user $targetUserId was kicked from room ${_roomState.roomId} by host');
       _kickedFromRoomController.add(event);
       await _webRTCManager.closePeerConnection();
@@ -252,13 +252,13 @@ class RoomManager {
       _roomState.reset();
     } else {
       // Remote participant was kicked: remove from local viewer and seat state
-      debugPrint('[RoomManager] Participant $targetUserId was kicked from room ${_roomState.roomId}');
+      OmniCastLogger.log('[RoomManager] Participant $targetUserId was kicked from room ${_roomState.roomId}');
       _queueUserLeft(targetUserId);
     }
   }
 
   Future<void> _handleHostClosedRoom(String roomId) async {
-    debugPrint(
+    OmniCastLogger.log(
         '[RoomManager] Host closed room $roomId -> Forcefully ejecting participants & clearing WebRTC resources');
     _roomClosedByHostController.add(roomId);
     await _webRTCManager.closePeerConnection();

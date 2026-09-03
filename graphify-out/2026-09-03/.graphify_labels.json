@@ -35,7 +35,7 @@
   "33": "omnicast_api.dart",
   "34": "👢 OmniCast SDK: Participant Kick & Ejection Guide",
   "35": "_OmniCastFlyingHeartsOverlayState",
-  "36": "omnicast_native_viewport_tracker.dart",
+  "36": "package:flutter/material.dart",
   "37": "🎙️ OmniCast SDK: Co-Host & Stage Moderation Guide",
   "38": "👥 OmniCast SDK: Viewers & Metadata Integration Guide",
   "39": "🚀 OmniCast SDK: Complete Developer & Media Rendering Guide",
@@ -44,6 +44,9 @@
   "42": "🚪 OmniCast SDK: Room Management & Participant Ejection Guide",
   "43": "🔄 OmniCast SDK: Late-Join State Synchronization Guide",
   "44": "🎪 OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+  "45": "omnicast_gifting_bottom_sheet.dart",
   "46": "RoomState",
-  "47": "pk_score_progress_bar.dart"
+  "47": "omnicast_viewers_bottom_sheet.dart",
+  "48": "🍎 iOS Setup & Permissions Configuration Guide for OmniCast SDK",
+  "49": "dart:async"
 }

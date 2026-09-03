@@ -6,6 +6,7 @@ import '../models/interaction_models.dart';
 import '../models/pk_models.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Real-time emoji reaction model transmitted via WebRTC DataChannels.
 class DataChannelReaction {
@@ -78,7 +79,7 @@ class DataChannelManager {
   /// Binds incoming DataChannel from the SFU or remote peer for a viewer.
   void attachIncomingChannel(RTCPeerConnection pc) {
     pc.onDataChannel = (RTCDataChannel channel) {
-      debugPrint('[DataChannel] Received remote DataChannel: ${channel.label}');
+      OmniCastLogger.log('[DataChannel] Received remote DataChannel: ${channel.label}');
       _bindDataChannel(channel);
     };
   }
@@ -87,7 +88,7 @@ class DataChannelManager {
     _dataChannel = channel;
 
     channel.onDataChannelState = (RTCDataChannelState state) {
-      debugPrint('[DataChannel] State: $state');
+      OmniCastLogger.log('[DataChannel] State: $state');
       if (!_isDisposed) {
         isChannelOpenNotifier.value = (state == RTCDataChannelState.RTCDataChannelOpen);
       }
@@ -171,7 +172,7 @@ class DataChannelManager {
           _roomState.processGift(event);
         }
       } catch (e) {
-        debugPrint('[DataChannel] Error parsing message: $e');
+        OmniCastLogger.error('[DataChannel] Error parsing message: $e');
       }
     };
   }
@@ -180,7 +181,7 @@ class DataChannelManager {
   void sendChat({required String text, String? senderName}) {
     if (_dataChannel == null ||
         _dataChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
-      debugPrint('[DataChannel] Cannot send chat: DataChannel is not open');
+      OmniCastLogger.log('[DataChannel] Cannot send chat: DataChannel is not open');
       return;
     }
 

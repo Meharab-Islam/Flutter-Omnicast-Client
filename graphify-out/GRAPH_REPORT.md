@@ -1,16 +1,16 @@
 # Graph Report - omnicast_client  (2026-09-03)
 
 ## Corpus Check
-- 66 files · ~43,148 words
+- 66 files · ~43,201 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1339 nodes · 1608 edges · 50 communities (46 shown, 4 thin omitted)
+- 1341 nodes · 1610 edges · 50 communities (47 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `571cff55`
+- Built from commit: `aef44e16`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -51,7 +51,7 @@
 - omnicast_api.dart
 - 👢 OmniCast SDK: Participant Kick & Ejection Guide
 - _OmniCastFlyingHeartsOverlayState
-- package:flutter/material.dart
+- omnicast_native_viewport_tracker.dart
 - 🎙️ OmniCast SDK: Co-Host & Stage Moderation Guide
 - 👥 OmniCast SDK: Viewers & Metadata Integration Guide
 - 🚀 OmniCast SDK: Complete Developer & Media Rendering Guide
@@ -64,7 +64,7 @@
 - RoomState
 - omnicast_viewers_bottom_sheet.dart
 - 🍎 iOS Setup & Permissions Configuration Guide for OmniCast SDK
-- dart:async
+- pk_score_progress_bar.dart
 
 ## God Nodes (most connected - your core abstractions)
 1. `🚀 OmniCast Client Flutter SDK` - 16 edges
@@ -79,13 +79,15 @@
 10. `👢 OmniCast SDK: Participant Kick & Ejection Guide` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `OmniCastGiftingBottomSheet` --inherits--> `StatefulWidget`  [EXTRACTED]
+  lib/src/widgets/omnicast_gifting_bottom_sheet.dart → None  _Bridges community 35 → community 45_
 - `OmniCastViewersBottomSheet` --inherits--> `StatelessWidget`  [EXTRACTED]
   lib/src/widgets/omnicast_viewers_bottom_sheet.dart → None  _Bridges community 28 → community 47_
 
 ## Import Cycles
 - None detected.
 
-## Communities (50 total, 4 thin omitted)
+## Communities (50 total, 3 thin omitted)
 
 ### Community 0 - "room_state.dart"
 Cohesion: 0.03
@@ -101,7 +103,7 @@ Nodes (56): answer, balanceUpdate, candidate, chat, createRoom, event, fromJson,
 
 ### Community 3 - "core/omnicast_client.dart"
 Cohesion: 0.02
-Nodes (84): DataChannelManager get, ../interaction/interaction_manager.dart, InteractionManager get, acceptCoHostInvite, acceptCoHostRequest, activeViewersList, _api, _bindInternalEventListeners (+76 more)
+Nodes (86): DataChannelManager get, ../interaction/interaction_manager.dart, InteractionManager get, acceptCoHostInvite, acceptCoHostRequest, activeViewersList, _api, _bindInternalEventListeners (+78 more)
 
 ### Community 4 - "media_controller.dart"
 Cohesion: 0.04
@@ -128,8 +130,8 @@ Cohesion: 0.08
 Nodes (23): AnimationController, dart:math, ../datachannel/data_channel_manager.dart, Key, build, controller, createState, dispose (+15 more)
 
 ### Community 10 - "pk_manager.dart"
-Cohesion: 0.04
-Nodes (44): Gradient?, PKState, acceptPKRequest, _bindStateNotifiers, _bindStreams, currentState, dispose, endPK (+36 more)
+Cohesion: 0.06
+Nodes (30): acceptPKRequest, _bindStateNotifiers, _bindStreams, currentState, dispose, endPK, isPKActive, isPKActiveNotifier (+22 more)
 
 ### Community 11 - "seat_manager.dart"
 Cohesion: 0.05
@@ -137,7 +139,7 @@ Nodes (37): acceptCoHostInvite, acceptSeatRequest, activeCoHostsList, activeSeat
 
 ### Community 12 - "package:flutter_test/flutter_test.dart"
 Cohesion: 0.07
-Nodes (23): dart:convert, dart:typed_data, package:flutter_test/flutter_test.dart, package:flutter/widgets.dart, package:http/http.dart, package:http/testing.dart, package:omnicast_client/omnicast_client.dart, main (+15 more)
+Nodes (26): dart:async, dart:convert, dart:typed_data, package:flutter/material.dart, package:flutter_test/flutter_test.dart, package:flutter/widgets.dart, package:http/http.dart, package:http/testing.dart (+18 more)
 
 ### Community 13 - "lib/omnicast_client.dart"
 Cohesion: 0.05
@@ -149,7 +151,7 @@ Nodes (29): attachIncomingChannel, _bindDataChannel, _chatController, createPubl
 
 ### Community 15 - "room_models.dart"
 Cohesion: 0.05
-Nodes (44): ActiveLiveRoom, avatarUrl, ClientConnectionState, copyWith, createdAt, displayName, enableAudio, enableDynacast (+36 more)
+Nodes (43): ActiveLiveRoom, avatarUrl, ClientConnectionState, copyWith, createdAt, displayName, enableAudio, enableDynacast (+35 more)
 
 ### Community 16 - "seat_models.dart"
 Cohesion: 0.04
@@ -169,15 +171,15 @@ Nodes (24): balanceStream, _balanceUpdatedController, _bindStateNotifiers, _bind
 
 ### Community 20 - "omnicast_pk_battle_view.dart"
 Cohesion: 0.10
-Nodes (20): Axis, MediaStreamManager, build, _buildVideoPane, hostDisplayName, hostPlaceholder, hostUserId, mediaStreamManager (+12 more)
+Nodes (19): Axis, MediaStreamManager, build, _buildVideoPane, hostDisplayName, hostPlaceholder, hostUserId, mediaStreamManager (+11 more)
 
 ### Community 21 - "omnicast_video_view.dart"
-Cohesion: 0.11
-Nodes (18): build, _checkAdaptiveStreaming, _cleanupRenderer, createState, didUpdateWidget, dispose, enableAdaptiveStreaming, _initializeLazyRenderer (+10 more)
+Cohesion: 0.10
+Nodes (19): build, _checkAdaptiveStreaming, _cleanupRenderer, createState, didUpdateWidget, dispose, enableAdaptiveStreaming, _initializeLazyRenderer (+11 more)
 
 ### Community 22 - "omnicast_media_control_bar.dart"
-Cohesion: 0.12
-Nodes (15): Color, EdgeInsetsGeometry, IconData, MediaController, activeColor, build, icon, inactiveColor (+7 more)
+Cohesion: 0.14
+Nodes (13): Color, EdgeInsetsGeometry, IconData, activeColor, build, icon, inactiveColor, isActive (+5 more)
 
 ### Community 23 - "webrtc_stats_monitor.dart"
 Cohesion: 0.06
@@ -192,8 +194,8 @@ Cohesion: 0.13
 Nodes (14): activeSpeakerNotifier, audioLevelsNotifier, dispose, _isDisposed, pollInterval, pollStats, _pollTimer, start (+6 more)
 
 ### Community 26 - "omnicast_video_canvas.dart"
-Cohesion: 0.12
-Nodes (16): RoomMode, build, _buildCoHostStage, _buildPKScoreHeader, _buildPKSplitScreen, _buildSoloScreen, child, client (+8 more)
+Cohesion: 0.11
+Nodes (17): PkScore, RoomMode, build, _buildCoHostStage, _buildPKScoreHeader, _buildPKSplitScreen, _buildSoloScreen, child (+9 more)
 
 ### Community 27 - "🚀 OmniCast Client Flutter SDK"
 Cohesion: 0.06
@@ -224,12 +226,12 @@ Cohesion: 0.11
 Nodes (18): 1. Architecture Overview, 2. Signaling JSON Protocol Contract, 3. SDK API Reference, 4. Data Models, 5. Flutter UI Integration Guide, 6. Under-The-Hood Lifecycle & Cleanup, A. Action Methods (`OmniCastClient` & `RoomManager`), A. Target User Handling (Viewer/Co-Host) (+10 more)
 
 ### Community 35 - "_OmniCastFlyingHeartsOverlayState"
-Cohesion: 0.24
-Nodes (11): GiftOverlayManager, _GiftOverlayManagerState, OmniCastFlyingHeartsOverlay, _OmniCastFlyingHeartsOverlayState, OmniCastGiftingBottomSheet, _OmniCastGiftingBottomSheetState, OmniCastVideoView, _OmniCastVideoViewState (+3 more)
+Cohesion: 0.28
+Nodes (9): GiftOverlayManager, _GiftOverlayManagerState, OmniCastFlyingHeartsOverlay, _OmniCastFlyingHeartsOverlayState, OmniCastVideoView, _OmniCastVideoViewState, State, StatefulWidget (+1 more)
 
-### Community 36 - "package:flutter/material.dart"
-Cohesion: 0.15
-Nodes (12): build, child, crossAxisCount, _evaluateVisibility, itemHeight, mediaController, trackIds, List (+4 more)
+### Community 36 - "omnicast_native_viewport_tracker.dart"
+Cohesion: 0.14
+Nodes (13): MediaController, build, child, crossAxisCount, _evaluateVisibility, itemHeight, mediaController, trackIds (+5 more)
 
 ### Community 37 - "🎙️ OmniCast SDK: Co-Host & Stage Moderation Guide"
 Cohesion: 0.11
@@ -261,7 +263,7 @@ Nodes (16): 1. Architecture & Lifecycle Overview, 2. 1. Host Ending the Room & E
 
 ### Community 45 - "omnicast_gifting_bottom_sheet.dart"
 Cohesion: 0.12
-Nodes (15): Function?, build, client, coinPrice, createState, emoji, gifts, id (+7 more)
+Nodes (17): Function?, build, client, coinPrice, createState, emoji, gifts, id (+9 more)
 
 ### Community 47 - "omnicast_viewers_bottom_sheet.dart"
 Cohesion: 0.16
@@ -271,10 +273,14 @@ Nodes (13): ../core/omnicast_client.dart, OmniCastClient, build, client, enableH
 Cohesion: 0.29
 Nodes (6): 1. 📝 `ios/Runner/Info.plist` Configuration, 2. 📦 `ios/Podfile` Permission Handler Macros, 3. 🛠️ CocoaPods Installation, 4. 📱 Requesting Permissions in Dart, 5. 💡 iOS Simulator vs Real Device Notice, 🍎 iOS Setup & Permissions Configuration Guide for OmniCast SDK
 
+### Community 49 - "pk_score_progress_bar.dart"
+Cohesion: 0.13
+Nodes (14): Gradient?, PKState, borderRadius, build, _formatTimer, height, hostGradient, opponentGradient (+6 more)
+
 ## Knowledge Gaps
-- **1001 isolated node(s):** `config`, `_client`, `getLiveRooms`, `getRoom`, `dispose` (+996 more)
+- **1003 isolated node(s):** `config`, `_client`, `getLiveRooms`, `getRoom`, `dispose` (+998 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -282,11 +288,11 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `RoomState` connect `RoomState` to `room_state.dart`, `core/omnicast_client.dart`, `media_controller.dart`, `room_manager.dart`, `pk_manager.dart`, `seat_manager.dart`, `data_channel_manager.dart`, `interaction_manager.dart`?**
   _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Why does `MediaStreamManager` connect `omnicast_pk_battle_view.dart` to `core/omnicast_client.dart`, `media_controller.dart`, `webrtc_manager.dart`, `media_stream_manager.dart`, `omnicast_video_view.dart`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Why does `WebRTCManager` connect `audio_level_detector.dart` to `core/omnicast_client.dart`, `media_controller.dart`, `room_manager.dart`, `webrtc_manager.dart`, `pk_manager.dart`, `seat_manager.dart`, `data_channel_manager.dart`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `config`, `_client`, `getLiveRooms` to the rest of the system?**
-  _1001 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1003 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `room_state.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.029850746268656716 - nodes in this community are weakly interconnected._
 - **Should `signaling_client.dart` be split into smaller, more focused modules?**

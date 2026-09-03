@@ -5,6 +5,7 @@ import '../models/signaling_message.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Manages Host vs Host PK Battles: requesting challenges, cross-room track subscriptions,
 /// live score updates, battle countdown timer streams, and punishment phase transitions.
@@ -217,7 +218,7 @@ class PKManager {
 
   /// Signals the SFU engine to bridge and forward the opponent's cross-room WebRTC tracks.
   void _subscribeToOpponentTracks(String opponentRoomId, String opponentUserId) {
-    debugPrint(
+    OmniCastLogger.log(
         '[PKManager] Subscribing to opponent tracks for room: $opponentRoomId, host: $opponentUserId');
 
     if (_roomState.isInRoom && _roomState.roomId != null && _roomState.userId != null) {

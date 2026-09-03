@@ -99,13 +99,13 @@ class MediaController with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       if (isCameraEnabled) {
         _wasCameraEnabledBeforePause = true;
-        debugPrint('[MediaController Lifecycle] App paused -> Pausing local camera');
+        OmniCastLogger.log('[MediaController Lifecycle] App paused -> Pausing local camera');
         setCameraEnabled(false);
       }
     } else if (state == AppLifecycleState.resumed) {
       if (_wasCameraEnabledBeforePause) {
         _wasCameraEnabledBeforePause = false;
-        debugPrint('[MediaController Lifecycle] App resumed -> Resuming local camera');
+        OmniCastLogger.log('[MediaController Lifecycle] App resumed -> Resuming local camera');
         setCameraEnabled(true);
       }
     }
@@ -333,7 +333,7 @@ class MediaController with WidgetsBindingObserver {
   void setSimulcastLayer(String layer, {String? targetUserId}) {
     if (_roomState.isAudioOnly) return;
     if (layer != 'f' && layer != 'h' && layer != 'q') {
-      debugPrint('[MediaController] Invalid simulcast layer: $layer (expected f, h, or q)');
+      OmniCastLogger.error('[MediaController] Invalid simulcast layer: $layer (expected f, h, or q)');
       return;
     }
     simulcastLayerNotifier.value = layer;
