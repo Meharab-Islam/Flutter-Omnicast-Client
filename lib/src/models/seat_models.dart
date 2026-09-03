@@ -7,6 +7,7 @@ class StageSeat {
   final Participant? user;
   final bool isLocked;
   final bool isMuted;
+  final bool isCameraOff;
 
   const StageSeat({
     required this.seatIndex,
@@ -14,9 +15,28 @@ class StageSeat {
     this.user,
     this.isLocked = false,
     this.isMuted = false,
+    this.isCameraOff = false,
   });
 
   bool get isOccupied => userId != null && userId!.isNotEmpty;
+
+  StageSeat copyWith({
+    int? seatIndex,
+    String? userId,
+    Participant? user,
+    bool? isLocked,
+    bool? isMuted,
+    bool? isCameraOff,
+  }) {
+    return StageSeat(
+      seatIndex: seatIndex ?? this.seatIndex,
+      userId: userId ?? this.userId,
+      user: user ?? this.user,
+      isLocked: isLocked ?? this.isLocked,
+      isMuted: isMuted ?? this.isMuted,
+      isCameraOff: isCameraOff ?? this.isCameraOff,
+    );
+  }
 
   factory StageSeat.fromJson(Map<String, dynamic> json) {
     return StageSeat(
@@ -26,7 +46,11 @@ class StageSeat {
           ? Participant.fromJson(json['user'] as Map<String, dynamic>)
           : null,
       isLocked: json['is_locked'] as bool? ?? false,
-      isMuted: json['is_muted'] as bool? ?? false,
+      isMuted: json['is_muted'] as bool? ?? json['muted'] as bool? ?? false,
+      isCameraOff: json['is_camera_off'] as bool? ??
+          json['is_video_muted'] as bool? ??
+          json['camera_off'] as bool? ??
+          false,
     );
   }
 
@@ -36,6 +60,7 @@ class StageSeat {
         'user': user?.toJson(),
         'is_locked': isLocked,
         'is_muted': isMuted,
+        'is_camera_off': isCameraOff,
       };
 }
 

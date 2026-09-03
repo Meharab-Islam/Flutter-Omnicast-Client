@@ -220,6 +220,10 @@ class MediaController with WidgetsBindingObserver {
     _mediaStreamManager.toggleAudio(!muted);
     isMicrophoneMutedNotifier.value = muted;
 
+    if (_roomState.userId != null) {
+      _roomState.updateUserMediaState(_roomState.userId!, isMuted: muted);
+    }
+
     if (_roomState.isInRoom && _signalingClient.isConnected) {
       _signalingClient.send(SignalingMessage(
         event: 'media_state_changed',
@@ -229,6 +233,7 @@ class MediaController with WidgetsBindingObserver {
           'type': 'audio',
           'kind': 'audio',
           'muted': muted,
+          'is_muted': muted,
         },
       ));
     }
@@ -243,6 +248,10 @@ class MediaController with WidgetsBindingObserver {
     _mediaStreamManager.toggleVideo(enabled);
     isCameraEnabledNotifier.value = enabled;
 
+    if (_roomState.userId != null) {
+      _roomState.updateUserMediaState(_roomState.userId!, isCameraOff: !enabled);
+    }
+
     if (_roomState.isInRoom && _signalingClient.isConnected) {
       _signalingClient.send(SignalingMessage(
         event: 'media_state_changed',
@@ -252,6 +261,8 @@ class MediaController with WidgetsBindingObserver {
           'type': 'video',
           'kind': 'video',
           'muted': !enabled,
+          'camera_off': !enabled,
+          'is_camera_off': !enabled,
         },
       ));
     }
@@ -261,14 +272,35 @@ class MediaController with WidgetsBindingObserver {
   void _bindMediaStateSignaling() {
     _mediaStateSubscription = _signalingClient.onMediaStateChanged.listen((msg) {
       final payload = msg.payload;
+      final targetUserId = msg.userId.isNotEmpty ? msg.userId : (msg.targetUser ?? '');
+
       if (payload is Map<String, dynamic>) {
         final type = payload['type'] as String? ?? payload['kind'] as String? ?? '';
-        final isMuted = (payload['muted'] as bool?) ?? false;
+        final isMuted = (payload['muted'] as bool?) ?? (payload['is_muted'] as bool?) ?? false;
+        final isCameraOff = (payload['camera_off'] as bool?) ??
+            (payload['is_camera_off'] as bool?) ??
+            (type == 'video' ? isMuted : false);
 
-        if (type == 'video') {
-          isHostCameraOffNotifier.value = isMuted;
-        } else if (type == 'audio') {
-          isHostMicrophoneMutedNotifier.value = isMuted;
+        if (targetUserId == _roomState.hostId || targetUserId.isEmpty || _roomState.hostId == null) {
+          if (type == 'video') {
+            isHostCameraOffNotifier.value = isCameraOff;
+          } else if (type == 'audio') {
+            isHostMicrophoneMutedNotifier.value = isMuted;
+          }
+        }
+
+        if (targetUserId.isNotEmpty) {
+          if (type == 'video') {
+            _roomState.updateUserMediaState(targetUserId, isCameraOff: isCameraOff);
+          } else if (type == 'audio') {
+            _roomState.updateUserMediaState(targetUserId, isMuted: isMuted);
+          } else {
+            _roomState.updateUserMediaState(
+              targetUserId,
+              isMuted: isMuted,
+              isCameraOff: isCameraOff,
+            );
+          }
         }
 
         onHostMediaStateChanged?.call(type, isMuted);

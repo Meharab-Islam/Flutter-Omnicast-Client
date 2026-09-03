@@ -72,6 +72,15 @@ class OmniCastVideoCanvas extends StatelessWidget {
     final primaryTrackId = isHost ? 'local' : (client.state.hostId ?? 'host');
     final renderer = isHost ? localRenderer : client.streamManager.getRenderer(primaryTrackId);
 
+    final isCameraEnabled = isHost
+        ? client.media.isCameraEnabled
+        : (!client.media.isHostCameraOffNotifier.value &&
+            !client.state.isUserCameraOff(primaryTrackId));
+    final isMicMuted = isHost
+        ? client.media.isMicrophoneMuted
+        : (client.media.isHostMicrophoneMutedNotifier.value ||
+            client.state.isUserAudioMuted(primaryTrackId));
+
     return OmniCastSpeakingVideoTile(
       key: const ValueKey('solo_canvas'),
       userId: primaryTrackId,
@@ -79,8 +88,8 @@ class OmniCastVideoCanvas extends StatelessWidget {
       userName: hostName,
       avatarUrl: hostAvatarUrl,
       renderer: renderer,
-      isCameraEnabled: client.media.isCameraEnabled,
-      isMicMuted: client.media.isMicrophoneMuted,
+      isCameraEnabled: isCameraEnabled,
+      isMicMuted: isMicMuted,
       mirror: isHost ? mirrorLocal : mirrorRemote,
       audioDetector: client.media.audioDetector,
     );
@@ -97,6 +106,16 @@ class OmniCastVideoCanvas extends StatelessWidget {
         : client.streamManager.getRenderer(hostId);
     final opponentRenderer = client.streamManager.getRenderer(opponentId);
 
+    final isHostCameraEnabled = client.state.isHost
+        ? client.media.isCameraEnabled
+        : (!client.media.isHostCameraOffNotifier.value && !client.state.isUserCameraOff(hostId));
+    final isHostMicMuted = client.state.isHost
+        ? client.media.isMicrophoneMuted
+        : (client.media.isHostMicrophoneMutedNotifier.value || client.state.isUserAudioMuted(hostId));
+
+    final isOpponentCameraEnabled = !client.state.isUserCameraOff(opponentId);
+    final isOpponentMicMuted = client.state.isUserAudioMuted(opponentId);
+
     return Row(
       key: const ValueKey('pk_split_canvas'),
       children: [
@@ -110,8 +129,8 @@ class OmniCastVideoCanvas extends StatelessWidget {
               userName: hostName,
               avatarUrl: hostAvatarUrl,
               renderer: hostRenderer,
-              isCameraEnabled: client.media.isCameraEnabled,
-              isMicMuted: client.media.isMicrophoneMuted,
+              isCameraEnabled: isHostCameraEnabled,
+              isMicMuted: isHostMicMuted,
               mirror: client.state.isHost ? mirrorLocal : mirrorRemote,
               audioDetector: client.media.audioDetector,
             ),
@@ -128,8 +147,8 @@ class OmniCastVideoCanvas extends StatelessWidget {
               userName: activePK?.opponentDisplayName ?? opponentName ?? 'Opponent',
               avatarUrl: activePK?.opponentAvatarUrl ?? opponentAvatarUrl,
               renderer: opponentRenderer,
-              isCameraEnabled: true,
-              isMicMuted: false,
+              isCameraEnabled: isOpponentCameraEnabled,
+              isMicMuted: isOpponentMicMuted,
               mirror: mirrorRemote,
               audioDetector: client.media.audioDetector,
             ),
@@ -161,14 +180,21 @@ class OmniCastVideoCanvas extends StatelessWidget {
             ? client.streamManager.localRenderer
             : client.streamManager.getRenderer(userId);
 
+        final isCameraEnabled = isLocal
+            ? client.media.isCameraEnabled
+            : (!client.state.isUserCameraOff(userId) && !seat.isCameraOff);
+        final isMicMuted = isLocal
+            ? client.media.isMicrophoneMuted
+            : (client.state.isUserAudioMuted(userId) || seat.isMuted);
+
         return OmniCastSpeakingVideoTile(
           userId: userId,
           trackId: userId,
           userName: seat.user?.displayName ?? 'Guest ${index + 1}',
           avatarUrl: seat.user?.avatarUrl,
           renderer: renderer,
-          isCameraEnabled: isLocal ? client.media.isCameraEnabled : true,
-          isMicMuted: isLocal ? client.media.isMicrophoneMuted : seat.isMuted,
+          isCameraEnabled: isCameraEnabled,
+          isMicMuted: isMicMuted,
           mirror: isLocal ? mirrorLocal : mirrorRemote,
           audioDetector: client.media.audioDetector,
         );

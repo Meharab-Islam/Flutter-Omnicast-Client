@@ -27,6 +27,8 @@ class RoomState extends ChangeNotifier {
   final List<GiftEvent> _recentGifts = [];
   final List<SeatRequest> _pendingSeatRequests = [];
   final List<CoHostInvite> _pendingInvites = [];
+  final Map<String, bool> _userAudioMuteStates = {};
+  final Map<String, bool> _userCameraOffStates = {};
 
   PKBattleInfo? _activePK;
 
@@ -56,7 +58,13 @@ class RoomState extends ChangeNotifier {
   List<GiftEvent> get recentGifts => List.unmodifiable(_recentGifts);
   List<SeatRequest> get pendingSeatRequests =>
       List.unmodifiable(_pendingSeatRequests);
+  List<SeatRequest> get waitingList => List.unmodifiable(_pendingSeatRequests);
   List<CoHostInvite> get pendingInvites => List.unmodifiable(_pendingInvites);
+  Map<String, bool> get userAudioMuteStates => Map.unmodifiable(_userAudioMuteStates);
+  Map<String, bool> get userCameraOffStates => Map.unmodifiable(_userCameraOffStates);
+
+  bool isUserAudioMuted(String userId) => _userAudioMuteStates[userId] ?? false;
+  bool isUserCameraOff(String userId) => _userCameraOffStates[userId] ?? false;
 
   PKBattleInfo? get activePK => _activePK;
   PKState get pkState => _activePK != null
@@ -136,18 +144,57 @@ class RoomState extends ChangeNotifier {
       }
     }
 
-    // Populate active seats
+    // Populate active seats & media states
     if (data['active_seats'] is List) {
       _activeSeats.clear();
       for (final item in data['active_seats'] as List) {
         if (item is Map<String, dynamic>) {
           final seat = StageSeat.fromJson(item);
           _activeSeats.add(seat);
-          if (seat.userId != null && seat.userId!.isNotEmpty && seat.userId != _userId) {
-            _activeRemoteUserIds.add(seat.userId!);
+          if (seat.userId != null && seat.userId!.isNotEmpty) {
+            if (seat.userId != _userId) {
+              _activeRemoteUserIds.add(seat.userId!);
+            }
+            _userAudioMuteStates[seat.userId!] = seat.isMuted;
+            _userCameraOffStates[seat.userId!] = seat.isCameraOff;
           }
         }
       }
+    }
+
+    // Populate waiting list / pending seat requests for late-join users
+    if (data['waiting_list'] is List ||
+        data['pending_requests'] is List ||
+        data['seat_requests'] is List) {
+      final list = (data['waiting_list'] ??
+          data['pending_requests'] ??
+          data['seat_requests']) as List;
+      _pendingSeatRequests.clear();
+      for (final item in list) {
+        if (item is Map<String, dynamic>) {
+          _pendingSeatRequests.add(SeatRequest.fromJson(item));
+        }
+      }
+    }
+
+    // Populate media states map if provided
+    if (data['media_states'] is Map<String, dynamic>) {
+      final states = data['media_states'] as Map<String, dynamic>;
+      states.forEach((uId, stateMap) {
+        if (stateMap is Map) {
+          if (stateMap['muted'] != null || stateMap['is_muted'] != null) {
+            _userAudioMuteStates[uId] =
+                (stateMap['muted'] ?? stateMap['is_muted']) as bool;
+          }
+          if (stateMap['camera_off'] != null ||
+              stateMap['is_camera_off'] != null ||
+              stateMap['is_video_muted'] != null) {
+            _userCameraOffStates[uId] = (stateMap['camera_off'] ??
+                stateMap['is_camera_off'] ??
+                stateMap['is_video_muted']) as bool;
+          }
+        }
+      });
     }
 
     // Populate chat history
@@ -289,6 +336,30 @@ class RoomState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates real-time audio mute and camera on/off states per user.
+  void updateUserMediaState(String userId, {bool? isMuted, bool? isCameraOff}) {
+    if (userId.isEmpty) return;
+
+    if (isMuted != null) {
+      _userAudioMuteStates[userId] = isMuted;
+    }
+    if (isCameraOff != null) {
+      _userCameraOffStates[userId] = isCameraOff;
+    }
+
+    // Also update any matching StageSeat
+    final seatIndex = _activeSeats.indexWhere((s) => s.userId == userId);
+    if (seatIndex >= 0) {
+      final oldSeat = _activeSeats[seatIndex];
+      _activeSeats[seatIndex] = oldSeat.copyWith(
+        isMuted: isMuted ?? oldSeat.isMuted,
+        isCameraOff: isCameraOff ?? oldSeat.isCameraOff,
+      );
+    }
+
+    notifyListeners();
+  }
+
   /// Adds or updates a stage seat.
   void updateStageSeat(StageSeat seat) {
     final idx = _activeSeats.indexWhere((s) => s.seatIndex == seat.seatIndex);
@@ -297,8 +368,12 @@ class RoomState extends ChangeNotifier {
     } else {
       _activeSeats.add(seat);
     }
-    if (seat.userId != null && seat.userId != _userId) {
-      _activeRemoteUserIds.add(seat.userId!);
+    if (seat.userId != null && seat.userId!.isNotEmpty) {
+      if (seat.userId != _userId) {
+        _activeRemoteUserIds.add(seat.userId!);
+      }
+      _userAudioMuteStates[seat.userId!] = seat.isMuted;
+      _userCameraOffStates[seat.userId!] = seat.isCameraOff;
     }
     if (!isInPKBattle) {
       _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
@@ -314,6 +389,8 @@ class RoomState extends ChangeNotifier {
       final removed = _activeSeats.removeAt(idx);
       if (removed.userId != null) {
         _activeRemoteUserIds.remove(removed.userId);
+        _userAudioMuteStates.remove(removed.userId);
+        _userCameraOffStates.remove(removed.userId);
       }
       if (!isInPKBattle) {
         _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;

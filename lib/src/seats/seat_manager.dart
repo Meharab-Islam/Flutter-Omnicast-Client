@@ -25,6 +25,9 @@ class SeatManager {
   // Backward compatibility alias
   ValueNotifier<List<StageSeat>> get activeSeatsNotifier => activeCoHostsList;
 
+  // Waiting list alias notifier
+  ValueNotifier<List<SeatRequest>> get waitingListNotifier => pendingSeatRequestsNotifier;
+
   // Pure Streams
   final _seatRequestController = StreamController<SeatRequest>.broadcast();
   final _seatInviteController = StreamController<CoHostInvite>.broadcast();
@@ -109,11 +112,26 @@ class SeatManager {
       requestedAt: DateTime.now(),
     );
 
+    _roomState.addSeatRequest(req);
+
     _signalingClient.send(SignalingMessage(
       event: SignalingEvents.seatRequest,
       roomId: _roomState.roomId!,
       userId: _roomState.userId!,
       payload: req.toJson(),
+    ));
+  }
+
+  /// Viewer action: Cancels their own pending seat request from the waiting list.
+  void cancelSeatRequest() {
+    if (!_roomState.isInRoom || _roomState.userId == null) return;
+
+    _roomState.removeSeatRequest(_roomState.userId!);
+
+    _signalingClient.send(SignalingMessage(
+      event: 'cancel_seat_request',
+      roomId: _roomState.roomId!,
+      userId: _roomState.userId!,
     ));
   }
 

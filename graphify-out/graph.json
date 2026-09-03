@@ -1368,6 +1368,28 @@
       "source_location": null
     },
     {
+      "id": "gradient",
+      "label": "Gradient?",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "gradient?",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "lib_src_models_pk_models_pkstate",
+      "label": "PKState",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstate",
+      "source_file": "lib/src/models/pk_models.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_pk_pk_manager",
       "label": "pk_manager.dart",
       "_origin": "ast",
@@ -1687,6 +1709,138 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_pk_score_progress_bar",
+      "label": "pk_score_progress_bar.dart",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pk_score_progress_bar.dart",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_borderradius",
+      "label": "borderRadius",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "borderradius",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_formattimer",
+      "label": "_formatTimer",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_formattimer",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_height",
+      "label": "height",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "height",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_hostgradient",
+      "label": "hostGradient",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "hostgradient",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_opponentgradient",
+      "label": "opponentGradient",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "opponentgradient",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_pkstate",
+      "label": "pkState",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstate",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
+      "label": "scoreTextStyle",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "scoretextstyle",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_showtimer",
+      "label": "showTimer",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "showtimer",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_timertextstyle",
+      "label": "timerTextStyle",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "timertextstyle",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "models_pk_models_dart",
+      "label": "../models/pk_models.dart",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "../models/pk_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "pkstate_get",
       "label": "PKState get",
       "_origin": "ast",
@@ -1694,6 +1848,17 @@
       "community_name": "pk_manager.dart",
       "file_type": "code",
       "norm_label": "pkstate get",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "textstyle",
+      "label": "TextStyle?",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "textstyle?",
       "source_file": null,
       "source_location": null
     },
@@ -3630,6 +3795,17 @@
       "community_name": "room_models.dart",
       "file_type": "code",
       "norm_label": "userid",
+      "source_file": "lib/src/models/room_models.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_models_room_models_userrole",
+      "label": "UserRole",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "room_models.dart",
+      "file_type": "code",
+      "norm_label": "userrole",
       "source_file": "lib/src/models/room_models.dart",
       "source_location": null
     },
@@ -8234,6 +8410,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_core_omnicast_client_onroomclosedbyhost",
+      "label": "onRoomClosedByHost",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "onroomclosedbyhost",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_core_omnicast_client_onroomcreated",
       "label": "onRoomCreated",
       "_origin": "ast",
@@ -8738,171 +8925,6 @@
       "community_name": "package:flutter/foundation.dart",
       "file_type": "code",
       "norm_label": "package:flutter/foundation.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "gradient",
-      "label": "Gradient?",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "gradient?",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "lib_src_models_pk_models_pkstate",
-      "label": "PKState",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "pkstate",
-      "source_file": "lib/src/models/pk_models.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar",
-      "label": "pk_score_progress_bar.dart",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "pk_score_progress_bar.dart",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_borderradius",
-      "label": "borderRadius",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "borderradius",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_build",
-      "label": "build",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "build",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_formattimer",
-      "label": "_formatTimer",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "_formattimer",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_height",
-      "label": "height",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "height",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_hostgradient",
-      "label": "hostGradient",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "hostgradient",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_opponentgradient",
-      "label": "opponentGradient",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "opponentgradient",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_pkstate",
-      "label": "pkState",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "pkstate",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
-      "label": "scoreTextStyle",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "scoretextstyle",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_showtimer",
-      "label": "showTimer",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "showtimer",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_timertextstyle",
-      "label": "timerTextStyle",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "timertextstyle",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "models_pk_models_dart",
-      "label": "../models/pk_models.dart",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "../models/pk_models.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "textstyle",
-      "label": "TextStyle?",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "pk_score_progress_bar.dart",
-      "file_type": "code",
-      "norm_label": "textstyle?",
       "source_file": null,
       "source_location": null
     },
@@ -9765,17 +9787,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_models_room_models_userrole",
-      "label": "UserRole",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "room_manager.dart",
-      "file_type": "code",
-      "norm_label": "userrole",
-      "source_file": "lib/src/models/room_models.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_room_room_manager",
       "label": "room_manager.dart",
       "_origin": "ast",
@@ -9842,6 +9853,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_room_room_manager_closeroom",
+      "label": "closeRoom",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "closeroom",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_room_room_manager_config",
       "label": "_config",
       "_origin": "ast",
@@ -9897,6 +9919,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_room_room_manager_handlehostclosedroom",
+      "label": "_handleHostClosedRoom",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "_handlehostclosedroom",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_room_room_manager_handleroominfosync",
       "label": "_handleRoomInfoSync",
       "_origin": "ast",
@@ -9948,6 +9981,17 @@
       "community_name": "room_manager.dart",
       "file_type": "code",
       "norm_label": "maxviewersinmemory",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_room_room_manager_onroomclosedbyhost",
+      "label": "onRoomClosedByHost",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "onroomclosedbyhost",
       "source_file": "lib/src/room/room_manager.dart",
       "source_location": null
     },
@@ -10014,6 +10058,17 @@
       "community_name": "room_manager.dart",
       "file_type": "code",
       "norm_label": "rolenotifier",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_room_room_manager_roomclosedbyhostcontroller",
+      "label": "_roomClosedByHostController",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "room_manager.dart",
+      "file_type": "code",
+      "norm_label": "_roomclosedbyhostcontroller",
       "source_file": "lib/src/room/room_manager.dart",
       "source_location": null
     },
@@ -13169,6 +13224,18 @@
     },
     {
       "source": "lib_src_room_room_manager",
+      "target": "stream",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "variable_type",
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
       "target": "streamsubscription",
       "relation": "references",
       "_origin": "ast",
@@ -15077,6 +15144,17 @@
     {
       "source": "lib_src_core_omnicast_client",
       "target": "lib_src_core_omnicast_client_onroomclosed",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_onroomclosedbyhost",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -19212,6 +19290,17 @@
     },
     {
       "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_closeroom",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
       "target": "lib_src_room_room_manager_config",
       "relation": "defines",
       "_origin": "ast",
@@ -19267,6 +19356,17 @@
     },
     {
       "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_handlehostclosedroom",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
       "target": "lib_src_room_room_manager_handleroominfosync",
       "relation": "defines",
       "_origin": "ast",
@@ -19312,6 +19412,17 @@
     {
       "source": "lib_src_room_room_manager",
       "target": "lib_src_room_room_manager_maxviewersinmemory",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_onroomclosedbyhost",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -19378,6 +19489,17 @@
     {
       "source": "lib_src_room_room_manager",
       "target": "lib_src_room_room_manager_rolenotifier",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/room/room_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_room_room_manager",
+      "target": "lib_src_room_room_manager_roomclosedbyhostcontroller",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -26428,5 +26550,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "cad57fd33101fa87b6bb37bb1f9d40742ccdb6b1"
+  "built_at_commit": "1a4dfe52103133d650f46842810f13e7642ebd5e"
 }
