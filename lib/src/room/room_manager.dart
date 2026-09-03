@@ -107,30 +107,45 @@ class RoomManager {
   Stream<String> get onUserLeft => _participantLeftController.stream;
 
   /// Listens to real-time participant signaling events with high-performance debouncing.
+  /// Listens to real-time participant signaling events with high-performance debouncing.
   void _bindSignalingEvents() {
     _signalingSubscription = _signalingClient.onMessage.listen((msg) {
-      switch (msg.event) {
+      final event = msg.event.toLowerCase().replaceAll('-', '_');
+
+      switch (event) {
         // 1. Initial Snapshot on Join
-        case SignalingEvents.roomInfoSync:
+        case 'room_info_sync':
         case 'room_info':
-        case 'roomInfoSync':
+        case 'roominfosync':
         case 'sync_room_info':
         case 'room_sync':
+        case 'sync':
+        case 'get_room_info':
           if (msg.payload is Map<String, dynamic>) {
             _handleRoomInfoSync(msg.payload as Map<String, dynamic>);
+          } else if (msg.payload is Map) {
+            _handleRoomInfoSync(Map<String, dynamic>.from(msg.payload as Map));
           }
           break;
 
         // 2. Real-time User Joined Event
-        case SignalingEvents.userJoined:
+        case 'user_joined':
+        case 'userjoined':
         case 'user_join':
-        case 'userJoined':
+        case 'userjoin':
         case 'participant_joined':
-        case 'participantJoined':
+        case 'participantjoined':
+        case 'participant_join':
         case 'viewer_joined':
-        case 'viewerJoined':
+        case 'viewerjoined':
+        case 'viewer_join':
         case 'room_user_joined':
         case 'member_joined':
+        case 'member_join':
+        case 'new_participant':
+        case 'peer_joined':
+        case 'peer_connect':
+        case 'peer_connected':
         case 'join_room':
         case 'join':
           final payloadMap = msg.payload is Map<String, dynamic>
@@ -147,17 +162,23 @@ class RoomManager {
           break;
 
         // 3. Real-time User Left Event
-        case SignalingEvents.userLeft:
+        case 'user_left':
+        case 'userleft':
         case 'user_leave':
-        case 'userLeft':
+        case 'userleave':
         case 'participant_left':
-        case 'participantLeft':
+        case 'participantleft':
+        case 'participant_leave':
         case 'viewer_left':
-        case 'viewerLeft':
+        case 'viewerleft':
+        case 'viewer_leave':
         case 'room_user_left':
         case 'member_left':
+        case 'member_leave':
         case 'leave_room':
         case 'leave':
+        case 'peer_left':
+        case 'peer_disconnected':
           final leftUserId = msg.payload is Map && msg.payload['user_id'] != null
               ? msg.payload['user_id'].toString()
               : (msg.payload is Map && msg.payload['userId'] != null
@@ -169,10 +190,10 @@ class RoomManager {
           break;
 
         // 4. Batch Viewer Count Sync
-        case SignalingEvents.viewerUpdate:
+        case 'viewer_update':
         case 'viewers_update':
-        case 'viewerUpdate':
-        case 'viewersUpdate':
+        case 'viewerupdate':
+        case 'viewersupdate':
         case 'viewer_count':
         case 'viewers_count':
         case 'room_viewers':
@@ -192,13 +213,21 @@ class RoomManager {
                   .toList();
               activeViewersList.value = viewers;
             }
+          } else if (msg.payload is Map) {
+            final payload = Map<String, dynamic>.from(msg.payload as Map);
+            final count = (payload['viewers_count'] as num?)?.toInt() ??
+                (payload['viewer_count'] as num?)?.toInt() ??
+                (payload['count'] as num?)?.toInt() ??
+                totalViewerCount.value;
+            totalViewerCount.value = count;
           } else if (msg.payload is num) {
             totalViewerCount.value = (msg.payload as num).toInt();
           }
           break;
 
         // 5. Host Terminated Room / Room Closed Event
-        case SignalingEvents.roomClosed:
+        case 'room_closed':
+        case 'roomclosed':
         case 'room_ended':
         case 'end_room':
         case 'host_left':
@@ -214,10 +243,12 @@ class RoomManager {
           break;
 
         // 6. User Kicked / Ejected Event
-        case SignalingEvents.kickUser:
-        case SignalingEvents.userKicked:
+        case 'kick_user':
+        case 'user_kicked':
+        case 'userkicked':
         case 'kicked':
         case 'user_ejected':
+        case 'ejected':
           final targetUser = msg.targetUser ??
               (msg.payload is Map<String, dynamic>
                   ? (msg.payload['target_user'] as String? ?? msg.payload['user_id'] as String?)
@@ -496,6 +527,13 @@ class RoomManager {
     await _webRTCManager.setupViewerTransceivers();
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
+    final dName = metadata?['displayName'] as String? ??
+        metadata?['user_name'] as String? ??
+        metadata?['name'] as String? ??
+        userId;
+    final aUrl = metadata?['avatarUrl'] as String? ??
+        metadata?['avatar'] as String?;
+
     _signalingClient.send(SignalingMessage(
       event: SignalingEvents.joinRoom,
       roomId: roomId,
@@ -505,6 +543,13 @@ class RoomManager {
         'sdp': offer.sdp,
         'type': offer.type,
         'metadata': metadata,
+        'user_id': userId,
+        'userId': userId,
+        'displayName': dName,
+        'display_name': dName,
+        'name': dName,
+        'avatar': aUrl,
+        'avatar_url': aUrl,
       },
     ));
   }
