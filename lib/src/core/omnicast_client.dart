@@ -15,6 +15,7 @@ import '../seats/seat_manager.dart';
 import '../signaling/signaling_client.dart';
 import '../state/room_state.dart';
 import '../webrtc/webrtc_manager.dart';
+import '../utils/omnicast_logger.dart';
 import 'omnicast_config.dart';
 
 /// The central production SDK Facade for OmniCast Live & WebRTC SFU engine.
@@ -93,6 +94,10 @@ class OmniCastClient {
           roomState: roomState,
         );
 
+  /// Master toggle for console logs across the SDK (WebRTC, signaling, media).
+  static bool get enableLogging => OmniCastLogger.enableLogging;
+  static set enableLogging(bool value) => OmniCastLogger.enableLogging = value;
+
   /// Initializes the [OmniCastClient] SDK using server credentials, SFU host URL, and media configuration.
   ///
   /// Developers can simply provide their server domain (e.g. `testlive.lolipoplive.top`) and credentials:
@@ -101,6 +106,7 @@ class OmniCastClient {
   ///   serverUrl: 'testlive.lolipoplive.top',
   ///   apiKey: 'dev_api_key_123',
   ///   apiSecret: 'my_secret_key_456',
+  ///   enableLogging: false, // Turn on/off console logs
   /// );
   /// ```
   static Future<OmniCastClient> init({
@@ -113,6 +119,7 @@ class OmniCastClient {
     GlobalMediaConfig? mediaConfig,
     String? token,
     bool autoConnect = true,
+    bool enableLogging = false,
     List<Map<String, dynamic>>? iceServers,
     Duration heartbeatInterval = const Duration(seconds: 15),
     Duration reconnectDelay = const Duration(seconds: 3),
@@ -121,6 +128,8 @@ class OmniCastClient {
     String wsPath = '/ws',
     String apiPath = '/api',
   }) async {
+    OmniCastLogger.enableLogging = enableLogging;
+
     final config = OmniCastConfig.fromServer(
       serverUrl: serverUrl,
       hostUrl: hostUrl,
@@ -128,6 +137,7 @@ class OmniCastClient {
       apiKey: apiKey,
       apiSecret: apiSecret,
       jwtSecret: jwtSecret,
+      enableLogging: enableLogging,
       iceServers: iceServers ??
           const [
             {'urls': 'stun:stun.l.google.com:19302'},

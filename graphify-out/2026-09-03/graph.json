@@ -1434,6 +1434,28 @@
       "source_location": null
     },
     {
+      "id": "gradient",
+      "label": "Gradient?",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "gradient?",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "lib_src_models_pk_models_pkstate",
+      "label": "PKState",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstate",
+      "source_file": "lib/src/models/pk_models.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_pk_pk_manager",
       "label": "pk_manager.dart",
       "_origin": "ast",
@@ -1753,6 +1775,138 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_pk_score_progress_bar",
+      "label": "pk_score_progress_bar.dart",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pk_score_progress_bar.dart",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_borderradius",
+      "label": "borderRadius",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "borderradius",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_formattimer",
+      "label": "_formatTimer",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "_formattimer",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_height",
+      "label": "height",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "height",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_hostgradient",
+      "label": "hostGradient",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "hostgradient",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_opponentgradient",
+      "label": "opponentGradient",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "opponentgradient",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_pkstate",
+      "label": "pkState",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstate",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
+      "label": "scoreTextStyle",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "scoretextstyle",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_showtimer",
+      "label": "showTimer",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "showtimer",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_timertextstyle",
+      "label": "timerTextStyle",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "timertextstyle",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "models_pk_models_dart",
+      "label": "../models/pk_models.dart",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "../models/pk_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "pkstate_get",
       "label": "PKState get",
       "_origin": "ast",
@@ -1760,6 +1914,17 @@
       "community_name": "pk_manager.dart",
       "file_type": "code",
       "norm_label": "pkstate get",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "textstyle",
+      "label": "TextStyle?",
+      "_origin": "ast",
+      "community": 10,
+      "community_name": "pk_manager.dart",
+      "file_type": "code",
+      "norm_label": "textstyle?",
       "source_file": null,
       "source_location": null
     },
@@ -3029,17 +3194,6 @@
       "source_location": null
     },
     {
-      "id": "gradient",
-      "label": "Gradient?",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "gradient?",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "lib_src_datachannel_data_channel_manager",
       "label": "data_channel_manager.dart",
       "_origin": "ast",
@@ -3359,149 +3513,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_models_pk_models_pkstate",
-      "label": "PKState",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "pkstate",
-      "source_file": "lib/src/models/pk_models.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar",
-      "label": "pk_score_progress_bar.dart",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "pk_score_progress_bar.dart",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_borderradius",
-      "label": "borderRadius",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "borderradius",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_build",
-      "label": "build",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "build",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_formattimer",
-      "label": "_formatTimer",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "_formattimer",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_height",
-      "label": "height",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "height",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_hostgradient",
-      "label": "hostGradient",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "hostgradient",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_opponentgradient",
-      "label": "opponentGradient",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "opponentgradient",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_pkstate",
-      "label": "pkState",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "pkstate",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
-      "label": "scoreTextStyle",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "scoretextstyle",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_showtimer",
-      "label": "showTimer",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "showtimer",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_timertextstyle",
-      "label": "timerTextStyle",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "timertextstyle",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "models_pk_models_dart",
-      "label": "../models/pk_models.dart",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "../models/pk_models.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "rtcdatachannel",
       "label": "RTCDataChannel?",
       "_origin": "ast",
@@ -3509,17 +3520,6 @@
       "community_name": "data_channel_manager.dart",
       "file_type": "code",
       "norm_label": "rtcdatachannel?",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "textstyle",
-      "label": "TextStyle?",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "data_channel_manager.dart",
-      "file_type": "code",
-      "norm_label": "textstyle?",
       "source_file": null,
       "source_location": null
     },
@@ -11573,6 +11573,174 @@
       "source_location": "L54"
     },
     {
+      "id": "late_join_state_sync_guide",
+      "label": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "late_join_state_sync_guide.md",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "late_join_state_sync_guide_1_architecture_how_late_join_sync_works",
+      "label": "1. Architecture & How Late-Join Sync Works",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. architecture & how late-join sync works",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L20"
+    },
+    {
+      "id": "late_join_state_sync_guide_1_omnicastvideocanvas",
+      "label": "1. `OmniCastVideoCanvas`",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. `omnicastvideocanvas`",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L143"
+    },
+    {
+      "id": "late_join_state_sync_guide_2_omnicastspeakingvideotile",
+      "label": "2. `OmniCastSpeakingVideoTile`",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. `omnicastspeakingvideotile`",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L152"
+    },
+    {
+      "id": "late_join_state_sync_guide_2_the_authoritative_snapshot_room_info_sync",
+      "label": "2. The Authoritative Snapshot: `room_info_sync`",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. the authoritative snapshot: `room_info_sync`",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L47"
+    },
+    {
+      "id": "late_join_state_sync_guide_3_what_gets_synchronized_automatically",
+      "label": "3. What Gets Synchronized Automatically",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "3. what gets synchronized automatically",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L111"
+    },
+    {
+      "id": "late_join_state_sync_guide_4_reactive_flutter_state_access_points",
+      "label": "4. Reactive Flutter State Access Points",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "4. reactive flutter state access points",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L124"
+    },
+    {
+      "id": "late_join_state_sync_guide_5_pre_built_widgets_with_automatic_late_join_support",
+      "label": "5. Pre-Built Widgets with Automatic Late-Join Support",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "5. pre-built widgets with automatic late-join support",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L139"
+    },
+    {
+      "id": "late_join_state_sync_guide_6_building_custom_ui_for_late_join_scenarios",
+      "label": "6. Building Custom UI for Late-Join Scenarios",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "6. building custom ui for late-join scenarios",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L169"
+    },
+    {
+      "id": "late_join_state_sync_guide_7_best_practices_performance_tuning",
+      "label": "7. Best Practices & Performance Tuning",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "7. best practices & performance tuning",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L302"
+    },
+    {
+      "id": "late_join_state_sync_guide_a_real_time_8_seat_audio_video_grid_with_mute_badges",
+      "label": "A. Real-Time 8-Seat Audio/Video Grid with Mute Badges",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "a. real-time 8-seat audio/video grid with mute badges",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L171"
+    },
+    {
+      "id": "late_join_state_sync_guide_b_ongoing_pk_battle_score_bar_sync",
+      "label": "B. Ongoing PK Battle & Score Bar Sync",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "b. ongoing pk battle & score bar sync",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L273"
+    },
+    {
+      "id": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "label": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83d\udd04 omnicast sdk: late-join state synchronization guide",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "late_join_state_sync_guide_table_of_contents",
+      "label": "\ud83d\udcd1 Table of Contents",
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "\ud83d\udd04 OmniCast SDK: Late-Join State Synchronization Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83d\udcd1 table of contents",
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L7"
+    },
+    {
       "id": "lib_src_room_room_manager",
       "label": "room_manager.dart",
       "_origin": "ast",
@@ -17060,6 +17228,149 @@
       "confidence_score": 1.0,
       "source_file": "KICK_PARTICIPANT_GUIDE.md",
       "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide",
+      "target": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_5_pre_built_widgets_with_automatic_late_join_support",
+      "target": "late_join_state_sync_guide_1_omnicastvideocanvas",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_5_pre_built_widgets_with_automatic_late_join_support",
+      "target": "late_join_state_sync_guide_2_omnicastspeakingvideotile",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_6_building_custom_ui_for_late_join_scenarios",
+      "target": "late_join_state_sync_guide_a_real_time_8_seat_audio_video_grid_with_mute_badges",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L171",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_6_building_custom_ui_for_late_join_scenarios",
+      "target": "late_join_state_sync_guide_b_ongoing_pk_battle_score_bar_sync",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L273",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_3_what_gets_synchronized_automatically",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_4_reactive_flutter_state_access_points",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L124",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_5_pre_built_widgets_with_automatic_late_join_support",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L139",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_6_building_custom_ui_for_late_join_scenarios",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L169",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_1_architecture_how_late_join_sync_works",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_7_best_practices_performance_tuning",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L302",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_2_the_authoritative_snapshot_room_info_sync",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "late_join_state_sync_guide_omnicast_sdk_late_join_state_synchronization_guide",
+      "target": "late_join_state_sync_guide_table_of_contents",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -30242,5 +30553,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "37e22280dba8fda3555f73ef69a84d285b235022"
+  "built_at_commit": "6be28a9483c7c064231094118770a1d42480296e"
 }

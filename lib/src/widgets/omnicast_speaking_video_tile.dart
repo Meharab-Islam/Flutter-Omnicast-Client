@@ -69,7 +69,7 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
             child: Stack(
               children: [
                 // 1. Live Video View or Avatar Placeholder
-                if (isCameraEnabled && renderer != null && renderer!.textureId != null)
+                if (isCameraEnabled && renderer != null)
                   SizedBox.expand(
                     child: RTCVideoView(
                       renderer!,

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../media/media_stream_manager.dart';
 import '../media/video_parameters.dart';
+import '../utils/omnicast_logger.dart';
 import 'webrtc_stats_monitor.dart';
 
 typedef OnLocalIceCandidateCallback = void Function(RTCIceCandidate candidate);
@@ -166,12 +167,12 @@ class WebRTCManager {
     };
 
     pc.onIceConnectionState = (state) {
-      debugPrint('[WebRTCManager] ICE Connection State: $state');
+      OmniCastLogger.log('[WebRTCManager] ICE Connection State: $state');
       if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
         _iceDisconnectTimer?.cancel();
         // 1-2s seamless ICE restart window during WiFi <-> Cellular handoffs
         _iceDisconnectTimer = Timer(const Duration(milliseconds: 1500), () {
-          debugPrint('[WebRTCManager] ICE disconnected for >1.5s -> Triggering seamless ICE Restart');
+          OmniCastLogger.log('[WebRTCManager] ICE disconnected for >1.5s -> Triggering seamless ICE Restart');
           onIceRestartNeeded?.call();
         });
       } else if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
@@ -181,18 +182,18 @@ class WebRTCManager {
       } else if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
         _iceDisconnectTimer?.cancel();
         _iceDisconnectTimer = null;
-        debugPrint('[WebRTCManager] ICE Failed -> Triggering Immediate ICE Restart');
+        OmniCastLogger.log('[WebRTCManager] ICE Failed -> Triggering Immediate ICE Restart');
         onIceRestartNeeded?.call();
       }
     };
 
     pc.onConnectionState = (state) {
-      debugPrint('[WebRTCManager] PeerConnection State: $state');
+      OmniCastLogger.log('[WebRTCManager] PeerConnection State: $state');
       if (state == RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
         _iceDisconnectTimer?.cancel();
         // 1.5s seamless ICE restart window
         _iceDisconnectTimer = Timer(const Duration(milliseconds: 1500), () {
-          debugPrint('[WebRTCManager] Connection state disconnected for >1.5s -> Triggering seamless ICE Restart');
+          OmniCastLogger.log('[WebRTCManager] Connection state disconnected for >1.5s -> Triggering seamless ICE Restart');
           onIceRestartNeeded?.call();
         });
       } else if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
@@ -201,13 +202,13 @@ class WebRTCManager {
       } else if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
         _iceDisconnectTimer?.cancel();
         _iceDisconnectTimer = null;
-        debugPrint('[WebRTCManager] Connection state Failed -> Triggering Immediate ICE Restart');
+        OmniCastLogger.log('[WebRTCManager] Connection state Failed -> Triggering Immediate ICE Restart');
         onIceRestartNeeded?.call();
       }
     };
 
     pc.onTrack = (RTCTrackEvent event) {
-      debugPrint(
+      OmniCastLogger.log(
           '[WebRTCManager] onTrack: kind=${event.track.kind}, streams=${event.streams.length}, id=${event.track.id}');
 
       // Force immediate zero-latency playout on incoming remote tracks (bypasses jitter buffer delay)

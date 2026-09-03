@@ -45,3 +45,5 @@ export 'src/widgets/omnicast_media_control_bar.dart';
 export 'src/widgets/omnicast_native_viewport_tracker.dart';
 export 'src/widgets/omnicast_flying_hearts_overlay.dart';
 export 'src/widgets/omnicast_gifting_bottom_sheet.dart';
+export 'src/widgets/omnicast_viewers_bottom_sheet.dart';
+export 'src/utils/omnicast_logger.dart';

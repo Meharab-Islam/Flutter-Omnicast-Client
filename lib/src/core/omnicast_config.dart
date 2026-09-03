@@ -32,6 +32,9 @@ class OmniCastConfig {
   /// Maximum automatic reconnection attempts before entering error state.
   final int maxReconnectAttempts;
 
+  /// Whether debug console logging is enabled. Defaults to false.
+  final bool enableLogging;
+
   const OmniCastConfig({
     required this.hostUrl,
     this.apiUrl,
@@ -45,6 +48,7 @@ class OmniCastConfig {
     this.heartbeatInterval = const Duration(seconds: 15),
     this.reconnectDelay = const Duration(seconds: 3),
     this.maxReconnectAttempts = 5,
+    this.enableLogging = false,
   })  : jwtSecret = jwtSecret ?? apiSecret;
 
   /// Factory constructor that automatically normalizes any server domain or URL.
@@ -59,6 +63,7 @@ class OmniCastConfig {
     Duration heartbeatInterval = const Duration(seconds: 15),
     Duration reconnectDelay = const Duration(seconds: 3),
     int maxReconnectAttempts = 5,
+    bool enableLogging = false,
     bool? isSecure,
     String wsPath = '/ws',
     String apiPath = '/api',
@@ -91,6 +96,7 @@ class OmniCastConfig {
       heartbeatInterval: heartbeatInterval,
       reconnectDelay: reconnectDelay,
       maxReconnectAttempts: maxReconnectAttempts,
+      enableLogging: enableLogging,
     );
   }
 

@@ -370,5 +370,11 @@
     "seen": 1788431669.2518148,
     "ast_hash": "ef8afa416451be2582d981ee14e52363",
     "semantic_hash": ""
+  },
+  "LATE_JOIN_STATE_SYNC_GUIDE.md": {
+    "mtime": 1788431968.384875,
+    "seen": 1788431985.939096,
+    "ast_hash": "b07c0d6a0463a3801fa5d445d0700146",
+    "semantic_hash": ""
   }
 }

@@ -6,6 +6,7 @@ import '../models/interaction_models.dart';
 import '../models/room_models.dart';
 import '../models/seat_models.dart';
 import '../models/signaling_message.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Top-level function for offloading heavy JSON parsing to a background Dart Isolate.
 SignalingMessage? _parseJsonPayload(String raw) => SignalingMessage.tryDeserialize(raw);
@@ -132,7 +133,7 @@ class SignalingClient {
         uri = uri.replace(queryParameters: queryParams);
       }
 
-      debugPrint('[SignalingClient] Connecting to WebSocket: $uri');
+      OmniCastLogger.log('[SignalingClient] Connecting to WebSocket: $uri');
 
       await _cleanupActiveConnection();
 
@@ -149,9 +150,9 @@ class SignalingClient {
 
       _updateState(ClientConnectionState.connected);
       _startHeartbeat();
-      debugPrint('[SignalingClient] WebSocket successfully connected.');
+      OmniCastLogger.log('[SignalingClient] WebSocket successfully connected.');
     } catch (e) {
-      debugPrint('[SignalingClient] Connection error: $e');
+      OmniCastLogger.error('[SignalingClient] Connection error: $e');
       _updateState(ClientConnectionState.disconnected);
       rethrow;
     }

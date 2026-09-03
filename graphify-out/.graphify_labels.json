@@ -42,5 +42,6 @@
   "40": "handleRawMessage",
   "41": "omnicast_video_canvas.dart",
   "42": "🚪 OmniCast SDK: Room Management & Participant Ejection Guide",
-  "43": "🔄 OmniCast SDK: Late-Join State Synchronization Guide"
+  "43": "🔄 OmniCast SDK: Late-Join State Synchronization Guide",
+  "44": "🎪 OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide"
 }
