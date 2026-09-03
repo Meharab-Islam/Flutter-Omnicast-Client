@@ -1,16 +1,16 @@
 # Graph Report - omnicast_client  (2026-09-03)
 
 ## Corpus Check
-- 66 files · ~43,762 words
+- 66 files · ~43,814 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1348 nodes · 1624 edges · 48 communities (45 shown, 3 thin omitted)
+- 1348 nodes · 1625 edges · 48 communities (45 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5f2f5753`
+- Built from commit: `fc808a2b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -121,7 +121,7 @@ Nodes (37): double get, Duration get, int get, battleId, copyWith, deltaPoints, 
 
 ### Community 8 - "media_stream_manager.dart"
 Cohesion: 0.07
-Nodes (26): attachRemoteStream, _currentParameters, dispose, getOrCreateRemoteRenderer, getRenderer, hasLocalStream, initLocalRenderer, _isAudioMuted (+18 more)
+Nodes (27): attachRemoteStream, _currentParameters, dispose, getOrCreateRemoteRenderer, getRenderer, hasLocalStream, initLocalRenderer, _isAudioMuted (+19 more)
 
 ### Community 9 - "omnicast_flying_hearts_overlay.dart"
 Cohesion: 0.08
@@ -140,8 +140,8 @@ Cohesion: 0.07
 Nodes (26): dart:async, dart:convert, dart:typed_data, package:flutter/material.dart, package:flutter_test/flutter_test.dart, package:flutter/widgets.dart, package:http/http.dart, package:http/testing.dart (+18 more)
 
 ### Community 13 - "lib/omnicast_client.dart"
-Cohesion: 0.05
-Nodes (36): package:permission_handler/permission_handler.dart, src/api/omnicast_api.dart, src/auth/omnicast_token_generator.dart, src/core/omnicast_client.dart, src/core/omnicast_config.dart, src/datachannel/data_channel_manager.dart, src/interaction/interaction_manager.dart, src/media/audio_level_detector.dart (+28 more)
+Cohesion: 0.06
+Nodes (35): src/api/omnicast_api.dart, src/auth/omnicast_token_generator.dart, src/core/omnicast_client.dart, src/core/omnicast_config.dart, src/datachannel/data_channel_manager.dart, src/interaction/interaction_manager.dart, src/media/audio_level_detector.dart, src/media/global_media_config.dart (+27 more)
 
 ### Community 14 - "data_channel_manager.dart"
 Cohesion: 0.07

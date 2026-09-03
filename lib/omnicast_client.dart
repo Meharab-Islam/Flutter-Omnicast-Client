@@ -48,3 +48,4 @@ export 'src/widgets/omnicast_gifting_bottom_sheet.dart';
 export 'src/widgets/omnicast_viewers_bottom_sheet.dart';
 export 'src/utils/omnicast_logger.dart';
 export 'package:permission_handler/permission_handler.dart';
+export 'package:flutter_webrtc/flutter_webrtc.dart' show RTCVideoRenderer, RTCVideoView, RTCVideoViewObjectFit;

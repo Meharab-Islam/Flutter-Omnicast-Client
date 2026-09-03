@@ -2875,17 +2875,6 @@
       "source_location": null
     },
     {
-      "id": "package_permission_handler_permission_handler_dart",
-      "label": "package:permission_handler/permission_handler.dart",
-      "_origin": "ast",
-      "community": 13,
-      "community_name": "lib/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "package:permission_handler/permission_handler.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "src_api_omnicast_api_dart",
       "label": "src/api/omnicast_api.dart",
       "_origin": "ast",
@@ -14756,6 +14745,17 @@
       "community_name": "media_stream_manager.dart",
       "file_type": "code",
       "norm_label": "mediastream? get",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "package_permission_handler_permission_handler_dart",
+      "label": "package:permission_handler/permission_handler.dart",
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "media_stream_manager.dart",
+      "file_type": "code",
+      "norm_label": "package:permission_handler/permission_handler.dart",
       "source_file": null,
       "source_location": null
     },
@@ -31338,6 +31338,17 @@
     },
     {
       "source": "lib_src_media_media_stream_manager",
+      "target": "package_permission_handler_permission_handler_dart",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_stream_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_stream_manager",
       "target": "utils_omnicast_logger_dart",
       "relation": "imports",
       "_origin": "ast",
@@ -33153,5 +33164,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5f2f57536e15090e571c807939cd34f983bb4fcb"
+  "built_at_commit": "fc808a2bf326191390b9d6e32563968f464b71da"
 }
