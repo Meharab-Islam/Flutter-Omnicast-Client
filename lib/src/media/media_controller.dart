@@ -10,6 +10,7 @@ import 'audio_level_detector.dart';
 import 'global_media_config.dart';
 import 'media_stream_manager.dart';
 import 'video_parameters.dart';
+import '../utils/omnicast_logger.dart';
 
 /// Controls local hardware media, video quality presets, simulcast layers,
 /// adaptive streaming, Dynacast throttling, audio-only room enforcement, and lifecycle management.
@@ -382,6 +383,23 @@ class MediaController with WidgetsBindingObserver {
       userId: '',
       targetUser: targetUserId,
     ));
+  }
+
+  /// Built-in hardware permission requester for Camera and Microphone.
+  ///
+  /// Automatically prompts the operating system (Android & iOS) to grant camera and audio access
+  /// without requiring external permission_handler plugins or causing Gradle build issues.
+  Future<bool> requestPermissions({bool camera = true, bool microphone = true}) async {
+    try {
+      final stream = await _mediaStreamManager.openUserMedia(
+        video: camera,
+        audio: microphone,
+      );
+      return stream.getVideoTracks().isNotEmpty || stream.getAudioTracks().isNotEmpty;
+    } catch (e) {
+      OmniCastLogger.error('[MediaController] Permission or media access failed: $e');
+      return false;
+    }
   }
 
   /// Disposes internal listeners, observers, and atomic notifiers.

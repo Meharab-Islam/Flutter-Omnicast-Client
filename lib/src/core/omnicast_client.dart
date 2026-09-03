@@ -333,6 +333,12 @@ class OmniCastClient {
   /// Stream emitting when the viewer's co-host request is rejected.
   Stream<SignalingMessage> get onCoHostRejected => _seatManager.onSeatRejected;
 
+  /// Built-in hardware permission requester for Camera and Microphone.
+  ///
+  /// Prompts Android and iOS to grant microphone/camera permissions without external plugins.
+  Future<bool> requestPermissions({bool camera = true, bool microphone = true}) =>
+      _mediaController.requestPermissions(camera: camera, microphone: microphone);
+
   /// Binds internal signaling and WebRTC event subscriptions.
   void _bindInternalEventListeners() {
     // 1. WebRTC Local ICE Candidates -> Signaling Server

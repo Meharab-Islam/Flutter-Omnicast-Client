@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788432721.087432,
-    "seen": 1788432789.5895522,
-    "ast_hash": "ff85513b73ce653e470e9891da9d4709",
+    "mtime": 1788433682.8670552,
+    "seen": 1788433734.911715,
+    "ast_hash": "56fd803b19922fdf2a32c40efe8f39cd",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {
-    "mtime": 1788422427.903761,
-    "seen": 1788422467.487442,
-    "ast_hash": "8bec897527a2396a770b8abd762a72b1",
+    "mtime": 1788433702.4492757,
+    "seen": 1788433734.911725,
+    "ast_hash": "5f7e16dec4f3de0cfb75def65836af72",
     "semantic_hash": ""
   },
   "lib/src/media/video_parameters.dart": {
@@ -393,6 +393,12 @@
     "mtime": 1788432763.017214,
     "seen": 1788432789.58957,
     "ast_hash": "942500e7d45e16233f58bfd4a91edf0c",
+    "semantic_hash": ""
+  },
+  "DEVELOPER_QUICKSTART_GUIDE.md": {
+    "mtime": 1788433717.637782,
+    "seen": 1788433734.911746,
+    "ast_hash": "4aced46d6c82754469d73561140ed8b3",
     "semantic_hash": ""
   }
 }
