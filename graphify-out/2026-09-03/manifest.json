@@ -358,5 +358,11 @@
     "seen": 1788422467.487465,
     "ast_hash": "59cee23550bd31669b83b3d5e5041f0a",
     "semantic_hash": ""
+  },
+  "COMPLETE_SDK_DEVELOPER_GUIDE.md": {
+    "mtime": 1788422538.575082,
+    "seen": 1788422556.7637918,
+    "ast_hash": "59550678b327668115334face5fa5144",
+    "semantic_hash": ""
   }
 }
