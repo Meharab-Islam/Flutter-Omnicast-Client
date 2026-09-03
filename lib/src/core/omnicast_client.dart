@@ -266,6 +266,9 @@ class OmniCastClient {
   ValueNotifier<List<OmniCastParticipant>> get activeViewersList => _roomManager.activeViewersList;
   ValueNotifier<int> get viewerCountNotifier => _roomManager.totalViewerCount;
   ValueNotifier<int> get totalViewerCount => _roomManager.totalViewerCount;
+  ValueNotifier<bool> get showJoinMessagesNotifier => _roomState.showJoinMessagesNotifier;
+  bool get showJoinMessages => _roomState.showJoinMessages;
+  set showJoinMessages(bool value) => _roomState.showJoinMessages = value;
 
   /// Host action: Kicks/ejects a participant out of the live room.
   void kickUser(String targetUserId, {String? reason}) =>

@@ -58,6 +58,7 @@ class RoomOptions {
   final bool enableSimulcast;
   final bool enableDynacast;
   final int maxCoHosts;
+  final bool showJoinMessages;
   final Map<String, dynamic>? metadata;
 
   const RoomOptions({
@@ -68,6 +69,7 @@ class RoomOptions {
     this.enableSimulcast = true,
     this.enableDynacast = true,
     this.maxCoHosts = 4,
+    this.showJoinMessages = true,
     this.metadata,
   });
 
@@ -81,6 +83,7 @@ class RoomOptions {
         'enable_simulcast': isAudioOnly ? false : enableSimulcast,
         'enable_dynacast': enableDynacast,
         'max_co_hosts': maxCoHosts,
+        'show_join_messages': showJoinMessages,
         'metadata': ?metadata,
       };
 
@@ -96,6 +99,7 @@ class RoomOptions {
       enableSimulcast: roomType == RoomType.audio ? false : (json['enable_simulcast'] as bool? ?? true),
       enableDynacast: json['enable_dynacast'] as bool? ?? true,
       maxCoHosts: (json['max_co_hosts'] as num?)?.toInt() ?? 4,
+      showJoinMessages: json['show_join_messages'] as bool? ?? true,
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }

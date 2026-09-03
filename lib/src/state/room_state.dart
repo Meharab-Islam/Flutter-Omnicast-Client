@@ -35,8 +35,12 @@ class RoomState extends ChangeNotifier {
   // Native Reactive ValueNotifiers for headless UI canvas binding
   final ValueNotifier<RoomMode> roomModeNotifier = ValueNotifier<RoomMode>(RoomMode.solo);
   final ValueNotifier<PkScore> pkScoreNotifier = ValueNotifier<PkScore>(const PkScore());
+  final ValueNotifier<bool> showJoinMessagesNotifier = ValueNotifier<bool>(true);
 
   // Getters
+  bool get showJoinMessages => showJoinMessagesNotifier.value;
+  set showJoinMessages(bool val) => showJoinMessagesNotifier.value = val;
+
   String? get roomId => _roomId;
   String? get hostId => _hostId;
   String? get userId => _userId;

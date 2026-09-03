@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788431173.0258746,
-    "seen": 1788431226.024141,
-    "ast_hash": "1f87d76248311df38212c4883042965e",
+    "mtime": 1788431632.3393862,
+    "seen": 1788431669.251783,
+    "ast_hash": "b67a95cb1625fb2c5ee468bf088ce7dc",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -363,6 +363,18 @@
     "mtime": 1788422538.575082,
     "seen": 1788422556.7637918,
     "ast_hash": "59550678b327668115334face5fa5144",
+    "semantic_hash": ""
+  },
+  "ROOM_MANAGEMENT_AND_EJECTION_GUIDE.md": {
+    "mtime": 1788431645.479858,
+    "seen": 1788431669.2518148,
+    "ast_hash": "ef8afa416451be2582d981ee14e52363",
+    "semantic_hash": ""
+  },
+  "LATE_JOIN_STATE_SYNC_GUIDE.md": {
+    "mtime": 1788431968.384875,
+    "seen": 1788431985.939096,
+    "ast_hash": "b07c0d6a0463a3801fa5d445d0700146",
     "semantic_hash": ""
   }
 }
