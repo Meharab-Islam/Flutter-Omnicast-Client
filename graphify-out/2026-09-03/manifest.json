@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788420627.5108302,
-    "seen": 1788420765.136367,
-    "ast_hash": "ca3179b065fb03b339603bb9f4b0e38d",
+    "mtime": 1788420862.9674742,
+    "seen": 1788420937.828467,
+    "ast_hash": "a741c98e4cdb5bb33d4f23ce3f8c60a9",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "lib/src/signaling/signaling_client.dart": {
-    "mtime": 1788420656.735042,
-    "seen": 1788420765.136378,
-    "ast_hash": "095654f611a4dc8ee93f272b4b1f6dcf",
+    "mtime": 1788420818.5515127,
+    "seen": 1788420937.8284779,
+    "ast_hash": "54b1c019a52ecc1588f04b9a038ad8c0",
     "semantic_hash": ""
   },
   "lib/src/state/room_state.dart": {
@@ -126,10 +126,10 @@
     "semantic_hash": ""
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1787897878.2514427,
-    "seen": 1787897945.54799,
-    "ast_hash": "fe12120e3c4184d57824aeee84149031",
-    "semantic_hash": "fe12120e3c4184d57824aeee84149031"
+    "mtime": 1788420844.056352,
+    "seen": 1788420937.828477,
+    "ast_hash": "9852d2692ef6b49ea019341697123d40",
+    "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {
     "mtime": 1787893114.913189,

@@ -77,9 +77,17 @@ class RoomManager {
   }
 
   final _roomClosedByHostController = StreamController<String>.broadcast();
+  final _kickedFromRoomController = StreamController<KickedEvent>.broadcast();
+  final _userKickedController = StreamController<String>.broadcast();
 
   /// Stream emitting when the room is terminated/closed by the host.
   Stream<String> get onRoomClosedByHost => _roomClosedByHostController.stream;
+
+  /// Stream emitting when the local user has been kicked out of the room by host.
+  Stream<KickedEvent> get onKickedFromRoom => _kickedFromRoomController.stream;
+
+  /// Stream emitting the userId whenever any user in the room is kicked.
+  Stream<String> get onUserKicked => _userKickedController.stream;
 
   /// Listens to real-time participant signaling events with high-performance debouncing.
   void _bindSignalingEvents() {
@@ -149,8 +157,49 @@ class RoomManager {
             _handleHostClosedRoom(closedRoomId.isNotEmpty ? closedRoomId : (_roomState.roomId ?? ''));
           }
           break;
+
+        // 6. User Kicked / Ejected Event
+        case SignalingEvents.kickUser:
+        case SignalingEvents.userKicked:
+        case 'kicked':
+        case 'user_ejected':
+          final targetUser = msg.targetUser ??
+              (msg.payload is Map<String, dynamic>
+                  ? (msg.payload['target_user'] as String? ?? msg.payload['user_id'] as String?)
+                  : msg.userId);
+          if (targetUser != null && targetUser.isNotEmpty) {
+            _handleUserKicked(targetUser, msg);
+          }
+          break;
       }
     });
+  }
+
+  Future<void> _handleUserKicked(String targetUserId, SignalingMessage msg) async {
+    final payloadMap = msg.payload is Map<String, dynamic>
+        ? msg.payload as Map<String, dynamic>
+        : <String, dynamic>{};
+    final event = KickedEvent.fromJson(
+      payloadMap,
+      defaultRoomId: _roomState.roomId,
+      defaultUserId: targetUserId,
+    );
+
+    _userKickedController.add(targetUserId);
+
+    // If the local user is the one who was kicked:
+    if (_roomState.userId == targetUserId) {
+      debugPrint(
+          '[RoomManager] Local user $targetUserId was kicked from room ${_roomState.roomId} by host');
+      _kickedFromRoomController.add(event);
+      await _webRTCManager.closePeerConnection();
+      await _webRTCManager.mediaStreamManager.stopLocalMedia();
+      _roomState.reset();
+    } else {
+      // Remote participant was kicked: remove from local viewer and seat state
+      debugPrint('[RoomManager] Participant $targetUserId was kicked from room ${_roomState.roomId}');
+      _queueUserLeft(targetUserId);
+    }
   }
 
   Future<void> _handleHostClosedRoom(String roomId) async {
@@ -389,8 +438,8 @@ class RoomManager {
     await leaveRoom();
   }
 
-  /// Host action: Kicks a specific user out of the room.
-  void kickUser(String targetUserId) {
+  /// Host action: Kicks a specific user out of the room with an optional reason message.
+  void kickUser(String targetUserId, {String? reason}) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
     _signalingClient.send(SignalingMessage(
@@ -398,6 +447,13 @@ class RoomManager {
       roomId: _roomState.roomId!,
       userId: _roomState.userId!,
       targetUser: targetUserId,
+      payload: {
+        'room_id': _roomState.roomId!,
+        'target_user': targetUserId,
+        'user_id': targetUserId,
+        'reason': reason ?? 'Kicked by host',
+        'kicked_by': _roomState.userId,
+      },
     ));
   }
 
@@ -407,6 +463,8 @@ class RoomManager {
     _signalingSubscription?.cancel();
     _roomState.removeListener(_syncGranularNotifiers);
     _roomClosedByHostController.close();
+    _kickedFromRoomController.close();
+    _userKickedController.close();
 
     totalViewerCount.dispose();
     activeViewersList.dispose();

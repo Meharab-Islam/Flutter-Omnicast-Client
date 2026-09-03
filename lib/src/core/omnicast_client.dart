@@ -194,7 +194,17 @@ class OmniCastClient {
   Stream<RoomModel> get onRoomCreated => _signalingClient.onRoomCreated;
   Stream<String> get onRoomClosed => _signalingClient.onRoomClosed;
   Stream<String> get onRoomClosedByHost => _roomManager.onRoomClosedByHost;
+  Stream<KickedEvent> get onKickedFromRoom => _roomManager.onKickedFromRoom;
+  Stream<String> get onUserKicked => _roomManager.onUserKicked;
   Stream<SignalingMessage> get onMediaStateChanged => _signalingClient.onMediaStateChanged;
+
+  /// Host action: Kicks/ejects a participant out of the live room.
+  void kickUser(String targetUserId, {String? reason}) =>
+      _roomManager.kickUser(targetUserId, reason: reason);
+
+  /// Host action alias: Kicks/ejects a participant out of the live room.
+  void kickParticipant(String targetUserId, {String? reason}) =>
+      _roomManager.kickUser(targetUserId, reason: reason);
 
   /// Binds internal signaling and WebRTC event subscriptions.
   void _bindInternalEventListeners() {

@@ -95,6 +95,7 @@ abstract final class SignalingEvents {
   static const String viewerUpdate = 'viewer_update';
   static const String userJoined = 'user_joined';
   static const String userLeft = 'user_left';
+  static const String userKicked = 'user_kicked';
 
   // Social & Interactive Events
   static const String chat = 'chat';

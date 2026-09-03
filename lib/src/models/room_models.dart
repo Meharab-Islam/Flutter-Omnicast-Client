@@ -355,3 +355,38 @@ class RoomModel {
 /// Backward compatibility alias for [RoomModel].
 typedef ActiveLiveRoom = RoomModel;
 
+/// Represents a room kick/ejection event dispatched when a user is forcefully removed.
+class KickedEvent {
+  final String roomId;
+  final String userId;
+  final String? reason;
+  final String? kickedBy;
+  final DateTime timestamp;
+
+  const KickedEvent({
+    required this.roomId,
+    required this.userId,
+    this.reason,
+    this.kickedBy,
+    required this.timestamp,
+  });
+
+  factory KickedEvent.fromJson(Map<String, dynamic> json, {String? defaultRoomId, String? defaultUserId}) {
+    return KickedEvent(
+      roomId: json['room_id'] as String? ?? json['roomId'] as String? ?? defaultRoomId ?? '',
+      userId: json['target_user'] as String? ?? json['user_id'] as String? ?? json['userId'] as String? ?? defaultUserId ?? '',
+      reason: json['reason'] as String? ?? json['message'] as String?,
+      kickedBy: json['kicked_by'] as String? ?? json['host_id'] as String?,
+      timestamp: DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'room_id': roomId,
+        'user_id': userId,
+        'reason': reason,
+        'kicked_by': kickedBy,
+        'timestamp': timestamp.toIso8601String(),
+      };
+}
+
