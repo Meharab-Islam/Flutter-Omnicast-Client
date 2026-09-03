@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1788435001.041501,
-    "seen": 1788435076.4497862,
-    "ast_hash": "def94b486626ca9ac63c52513d5a6227",
+    "mtime": 1788435600.9150279,
+    "seen": 1788435626.6060438,
+    "ast_hash": "9e78f230c2aea4698782f20879893345",
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {

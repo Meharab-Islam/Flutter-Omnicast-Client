@@ -122,6 +122,35 @@ class MediaStreamManager {
     _isVideoMuted = !enabled;
   }
 
+  /// Explicitly mutes or unmutes a remote peer's media track by kind ('audio' or 'video').
+  void setRemoteTrackEnabled(String? userId, String kind, bool enabled) {
+    if (userId != null && _remoteStreams.containsKey(userId)) {
+      final stream = _remoteStreams[userId]!;
+      if (kind == 'audio') {
+        for (final track in stream.getAudioTracks()) {
+          track.enabled = enabled;
+        }
+      } else if (kind == 'video') {
+        for (final track in stream.getVideoTracks()) {
+          track.enabled = enabled;
+        }
+      }
+    } else {
+      // If userId is omitted or empty, apply to all remote streams
+      for (final stream in _remoteStreams.values) {
+        if (kind == 'audio') {
+          for (final track in stream.getAudioTracks()) {
+            track.enabled = enabled;
+          }
+        } else if (kind == 'video') {
+          for (final track in stream.getVideoTracks()) {
+            track.enabled = enabled;
+          }
+        }
+      }
+    }
+  }
+
   /// Retrieves or creates and initializes an [RTCVideoRenderer] for a given [userId].
   Future<RTCVideoRenderer> getOrCreateRemoteRenderer(String userId) async {
     if (_remoteRenderers.containsKey(userId)) {

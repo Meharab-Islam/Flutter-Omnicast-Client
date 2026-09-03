@@ -322,6 +322,28 @@ class WebRTCManager {
     }
   }
 
+  /// Strictly enables/mutes a local track both on [MediaStreamTrack] and on all matching [RTCRtpSender]s.
+  Future<void> setLocalTrackEnabled(String kind, bool enabled) async {
+    if (kind == 'audio') {
+      mediaStreamManager.toggleAudio(enabled);
+    } else if (kind == 'video') {
+      mediaStreamManager.toggleVideo(enabled);
+    }
+
+    if (_peerConnection != null) {
+      try {
+        final senders = await _peerConnection!.getSenders();
+        for (final sender in senders) {
+          if (sender.track?.kind == kind) {
+            sender.track?.enabled = enabled;
+          }
+        }
+      } catch (e) {
+        OmniCastLogger.error('[WebRTCManager] Error setting sender track enabled: $e');
+      }
+    }
+  }
+
   /// Dynacast: Dynamically pauses/resumes sending a specific simulcast layer upstream (e.g. 'f', 'h', 'q').
   Future<void> setPublisherLayerActive(String rid, bool active) async {
     if (_videoSender == null) return;

@@ -219,7 +219,7 @@ class MediaController with WidgetsBindingObserver {
 
   /// Enables or mutes the local microphone.
   void setMicrophoneMuted(bool muted) {
-    _mediaStreamManager.toggleAudio(!muted);
+    _webRTCManager.setLocalTrackEnabled('audio', !muted);
     isMicrophoneMutedNotifier.value = muted;
 
     if (_roomState.userId != null) {
@@ -236,6 +236,7 @@ class MediaController with WidgetsBindingObserver {
           'kind': 'audio',
           'muted': muted,
           'is_muted': muted,
+          'audio_muted': muted,
         },
       ));
     }
@@ -247,7 +248,7 @@ class MediaController with WidgetsBindingObserver {
       isCameraEnabledNotifier.value = false;
       return;
     }
-    _mediaStreamManager.toggleVideo(enabled);
+    _webRTCManager.setLocalTrackEnabled('video', enabled);
     isCameraEnabledNotifier.value = enabled;
 
     if (_roomState.userId != null) {
@@ -263,8 +264,10 @@ class MediaController with WidgetsBindingObserver {
           'type': 'video',
           'kind': 'video',
           'muted': !enabled,
+          'video_muted': !enabled,
           'camera_off': !enabled,
           'is_camera_off': !enabled,
+          'enabled': enabled,
         },
       ));
     }
@@ -278,9 +281,14 @@ class MediaController with WidgetsBindingObserver {
 
       if (payload is Map<String, dynamic>) {
         final type = payload['type'] as String? ?? payload['kind'] as String? ?? '';
-        final isMuted = (payload['muted'] as bool?) ?? (payload['is_muted'] as bool?) ?? false;
+        final isMuted = (payload['muted'] as bool?) ??
+            (payload['is_muted'] as bool?) ??
+            (payload['audio_muted'] as bool?) ??
+            false;
         final isCameraOff = (payload['camera_off'] as bool?) ??
             (payload['is_camera_off'] as bool?) ??
+            (payload['video_muted'] as bool?) ??
+            (payload['enabled'] is bool ? !(payload['enabled'] as bool) : null) ??
             (type == 'video' ? isMuted : false);
 
         // If the host force-muted or disabled the camera of this local user
@@ -288,12 +296,19 @@ class MediaController with WidgetsBindingObserver {
             (payload['target_user'] == _roomState.userId &&
                 payload['forced_by_host'] == true)) {
           if (type == 'audio') {
-            _mediaStreamManager.toggleAudio(!isMuted);
+            _webRTCManager.setLocalTrackEnabled('audio', !isMuted);
             isMicrophoneMutedNotifier.value = isMuted;
           } else if (type == 'video') {
-            _mediaStreamManager.toggleVideo(!isCameraOff);
+            _webRTCManager.setLocalTrackEnabled('video', !isCameraOff);
             isCameraEnabledNotifier.value = !isCameraOff;
           }
+        }
+
+        // Synchronize remote media stream tracks to immediately mute sound or disable video frames
+        if (type == 'audio') {
+          _mediaStreamManager.setRemoteTrackEnabled(targetUserId.isNotEmpty ? targetUserId : null, 'audio', !isMuted);
+        } else if (type == 'video') {
+          _mediaStreamManager.setRemoteTrackEnabled(targetUserId.isNotEmpty ? targetUserId : null, 'video', !isCameraOff);
         }
 
         if (targetUserId == _roomState.hostId || targetUserId.isEmpty || _roomState.hostId == null) {

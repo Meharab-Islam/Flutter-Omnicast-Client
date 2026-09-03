@@ -562,6 +562,24 @@ class RoomManager {
         'avatar_url': aUrl,
       },
     ));
+
+    // Also broadcast explicit user_joined notification to room peers
+    _signalingClient.send(SignalingMessage(
+      event: 'user_joined',
+      roomId: roomId,
+      userId: userId,
+      payload: {
+        'user_id': userId,
+        'userId': userId,
+        'displayName': dName,
+        'display_name': dName,
+        'name': dName,
+        'avatar': aUrl,
+        'avatar_url': aUrl,
+        'role': 'viewer',
+        'metadata': metadata,
+      },
+    ));
   }
 
   /// Periodically synchronizes room state, active seats, and viewers from backend.
@@ -613,6 +631,15 @@ class RoomManager {
         event: SignalingEvents.leaveRoom,
         roomId: _roomState.roomId!,
         userId: _roomState.userId!,
+      ));
+      _signalingClient.send(SignalingMessage(
+        event: 'user_left',
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {
+          'user_id': _roomState.userId!,
+          'userId': _roomState.userId!,
+        },
       ));
     }
 
