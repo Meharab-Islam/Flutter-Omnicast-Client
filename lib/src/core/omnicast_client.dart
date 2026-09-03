@@ -339,6 +339,14 @@ class OmniCastClient {
   Future<bool> requestPermissions({bool camera = true, bool microphone = true}) =>
       _mediaController.requestPermissions(camera: camera, microphone: microphone);
 
+  /// REST API: Fetches all active live broadcasting rooms from the backend (`GET /rooms`).
+  Future<List<RoomModel>> getLiveRooms({Duration timeout = const Duration(seconds: 10)}) =>
+      _api.getLiveRooms(timeout: timeout);
+
+  /// REST API: Fetches details and active viewers for a single live room (`GET /rooms/{roomId}`).
+  Future<Map<String, dynamic>?> getRoom(String roomId, {Duration timeout = const Duration(seconds: 5)}) =>
+      _api.getRoom(roomId, timeout: timeout);
+
   /// Binds internal signaling and WebRTC event subscriptions.
   void _bindInternalEventListeners() {
     // 1. WebRTC Local ICE Candidates -> Signaling Server
