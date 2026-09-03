@@ -477,6 +477,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_state_room_state_showjoinmessages",
+      "label": "showJoinMessages",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "room_state.dart",
+      "file_type": "code",
+      "norm_label": "showjoinmessages",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_state_room_state_showjoinmessagesnotifier",
+      "label": "showJoinMessagesNotifier",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "room_state.dart",
+      "file_type": "code",
+      "norm_label": "showjoinmessagesnotifier",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_state_room_state_syncroominfo",
       "label": "syncRoomInfo",
       "_origin": "ast",
@@ -1434,28 +1456,6 @@
       "source_location": null
     },
     {
-      "id": "gradient",
-      "label": "Gradient?",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "gradient?",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "lib_src_models_pk_models_pkstate",
-      "label": "PKState",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "pkstate",
-      "source_file": "lib/src/models/pk_models.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_pk_pk_manager",
       "label": "pk_manager.dart",
       "_origin": "ast",
@@ -1775,138 +1775,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_pk_score_progress_bar",
-      "label": "pk_score_progress_bar.dart",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "pk_score_progress_bar.dart",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_borderradius",
-      "label": "borderRadius",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "borderradius",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_build",
-      "label": "build",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "build",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_formattimer",
-      "label": "_formatTimer",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "_formattimer",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_height",
-      "label": "height",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "height",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_hostgradient",
-      "label": "hostGradient",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "hostgradient",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_opponentgradient",
-      "label": "opponentGradient",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "opponentgradient",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_pkstate",
-      "label": "pkState",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "pkstate",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
-      "label": "scoreTextStyle",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "scoretextstyle",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_showtimer",
-      "label": "showTimer",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "showtimer",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_pk_score_progress_bar_timertextstyle",
-      "label": "timerTextStyle",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "timertextstyle",
-      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "models_pk_models_dart",
-      "label": "../models/pk_models.dart",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "../models/pk_models.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "pkstate_get",
       "label": "PKState get",
       "_origin": "ast",
@@ -1914,17 +1782,6 @@
       "community_name": "pk_manager.dart",
       "file_type": "code",
       "norm_label": "pkstate get",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "textstyle",
-      "label": "TextStyle?",
-      "_origin": "ast",
-      "community": 10,
-      "community_name": "pk_manager.dart",
-      "file_type": "code",
-      "norm_label": "textstyle?",
       "source_file": null,
       "source_location": null
     },
@@ -3194,6 +3051,17 @@
       "source_location": null
     },
     {
+      "id": "gradient",
+      "label": "Gradient?",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "gradient?",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "lib_src_datachannel_data_channel_manager",
       "label": "data_channel_manager.dart",
       "_origin": "ast",
@@ -3513,6 +3381,149 @@
       "source_location": null
     },
     {
+      "id": "lib_src_models_pk_models_pkstate",
+      "label": "PKState",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstate",
+      "source_file": "lib/src/models/pk_models.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar",
+      "label": "pk_score_progress_bar.dart",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "pk_score_progress_bar.dart",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_borderradius",
+      "label": "borderRadius",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "borderradius",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_formattimer",
+      "label": "_formatTimer",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "_formattimer",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_height",
+      "label": "height",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "height",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_hostgradient",
+      "label": "hostGradient",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "hostgradient",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_opponentgradient",
+      "label": "opponentGradient",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "opponentgradient",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_pkstate",
+      "label": "pkState",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "pkstate",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_scoretextstyle",
+      "label": "scoreTextStyle",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "scoretextstyle",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_showtimer",
+      "label": "showTimer",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "showtimer",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_pk_score_progress_bar_timertextstyle",
+      "label": "timerTextStyle",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "timertextstyle",
+      "source_file": "lib/src/widgets/pk_score_progress_bar.dart",
+      "source_location": null
+    },
+    {
+      "id": "models_pk_models_dart",
+      "label": "../models/pk_models.dart",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "../models/pk_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "rtcdatachannel",
       "label": "RTCDataChannel?",
       "_origin": "ast",
@@ -3520,6 +3531,17 @@
       "community_name": "data_channel_manager.dart",
       "file_type": "code",
       "norm_label": "rtcdatachannel?",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "textstyle",
+      "label": "TextStyle?",
+      "_origin": "ast",
+      "community": 14,
+      "community_name": "data_channel_manager.dart",
+      "file_type": "code",
+      "norm_label": "textstyle?",
       "source_file": null,
       "source_location": null
     },
@@ -3916,6 +3938,17 @@
       "community_name": "room_models.dart",
       "file_type": "code",
       "norm_label": "roomtype",
+      "source_file": "lib/src/models/room_models.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_models_room_models_showjoinmessages",
+      "label": "showJoinMessages",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "room_models.dart",
+      "file_type": "code",
+      "norm_label": "showjoinmessages",
       "source_file": "lib/src/models/room_models.dart",
       "source_location": null
     },
@@ -7583,28 +7616,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
-      "label": "OmniCastGiftingBottomSheet",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "omnicast_gifting_bottom_sheet.dart",
-      "file_type": "code",
-      "norm_label": "omnicastgiftingbottomsheet",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
-      "label": "_OmniCastGiftingBottomSheetState",
-      "_origin": "ast",
-      "community": 26,
-      "community_name": "omnicast_gifting_bottom_sheet.dart",
-      "file_type": "code",
-      "norm_label": "_omnicastgiftingbottomsheetstate",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_ongiftsent",
       "label": "onGiftSent",
       "_origin": "ast",
@@ -8971,6 +8982,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_core_omnicast_client_showjoinmessages",
+      "label": "showJoinMessages",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "showjoinmessages",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_core_omnicast_client_showjoinmessagesnotifier",
+      "label": "showJoinMessagesNotifier",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "core/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "showjoinmessagesnotifier",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_core_omnicast_client_signaling",
       "label": "signaling",
       "_origin": "ast",
@@ -9704,6 +9737,28 @@
       "file_type": "code",
       "norm_label": "_omnicastflyingheartsoverlaystate",
       "source_file": "lib/src/widgets/omnicast_flying_hearts_overlay.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
+      "label": "OmniCastGiftingBottomSheet",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "_OmniCastFlyingHeartsOverlayState",
+      "file_type": "code",
+      "norm_label": "omnicastgiftingbottomsheet",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
+      "label": "_OmniCastGiftingBottomSheetState",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "_OmniCastFlyingHeartsOverlayState",
+      "file_type": "code",
+      "norm_label": "_omnicastgiftingbottomsheetstate",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
       "source_location": null
     },
     {
@@ -11739,6 +11794,210 @@
       "norm_label": "\ud83d\udcd1 table of contents",
       "source_file": "LATE_JOIN_STATE_SYNC_GUIDE.md",
       "source_location": "L7"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide",
+      "label": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "room_lifecycle_viewers_and_enter_event_guide.md",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_1_architecture_lifecycle_overview",
+      "label": "1. Architecture & Lifecycle Overview",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. architecture & lifecycle overview",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L24"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_2_1_host_ending_the_room_ejecting_all_viewers",
+      "label": "2. 1. Host Ending the Room & Ejecting All Viewers",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. 1. host ending the room & ejecting all viewers",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L52"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_3_2_viewing_the_real_time_viewers_list",
+      "label": "3. 2. Viewing the Real-Time Viewers List",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "3. 2. viewing the real-time viewers list",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L110"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_4_3_real_time_room_entrance_messages_on_off_toggle",
+      "label": "4. 3. Real-Time Room Entrance Messages & On/Off Toggle",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "4. 3. real-time room entrance messages & on/off toggle",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L188"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_5_complete_ready_to_use_flutter_ui_screen_example",
+      "label": "5. Complete Ready-to-Use Flutter UI Screen Example",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "5. complete ready-to-use flutter ui screen example",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L358"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_a_1_line_pre_built_modal_bottom_sheet",
+      "label": "A. 1-Line Pre-built Modal Bottom Sheet",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "a. 1-line pre-built modal bottom sheet",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L112"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_a_entrance_event_stream_data",
+      "label": "A. Entrance Event Stream & Data",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "a. entrance event stream & data",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L190"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_a_host_triggers_room_closure",
+      "label": "A. Host Triggers Room Closure:",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "a. host triggers room closure:",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L56"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_b_toggling_entrance_messages_on_off_host_settings",
+      "label": "B. Toggling Entrance Messages On/Off (Host & Settings)",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "b. toggling entrance messages on/off (host & settings)",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L205"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_b_top_bar_horizontal_avatars_row",
+      "label": "B. Top Bar Horizontal Avatars Row",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "b. top bar horizontal avatars row",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L127"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_b_viewers_automatically_handle_closure",
+      "label": "B. Viewers Automatically Handle Closure:",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "b. viewers automatically handle closure:",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L62"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_built_in_features",
+      "label": "\u2728 Built-in Features:",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\u2728 built-in features:",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L120"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_c_animated_sliding_entrance_banner_widget",
+      "label": "C. Animated Sliding Entrance Banner Widget",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "c. animated sliding entrance banner widget",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L234"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "label": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83c\udfaa omnicast sdk: room closure, viewers list & toggleable entrance banners guide",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_settings_toggle_switch_in_live_room",
+      "label": "Settings Toggle Switch in Live Room:",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "settings toggle switch in live room:",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L211"
+    },
+    {
+      "id": "room_lifecycle_viewers_and_enter_event_guide_table_of_contents",
+      "label": "\ud83d\udcd1 Table of Contents",
+      "_origin": "ast",
+      "community": 44,
+      "community_name": "\ud83c\udfaa OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83d\udcd1 table of contents",
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L10"
     },
     {
       "id": "lib_src_room_room_manager",
@@ -13973,6 +14232,18 @@
       "confidence_score": 1.0,
       "context": "variable_type",
       "source_file": "lib/src/api/omnicast_api.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "bool_get",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "variable_type",
+      "source_file": "lib/src/core/omnicast_client.dart",
       "source_location": null,
       "weight": 1.0
     },
@@ -17979,6 +18250,182 @@
       "weight": 1.0
     },
     {
+      "source": "room_lifecycle_viewers_and_enter_event_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_2_1_host_ending_the_room_ejecting_all_viewers",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_a_host_triggers_room_closure",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_2_1_host_ending_the_room_ejecting_all_viewers",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_b_viewers_automatically_handle_closure",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_3_2_viewing_the_real_time_viewers_list",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_a_1_line_pre_built_modal_bottom_sheet",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_3_2_viewing_the_real_time_viewers_list",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_b_top_bar_horizontal_avatars_row",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_4_3_real_time_room_entrance_messages_on_off_toggle",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_a_entrance_event_stream_data",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L190",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_4_3_real_time_room_entrance_messages_on_off_toggle",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_b_toggling_entrance_messages_on_off_host_settings",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L205",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_4_3_real_time_room_entrance_messages_on_off_toggle",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_c_animated_sliding_entrance_banner_widget",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L234",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_a_1_line_pre_built_modal_bottom_sheet",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_built_in_features",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_b_toggling_entrance_messages_on_off_host_settings",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_settings_toggle_switch_in_live_room",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L211",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_table_of_contents",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_3_2_viewing_the_real_time_viewers_list",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_4_3_real_time_room_entrance_messages_on_off_toggle",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L188",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_1_architecture_lifecycle_overview",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_5_complete_ready_to_use_flutter_ui_screen_example",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L358",
+      "weight": 1.0
+    },
+    {
+      "source": "room_lifecycle_viewers_and_enter_event_guide_omnicast_sdk_room_closure_viewers_list_toggleable_entrance_banners_guide",
+      "target": "room_lifecycle_viewers_and_enter_event_guide_2_1_host_ending_the_room_ejecting_all_viewers",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
       "source": "room_management_and_ejection_guide",
       "target": "room_management_and_ejection_guide_omnicast_sdk_room_management_participant_ejection_guide",
       "relation": "contains",
@@ -18839,6 +19286,28 @@
     {
       "source": "lib_src_core_omnicast_client",
       "target": "lib_src_core_omnicast_client_seats",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_showjoinmessages",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_core_omnicast_client",
+      "target": "lib_src_core_omnicast_client_showjoinmessagesnotifier",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21743,6 +22212,17 @@
     {
       "source": "lib_src_models_room_models",
       "target": "lib_src_models_room_models_roomtype",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/models/room_models.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_models_room_models",
+      "target": "lib_src_models_room_models_showjoinmessages",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -25021,6 +25501,28 @@
     {
       "source": "lib_src_state_room_state",
       "target": "lib_src_state_room_state_setsession",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_state_room_state",
+      "target": "lib_src_state_room_state_showjoinmessages",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_state_room_state",
+      "target": "lib_src_state_room_state_showjoinmessagesnotifier",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -30553,5 +31055,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6be28a9483c7c064231094118770a1d42480296e"
+  "built_at_commit": "f5210140e2c4c6df0f958f0eba2629963a78ca15"
 }

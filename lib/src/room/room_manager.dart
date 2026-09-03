@@ -107,6 +107,10 @@ class RoomManager {
       switch (msg.event) {
         // 1. Initial Snapshot on Join
         case SignalingEvents.roomInfoSync:
+        case 'room_info':
+        case 'roomInfoSync':
+        case 'sync_room_info':
+        case 'room_sync':
           if (msg.payload is Map<String, dynamic>) {
             _handleRoomInfoSync(msg.payload as Map<String, dynamic>);
           }
@@ -114,43 +118,77 @@ class RoomManager {
 
         // 2. Real-time User Joined Event
         case SignalingEvents.userJoined:
-          if (msg.payload is Map<String, dynamic>) {
-            final participant = OmniCastParticipant.fromJson(
-              msg.payload as Map<String, dynamic>,
-            );
-            _queueUserJoined(participant);
-          } else {
-            final participant = OmniCastParticipant(
-              userId: msg.userId,
-              joinedAt: DateTime.now(),
-            );
+        case 'user_join':
+        case 'userJoined':
+        case 'participant_joined':
+        case 'participantJoined':
+        case 'viewer_joined':
+        case 'viewerJoined':
+        case 'room_user_joined':
+        case 'member_joined':
+        case 'join_room':
+        case 'join':
+          final payloadMap = msg.payload is Map<String, dynamic>
+              ? msg.payload as Map<String, dynamic>
+              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
+          final effectivePayload = {
+            'user_id': msg.userId,
+            ...payloadMap,
+          };
+          final participant = OmniCastParticipant.fromJson(effectivePayload);
+          if (participant.userId.isNotEmpty) {
             _queueUserJoined(participant);
           }
           break;
 
         // 3. Real-time User Left Event
         case SignalingEvents.userLeft:
+        case 'user_leave':
+        case 'userLeft':
+        case 'participant_left':
+        case 'participantLeft':
+        case 'viewer_left':
+        case 'viewerLeft':
+        case 'room_user_left':
+        case 'member_left':
+        case 'leave_room':
+        case 'leave':
           final leftUserId = msg.payload is Map && msg.payload['user_id'] != null
               ? msg.payload['user_id'].toString()
-              : msg.userId;
-          _queueUserLeft(leftUserId);
+              : (msg.payload is Map && msg.payload['userId'] != null
+                  ? msg.payload['userId'].toString()
+                  : msg.userId);
+          if (leftUserId.isNotEmpty) {
+            _queueUserLeft(leftUserId);
+          }
           break;
 
         // 4. Batch Viewer Count Sync
         case SignalingEvents.viewerUpdate:
+        case 'viewers_update':
+        case 'viewerUpdate':
+        case 'viewersUpdate':
+        case 'viewer_count':
+        case 'viewers_count':
+        case 'room_viewers':
+        case 'viewers':
           if (msg.payload is Map<String, dynamic>) {
             final payload = msg.payload as Map<String, dynamic>;
             final count = (payload['viewers_count'] as num?)?.toInt() ??
                 (payload['viewer_count'] as num?)?.toInt() ??
-                0;
+                (payload['count'] as num?)?.toInt() ??
+                totalViewerCount.value;
             totalViewerCount.value = count;
             if (payload['viewers'] is List) {
               final viewers = (payload['viewers'] as List)
-                  .map((e) => OmniCastParticipant.fromJson(e as Map<String, dynamic>))
+                  .whereType<Map>()
+                  .map((e) => OmniCastParticipant.fromJson(Map<String, dynamic>.from(e)))
                   .take(maxViewersInMemory)
                   .toList();
               activeViewersList.value = viewers;
             }
+          } else if (msg.payload is num) {
+            totalViewerCount.value = (msg.payload as num).toInt();
           }
           break;
 
@@ -231,14 +269,15 @@ class RoomManager {
 
     if (data['viewers'] is List) {
       final list = (data['viewers'] as List)
-          .map((e) => OmniCastParticipant.fromJson(e as Map<String, dynamic>))
+          .whereType<Map>()
+          .map((e) => OmniCastParticipant.fromJson(Map<String, dynamic>.from(e)))
           .take(maxViewersInMemory)
           .toList();
       activeViewersList.value = list;
     }
   }
 
-  /// Queues user joined event with micro-batch throttle (50ms) to eliminate UI thread frame drops.
+  /// Queues user joined event with immediate in-memory reactivity and micro-batch throttle.
   void _queueUserJoined(OmniCastParticipant participant) {
     _roomState.addParticipant(participant);
 
@@ -247,10 +286,10 @@ class RoomManager {
 
     totalViewerCount.value++;
     _participantJoinedController.add(participant);
-    _scheduleBatchFlush();
+    _flushParticipantBatch();
   }
 
-  /// Queues user left event with micro-batch throttle.
+  /// Queues user left event with immediate in-memory reactivity.
   void _queueUserLeft(String userId) {
     _roomState.removeParticipant(userId);
 
@@ -261,12 +300,7 @@ class RoomManager {
       totalViewerCount.value--;
     }
     _participantLeftController.add(userId);
-    _scheduleBatchFlush();
-  }
-
-  void _scheduleBatchFlush() {
-    _batchDebounceTimer?.cancel();
-    _batchDebounceTimer = Timer(const Duration(milliseconds: 50), _flushParticipantBatch);
+    _flushParticipantBatch();
   }
 
   void _flushParticipantBatch() {

@@ -136,19 +136,37 @@ class OmniCastParticipant {
     };
 
     final rawMeta = json['metadata'];
-    final meta = rawMeta is Map<String, dynamic>
-        ? Map<String, dynamic>.from(rawMeta)
-        : (rawMeta is Map
-            ? Map<String, dynamic>.from(rawMeta)
-            : const <String, dynamic>{});
+    final meta = <String, dynamic>{};
+    if (rawMeta is Map) {
+      meta.addAll(Map<String, dynamic>.from(rawMeta));
+    }
+    if (json['level'] != null) meta['level'] = json['level'];
+    if (json['is_vip'] != null) meta['is_vip'] = json['is_vip'];
+    if (json['isVip'] != null) meta['is_vip'] = json['isVip'];
+    if (json['badge'] != null) meta['badge'] = json['badge'];
+
+    final userId = (json['user_id'] ?? json['userId'] ?? json['id'] ?? json['sub'] ?? '').toString();
+    final displayName = (json['display_name'] ??
+            json['displayName'] ??
+            json['user_name'] ??
+            json['userName'] ??
+            json['name'] ??
+            json['nickname'])
+        ?.toString();
+    final avatarUrl = (json['avatar_url'] ??
+            json['avatarUrl'] ??
+            json['avatar'] ??
+            json['profile_pic'] ??
+            json['image'])
+        ?.toString();
 
     return OmniCastParticipant(
-      userId: json['user_id'] as String? ?? json['userId'] as String? ?? '',
-      displayName: json['display_name'] as String? ?? json['name'] as String?,
-      avatarUrl: json['avatar_url'] as String? ?? json['avatar'] as String?,
+      userId: userId,
+      displayName: displayName,
+      avatarUrl: avatarUrl,
       role: role,
-      isAudioMuted: json['is_audio_muted'] as bool? ?? false,
-      isVideoMuted: json['is_video_muted'] as bool? ?? false,
+      isAudioMuted: json['is_audio_muted'] as bool? ?? json['is_muted'] as bool? ?? false,
+      isVideoMuted: json['is_video_muted'] as bool? ?? json['is_camera_off'] as bool? ?? false,
       joinedAt: json['joined_at'] != null
           ? DateTime.tryParse(json['joined_at'].toString()) ?? DateTime.now()
           : DateTime.now(),

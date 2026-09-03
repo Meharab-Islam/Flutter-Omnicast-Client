@@ -12,9 +12,9 @@
     "semantic_hash": "a8c8029eee43b44ebc692ca3a74a932b"
   },
   "lib/src/core/omnicast_client.dart": {
-    "mtime": 1788431632.3393862,
-    "seen": 1788431669.251783,
-    "ast_hash": "b67a95cb1625fb2c5ee468bf088ce7dc",
+    "mtime": 1788432309.5459626,
+    "seen": 1788432349.819805,
+    "ast_hash": "98ae5c56407bd4699881ba3feb8aafef",
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "lib/src/state/room_state.dart": {
-    "mtime": 1788421192.1409414,
-    "seen": 1788421680.9316611,
-    "ast_hash": "8b16a7de15ea47d66d1a9c336c2a01ef",
+    "mtime": 1788432300.8302536,
+    "seen": 1788432349.819818,
+    "ast_hash": "bbfafdd09f4028a3d8d4cd5d79fe5286",
     "semantic_hash": ""
   },
   "lib/src/webrtc/webrtc_manager.dart": {
@@ -108,9 +108,9 @@
     "semantic_hash": "e4fed8d621290b715dda6b58572e4b92"
   },
   "lib/src/models/room_models.dart": {
-    "mtime": 1788421780.1579487,
-    "seen": 1788421883.858073,
-    "ast_hash": "a52a5507612dd698ee4a5b1cd0a013bc",
+    "mtime": 1788432293.3612444,
+    "seen": 1788432349.819814,
+    "ast_hash": "6277ff3155c1c5ef1577acb299430a81",
     "semantic_hash": ""
   },
   "lib/src/models/seat_models.dart": {
@@ -375,6 +375,12 @@
     "mtime": 1788431968.384875,
     "seen": 1788431985.939096,
     "ast_hash": "b07c0d6a0463a3801fa5d445d0700146",
+    "semantic_hash": ""
+  },
+  "ROOM_LIFECYCLE_VIEWERS_AND_ENTER_EVENT_GUIDE.md": {
+    "mtime": 1788432324.7590494,
+    "seen": 1788432349.819841,
+    "ast_hash": "991ab55260b0640dab785e6f6f5f2ce5",
     "semantic_hash": ""
   }
 }
