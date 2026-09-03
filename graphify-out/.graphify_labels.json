@@ -45,5 +45,6 @@
   "43": "🔄 OmniCast SDK: Late-Join State Synchronization Guide",
   "44": "🎪 OmniCast SDK: Room Closure, Viewers List & Toggleable Entrance Banners Guide",
   "45": "omnicast_viewers_bottom_sheet.dart",
-  "46": "RoomState"
+  "46": "RoomState",
+  "47": "pk_score_progress_bar.dart"
 }

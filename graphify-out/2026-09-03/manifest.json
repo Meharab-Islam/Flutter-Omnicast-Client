@@ -108,9 +108,9 @@
     "semantic_hash": "e4fed8d621290b715dda6b58572e4b92"
   },
   "lib/src/models/room_models.dart": {
-    "mtime": 1788432293.3612444,
-    "seen": 1788432349.819814,
-    "ast_hash": "6277ff3155c1c5ef1577acb299430a81",
+    "mtime": 1788432831.4842656,
+    "seen": 1788432890.970679,
+    "ast_hash": "23d3c071c5bb9206ccd2d5342d56be3b",
     "semantic_hash": ""
   },
   "lib/src/models/seat_models.dart": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1788431519.4151351,
-    "seen": 1788431549.782228,
-    "ast_hash": "80850df9ae5d6eb3750c257d86080b6a",
+    "mtime": 1788432865.8339505,
+    "seen": 1788432890.9706812,
+    "ast_hash": "3f979c3ae2280ffc799565f88bc40de2",
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {

@@ -152,7 +152,67 @@ ValueListenableBuilder<List<OmniCastParticipant>>(
 
 ---
 
-## 7. 🔔 Listening to Real-time Join/Leave Events
+## 7. 🎤 Co-Host & Multi-Guest Stage Management
+
+### A. Viewer Requests to Become Co-Host:
+```dart
+// 1. Viewer sends request to join the stage:
+client.requestCoHost();
+
+// Or cancel pending request:
+client.cancelCoHostRequest();
+
+// 2. Viewer listens if host accepts or rejects:
+client.onCoHostAccepted.listen((_) {
+  print('🎉 Host accepted your request! Upgraded to Co-Host!');
+});
+
+client.onCoHostRejected.listen((_) {
+  print('❌ Host rejected your co-host request.');
+});
+```
+
+### B. Host Manages Co-Host Requests & Stage:
+```dart
+// 1. Host listens to incoming viewer co-host requests:
+client.onCoHostRequested.listen((req) {
+  print('👋 ${req.requesterName} wants to join the stage!');
+  
+  // Show dialog to Accept or Reject
+  // To accept:
+  client.acceptCoHostRequest(req.requesterId);
+  
+  // To reject:
+  client.rejectCoHostRequest(req.requesterId);
+});
+
+// 2. Host invites a specific viewer to stage:
+client.inviteToCoHost('viewer_user_99');
+
+// 3. Host demotes a co-host back to viewer (without kicking):
+client.demoteCoHost('cohost_user_99');
+```
+
+### C. Viewer Listens to Host Invitation:
+```dart
+client.onCoHostInviteReceived.listen((invite) async {
+  // Viewer accepts host invitation
+  await client.acceptCoHostInvite(inviteId: invite.inviteId);
+  
+  // Or reject:
+  // client.rejectCoHostInvite(inviteId: invite.inviteId);
+});
+```
+
+### D. Co-Host Voluntarily Leaves the Stage:
+```dart
+// Co-host leaves seat and returns to viewer mode:
+await client.leaveCoHostSeat();
+```
+
+---
+
+## 8. 🔔 Listening to Real-time Join/Leave Events
 
 Listen to live user arrivals and departures to show floating banners or chat notifications:
 
@@ -170,7 +230,7 @@ client.onUserLeft.listen((userId) {
 
 ---
 
-## 8. 🛡️ Room Termination & Ejection Moderation
+## 9. 🛡️ Room Termination & Ejection Moderation
 
 ### Host Closes/Deletes the Room:
 ```dart

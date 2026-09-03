@@ -288,6 +288,51 @@ class OmniCastClient {
   void kickParticipant(String targetUserId, {String? reason}) =>
       _roomManager.kickUser(targetUserId, reason: reason);
 
+  // Co-Host & Stage Seat Action Facades
+  /// Viewer action: Requests to join the broadcast stage as a Co-Host.
+  void requestCoHost({int? seatIndex}) => _seatManager.requestSeat(seatIndex: seatIndex);
+
+  /// Viewer action: Cancels their own pending co-host seat request.
+  void cancelCoHostRequest() => _seatManager.cancelSeatRequest();
+
+  /// Host action: Accepts a viewer's co-host request and brings them onto the live stage.
+  void acceptCoHostRequest(String userId, {int? seatIndex}) =>
+      _seatManager.acceptSeatRequest(userId, seatIndex: seatIndex);
+
+  /// Host action: Rejects a viewer's co-host request.
+  void rejectCoHostRequest(String userId) => _seatManager.rejectSeatRequest(userId);
+
+  /// Host action: Invites a specific viewer to take a co-host seat on stage.
+  void inviteToCoHost(String targetUserId, {int? seatIndex}) =>
+      _seatManager.inviteToCoHost(targetUserId, seatIndex: seatIndex);
+
+  /// Viewer action: Accepts a co-host invitation from the host.
+  Future<void> acceptCoHostInvite({String? inviteId, bool video = true, bool audio = true}) =>
+      _seatManager.acceptCoHostInvite(inviteId: inviteId, video: video, audio: audio);
+
+  /// Viewer action: Rejects a co-host invitation from the host.
+  void rejectCoHostInvite({String? inviteId}) =>
+      _seatManager.rejectCoHostInvite(inviteId: inviteId);
+
+  /// Co-Host action: Leaves the stage seat and returns to viewer mode.
+  Future<void> leaveCoHostSeat() => _seatManager.leaveSeat();
+
+  /// Host action: Demotes a co-host back to a viewer seat without kicking them.
+  void demoteCoHost(String userId) => _seatManager.demoteToViewer(userId);
+
+  // Co-Host Streams
+  /// Stream emitting when a viewer requests to become a co-host (Host listens to this).
+  Stream<SeatRequest> get onCoHostRequested => _seatManager.onSeatRequestReceived;
+
+  /// Stream emitting when the host invites the viewer to co-host (Viewer listens to this).
+  Stream<CoHostInvite> get onCoHostInviteReceived => _seatManager.onSeatInviteReceived;
+
+  /// Stream emitting when the viewer's co-host request is accepted.
+  Stream<SignalingMessage> get onCoHostAccepted => _seatManager.onSeatAccepted;
+
+  /// Stream emitting when the viewer's co-host request is rejected.
+  Stream<SignalingMessage> get onCoHostRejected => _seatManager.onSeatRejected;
+
   /// Binds internal signaling and WebRTC event subscriptions.
   void _bindInternalEventListeners() {
     // 1. WebRTC Local ICE Candidates -> Signaling Server
