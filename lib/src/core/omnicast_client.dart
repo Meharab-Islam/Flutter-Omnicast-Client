@@ -191,6 +191,9 @@ class OmniCastClient {
   /// Leaves the current room session, tears down peer connections, and stops local media tracks.
   Future<void> leaveRoom() => _roomManager.leaveRoom();
 
+  /// Host action: Explicitly ends and terminates the live broadcast room, notifying all viewers.
+  Future<void> closeRoom() => _roomManager.closeRoom();
+
   void _initSubManagers() {
     _api = OmniCastApi(config: config);
 

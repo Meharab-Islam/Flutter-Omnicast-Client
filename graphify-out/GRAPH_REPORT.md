@@ -1,16 +1,16 @@
 # Graph Report - omnicast_client  (2026-09-03)
 
 ## Corpus Check
-- 59 files · ~36,038 words
+- 59 files · ~36,184 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1209 nodes · 1467 edges · 41 communities (38 shown, 3 thin omitted)
+- 1209 nodes · 1468 edges · 41 communities (38 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d7ae4025`
+- Built from commit: `cd020534`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

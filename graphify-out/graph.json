@@ -28442,6 +28442,17 @@
     },
     {
       "source": "lib_src_signaling_signaling_client",
+      "target": "dart_convert",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_signaling_signaling_client",
       "target": "models_interaction_models_dart",
       "relation": "imports",
       "_origin": "ast",
@@ -29806,5 +29817,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d7ae4025489cb90828721d137abf224f091c83a4"
+  "built_at_commit": "cd0205348d1a234ea7af32a289531c25392b4bcc"
 }
