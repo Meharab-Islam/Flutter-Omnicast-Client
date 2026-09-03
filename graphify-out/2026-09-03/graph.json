@@ -7561,6 +7561,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
+      "label": "OmniCastGiftingBottomSheet",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "omnicastgiftingbottomsheet",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
+      "label": "_OmniCastGiftingBottomSheetState",
+      "_origin": "ast",
+      "community": 26,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "_omnicastgiftingbottomsheetstate",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_ongiftsent",
       "label": "onGiftSent",
       "_origin": "ast",
@@ -9608,28 +9630,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
-      "label": "OmniCastGiftingBottomSheet",
-      "_origin": "ast",
-      "community": 35,
-      "community_name": "_OmniCastFlyingHeartsOverlayState",
-      "file_type": "code",
-      "norm_label": "omnicastgiftingbottomsheet",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
-      "label": "_OmniCastGiftingBottomSheetState",
-      "_origin": "ast",
-      "community": 35,
-      "community_name": "_OmniCastFlyingHeartsOverlayState",
-      "file_type": "code",
-      "norm_label": "_omnicastgiftingbottomsheetstate",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
       "label": "OmniCastVideoView",
       "_origin": "ast",
@@ -10088,7 +10088,7 @@
       "node_kind": "heading",
       "norm_label": "1. overview & state access points",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L20"
+      "source_location": "L21"
     },
     {
       "id": "viewers_metadata_guide_2_data_model_omnicastparticipant",
@@ -10100,7 +10100,7 @@
       "node_kind": "heading",
       "norm_label": "2. data model: `omnicastparticipant`",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L32"
+      "source_location": "L35"
     },
     {
       "id": "viewers_metadata_guide_3_passing_metadata_when_joining_a_room",
@@ -10112,7 +10112,7 @@
       "node_kind": "heading",
       "norm_label": "3. passing metadata when joining a room",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L52"
+      "source_location": "L55"
     },
     {
       "id": "viewers_metadata_guide_4_real_time_lifecycle_state_sync",
@@ -10124,67 +10124,79 @@
       "node_kind": "heading",
       "norm_label": "4. real-time lifecycle & state sync",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L74"
+      "source_location": "L77"
     },
     {
-      "id": "viewers_metadata_guide_5_flutter_ui_integration_examples",
-      "label": "5. Flutter UI Integration Examples",
+      "id": "viewers_metadata_guide_5_the_easiest_way_1_line_pre_built_viewers_bottom_sheet",
+      "label": "5. The Easiest Way: 1-Line Pre-Built Viewers Bottom Sheet",
       "_origin": "ast",
       "community": 38,
       "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "5. flutter ui integration examples",
+      "norm_label": "5. the easiest way: 1-line pre-built viewers bottom sheet",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L99"
+      "source_location": "L102"
     },
     {
-      "id": "viewers_metadata_guide_6_best_practices_performance_tuning",
-      "label": "6. Best Practices & Performance Tuning",
+      "id": "viewers_metadata_guide_6_building_custom_ui_elements",
+      "label": "6. Building Custom UI Elements",
       "_origin": "ast",
       "community": 38,
       "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "6. best practices & performance tuning",
+      "norm_label": "6. building custom ui elements",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L335"
+      "source_location": "L132"
     },
     {
-      "id": "viewers_metadata_guide_a_real_time_viewers_modal_bottom_sheet",
-      "label": "A. Real-Time Viewers Modal Bottom Sheet",
+      "id": "viewers_metadata_guide_7_best_practices_performance_tuning",
+      "label": "7. Best Practices & Performance Tuning",
       "_origin": "ast",
       "community": 38,
       "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "a. real-time viewers modal bottom sheet",
+      "norm_label": "7. best practices & performance tuning",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L101"
+      "source_location": "L244"
     },
     {
-      "id": "viewers_metadata_guide_b_horizontal_top_bar_live_avatars_row",
-      "label": "B. Horizontal Top-Bar Live Avatars Row",
+      "id": "viewers_metadata_guide_a_horizontal_top_bar_live_avatars_row",
+      "label": "A. Horizontal Top-Bar Live Avatars Row",
       "_origin": "ast",
       "community": 38,
       "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "b. horizontal top-bar live avatars row",
+      "norm_label": "a. horizontal top-bar live avatars row",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L259"
+      "source_location": "L134"
     },
     {
-      "id": "viewers_metadata_guide_c_total_live_viewer_counter_badge",
-      "label": "C. Total Live Viewer Counter Badge",
+      "id": "viewers_metadata_guide_b_total_live_viewer_counter_badge",
+      "label": "B. Total Live Viewer Counter Badge",
       "_origin": "ast",
       "community": 38,
       "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "c. total live viewer counter badge",
+      "norm_label": "b. total live viewer counter badge",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L299"
+      "source_location": "L174"
+    },
+    {
+      "id": "viewers_metadata_guide_c_real_time_join_leave_toast_notifications_streams",
+      "label": "C. Real-Time Join/Leave Toast Notifications (Streams)",
+      "_origin": "ast",
+      "community": 38,
+      "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "c. real-time join/leave toast notifications (streams)",
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L214"
     },
     {
       "id": "viewers_metadata_guide_omnicast_sdk_viewers_metadata_integration_guide",
@@ -10199,6 +10211,18 @@
       "source_location": "L1"
     },
     {
+      "id": "viewers_metadata_guide_optional_customization",
+      "label": "Optional Customization:",
+      "_origin": "ast",
+      "community": 38,
+      "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "optional customization:",
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L117"
+    },
+    {
       "id": "viewers_metadata_guide_table_of_contents",
       "label": "\ud83d\udcd1 Table of Contents",
       "_origin": "ast",
@@ -10209,6 +10233,18 @@
       "norm_label": "\ud83d\udcd1 table of contents",
       "source_file": "VIEWERS_METADATA_GUIDE.md",
       "source_location": "L7"
+    },
+    {
+      "id": "viewers_metadata_guide_what_omnicastviewersbottomsheet_handles_automatically",
+      "label": "\ud83c\udf1f What `OmniCastViewersBottomSheet` handles automatically:",
+      "_origin": "ast",
+      "community": 38,
+      "community_name": "\ud83d\udc65 OmniCast SDK: Viewers & Metadata Integration Guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83c\udf1f what `omnicastviewersbottomsheet` handles automatically:",
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L111"
     },
     {
       "id": "complete_sdk_developer_guide",
@@ -17350,36 +17386,80 @@
       "weight": 1.0
     },
     {
-      "source": "viewers_metadata_guide_5_flutter_ui_integration_examples",
-      "target": "viewers_metadata_guide_a_real_time_viewers_modal_bottom_sheet",
+      "source": "viewers_metadata_guide_5_the_easiest_way_1_line_pre_built_viewers_bottom_sheet",
+      "target": "viewers_metadata_guide_what_omnicastviewersbottomsheet_handles_automatically",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L101",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
-      "source": "viewers_metadata_guide_5_flutter_ui_integration_examples",
-      "target": "viewers_metadata_guide_b_horizontal_top_bar_live_avatars_row",
+      "source": "viewers_metadata_guide_5_the_easiest_way_1_line_pre_built_viewers_bottom_sheet",
+      "target": "viewers_metadata_guide_optional_customization",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L259",
+      "source_location": "L117",
       "weight": 1.0
     },
     {
-      "source": "viewers_metadata_guide_5_flutter_ui_integration_examples",
-      "target": "viewers_metadata_guide_c_total_live_viewer_counter_badge",
+      "source": "viewers_metadata_guide_6_building_custom_ui_elements",
+      "target": "viewers_metadata_guide_a_horizontal_top_bar_live_avatars_row",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L299",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "viewers_metadata_guide_6_building_custom_ui_elements",
+      "target": "viewers_metadata_guide_b_total_live_viewer_counter_badge",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L174",
+      "weight": 1.0
+    },
+    {
+      "source": "viewers_metadata_guide_6_building_custom_ui_elements",
+      "target": "viewers_metadata_guide_c_real_time_join_leave_toast_notifications_streams",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L214",
+      "weight": 1.0
+    },
+    {
+      "source": "viewers_metadata_guide_omnicast_sdk_viewers_metadata_integration_guide",
+      "target": "viewers_metadata_guide_5_the_easiest_way_1_line_pre_built_viewers_bottom_sheet",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "viewers_metadata_guide_omnicast_sdk_viewers_metadata_integration_guide",
+      "target": "viewers_metadata_guide_6_building_custom_ui_elements",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L132",
       "weight": 1.0
     },
     {
@@ -17390,7 +17470,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L20",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "viewers_metadata_guide_omnicast_sdk_viewers_metadata_integration_guide",
+      "target": "viewers_metadata_guide_7_best_practices_performance_tuning",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "VIEWERS_METADATA_GUIDE.md",
+      "source_location": "L244",
       "weight": 1.0
     },
     {
@@ -17401,18 +17492,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L32",
-      "weight": 1.0
-    },
-    {
-      "source": "viewers_metadata_guide_omnicast_sdk_viewers_metadata_integration_guide",
-      "target": "viewers_metadata_guide_6_best_practices_performance_tuning",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L335",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -17423,7 +17503,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L52",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -17445,18 +17525,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L74",
-      "weight": 1.0
-    },
-    {
-      "source": "viewers_metadata_guide_omnicast_sdk_viewers_metadata_integration_guide",
-      "target": "viewers_metadata_guide_5_flutter_ui_integration_examples",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "VIEWERS_METADATA_GUIDE.md",
-      "source_location": "L99",
+      "source_location": "L77",
       "weight": 1.0
     },
     {
@@ -29605,5 +29674,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d39aea8d6f40e15ed09a68f95b5c488a7b30d425"
+  "built_at_commit": "0263ab59a5aaeb3ddbd244c07635cccc818716ea"
 }

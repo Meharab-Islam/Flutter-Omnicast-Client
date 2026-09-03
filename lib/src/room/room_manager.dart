@@ -322,13 +322,6 @@ class RoomManager {
             ) ??
             '');
 
-    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
-    if (wsUrl != null) {
-      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
-        await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
-      }
-    }
-
     _roomState.setSession(
       roomId: roomId,
       userId: userId,
@@ -336,23 +329,39 @@ class RoomManager {
       roomType: options.roomType,
     );
 
-    // Open media & add tracks (Strict 0% video bandwidth enforcement for Audio-Only rooms)
-    if (options.isAudioOnly) {
-      await _webRTCManager.mediaStreamManager.openUserMedia(
-        audio: true,
-        video: false,
-      );
-      await _webRTCManager.addLocalMediaTracks(
-        enableSimulcast: false,
-      );
-    } else if (options.enableAudio || options.enableVideo) {
-      await _webRTCManager.mediaStreamManager.openUserMedia(
-        audio: options.enableAudio,
-        video: options.enableVideo,
-      );
-      await _webRTCManager.addLocalMediaTracks(
-        enableSimulcast: options.enableSimulcast,
-      );
+    // 1. Open media hardware & add tracks immediately so local camera preview starts without waiting for network!
+    try {
+      if (options.isAudioOnly) {
+        await _webRTCManager.mediaStreamManager.openUserMedia(
+          audio: true,
+          video: false,
+        );
+        await _webRTCManager.addLocalMediaTracks(
+          enableSimulcast: false,
+        );
+      } else if (options.enableAudio || options.enableVideo) {
+        await _webRTCManager.mediaStreamManager.openUserMedia(
+          audio: options.enableAudio,
+          video: options.enableVideo,
+        );
+        await _webRTCManager.addLocalMediaTracks(
+          enableSimulcast: options.enableSimulcast,
+        );
+      }
+    } catch (e) {
+      debugPrint('[RoomManager] Media open deferred or headless: $e');
+    }
+
+    // 2. Connect signaling WebSocket and publish room session
+    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
+    if (wsUrl != null) {
+      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
+        try {
+          await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
+        } catch (e) {
+          debugPrint('[RoomManager] WebSocket connection deferred or offline: $e');
+        }
+      }
     }
 
     final offer = await _webRTCManager.createAndSetLocalOffer();

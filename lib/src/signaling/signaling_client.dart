@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/interaction_models.dart';
@@ -99,9 +100,35 @@ class SignalingClient {
 
     try {
       var uri = Uri.parse(_wsUrl!);
+      final queryParams = Map<String, String>.from(uri.queryParameters);
+
       if (_token != null && _token!.isNotEmpty) {
-        final queryParams = Map<String, String>.from(uri.queryParameters);
         queryParams['token'] = _token!;
+
+        // Automatically extract userId, roomId, and role from JWT claims for SFU handshake
+        try {
+          final parts = _token!.split('.');
+          if (parts.length >= 2) {
+            final normalized = base64Url.normalize(parts[1]);
+            final payloadJson = utf8.decode(base64Url.decode(normalized));
+            final payload = jsonDecode(payloadJson) as Map<String, dynamic>;
+            final uId = payload['userId'] ?? payload['user_id'] ?? payload['sub'];
+            final rId = payload['roomId'] ?? payload['room_id'];
+            final role = payload['role'];
+            if (uId != null && !queryParams.containsKey('userId')) {
+              queryParams['userId'] = uId.toString();
+              queryParams['user_id'] = uId.toString();
+            }
+            if (rId != null && !queryParams.containsKey('roomId')) {
+              queryParams['roomId'] = rId.toString();
+              queryParams['room_id'] = rId.toString();
+            }
+            if (role != null && !queryParams.containsKey('role')) {
+              queryParams['role'] = role.toString();
+            }
+          }
+        } catch (_) {}
+
         uri = uri.replace(queryParameters: queryParams);
       }
 
@@ -110,7 +137,7 @@ class SignalingClient {
       await _cleanupActiveConnection();
 
       final channel = WebSocketChannel.connect(uri);
-      await channel.ready;
+      await channel.ready.timeout(const Duration(seconds: 8));
       _channel = channel;
 
       _channelSubscription = channel.stream.listen(
