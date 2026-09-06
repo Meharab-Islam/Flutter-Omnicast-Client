@@ -130,7 +130,7 @@ class OmniCastStageGrid extends StatelessWidget {
             children: [
               // Video View or Avatar Placeholder
               Positioned.fill(
-                child: (!isCameraOff && renderer != null && renderer.renderVideo)
+                child: (!isCameraOff && renderer != null && (renderer.srcObject != null || renderer.renderVideo))
                     ? RTCVideoView(
                         renderer,
                         objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,

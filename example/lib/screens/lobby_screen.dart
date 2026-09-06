@@ -27,6 +27,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     final randomId = Random().nextInt(9000) + 1000;
     _userIdController.text = 'user-$randomId';
     _nameController.text = 'User $randomId';
+    _serverController.text = AppConstants.defaultLanIP;
     _initLobbyClient();
   }
 

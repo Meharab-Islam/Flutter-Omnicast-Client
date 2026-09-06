@@ -603,7 +603,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Widget _buildVideoCanvas() {
     if (widget.session.isHost) {
       final renderer = _client.media.localRenderer;
-      if (renderer != null && renderer.renderVideo) {
+      if (renderer != null && (renderer.srcObject != null || renderer.renderVideo)) {
         return RTCVideoView(
           renderer,
           objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
@@ -619,7 +619,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     } else {
       // Viewer Mode: Subscribed Host Stream
       final renderer = _client.media.getRenderer(widget.session.roomId);
-      if (renderer != null && renderer.renderVideo) {
+      if (renderer != null && (renderer.srcObject != null || renderer.renderVideo)) {
         return RTCVideoView(
           renderer,
           objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
