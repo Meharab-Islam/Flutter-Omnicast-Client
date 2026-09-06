@@ -116,7 +116,7 @@ class InteractionManager {
     );
 
     _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.giftProcessed,
+      event: SignalingEvents.gift,
       roomId: _roomState.roomId!,
       userId: _roomState.userId!,
       targetUser: targetUserId,

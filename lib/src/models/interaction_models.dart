@@ -77,36 +77,54 @@ class GiftEvent {
   });
 
   factory GiftEvent.fromJson(Map<String, dynamic> json) {
+    final amount = (json['amount'] as num?)?.toInt() ?? 1;
+    final coinVal = (json['coin_value'] as num?)?.toInt() ??
+        (json['coins'] as num?)?.toInt() ??
+        (json['points_added'] as num?)?.toInt() ??
+        (json['points'] as num?)?.toInt() ??
+        0;
+    final totalHostCoins = (json['host_total_coins'] as num?)?.toInt() ??
+        (json['host_coin_balance'] as num?)?.toInt() ??
+        (json['new_score'] as num?)?.toInt() ??
+        (json['host_a_points'] as num?)?.toInt() ??
+        0;
+
     return GiftEvent(
-      giftId: json['gift_id'] as String? ?? '',
-      giftName: json['gift_name'] as String? ?? 'Gift',
+      giftId: json['gift_id'] as String? ?? json['gift'] as String? ?? '',
+      giftName: json['gift_name'] as String? ?? json['gift'] as String? ?? json['gift_id'] as String? ?? 'Gift',
       giftIconUrl: json['gift_icon_url'] as String?,
-      senderId: json['sender_id'] as String? ?? json['user_id'] as String? ?? '',
+      senderId: json['sender_id'] as String? ?? json['user_id'] as String? ?? json['sender'] as String? ?? '',
       senderName: json['sender_name'] as String? ?? 'Anonymous',
-      targetUserId: json['target_user_id'] as String?,
-      amount: (json['amount'] as num?)?.toInt() ?? 1,
-      coinValue: (json['coin_value'] as num?)?.toInt() ?? 0,
-      hostTotalCoins: (json['host_total_coins'] as num?)?.toInt() ??
-          (json['host_coin_balance'] as num?)?.toInt() ??
-          0,
+      targetUserId: json['target_user_id'] as String? ?? json['target_host_id'] as String? ?? json['receiver_id'] as String? ?? json['host_id'] as String?,
+      amount: amount,
+      coinValue: coinVal,
+      hostTotalCoins: totalHostCoins,
       timestamp: json['timestamp'] != null
           ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
           : DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'gift_id': giftId,
-        'gift_name': giftName,
-        'gift_icon_url': giftIconUrl,
-        'sender_id': senderId,
-        'sender_name': senderName,
-        'target_user_id': targetUserId,
-        'amount': amount,
-        'coin_value': coinValue,
-        'host_total_coins': hostTotalCoins,
-        'timestamp': timestamp.toIso8601String(),
-      };
+  Map<String, dynamic> toJson() {
+    final totalCoins = coinValue > 0 ? (coinValue * amount) : amount;
+    return {
+      'gift_id': giftId,
+      'gift_name': giftName,
+      'gift': giftName,
+      'gift_icon_url': giftIconUrl,
+      'sender_id': senderId,
+      'sender_name': senderName,
+      'target_user_id': targetUserId,
+      'target_host_id': targetUserId,
+      'receiver_id': targetUserId,
+      'amount': amount,
+      'coin_value': coinValue,
+      'coins': totalCoins,
+      'points': totalCoins,
+      'host_total_coins': hostTotalCoins,
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
 }
 
 /// Coin balance update event for the user or host.

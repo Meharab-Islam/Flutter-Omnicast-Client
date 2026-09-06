@@ -35,6 +35,9 @@ class SignalingClient {
   final _iceController = StreamController<SignalingMessage>.broadcast();
   final _roomInfoController = StreamController<SignalingMessage>.broadcast();
   final _viewerUpdateController = StreamController<SignalingMessage>.broadcast();
+  final _presenceUpdateController = StreamController<SignalingMessage>.broadcast();
+  final _userJoinedController = StreamController<OmniCastParticipant>.broadcast();
+  final _userLeftController = StreamController<String>.broadcast();
   final _chatController = StreamController<ChatMessage>.broadcast();
   final _giftController = StreamController<GiftEvent>.broadcast();
   final _seatRequestController = StreamController<SeatRequest>.broadcast();
@@ -42,7 +45,16 @@ class SignalingClient {
   final _seatAcceptController = StreamController<SignalingMessage>.broadcast();
   final _seatRejectController = StreamController<SignalingMessage>.broadcast();
   final _seatLeaveController = StreamController<SignalingMessage>.broadcast();
+  final _seatUpdatedController = StreamController<SignalingMessage>.broadcast();
+  final _seatKickedController = StreamController<SignalingMessage>.broadcast();
   final _mediaStateController = StreamController<SignalingMessage>.broadcast();
+  final _pkStartedController = StreamController<SignalingMessage>.broadcast();
+  final _pkScoreController = StreamController<SignalingMessage>.broadcast();
+  final _pkEndedController = StreamController<SignalingMessage>.broadcast();
+  final _pkGiftOverlayController = StreamController<SignalingMessage>.broadcast();
+  final _layerSwitchedController = StreamController<SignalingMessage>.broadcast();
+  final _viewportUpdatedController = StreamController<SignalingMessage>.broadcast();
+  final _leaveAcknowledgedController = StreamController<SignalingMessage>.broadcast();
   final _roomCreatedController = StreamController<RoomModel>.broadcast();
   final _roomClosedController = StreamController<String>.broadcast();
 
@@ -72,6 +84,9 @@ class SignalingClient {
   Stream<SignalingMessage> get onIceCandidate => _iceController.stream;
   Stream<SignalingMessage> get onRoomInfoSync => _roomInfoController.stream;
   Stream<SignalingMessage> get onViewerUpdate => _viewerUpdateController.stream;
+  Stream<SignalingMessage> get onPresenceUpdate => _presenceUpdateController.stream;
+  Stream<OmniCastParticipant> get onUserJoined => _userJoinedController.stream;
+  Stream<String> get onUserLeft => _userLeftController.stream;
   Stream<ChatMessage> get onChat => _chatController.stream;
   Stream<GiftEvent> get onGift => _giftController.stream;
   Stream<SeatRequest> get onSeatRequest => _seatRequestController.stream;
@@ -79,6 +94,15 @@ class SignalingClient {
   Stream<SignalingMessage> get onSeatAccept => _seatAcceptController.stream;
   Stream<SignalingMessage> get onSeatReject => _seatRejectController.stream;
   Stream<SignalingMessage> get onSeatLeave => _seatLeaveController.stream;
+  Stream<SignalingMessage> get onSeatUpdated => _seatUpdatedController.stream;
+  Stream<SignalingMessage> get onSeatKicked => _seatKickedController.stream;
+  Stream<SignalingMessage> get onPKStarted => _pkStartedController.stream;
+  Stream<SignalingMessage> get onPKScoreUpdate => _pkScoreController.stream;
+  Stream<SignalingMessage> get onPKEnded => _pkEndedController.stream;
+  Stream<SignalingMessage> get onPKGiftOverlay => _pkGiftOverlayController.stream;
+  Stream<SignalingMessage> get onLayerSwitched => _layerSwitchedController.stream;
+  Stream<SignalingMessage> get onViewportUpdated => _viewportUpdatedController.stream;
+  Stream<SignalingMessage> get onLeaveAcknowledged => _leaveAcknowledgedController.stream;
   Stream<SignalingMessage> get onMediaStateChanged => _mediaStateController.stream;
   Stream<RoomModel> get onRoomCreated => _roomCreatedController.stream;
   Stream<String> get onRoomClosed => _roomClosedController.stream;
@@ -199,10 +223,43 @@ class SignalingClient {
         break;
 
       case SignalingEvents.viewerUpdate:
+      case SignalingEvents.viewerCount:
         _viewerUpdateController.add(msg);
         break;
 
+      case SignalingEvents.presenceUpdate:
+        _presenceUpdateController.add(msg);
+        _viewerUpdateController.add(msg);
+        break;
+
+      case SignalingEvents.userJoined:
+      case 'participant_joined':
+      case 'new_cohost':
+      case 'host_reconnected':
+        if (msg.payload is Map<String, dynamic>) {
+          _userJoinedController.add(OmniCastParticipant.fromJson(msg.payload as Map<String, dynamic>));
+        } else {
+          _userJoinedController.add(OmniCastParticipant(
+            userId: msg.userId,
+            joinedAt: DateTime.now(),
+          ));
+        }
+        break;
+
+      case SignalingEvents.userLeft:
+      case 'participant_left':
+      case 'participant_removed':
+      case 'cohost_left':
+        final leftId = msg.payload is Map && msg.payload['user_id'] != null
+            ? msg.payload['user_id'].toString()
+            : msg.userId;
+        if (leftId.isNotEmpty) {
+          _userLeftController.add(leftId);
+        }
+        break;
+
       case SignalingEvents.chat:
+      case SignalingEvents.chatMessage:
         if (msg.payload is Map<String, dynamic>) {
           _chatController.add(ChatMessage.fromJson(msg.payload as Map<String, dynamic>));
         } else if (msg.payload is String) {
@@ -218,6 +275,13 @@ class SignalingClient {
 
       case SignalingEvents.gift:
       case SignalingEvents.giftProcessed:
+        if (msg.payload is Map<String, dynamic>) {
+          _giftController.add(GiftEvent.fromJson(msg.payload as Map<String, dynamic>));
+        }
+        break;
+
+      case SignalingEvents.pkGiftOverlay:
+        _pkGiftOverlayController.add(msg);
         if (msg.payload is Map<String, dynamic>) {
           _giftController.add(GiftEvent.fromJson(msg.payload as Map<String, dynamic>));
         }
@@ -250,11 +314,49 @@ class SignalingClient {
         break;
 
       case SignalingEvents.seatLeave:
+      case SignalingEvents.seatLeft:
         _seatLeaveController.add(msg);
+        break;
+
+      case SignalingEvents.seatUpdated:
+        _seatUpdatedController.add(msg);
+        break;
+
+      case SignalingEvents.seatKick:
+      case 'seat_kicked':
+        _seatKickedController.add(msg);
+        break;
+
+      case SignalingEvents.pkStart:
+      case SignalingEvents.pkStarted:
+        _pkStartedController.add(msg);
+        break;
+
+      case SignalingEvents.pkScoreUpdate:
+        _pkScoreController.add(msg);
+        break;
+
+      case SignalingEvents.pkStop:
+      case SignalingEvents.pkEnd:
+      case SignalingEvents.pkEnded:
+        _pkEndedController.add(msg);
+        break;
+
+      case SignalingEvents.layerSwitched:
+        _layerSwitchedController.add(msg);
+        break;
+
+      case SignalingEvents.viewportUpdated:
+        _viewportUpdatedController.add(msg);
+        break;
+
+      case SignalingEvents.leaveAcknowledged:
+        _leaveAcknowledgedController.add(msg);
         break;
 
       case SignalingEvents.mediaStateChanged:
       case SignalingEvents.trackMuted:
+      case SignalingEvents.trackUnmuted:
         _mediaStateController.add(msg);
         break;
 
@@ -425,6 +527,9 @@ class SignalingClient {
     await _iceController.close();
     await _roomInfoController.close();
     await _viewerUpdateController.close();
+    await _presenceUpdateController.close();
+    await _userJoinedController.close();
+    await _userLeftController.close();
     await _chatController.close();
     await _giftController.close();
     await _seatRequestController.close();
@@ -432,7 +537,16 @@ class SignalingClient {
     await _seatAcceptController.close();
     await _seatRejectController.close();
     await _seatLeaveController.close();
+    await _seatUpdatedController.close();
+    await _seatKickedController.close();
     await _mediaStateController.close();
+    await _pkStartedController.close();
+    await _pkScoreController.close();
+    await _pkEndedController.close();
+    await _pkGiftOverlayController.close();
+    await _layerSwitchedController.close();
+    await _viewportUpdatedController.close();
+    await _leaveAcknowledgedController.close();
     await _roomCreatedController.close();
     await _roomClosedController.close();
   }

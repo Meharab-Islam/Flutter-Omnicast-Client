@@ -104,7 +104,7 @@ class SeatManager {
     // 5. Seat kick / demote response (host demotes co-host to viewer)
     _subscriptions.add(
       _signalingClient.onMessage.listen((msg) async {
-        if (msg.event == SignalingEvents.seatKick || msg.event == 'seat_demote') {
+        if (msg.event == SignalingEvents.seatKick || msg.event == 'seat_demote' || msg.event == 'seat_kicked') {
           final targetUser = msg.targetUser ??
               (msg.payload is Map ? msg.payload['target_user'] : null);
           if (targetUser == _roomState.userId && _roomState.isCoHost) {
@@ -123,6 +123,34 @@ class SeatManager {
                 'renegotiate': true,
               },
             ));
+          }
+        }
+      }),
+    );
+
+    // 6. Real-time seat updates across room (9-seat sync)
+    _subscriptions.add(
+      _signalingClient.onSeatUpdated.listen((msg) {
+        if (msg.payload is Map<String, dynamic>) {
+          final payload = msg.payload as Map<String, dynamic>;
+          final seats = payload['active_seats'] ?? payload['seats'];
+          if (seats != null) {
+            _roomState.updateActiveSeats(seats);
+          }
+        }
+      }),
+    );
+
+    // 7. Remote Co-Host Left or Demoted
+    _subscriptions.add(
+      _signalingClient.onMessage.listen((msg) {
+        if (msg.event == 'cohost_left' || msg.event == 'seat_left') {
+          final leftId = msg.payload is Map
+              ? (msg.payload['user_id'] ?? msg.payload['userId'] ?? '').toString()
+              : msg.userId;
+          if (leftId.isNotEmpty) {
+            final updatedSeats = _roomState.activeSeats.where((s) => s.userId != leftId).toList();
+            _roomState.updateActiveSeats(updatedSeats);
           }
         }
       }),
@@ -376,6 +404,40 @@ class SeatManager {
     ));
 
     _roomState.setPinnedStageUser(targetUserId);
+  }
+
+  /// Host action: Kicks a co-host from their assigned stage seat.
+  void kickSeat(int seatIndex, {String? targetUserId}) {
+    if (!_roomState.isInRoom || !_roomState.isHost) return;
+
+    _signalingClient.send(SignalingMessage(
+      event: SignalingEvents.seatKick,
+      roomId: _roomState.roomId!,
+      userId: _roomState.userId!,
+      targetUser: targetUserId,
+      payload: {
+        'seat_index': seatIndex,
+        'seat_id': seatIndex.toString(),
+        'target_user': targetUserId,
+        'user_id': targetUserId,
+      },
+    ));
+  }
+
+  /// Viewer action: Explicitly requests to subscribe to a co-host's media tracks.
+  void subscribeCoHost(String coHostUserId) {
+    if (!_roomState.isInRoom) return;
+
+    _signalingClient.send(SignalingMessage(
+      event: 'subscribe_cohost',
+      roomId: _roomState.roomId!,
+      userId: _roomState.userId!,
+      targetUser: coHostUserId,
+      payload: {
+        'target_user': coHostUserId,
+        'cohost_id': coHostUserId,
+      },
+    ));
   }
 
   /// Disposes streams, listeners, and notifiers.

@@ -356,17 +356,23 @@ class MediaController with WidgetsBindingObserver {
   /// Sets the preferred simulcast layer subscription: `'f'` (high), `'h'` (medium), `'q'` (low).
   void setSimulcastLayer(String layer, {String? targetUserId}) {
     if (_roomState.isAudioOnly) return;
-    if (layer != 'f' && layer != 'h' && layer != 'q') {
-      OmniCastLogger.error('[MediaController] Invalid simulcast layer: $layer (expected f, h, or q)');
-      return;
-    }
-    simulcastLayerNotifier.value = layer;
+    final normalized = switch (layer.toLowerCase()) {
+      'f' || 'high' => 'f',
+      'h' || 'medium' || 'med' => 'h',
+      'q' || 'low' => 'q',
+      _ => 'f',
+    };
+    simulcastLayerNotifier.value = normalized;
     _signalingClient.send(SignalingMessage(
       event: 'request_layer',
-      roomId: '',
-      userId: '',
+      roomId: _roomState.roomId ?? '',
+      userId: _roomState.userId ?? '',
       targetUser: targetUserId,
-      payload: {'layer': layer},
+      payload: {
+        'layer': normalized,
+        'rid': normalized,
+        'target_user': targetUserId,
+      },
     ));
   }
 
@@ -388,26 +394,78 @@ class MediaController with WidgetsBindingObserver {
   /// Requests a specific simulcast layer from the SFU for a given remote peer.
   void requestLayerForUser({required String targetUserId, required String layer}) {
     if (_roomState.isAudioOnly) return;
-    if (layer != 'f' && layer != 'h' && layer != 'q') return;
+    final normalized = switch (layer.toLowerCase()) {
+      'f' || 'high' => 'f',
+      'h' || 'medium' || 'med' => 'h',
+      'q' || 'low' => 'q',
+      _ => 'f',
+    };
 
     _signalingClient.send(SignalingMessage(
       event: 'request_layer',
-      roomId: '',
-      userId: '',
+      roomId: _roomState.roomId ?? '',
+      userId: _roomState.userId ?? '',
       targetUser: targetUserId,
-      payload: {'layer': layer},
+      payload: {
+        'layer': normalized,
+        'rid': normalized,
+        'target_user': targetUserId,
+      },
     ));
   }
 
-  /// Requests the SFU to dynamically pause/resume a remote peer's video track.
-  void setRemoteTrackVisibility(String targetUserId, bool isVisible) {
+  /// Requests the SFU to dynamically pause/resume a remote peer's video track and configure viewport dimension.
+  void setRemoteTrackVisibility(String targetUserId, bool isVisible, {int width = 0, int height = 0}) {
     if (!_dynacastEnabled || _roomState.isAudioOnly) return;
+    final rId = _roomState.roomId ?? '';
+    final uId = _roomState.userId ?? '';
+
+    _signalingClient.send(SignalingMessage(
+      event: 'set_viewport',
+      roomId: rId,
+      userId: uId,
+      targetUser: targetUserId,
+      payload: {
+        'target_user': targetUserId,
+        'visible': isVisible,
+        'width': width,
+        'height': height,
+      },
+    ));
+
     _signalingClient.send(SignalingMessage(
       event: isVisible ? SignalingEvents.trackResume : SignalingEvents.trackPause,
-      roomId: '',
-      userId: '',
+      roomId: rId,
+      userId: uId,
       targetUser: targetUserId,
     ));
+  }
+
+  /// Explicitly requests an ICE restart for seamless network handoff or recovery.
+  Future<void> requestICERestart() async {
+    if (!_roomState.isInRoom || !_signalingClient.isConnected) return;
+    try {
+      final restartOffer = await _webRTCManager.createIceRestartOffer();
+      final eventName = _roomState.isHost ? SignalingEvents.createRoom : SignalingEvents.joinRoom;
+      _signalingClient.send(SignalingMessage(
+        event: eventName,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {
+          'token': _signalingClient.token,
+          'sdp': restartOffer.sdp,
+          'type': restartOffer.type,
+          'ice_restart': true,
+          'reconnect': true,
+        },
+      ));
+    } catch (e) {
+      _signalingClient.send(SignalingMessage(
+        event: 'ice_restart',
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+      ));
+    }
   }
 
   /// Built-in hardware permission requester for Camera and Microphone.
