@@ -19,9 +19,13 @@ class OmniCastStageBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<StageSeat>>(
-      valueListenable: client.seats.activeSeatsNotifier,
-      builder: (context, seats, _) {
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        client.seats.activeSeatsNotifier,
+        client.state,
+      ]),
+      builder: (context, _) {
+        final seats = client.seats.activeSeatsNotifier.value;
         final occupiedCount = seats.where((s) => s.isOccupied).length;
         return builder(context, seats, occupiedCount);
       },
@@ -112,6 +116,7 @@ class OmniCastStageGrid extends StatelessWidget {
     final displayName = seat.user?.displayName ?? uId;
     final isMuted = client.seats.isUserMuted(uId) || seat.isMuted;
     final isCameraOff = client.seats.isUserCameraOff(uId) || seat.isCameraOff;
+    final isSelf = uId == client.state.userId;
     final renderer = client.media.getRenderer(uId);
 
     return ClipRRect(
@@ -130,10 +135,35 @@ class OmniCastStageGrid extends StatelessWidget {
             children: [
               // Video View or Avatar Placeholder
               Positioned.fill(
-                child: (!isCameraOff && renderer != null && (renderer.srcObject != null || renderer.renderVideo))
-                    ? RTCVideoView(
-                        renderer,
-                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                child: (!isCameraOff && renderer != null)
+                    ? ListenableBuilder(
+                        listenable: renderer,
+                        builder: (context, _) {
+                          if (renderer.srcObject != null || renderer.renderVideo) {
+                            return RTCVideoView(
+                              renderer,
+                              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                              mirror: isSelf,
+                            );
+                          }
+                          return Container(
+                            color: const Color(0xFF1E2132),
+                            child: Center(
+                              child: CircleAvatar(
+                                radius: 22,
+                                backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
+                                child: Text(
+                                  displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       )
                     : Container(
                         color: const Color(0xFF1E2132),
