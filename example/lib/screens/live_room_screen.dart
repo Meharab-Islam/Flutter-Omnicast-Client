@@ -51,11 +51,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   Future<void> _initOmniCastSession() async {
     try {
+      final isLocal = widget.session.serverUrl.contains('localhost') ||
+          widget.session.serverUrl.contains('127.0.0.1') ||
+          widget.session.serverUrl.contains(':8080') ||
+          RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(widget.session.serverUrl);
       _client = await OmniCastClient.init(
         serverUrl: widget.session.serverUrl,
         apiKey: 'dev_api_key_123',
         apiSecret: 'dev_api_secret_456',
         jwtSecret: 'super_secret_jwt_key_789',
+        isSecure: isLocal ? false : null,
         enableLogging: true,
       );
 

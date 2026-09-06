@@ -98,5 +98,26 @@ void main() {
       await client.dispose();
       expect(OmniCastClient.instance, isNull);
     });
+
+    test('OmniCastConfig automatically derives http and ws for LAN IP addresses', () {
+      expect(
+        OmniCastConfig.deriveWebSocketUrl('192.168.0.116:8080'),
+        'ws://192.168.0.116:8080/ws',
+      );
+      expect(
+        OmniCastConfig.deriveApiUrl('192.168.0.116:8080'),
+        'http://192.168.0.116:8080/api',
+      );
+
+      // Domain names should still default to wss and https
+      expect(
+        OmniCastConfig.deriveWebSocketUrl('live.example.com'),
+        'wss://live.example.com/ws',
+      );
+      expect(
+        OmniCastConfig.deriveApiUrl('live.example.com'),
+        'https://live.example.com/api',
+      );
+    });
   });
 }

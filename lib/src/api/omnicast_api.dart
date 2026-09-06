@@ -53,7 +53,7 @@ class OmniCastApi {
   /// Fetches active live broadcasting rooms from the backend (`GET /rooms`).
   Future<List<RoomModel>> getLiveRooms({Duration timeout = const Duration(seconds: 10)}) async {
     final baseUrl = baseApiUrl;
-    final urlString = baseUrl.endsWith('/api') ? '$baseUrl/rooms' : '$baseUrl/rooms';
+    final urlString = '$baseUrl/rooms';
     final uri = Uri.parse(urlString);
 
     try {

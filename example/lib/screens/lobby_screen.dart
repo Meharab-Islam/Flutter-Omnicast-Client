@@ -36,11 +36,16 @@ class _LobbyScreenState extends State<LobbyScreen> {
     final server = _serverController.text.trim().isNotEmpty
         ? _serverController.text.trim()
         : AppConstants.defaultLocalhost;
+    final isLocal = server.contains('localhost') ||
+        server.contains('127.0.0.1') ||
+        server.contains(':8080') ||
+        RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(server);
     final client = await OmniCastClient.init(
       serverUrl: server,
       apiKey: 'dev_api_key_123',
       apiSecret: 'dev_api_secret_456',
       jwtSecret: 'super_secret_jwt_key_789',
+      isSecure: isLocal ? false : null,
       autoConnect: false,
       autoWatchRooms: true,
       watchRoomsInterval: const Duration(seconds: 4),

@@ -127,7 +127,12 @@ class OmniCastConfig {
       raw = raw.replaceFirst('https://', '');
     }
 
-    if (raw.contains('localhost') || raw.contains('127.0.0.1')) {
+    final isNumericIp = RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(raw);
+    if (raw.contains('localhost') ||
+        raw.contains('127.0.0.1') ||
+        isNumericIp ||
+        raw.contains(':8080') ||
+        raw.contains(':8000')) {
       if (useSsl == null) isSecure = false;
     }
 
@@ -169,7 +174,12 @@ class OmniCastConfig {
       raw = raw.replaceFirst('wss://', '');
     }
 
-    if (raw.contains('localhost') || raw.contains('127.0.0.1')) {
+    final isNumericIp = RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(raw);
+    if (raw.contains('localhost') ||
+        raw.contains('127.0.0.1') ||
+        isNumericIp ||
+        raw.contains(':8080') ||
+        raw.contains(':8000')) {
       if (useSsl == null) isSecure = false;
     }
 
