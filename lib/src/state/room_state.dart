@@ -650,9 +650,8 @@ class RoomState extends ChangeNotifier {
 
   /// Registers an active remote user track.
   void addActiveRemoteUser(String userId) {
-    if (_activeRemoteUserIds.add(userId)) {
-      notifyListeners();
-    }
+    _activeRemoteUserIds.add(userId);
+    notifyListeners();
   }
 
   /// Unregisters an active remote user track.

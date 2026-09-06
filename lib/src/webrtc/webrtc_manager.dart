@@ -223,6 +223,11 @@ class WebRTCManager {
       if (event.streams.isNotEmpty) {
         final stream = event.streams.first;
         onRemoteTrack?.call(event.track, stream);
+      } else {
+        createLocalMediaStream('stream_${event.track.id}').then((stream) {
+          stream.addTrack(event.track);
+          onRemoteTrack?.call(event.track, stream);
+        }).catchError((_) {});
       }
     };
 

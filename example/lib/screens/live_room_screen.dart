@@ -639,7 +639,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       return ListenableBuilder(
         listenable: _client.state,
         builder: (context, _) {
-          final renderer = _client.media.getRenderer(widget.session.roomId);
+          final renderer = _client.media.getRenderer(widget.session.roomId) ??
+              _client.media.getRenderer('host');
           if (renderer != null) {
             return ListenableBuilder(
               listenable: renderer,

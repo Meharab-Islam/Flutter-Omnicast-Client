@@ -602,9 +602,24 @@ class OmniCastClient {
     // 2. WebRTC Remote Track -> MediaStreamManager & RoomState
     _webRTCManager.onRemoteTrack = (track, stream) async {
       final streamId = stream.id;
-      final peerId = streamId.isNotEmpty ? streamId : (_roomState.hostId ?? 'remote_peer');
-      await _mediaStreamManager.attachRemoteStream(peerId, stream);
+      final hostId = _roomState.hostId;
+      final roomId = _roomState.roomId;
+
+      if (streamId.isNotEmpty) {
+        await _mediaStreamManager.attachRemoteStream(streamId, stream);
+      }
+      if (roomId != null && roomId.isNotEmpty) {
+        await _mediaStreamManager.attachRemoteStream(roomId, stream);
+      }
+      if (hostId != null && hostId.isNotEmpty) {
+        await _mediaStreamManager.attachRemoteStream(hostId, stream);
+      }
+      await _mediaStreamManager.attachRemoteStream('host', stream);
+
+      final peerId = hostId ?? roomId ?? streamId;
       _roomState.addActiveRemoteUser(peerId);
+      if (roomId != null) _roomState.addActiveRemoteUser(roomId);
+      if (hostId != null) _roomState.addActiveRemoteUser(hostId);
     };
 
     // 3. Signaling State -> RoomState

@@ -221,7 +221,16 @@ class MediaStreamManager {
     if (userId == null || userId == 'local') {
       return _localRenderer;
     }
-    return _remoteRenderers[userId];
+    if (_remoteRenderers.containsKey(userId)) {
+      return _remoteRenderers[userId];
+    }
+    // Fallback for live broadcast viewers: if looking up host or if only 1 remote stream exists
+    if (_remoteRenderers.isNotEmpty) {
+      if (userId == 'host' || _remoteRenderers.length == 1) {
+        return _remoteRenderers.values.first;
+      }
+    }
+    return null;
   }
 
   /// Stops all tracks in the local media stream and clears the local renderer source.
