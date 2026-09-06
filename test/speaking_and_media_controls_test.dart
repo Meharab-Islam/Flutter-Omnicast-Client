@@ -219,5 +219,33 @@ void main() {
       await signaling.dispose();
       roomState.dispose();
     });
+
+    test('RoomState manages speaking users state and notifies listeners', () {
+      final roomState = RoomState();
+      expect(roomState.isUserSpeaking('user-1'), isFalse);
+      expect(roomState.speakingUsersNotifier.value['user-1'], isNull);
+
+      roomState.updateUserSpeaking('user-1', true);
+      expect(roomState.isUserSpeaking('user-1'), isTrue);
+      expect(roomState.speakingUsersNotifier.value['user-1'], isTrue);
+
+      roomState.updateUserSpeaking('user-1', false);
+      expect(roomState.isUserSpeaking('user-1'), isFalse);
+      expect(roomState.speakingUsersNotifier.value['user-1'], isFalse);
+
+      roomState.reset();
+      expect(roomState.isUserSpeaking('user-1'), isFalse);
+      expect(roomState.speakingUsersNotifier.value.isEmpty, isTrue);
+
+      roomState.dispose();
+    });
+
+    test('MediaStreamManager manages aliases cleanly', () async {
+      final manager = MediaStreamManager();
+      manager.registerAlias('host', 'user-host');
+      expect(manager.getRenderer('host'), isNull);
+
+      await manager.dispose();
+    });
   });
 }

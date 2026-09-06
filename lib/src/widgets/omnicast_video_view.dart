@@ -67,50 +67,69 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   void initState() {
     super.initState();
     _isMounted = true;
+    widget.mediaStreamManager.addListener(_onMediaManagerChanged);
     _initializeLazyRenderer();
+  }
+
+  void _onMediaManagerChanged() {
+    if (!_isMounted) return;
+    final isLocal = widget.userId == null || widget.userId == 'local';
+    RTCVideoRenderer? r;
+    if (isLocal) {
+      r = widget.mediaStreamManager.localRenderer;
+    } else {
+      r = widget.mediaStreamManager.getRenderer(widget.userId);
+    }
+    if (r != null && r != _renderer) {
+      setState(() {
+        _renderer = r;
+      });
+      widget.onRendererReady?.call(r);
+    } else if (_renderer != null && _renderer!.srcObject != null) {
+      setState(() {});
+    }
   }
 
   @override
   void didUpdateWidget(covariant OmniCastVideoView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.userId != widget.userId ||
-        oldWidget.mediaStreamManager != widget.mediaStreamManager) {
+    if (oldWidget.mediaStreamManager != widget.mediaStreamManager) {
+      oldWidget.mediaStreamManager.removeListener(_onMediaManagerChanged);
+      widget.mediaStreamManager.addListener(_onMediaManagerChanged);
+      _cleanupRenderer();
+      _initializeLazyRenderer();
+    } else if (oldWidget.userId != widget.userId) {
       _cleanupRenderer();
       _initializeLazyRenderer();
     }
   }
 
-  /// Lazy initialization: only allocate renderer resources when mounted in widget tree.
+  /// Lazy initialization: binds directly to shared renderer from MediaStreamManager
+  /// to eliminate duplicate EGL contexts.
   Future<void> _initializeLazyRenderer() async {
-    final renderer = RTCVideoRenderer();
-    await renderer.initialize();
-
-    if (!_isMounted) {
-      await renderer.dispose();
-      return;
-    }
-
     final isLocal = widget.userId == null || widget.userId == 'local';
+    RTCVideoRenderer? renderer;
     if (isLocal) {
-      if (widget.mediaStreamManager.localStream != null) {
-        renderer.srcObject = widget.mediaStreamManager.localStream;
+      renderer = widget.mediaStreamManager.localRenderer;
+      if (renderer == null && widget.mediaStreamManager.localStream != null) {
+        renderer = await widget.mediaStreamManager.initLocalRenderer();
       }
-    } else {
-      final remoteStream =
-          widget.mediaStreamManager.remoteStreams[widget.userId!];
-      if (remoteStream != null) {
-        renderer.srcObject = remoteStream;
+    } else if (widget.userId != null) {
+      renderer = widget.mediaStreamManager.getRenderer(widget.userId);
+      if (renderer == null &&
+          widget.mediaStreamManager.remoteStreams.containsKey(widget.userId)) {
+        renderer = await widget.mediaStreamManager
+            .getOrCreateRemoteRenderer(widget.userId!);
       }
     }
 
-    if (_isMounted) {
+    if (!_isMounted) return;
+
+    if (renderer != null) {
       setState(() {
         _renderer = renderer;
       });
       widget.onRendererReady?.call(renderer);
-    } else {
-      renderer.srcObject = null;
-      await renderer.dispose();
     }
   }
 
@@ -141,17 +160,14 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   }
 
   void _cleanupRenderer() {
-    if (_renderer != null) {
-      _renderer!.srcObject = null;
-      _renderer!.dispose();
-      _renderer = null;
-    }
+    _renderer = null;
   }
 
-  /// Aggressive Disposal: Free VRAM and hardware resources immediately on unmount.
+  /// Aggressive Disposal: Free VRAM and detach listeners immediately on unmount.
   @override
   void dispose() {
     _isMounted = false;
+    widget.mediaStreamManager.removeListener(_onMediaManagerChanged);
     _cleanupRenderer();
     super.dispose();
   }

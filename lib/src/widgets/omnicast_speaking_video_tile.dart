@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../media/audio_level_detector.dart';
+import '../state/room_state.dart';
 
 /// Interactive video tile with active speaking pulsating aura, decibel equalizer animation,
 /// and camera-off avatar placeholder.
@@ -13,6 +14,7 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
   final bool isCameraEnabled;
   final bool isMicMuted;
   final AudioLevelDetector audioDetector;
+  final RoomState? roomState;
   final VoidCallback? onTap;
 
   /// Whether to mirror the video rendering.
@@ -30,6 +32,7 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
     this.isMicMuted = false,
     this.mirror,
     required this.audioDetector,
+    this.roomState,
     this.onTap,
   });
 
@@ -37,65 +40,56 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveMirror = mirror ?? (userId == 'local' || trackId == 'local');
 
-    return GestureDetector(
-      onTap: onTap,
-      child: ValueListenableBuilder<Map<String, double>>(
-        valueListenable: audioDetector.audioLevelsNotifier,
-        builder: (context, levels, child) {
-          final level = isMicMuted
-              ? 0.0
-              : (levels[trackId] ?? levels[userId] ?? 0.0);
-          final isSpeaking = level > 0.04;
-
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isSpeaking
-                    ? const Color(0xFF10B981)
-                    : Colors.white.withValues(alpha: 0.08),
-                width: isSpeaking ? 2.5 : 1.0,
-              ),
-              boxShadow: isSpeaking
-                  ? [
-                      BoxShadow(
-                        color: const Color(
-                          0xFF10B981,
-                        ).withValues(alpha: (level * 2.5).clamp(0.3, 0.8)),
-                        blurRadius: 10 + (level * 14),
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : null,
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
-                // 1. Live Video View or Avatar Placeholder
-                if (isCameraEnabled && renderer != null)
-                  ListenableBuilder(
-                    listenable: renderer!,
-                    builder: (context, _) {
-                      final hasVideo =
-                          renderer!.renderVideo || renderer!.srcObject != null;
-                      if (!hasVideo && userId != 'local') {
-                        return _buildAvatarPlaceholder();
-                      }
-                      return SizedBox.expand(
-                        child: RTCVideoView(
-                          renderer!,
-                          mirror: effectiveMirror,
-                          objectFit:
-                              RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                        ),
-                      );
-                    },
-                  )
-                else
-                  _buildAvatarPlaceholder(),
+    Widget buildTileContent(bool isSpeaking, double level) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSpeaking
+                ? const Color(0xFF10B981)
+                : Colors.white.withValues(alpha: 0.08),
+            width: isSpeaking ? 2.5 : 1.0,
+          ),
+          boxShadow: isSpeaking
+              ? [
+                  BoxShadow(
+                    color: const Color(
+                      0xFF10B981,
+                    ).withValues(alpha: (level * 2.5).clamp(0.3, 0.8)),
+                    blurRadius: 10 + (level * 14),
+                    spreadRadius: 2,
+                  ),
+                ]
+              : null,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // 1. Live Video View or Avatar Placeholder
+            if (isCameraEnabled && renderer != null)
+              ListenableBuilder(
+                listenable: renderer!,
+                builder: (context, _) {
+                  final hasVideo =
+                      renderer!.renderVideo || renderer!.srcObject != null;
+                  if (!hasVideo && userId != 'local') {
+                    return _buildAvatarPlaceholder();
+                  }
+                  return SizedBox.expand(
+                    child: RTCVideoView(
+                      renderer!,
+                      mirror: effectiveMirror,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    ),
+                  );
+                },
+              )
+            else
+              _buildAvatarPlaceholder(),
 
                 // 2. User Info & Active Speaking Waveform Badge (Bottom Left)
                 Positioned(
@@ -151,6 +145,34 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
               ],
             ),
           );
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: ValueListenableBuilder<Map<String, double>>(
+        valueListenable: audioDetector.audioLevelsNotifier,
+        builder: (context, levels, child) {
+          final level = isMicMuted
+              ? 0.0
+              : (levels[trackId] ?? levels[userId] ?? 0.0);
+          final isLocallySpeaking = level > 0.04;
+
+          if (roomState != null) {
+            return ValueListenableBuilder<Map<String, bool>>(
+              valueListenable: roomState!.speakingUsersNotifier,
+              builder: (context, speakingMap, _) {
+                final isSignaledSpeaking =
+                    !isMicMuted && (speakingMap[userId] == true);
+                final isSpeaking = isLocallySpeaking || isSignaledSpeaking;
+                return buildTileContent(
+                  isSpeaking,
+                  isSpeaking ? (level > 0.04 ? level : 0.25) : 0.0,
+                );
+              },
+            );
+          }
+
+          return buildTileContent(isLocallySpeaking, level);
         },
       ),
     );

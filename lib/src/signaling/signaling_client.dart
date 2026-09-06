@@ -67,13 +67,16 @@ class SignalingClient {
   final _roomClosedController = StreamController<String>.broadcast();
   final _roomListController = StreamController<List<RoomModel>>.broadcast();
 
+  final _userSpeakingController =
+      StreamController<SignalingMessage>.broadcast();
+
   // Reconnection state
   bool autoReconnect;
   Timer? _reconnectTimer;
   int _reconnectAttempts = 0;
 
   SignalingClient({
-    this.heartbeatInterval = const Duration(seconds: 15),
+    this.heartbeatInterval = const Duration(seconds: 5),
     this.autoReconnect = true,
   });
 
@@ -119,6 +122,7 @@ class SignalingClient {
       _leaveAcknowledgedController.stream;
   Stream<SignalingMessage> get onMediaStateChanged =>
       _mediaStateController.stream;
+  Stream<SignalingMessage> get onUserSpeaking => _userSpeakingController.stream;
   Stream<RoomModel> get onRoomCreated => _roomCreatedController.stream;
   Stream<String> get onRoomClosed => _roomClosedController.stream;
   Stream<List<RoomModel>> get onRoomListReceived => _roomListController.stream;
@@ -414,6 +418,12 @@ class SignalingClient {
         _mediaStateController.add(msg);
         break;
 
+      case 'user_speaking':
+      case 'speaking':
+      case 'speaking_state_changed':
+        _userSpeakingController.add(msg);
+        break;
+
       case SignalingEvents.roomCreated:
         if (msg.payload is Map<String, dynamic>) {
           _roomCreatedController.add(
@@ -586,6 +596,44 @@ class SignalingClient {
     _updateState(ClientConnectionState.disconnected);
   }
 
+  /// Broadcasts the local participant's speaking status to the room.
+  bool sendSpeakingState({
+    required String roomId,
+    required String userId,
+    required bool isSpeaking,
+    double level = 0.0,
+  }) {
+    return send(
+      SignalingMessage(
+        event: 'user_speaking',
+        roomId: roomId,
+        userId: userId,
+        payload: {
+          'user_id': userId,
+          'is_speaking': isSpeaking,
+          'speaking': isSpeaking,
+          'audio_level': level,
+        },
+      ),
+    );
+  }
+
+  /// Requests an immediate unthrottled Keyframe (PLI) from the media server.
+  bool requestKeyframe({required String roomId, String? userId}) {
+    return send(
+      SignalingMessage(
+        event: 'request_keyframe',
+        roomId: roomId,
+        userId: userId ?? '',
+      ),
+    );
+  }
+
+  /// Requests a refreshed list of active broadcast rooms from the server.
+  void fetchRoomList() {
+    requestRoomList();
+  }
+
   /// Permanently disposes the signaling client and closes all broadcast streams.
   Future<void> dispose() async {
     if (_isDisposed) return;
@@ -614,6 +662,7 @@ class SignalingClient {
     await _seatUpdatedController.close();
     await _seatKickedController.close();
     await _mediaStateController.close();
+    await _userSpeakingController.close();
     await _pkStartedController.close();
     await _pkScoreController.close();
     await _pkEndedController.close();

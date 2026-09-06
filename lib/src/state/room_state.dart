@@ -45,6 +45,9 @@ class RoomState extends ChangeNotifier {
   final ValueNotifier<List<StageSeat>> activeSeatsNotifier =
       ValueNotifier<List<StageSeat>>(const []);
   final ValueNotifier<int> occupiedSeatsCountNotifier = ValueNotifier<int>(0);
+  final Map<String, bool> _speakingUsers = {};
+  final ValueNotifier<Map<String, bool>> speakingUsersNotifier =
+      ValueNotifier<Map<String, bool>>(const {});
 
   bool _isDisposed = false;
 
@@ -720,6 +723,19 @@ class RoomState extends ChangeNotifier {
     }
   }
 
+  /// Returns whether a participant is currently speaking.
+  bool isUserSpeaking(String userId) => _speakingUsers[userId] == true;
+
+  /// Updates the speaking status for a given user.
+  void updateUserSpeaking(String userId, bool isSpeaking) {
+    if (_isDisposed) return;
+    if (_speakingUsers[userId] == isSpeaking) return;
+    _speakingUsers[userId] = isSpeaking;
+    speakingUsersNotifier.value =
+        Map<String, bool>.unmodifiable(_speakingUsers);
+    notifyListeners();
+  }
+
   /// Resets state when disconnecting or leaving room.
   void reset() {
     if (_isDisposed) return;
@@ -753,6 +769,10 @@ class RoomState extends ChangeNotifier {
     _recentGifts.clear();
     _pendingSeatRequests.clear();
     _pendingInvites.clear();
+    _speakingUsers.clear();
+    try {
+      speakingUsersNotifier.value = const {};
+    } catch (_) {}
     _activePK = null;
     notifyListeners();
   }
@@ -775,6 +795,9 @@ class RoomState extends ChangeNotifier {
     } catch (_) {}
     try {
       occupiedSeatsCountNotifier.dispose();
+    } catch (_) {}
+    try {
+      speakingUsersNotifier.dispose();
     } catch (_) {}
     super.dispose();
   }

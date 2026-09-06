@@ -204,18 +204,40 @@ class MediaStreamManager implements Listenable {
     }
   }
 
+  /// Registers an alias for an existing remote user/stream to avoid allocating duplicate renderers.
+  void registerAlias(String alias, String targetUserId) {
+    if (alias == targetUserId) return;
+    if (_remoteStreams.containsKey(targetUserId)) {
+      _remoteStreams[alias] = _remoteStreams[targetUserId]!;
+    }
+    if (_remoteRenderers.containsKey(targetUserId)) {
+      _remoteRenderers[alias] = _remoteRenderers[targetUserId]!;
+    }
+  }
+
   /// Retrieves or creates and initializes an [RTCVideoRenderer] for a given [userId].
+  /// Reuses any existing renderer attached to the same [MediaStream] to prevent EGL context exhaustion.
   Future<RTCVideoRenderer> getOrCreateRemoteRenderer(String userId) async {
     if (_remoteRenderers.containsKey(userId)) {
       return _remoteRenderers[userId]!;
+    }
+
+    final targetStream = _remoteStreams[userId];
+    if (targetStream != null) {
+      for (final entry in _remoteRenderers.entries) {
+        if (entry.value.srcObject == targetStream) {
+          _remoteRenderers[userId] = entry.value;
+          return entry.value;
+        }
+      }
     }
 
     final renderer = RTCVideoRenderer();
     await renderer.initialize();
     _remoteRenderers[userId] = renderer;
 
-    if (_remoteStreams.containsKey(userId)) {
-      renderer.srcObject = _remoteStreams[userId];
+    if (targetStream != null) {
+      renderer.srcObject = targetStream;
     }
 
     return renderer;
@@ -235,7 +257,15 @@ class MediaStreamManager implements Listenable {
           (t) => t.id == track.id,
         );
         if (!hasTrack) {
-          existingStream.addTrack(track);
+          try {
+            existingStream.addTrack(track);
+          } catch (e) {
+            OmniCastLogger.log(
+              '[MediaStreamManager] addTrack failed ($e), falling back to replacing stream',
+            );
+            _remoteStreams[userId] = stream;
+            break;
+          }
         }
       }
     } else {
@@ -260,19 +290,32 @@ class MediaStreamManager implements Listenable {
   }
 
   /// Safely removes and disposes the [RTCVideoRenderer] and cached stream for a given [userId].
+  /// Does not prematurely dispose renderers that are still shared with aliases.
   Future<void> removeRemoteRenderer(String userId) async {
     final stream = _remoteStreams.remove(userId);
-    if (stream != null) {
+    if (stream != null && !_remoteStreams.values.contains(stream)) {
       for (final track in stream.getTracks()) {
-        await track.stop();
+        try {
+          await track.stop();
+        } catch (_) {}
       }
-      await stream.dispose();
+      try {
+        await stream.dispose();
+      } catch (_) {}
     }
 
     final renderer = _remoteRenderers.remove(userId);
     if (renderer != null) {
-      renderer.srcObject = null;
-      await renderer.dispose();
+      final isShared = _remoteRenderers.values.contains(renderer);
+      if (!isShared) {
+        renderer.srcObject = null;
+        try {
+          await renderer.dispose().timeout(
+            const Duration(milliseconds: 250),
+            onTimeout: () {},
+          );
+        } catch (_) {}
+      }
     }
 
     if (!_isDisposed) {
@@ -343,11 +386,29 @@ class MediaStreamManager implements Listenable {
       _localRenderer = null;
     }
 
-    final remoteIds = List<String>.from(_remoteRenderers.keys);
-    for (final id in remoteIds) {
-      await removeRemoteRenderer(id);
+    final uniqueStreams = _remoteStreams.values.toSet();
+    for (final stream in uniqueStreams) {
+      for (final track in stream.getTracks()) {
+        try {
+          await track.stop();
+        } catch (_) {}
+      }
+      try {
+        await stream.dispose();
+      } catch (_) {}
     }
     _remoteStreams.clear();
+
+    final uniqueRenderers = _remoteRenderers.values.toSet();
+    for (final renderer in uniqueRenderers) {
+      renderer.srcObject = null;
+      try {
+        await renderer.dispose().timeout(
+          const Duration(milliseconds: 250),
+          onTimeout: () {},
+        );
+      } catch (_) {}
+    }
     _remoteRenderers.clear();
     _changeNotifier.dispose();
   }

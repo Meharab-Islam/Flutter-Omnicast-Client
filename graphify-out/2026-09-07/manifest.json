@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "lib/src/media/media_stream_manager.dart": {
-    "mtime": 1788730459.9812896,
-    "seen": 1788730517.213794,
-    "ast_hash": "6b0a6a179d4feb120330feff3284b7e4",
+    "mtime": 1788731537.5674074,
+    "seen": 1788731567.922455,
+    "ast_hash": "18a14ecf52f989a9e8fc374248578e86",
     "semantic_hash": ""
   },
   "lib/src/models/room_event_models.dart": {
@@ -48,15 +48,15 @@
     "semantic_hash": ""
   },
   "lib/src/webrtc/webrtc_manager.dart": {
-    "mtime": 1788730460.0233514,
-    "seen": 1788730517.213802,
-    "ast_hash": "951362b973df26051925d09c1eaec65c",
+    "mtime": 1788731537.598662,
+    "seen": 1788731567.922463,
+    "ast_hash": "e5a502850a4a03cd34f856d6e5eb376c",
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_video_view.dart": {
-    "mtime": 1788730460.067927,
-    "seen": 1788730517.213809,
-    "ast_hash": "66e809e7fd3be7c276b8074205085006",
+    "mtime": 1788731495.7080402,
+    "seen": 1788731567.9224708,
+    "ast_hash": "f2cb3864fe822f7f9d94910e3963b3ed",
     "semantic_hash": ""
   },
   "test/omnicast_video_view_test.dart": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "lib/src/room/room_manager.dart": {
-    "mtime": 1788730460.0027401,
-    "seen": 1788730517.213799,
-    "ast_hash": "945ca64ca2b0239b39f89bd53b247072",
+    "mtime": 1788731492.7865093,
+    "seen": 1788731567.9224598,
+    "ast_hash": "e3423d55e1b214dbea5f070228f792c0",
     "semantic_hash": ""
   },
   "lib/src/seats/seat_manager.dart": {
@@ -144,9 +144,9 @@
     "semantic_hash": ""
   },
   "test/video_parameters_test.dart": {
-    "mtime": 1788730460.0982146,
-    "seen": 1788730517.21382,
-    "ast_hash": "441fb6ebd03f2784861f53a33e11bf9a",
+    "mtime": 1788731537.6591918,
+    "seen": 1788731567.922483,
+    "ast_hash": "c5b8891dc34bad7037d5c2b791fe340c",
     "semantic_hash": ""
   },
   "lib/src/widgets/gift_overlay_manager.dart": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_speaking_video_tile.dart": {
-    "mtime": 1788730460.0579817,
-    "seen": 1788730517.213808,
-    "ast_hash": "1041f1993e63256d0784e036a2aca286",
+    "mtime": 1788731537.627725,
+    "seen": 1788731567.9224691,
+    "ast_hash": "76a7f03099f602cb7b27865896f94e83",
     "semantic_hash": ""
   },
   "test/speaking_and_media_controls_test.dart": {
@@ -306,9 +306,9 @@
     "semantic_hash": ""
   },
   "lib/src/api/omnicast_api.dart": {
-    "mtime": 1788730459.9568303,
-    "seen": 1788730517.2137878,
-    "ast_hash": "43ccea14003a9622ff4f5d03adc45289",
+    "mtime": 1788731389.825169,
+    "seen": 1788731567.9224489,
+    "ast_hash": "17aea309a51b3d63ae6533806b35a43f",
     "semantic_hash": ""
   },
   "test/omnicast_api_test.dart": {
@@ -468,15 +468,15 @@
     "semantic_hash": ""
   },
   "example/lib/config/app_constants.dart": {
-    "mtime": 1788723826.335621,
-    "seen": 1788730517.213772,
-    "ast_hash": "1032de32baaf2b68709d277b285fda44",
+    "mtime": 1788731537.486429,
+    "seen": 1788731567.92243,
+    "ast_hash": "6d4404141582c5714e7d70359a7183ec",
     "semantic_hash": ""
   },
   "example/lib/main.dart": {
-    "mtime": 1788728072.0699823,
-    "seen": 1788730517.213773,
-    "ast_hash": "d41992515d7cc6d5c8d3b8ed006ad56d",
+    "mtime": 1788731537.4880886,
+    "seen": 1788731567.92243,
+    "ast_hash": "c26b4c36a589ef697c502c287e174692",
     "semantic_hash": ""
   },
   "example/lib/models/demo_user_model.dart": {
@@ -486,39 +486,39 @@
     "semantic_hash": ""
   },
   "example/lib/screens/live_room_screen.dart": {
-    "mtime": 1788729517.928483,
-    "seen": 1788730517.213773,
-    "ast_hash": "8c2899c70ff390f10637e25ef6191b40",
+    "mtime": 1788731546.7323587,
+    "seen": 1788731567.922432,
+    "ast_hash": "aa14e7dedcb750060c975502b7bdd9f1",
     "semantic_hash": ""
   },
   "example/lib/screens/lobby_screen.dart": {
-    "mtime": 1788724320.766999,
-    "seen": 1788730517.213774,
-    "ast_hash": "b9dccd3e02a99a688ba3902c54edfa5f",
+    "mtime": 1788731537.5337205,
+    "seen": 1788731567.922432,
+    "ast_hash": "f30c42a0734633f0fdb873d03fdc8c63",
     "semantic_hash": ""
   },
   "example/lib/widgets/gift_modal.dart": {
-    "mtime": 1788721567.6509602,
-    "seen": 1788730517.213774,
-    "ast_hash": "a1b295a131d450fdae43fed3b4093aee",
+    "mtime": 1788731552.14798,
+    "seen": 1788731567.9224331,
+    "ast_hash": "8c56ad274b88497815da8310b6639bd7",
     "semantic_hash": ""
   },
   "example/lib/widgets/live_chat_view.dart": {
-    "mtime": 1788721571.9236774,
-    "seen": 1788730517.2137752,
-    "ast_hash": "d9227233b12f2fbb14069a1bf87d5569",
+    "mtime": 1788731537.5389128,
+    "seen": 1788731567.9224331,
+    "ast_hash": "12d1fd905251b52295fcfdac979d63a1",
     "semantic_hash": ""
   },
   "example/lib/widgets/media_control_bar.dart": {
-    "mtime": 1788721584.37684,
-    "seen": 1788730517.2137752,
-    "ast_hash": "af12e7b115ca9f3261586267335c63ad",
+    "mtime": 1788731537.542015,
+    "seen": 1788731567.922434,
+    "ast_hash": "9149876a6cdc450513a2fa1e2124df65",
     "semantic_hash": ""
   },
   "example/lib/widgets/pk_score_bar.dart": {
-    "mtime": 1788721590.0444977,
-    "seen": 1788730517.2137759,
-    "ast_hash": "03307d2a0669181316f93d1e75f32fe2",
+    "mtime": 1788731537.5445037,
+    "seen": 1788731567.922434,
+    "ast_hash": "181cbaa03f0b358a401446a28a9ec105",
     "semantic_hash": ""
   },
   "example/linux/flutter/generated_plugin_registrant.cc": {
@@ -582,9 +582,9 @@
     "semantic_hash": ""
   },
   "example/test/widget_test.dart": {
-    "mtime": 1788722530.1556678,
-    "seen": 1788730517.213782,
-    "ast_hash": "72a014d8a7cbfd4bde5c2e82cb2ee5d0",
+    "mtime": 1788731537.5457623,
+    "seen": 1788731567.922441,
+    "ast_hash": "fd12dd8c60718968447252d4b5db9687",
     "semantic_hash": ""
   },
   "example/web/manifest.json": {
@@ -654,9 +654,9 @@
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_dynamic_stage.dart": {
-    "mtime": 1788730460.0385485,
-    "seen": 1788730517.213803,
-    "ast_hash": "2d4dd2c5b326610ef6d60b86ebe7f8db",
+    "mtime": 1788731459.66553,
+    "seen": 1788731567.922465,
+    "ast_hash": "36c42fc9ae54c342dd15e87e9112a568",
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_room_list_view.dart": {

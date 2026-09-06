@@ -679,10 +679,6 @@ class OmniCastClient {
           _roomState.isHost ||
           (_roomState.userId != null && _roomState.userId == hostId);
 
-      if (streamId.isNotEmpty) {
-        await _mediaStreamManager.attachRemoteStream(streamId, stream);
-      }
-
       // 1. If track ID has cohost_ prefix (e.g. cohost_user123_video), extract cohost user ID
       var cohostUserId = '';
       if (trackId.startsWith('cohost_')) {
@@ -697,15 +693,18 @@ class OmniCastClient {
       }
 
       // 2. Check if streamId directly matches an active co-host seat user
-      for (final seat in _roomState.activeSeats) {
-        if (seat.isOccupied && seat.userId != null) {
-          final uId = seat.userId!;
-          if (streamId == uId ||
-              streamId.contains(uId) ||
-              trackId.contains(uId)) {
-            cohostUserId = uId;
-            await _mediaStreamManager.attachRemoteStream(uId, stream);
-            _roomState.addActiveRemoteUser(uId);
+      if (cohostUserId.isEmpty) {
+        for (final seat in _roomState.activeSeats) {
+          if (seat.isOccupied && seat.userId != null) {
+            final uId = seat.userId!;
+            if (streamId == uId ||
+                streamId.contains(uId) ||
+                trackId.contains(uId)) {
+              cohostUserId = uId;
+              await _mediaStreamManager.attachRemoteStream(uId, stream);
+              _roomState.addActiveRemoteUser(uId);
+              break;
+            }
           }
         }
       }
@@ -740,7 +739,11 @@ class OmniCastClient {
                 seat.userId != hostId &&
                 seat.userId != _roomState.userId) {
               final uId = seat.userId!;
-              if (!_mediaStreamManager.remoteStreams.containsKey(uId)) {
+              final existing = _mediaStreamManager.remoteStreams[uId];
+              final needsThisTrack = existing == null ||
+                  (track.kind == 'video' && existing.getVideoTracks().isEmpty) ||
+                  (track.kind == 'audio' && existing.getAudioTracks().isEmpty);
+              if (needsThisTrack) {
                 cohostUserId = uId;
                 await _mediaStreamManager.attachRemoteStream(uId, stream);
                 _roomState.addActiveRemoteUser(uId);
@@ -754,13 +757,16 @@ class OmniCastClient {
       // 5. If main host stream (only when not host, not a cohost track, and host stream is not yet attached)
       final isCoHost = cohostUserId.isNotEmpty || trackId.startsWith('cohost_');
       if (!isCurrentHost && !isCoHost && !hasHostStream) {
+        final hostKey =
+            (hostId != null && hostId.isNotEmpty) ? hostId : 'host';
+        await _mediaStreamManager.attachRemoteStream(hostKey, stream);
+        _mediaStreamManager.registerAlias('host', hostKey);
         if (roomId != null && roomId.isNotEmpty) {
-          await _mediaStreamManager.attachRemoteStream(roomId, stream);
+          _mediaStreamManager.registerAlias(roomId, hostKey);
         }
-        if (hostId != null && hostId.isNotEmpty) {
-          await _mediaStreamManager.attachRemoteStream(hostId, stream);
+        if (streamId.isNotEmpty && streamId != hostKey) {
+          _mediaStreamManager.registerAlias(streamId, hostKey);
         }
-        await _mediaStreamManager.attachRemoteStream('host', stream);
       }
 
       final peerId = cohostUserId.isNotEmpty
@@ -823,6 +829,10 @@ class OmniCastClient {
                 userId: _roomState.userId!,
                 payload: {'sdp': answer.sdp, 'type': answer.type},
               ),
+            );
+            _signalingClient.requestKeyframe(
+              roomId: _roomState.roomId!,
+              userId: _roomState.userId,
             );
           } catch (e) {
             OmniCastLogger.error(

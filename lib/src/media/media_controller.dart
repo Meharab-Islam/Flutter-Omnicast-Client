@@ -50,6 +50,9 @@ class MediaController with WidgetsBindingObserver {
 
   StreamSubscription? _dynacastSubscription;
   StreamSubscription? _mediaStateSubscription;
+  StreamSubscription? _userSpeakingSubscription;
+  Timer? _speakingDebounceTimer;
+  bool _isCurrentlySpeaking = false;
 
   MediaController({
     required MediaStreamManager mediaStreamManager,
@@ -73,6 +76,8 @@ class MediaController with WidgetsBindingObserver {
 
     _bindDynacastSignaling();
     _bindMediaStateSignaling();
+    _bindSpeakingSignaling();
+    _audioLevelDetector.start();
     if (_autoPauseOnBackground) {
       try {
         WidgetsBinding.instance.addObserver(this);
@@ -600,6 +605,11 @@ class MediaController with WidgetsBindingObserver {
         WidgetsBinding.instance.removeObserver(this);
       } catch (_) {}
     }
+    _userSpeakingSubscription?.cancel();
+    _speakingDebounceTimer?.cancel();
+    _audioLevelDetector.audioLevelsNotifier.removeListener(
+      _checkLocalSpeakingState,
+    );
     _dynacastSubscription?.cancel();
     _mediaStateSubscription?.cancel();
     _audioLevelDetector.dispose();
@@ -608,5 +618,107 @@ class MediaController with WidgetsBindingObserver {
     simulcastLayerNotifier.dispose();
     isHostCameraOffNotifier.dispose();
     isHostMicrophoneMutedNotifier.dispose();
+  }
+
+  void _bindSpeakingSignaling() {
+    _userSpeakingSubscription = _signalingClient.onUserSpeaking.listen((msg) {
+      final payload = msg.payload;
+      bool isSpeaking = false;
+      if (payload is Map) {
+        isSpeaking =
+            payload['is_speaking'] == true || payload['speaking'] == true;
+      }
+      final targetUser = (payload is Map && payload['user_id'] != null)
+          ? payload['user_id'].toString()
+          : msg.userId;
+      if (targetUser.isNotEmpty) {
+        _roomState.updateUserSpeaking(targetUser, isSpeaking);
+      }
+    });
+
+    _audioLevelDetector.audioLevelsNotifier.addListener(
+      _checkLocalSpeakingState,
+    );
+  }
+
+  void _checkLocalSpeakingState() {
+    final roomId = _roomState.roomId ?? '';
+    final userId = _roomState.userId ?? '';
+
+    if (isMicrophoneMutedNotifier.value ||
+        !_roomState.isInRoom ||
+        roomId.isEmpty ||
+        userId.isEmpty) {
+      if (_isCurrentlySpeaking) {
+        _isCurrentlySpeaking = false;
+        _speakingDebounceTimer?.cancel();
+        if (userId.isNotEmpty) {
+          _roomState.updateUserSpeaking(userId, false);
+          _signalingClient.sendSpeakingState(
+            roomId: roomId,
+            userId: userId,
+            isSpeaking: false,
+            level: 0.0,
+          );
+        }
+      }
+      return;
+    }
+
+    final levels = _audioLevelDetector.audioLevelsNotifier.value;
+    double myLevel = levels['local'] ?? 0.0;
+    if (myLevel == 0.0) {
+      myLevel = levels[userId] ?? 0.0;
+    }
+    if (myLevel == 0.0 && _mediaStreamManager.localStream != null) {
+      for (final t in _mediaStreamManager.localStream!.getAudioTracks()) {
+        if (levels.containsKey(t.id)) {
+          myLevel = levels[t.id] ?? 0.0;
+          break;
+        }
+      }
+    }
+
+    final isSpeakingNow = myLevel > 0.04;
+    if (isSpeakingNow) {
+      _speakingDebounceTimer?.cancel();
+      if (!_isCurrentlySpeaking) {
+        _isCurrentlySpeaking = true;
+        _roomState.updateUserSpeaking(userId, true);
+        _signalingClient.sendSpeakingState(
+          roomId: roomId,
+          userId: userId,
+          isSpeaking: true,
+          level: myLevel,
+        );
+      }
+    } else if (_isCurrentlySpeaking) {
+      if (_speakingDebounceTimer == null || !_speakingDebounceTimer!.isActive) {
+        _speakingDebounceTimer = Timer(
+          const Duration(milliseconds: 600),
+          () {
+            _isCurrentlySpeaking = false;
+            _roomState.updateUserSpeaking(userId, false);
+            _signalingClient.sendSpeakingState(
+              roomId: roomId,
+              userId: userId,
+              isSpeaking: false,
+              level: 0.0,
+            );
+          },
+        );
+      }
+    }
+  }
+
+  /// Dispatches an unthrottled Keyframe (PLI) request to all broadcasters.
+  void requestKeyframe() {
+    final roomId = _roomState.roomId;
+    if (roomId != null && roomId.isNotEmpty) {
+      _signalingClient.requestKeyframe(
+        roomId: roomId,
+        userId: _roomState.userId,
+      );
+    }
   }
 }
