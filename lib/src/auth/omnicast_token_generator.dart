@@ -15,7 +15,11 @@ abstract final class OmniCastTokenGenerator {
     Map<String, dynamic>? metadata,
     Duration expiresIn = const Duration(hours: 24),
   }) {
-    final signingSecret = jwtSecret ?? apiSecret ?? 'default_secret';
+    final signingSecret = jwtSecret ?? apiSecret ?? 'live_media_server_jwt_secret_key_2026';
+    final canPublish = role == 'host' || role == 'cohost' || role == 'co_host' || role == 'publisher';
+    final dName = metadata?['displayName'] ?? metadata?['display_name'] ?? metadata?['user_name'] ?? metadata?['name'];
+    final aUrl = metadata?['avatarUrl'] ?? metadata?['avatar_url'] ?? metadata?['avatar'];
+
     final jwt = JWT(
       {
         if (apiKey != null && apiKey.isNotEmpty) ...{
@@ -27,9 +31,18 @@ abstract final class OmniCastTokenGenerator {
         'room_id': roomId,
         'roomId': roomId,
         'role': role,
+        'can_publish': canPublish,
+        'can_subscribe': true,
+        if (dName != null) ...{
+          'display_name': dName.toString(),
+          'user_name': dName.toString(),
+        },
+        if (aUrl != null) ...{
+          'avatar_url': aUrl.toString(),
+        },
         if (metadata != null && metadata.isNotEmpty) 'metadata': metadata,
       },
-      issuer: apiKey,
+      issuer: apiKey ?? 'omnicast_engine',
       subject: userId,
     );
 

@@ -132,38 +132,38 @@ class RoomState extends ChangeNotifier {
     }
     _viewersCount = (data['viewers_count'] as num?)?.toInt() ??
         (data['viewer_count'] as num?)?.toInt() ??
+        (data['total_viewers'] as num?)?.toInt() ??
+        (data['count'] as num?)?.toInt() ??
         _viewersCount;
     _hostCoinBalance = (data['host_coin_balance'] as num?)?.toInt() ??
         (data['host_coins'] as num?)?.toInt() ??
+        (data['host_score'] as num?)?.toInt() ??
         _hostCoinBalance;
     _pinnedStageUserId = data['pinned_user_id'] as String? ?? _pinnedStageUserId;
 
-    // Populate active users/viewers
-    if (data['viewers'] is List) {
+    // Populate active users/viewers from viewers, viewers_list, or participants
+    final viewersData = data['viewers'] ?? data['viewers_list'] ?? data['participants'];
+    if (viewersData is List) {
       _viewers.clear();
-      for (final item in data['viewers'] as List) {
+      for (final item in viewersData) {
         if (item is Map<String, dynamic>) {
           _viewers.add(Participant.fromJson(item));
+        } else if (item is Map) {
+          _viewers.add(Participant.fromJson(Map<String, dynamic>.from(item)));
+        } else if (item is String && item.isNotEmpty) {
+          _viewers.add(Participant(
+            userId: item,
+            displayName: item,
+            role: item == _hostId ? UserRole.host : UserRole.viewer,
+            joinedAt: DateTime.now(),
+          ));
         }
       }
     }
 
     // Populate active seats & media states
-    if (data['active_seats'] is List) {
-      _activeSeats.clear();
-      for (final item in data['active_seats'] as List) {
-        if (item is Map<String, dynamic>) {
-          final seat = StageSeat.fromJson(item);
-          _activeSeats.add(seat);
-          if (seat.userId != null && seat.userId!.isNotEmpty) {
-            if (seat.userId != _userId) {
-              _activeRemoteUserIds.add(seat.userId!);
-            }
-            _userAudioMuteStates[seat.userId!] = seat.isMuted;
-            _userCameraOffStates[seat.userId!] = seat.isCameraOff;
-          }
-        }
-      }
+    if (data['active_seats'] != null) {
+      updateActiveSeats(data['active_seats']);
     }
 
     // Populate waiting list / pending seat requests for late-join users
@@ -244,6 +244,69 @@ class RoomState extends ChangeNotifier {
       _viewers.clear();
       _viewers.addAll(viewersList.take(200));
     }
+    notifyListeners();
+  }
+
+  /// Updates active co-host seats from either a List or Map representation.
+  void updateActiveSeats(dynamic activeSeatsData) {
+    if (activeSeatsData == null) return;
+    _activeSeats.clear();
+
+    if (activeSeatsData is List) {
+      for (int i = 0; i < activeSeatsData.length; i++) {
+        final item = activeSeatsData[i];
+        if (item is Map<String, dynamic>) {
+          final seat = StageSeat.fromJson(item);
+          _activeSeats.add(seat);
+          if (seat.userId != null && seat.userId!.isNotEmpty) {
+            if (seat.userId != _userId) {
+              _activeRemoteUserIds.add(seat.userId!);
+            }
+            _userAudioMuteStates[seat.userId!] = seat.isMuted;
+            _userCameraOffStates[seat.userId!] = seat.isCameraOff;
+          }
+        } else if (item is Map) {
+          final seat = StageSeat.fromJson(Map<String, dynamic>.from(item));
+          _activeSeats.add(seat);
+          if (seat.userId != null && seat.userId!.isNotEmpty) {
+            if (seat.userId != _userId) {
+              _activeRemoteUserIds.add(seat.userId!);
+            }
+            _userAudioMuteStates[seat.userId!] = seat.isMuted;
+            _userCameraOffStates[seat.userId!] = seat.isCameraOff;
+          }
+        } else if (item is String && item.isNotEmpty) {
+          final seat = StageSeat(
+            seatIndex: i + 1,
+            userId: item,
+            isMuted: _userAudioMuteStates[item] ?? false,
+            isCameraOff: _userCameraOffStates[item] ?? false,
+          );
+          _activeSeats.add(seat);
+          if (item != _userId) {
+            _activeRemoteUserIds.add(item);
+          }
+        }
+      }
+    } else if (activeSeatsData is Map) {
+      activeSeatsData.forEach((k, v) {
+        final seatIndex = int.tryParse(k.toString()) ?? 0;
+        final uId = v?.toString() ?? '';
+        if (uId.isNotEmpty) {
+          final seat = StageSeat(
+            seatIndex: seatIndex,
+            userId: uId,
+            isMuted: _userAudioMuteStates[uId] ?? false,
+            isCameraOff: _userCameraOffStates[uId] ?? false,
+          );
+          _activeSeats.add(seat);
+          if (uId != _userId) {
+            _activeRemoteUserIds.add(uId);
+          }
+        }
+      });
+    }
+
     notifyListeners();
   }
 

@@ -6,6 +6,8 @@ import '../interaction/interaction_manager.dart';
 import '../media/media_controller.dart';
 import '../media/media_stream_manager.dart';
 import '../media/global_media_config.dart';
+import '../models/interaction_models.dart';
+import '../models/pk_models.dart';
 import '../models/room_models.dart';
 import '../models/seat_models.dart';
 import '../models/signaling_message.dart';
@@ -272,7 +274,21 @@ class OmniCastClient {
   Stream<String> get onParticipantLeft => _roomManager.onParticipantLeft;
   Stream<OmniCastParticipant> get onUserJoined => _roomManager.onUserJoined;
   Stream<String> get onUserLeft => _roomManager.onUserLeft;
+  Stream<SignalingMessage> get onViewerUpdate => _signalingClient.onViewerUpdate;
+  Stream<SignalingMessage> get onPresenceUpdate => _signalingClient.onPresenceUpdate;
   Stream<SignalingMessage> get onMediaStateChanged => _signalingClient.onMediaStateChanged;
+  Stream<ChatMessage> get onChat => _interactionManager.chatStream;
+  Stream<GiftEvent> get onGift => _interactionManager.giftStream;
+  Stream<PKBattleInfo> get onPKStarted => _pkManager.onPKStarted;
+  Stream<PKScoreUpdate> get onPKScoreUpdated => _pkManager.onPKScoreUpdated;
+  Stream<PKTimerTick> get onPKTimerTick => _pkManager.onPKTimerTick;
+  Stream<String> get onPKEnded => _pkManager.onPKEnded;
+  Stream<SignalingMessage> get onPKRequested => _pkManager.onPKRequested;
+  Stream<SignalingMessage> get onSeatUpdated => _signalingClient.onSeatUpdated;
+  Stream<SignalingMessage> get onSeatKicked => _signalingClient.onSeatKicked;
+  Stream<SignalingMessage> get onLayerSwitched => _signalingClient.onLayerSwitched;
+  Stream<SignalingMessage> get onViewportUpdated => _signalingClient.onViewportUpdated;
+  Stream<SignalingMessage> get onLeaveAcknowledged => _signalingClient.onLeaveAcknowledged;
 
   // Real-time Reactive ValueListenable Notifiers for UI Composition
   ValueNotifier<List<OmniCastParticipant>> get viewersNotifier => _roomManager.activeViewersList;
@@ -290,6 +306,9 @@ class OmniCastClient {
   /// Host action alias: Kicks/ejects a participant out of the live room.
   void kickParticipant(String targetUserId, {String? reason}) =>
       _roomManager.kickUser(targetUserId, reason: reason);
+
+  /// Requests a fresh room state snapshot from the server.
+  void requestRoomInfoSync() => _roomManager.requestRoomInfoSync();
 
   // Co-Host & Stage Seat Action Facades
   /// Viewer action: Requests to join the broadcast stage as a Co-Host.
@@ -322,6 +341,82 @@ class OmniCastClient {
 
   /// Host action: Demotes a co-host back to a viewer seat without kicking them.
   void demoteCoHost(String userId) => _seatManager.demoteToViewer(userId);
+
+  /// Host action: Kicks a co-host from their assigned stage seat.
+  void kickSeat(int seatIndex, {String? targetUserId}) =>
+      _seatManager.kickSeat(seatIndex, targetUserId: targetUserId);
+
+  /// Viewer action: Subscribes to a co-host's media stream.
+  void subscribeCoHost(String coHostUserId) =>
+      _seatManager.subscribeCoHost(coHostUserId);
+
+  // Social & Interactivity Facades
+  /// Sends a real-time chat message to the room.
+  void sendChat(String text) => _interactionManager.sendChat(text);
+
+  /// Sends a gift to the room host or a specific participant.
+  void sendGift({
+    required String giftId,
+    required int amount,
+    String? targetUserId,
+    String giftName = 'Gift',
+    int coinValue = 0,
+  }) =>
+      _interactionManager.sendGift(
+        giftId: giftId,
+        amount: amount,
+        targetUserId: targetUserId,
+        giftName: giftName,
+        coinValue: coinValue,
+      );
+
+  // PK Battle System Facades
+  /// Host action: Sends a cross-room PK battle challenge to an opponent host.
+  void sendPKRequest({
+    required String targetRoomId,
+    required String targetHostId,
+    int durationSeconds = 300,
+  }) =>
+      _pkManager.sendPKRequest(
+        targetRoomId: targetRoomId,
+        targetHostId: targetHostId,
+        durationSeconds: durationSeconds,
+      );
+
+  /// Host action: Accepts an incoming PK battle challenge.
+  void acceptPKRequest(
+    String battleId, {
+    String? opponentRoomId,
+    String? opponentHostId,
+  }) =>
+      _pkManager.acceptPKRequest(
+        battleId,
+        opponentRoomId: opponentRoomId,
+        opponentHostId: opponentHostId,
+      );
+
+  /// Host action: Rejects an incoming PK challenge.
+  void rejectPKRequest(String battleId) => _pkManager.rejectPKRequest(battleId);
+
+  /// Host action: Terminates an ongoing PK battle.
+  void endPK(String battleId) => _pkManager.endPK(battleId);
+
+  // Media & Hardware Controls
+  /// Toggles local microphone mute state.
+  void setMicrophoneMuted(bool muted) => _mediaController.setMicrophoneMuted(muted);
+
+  /// Toggles local camera enabled state.
+  void setCameraEnabled(bool enabled) => _mediaController.setCameraEnabled(enabled);
+
+  /// Switches between front and rear cameras.
+  Future<void> switchCamera() => _mediaController.switchCamera();
+
+  /// Switches simulcast subscription layer ('f', 'h', 'q').
+  void setSimulcastLayer(String layer, {String? targetUserId}) =>
+      _mediaController.setSimulcastLayer(layer, targetUserId: targetUserId);
+
+  /// Requests seamless ICE restart for reconnection.
+  Future<void> requestICERestart() => _mediaController.requestICERestart();
 
   // Co-Host Streams
   /// Stream emitting when a viewer requests to become a co-host (Host listens to this).
