@@ -37,6 +37,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
         : AppConstants.defaultLocalhost;
     final client = await OmniCastClient.init(
       serverUrl: server,
+      apiKey: 'dev_api_key_123',
+      apiSecret: 'dev_api_secret_456',
+      jwtSecret: 'super_secret_jwt_key_789',
       autoConnect: false,
       autoWatchRooms: true,
       watchRoomsInterval: const Duration(seconds: 4),

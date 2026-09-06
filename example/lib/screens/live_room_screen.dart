@@ -54,7 +54,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       _client = await OmniCastClient.init(
         serverUrl: widget.session.serverUrl,
         apiKey: 'dev_api_key_123',
-        jwtSecret: 'live_media_server_jwt_secret_key_2026',
+        apiSecret: 'dev_api_secret_456',
+        jwtSecret: 'super_secret_jwt_key_789',
         enableLogging: true,
       );
 
