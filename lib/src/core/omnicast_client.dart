@@ -701,14 +701,18 @@ class OmniCastClient {
       _signalingClient.onAnswer.listen((msg) async {
         final payload = msg.payload;
         String? sdp;
-        if (payload is Map<String, dynamic>) {
-          sdp = payload['sdp'] as String?;
+        if (payload is Map) {
+          sdp = (payload['sdp'] ?? payload['SDP'])?.toString();
         } else if (payload is String) {
           sdp = payload;
         }
 
         if (sdp != null && sdp.isNotEmpty) {
-          await _webRTCManager.handleRemoteAnswer(sdp);
+          try {
+            await _webRTCManager.handleRemoteAnswer(sdp);
+          } catch (e) {
+            OmniCastLogger.error('[OmniCastClient] Error handling remote SDP answer: $e');
+          }
         }
       }),
     );
@@ -718,23 +722,27 @@ class OmniCastClient {
       _signalingClient.onOffer.listen((msg) async {
         final payload = msg.payload;
         String? sdp;
-        if (payload is Map<String, dynamic>) {
-          sdp = payload['sdp'] as String?;
+        if (payload is Map) {
+          sdp = (payload['sdp'] ?? payload['SDP'])?.toString();
         } else if (payload is String) {
           sdp = payload;
         }
 
         if (sdp != null && sdp.isNotEmpty && _roomState.isInRoom) {
-          final answer = await _webRTCManager.handleRemoteOfferAndCreateAnswer(sdp);
-          _signalingClient.send(SignalingMessage(
-            event: SignalingEvents.sdpAnswer,
-            roomId: _roomState.roomId!,
-            userId: _roomState.userId!,
-            payload: {
-              'sdp': answer.sdp,
-              'type': answer.type,
-            },
-          ));
+          try {
+            final answer = await _webRTCManager.handleRemoteOfferAndCreateAnswer(sdp);
+            _signalingClient.send(SignalingMessage(
+              event: SignalingEvents.sdpAnswer,
+              roomId: _roomState.roomId!,
+              userId: _roomState.userId!,
+              payload: {
+                'sdp': answer.sdp,
+                'type': answer.type,
+              },
+            ));
+          } catch (e) {
+            OmniCastLogger.error('[OmniCastClient] Error handling remote SDP offer: $e');
+          }
         }
       }),
     );

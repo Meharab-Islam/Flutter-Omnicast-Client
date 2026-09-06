@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../media/media_stream_manager.dart';
 import '../media/video_parameters.dart';
@@ -455,10 +456,59 @@ class WebRTCManager {
     }
   }
 
-  /// Handles an incoming SDP Answer from the SFU.
-  Future<void> handleRemoteAnswer(String sdp) async {
+  /// Safely sanitizes and unrolls incoming SDP strings from JSON envelopes or escaped strings.
+  static String sanitizeSdp(dynamic input) {
+    if (input == null) return '';
+    String sdp = '';
+    if (input is Map) {
+      sdp = (input['sdp'] ?? input['SDP'] ?? '').toString();
+    } else if (input is String) {
+      final trimmed = input.trim();
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        try {
+          final decoded = jsonDecode(trimmed);
+          if (decoded is Map) {
+            sdp = (decoded['sdp'] ?? decoded['SDP'] ?? '').toString();
+            if (sdp.isEmpty) {
+              sdp = trimmed;
+            }
+          } else {
+            sdp = trimmed;
+          }
+        } catch (_) {
+          sdp = trimmed;
+        }
+      } else {
+        sdp = trimmed;
+      }
+    } else {
+      sdp = input.toString();
+    }
+
+    // Fix escaped newlines if JSON-encoded
+    if (sdp.contains(r'\r\n') || (sdp.contains(r'\n') && !sdp.contains('\n'))) {
+      sdp = sdp.replaceAll(r'\r\n', '\r\n').replaceAll(r'\n', '\n');
+    }
+
+    // Ensure valid trailing newline format required by native WebRTC
+    sdp = sdp.trimRight();
+    if (sdp.isNotEmpty) {
+      sdp = '$sdp\r\n';
+    }
+
+    return sdp;
+  }
+
+  /// Handles a remote SDP Answer received from the signaling server.
+  Future<void> handleRemoteAnswer(dynamic rawSdp) async {
     if (_peerConnection == null) {
       throw StateError('Cannot handle remote answer without an active PeerConnection');
+    }
+
+    final sdp = sanitizeSdp(rawSdp);
+    if (sdp.isEmpty) {
+      OmniCastLogger.error('[WebRTCManager] handleRemoteAnswer received empty SDP');
+      return;
     }
 
     final description = RTCSessionDescription(sdp, 'answer');
@@ -467,8 +517,25 @@ class WebRTCManager {
   }
 
   /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
-  Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(String sdp) async {
+  Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(dynamic rawSdp) async {
+    final sdp = sanitizeSdp(rawSdp);
+    if (sdp.isEmpty) {
+      throw ArgumentError('Cannot handle remote offer with empty or invalid SDP: $rawSdp');
+    }
+
     final pc = await initializePeerConnection();
+
+    // Check signaling state: If we have an offer collision (have-local-offer),
+    // perform JSEP rollback before applying the remote offer.
+    final state = pc.signalingState;
+    if (state == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+      try {
+        await pc.setLocalDescription(RTCSessionDescription('', 'rollback'));
+        OmniCastLogger.log('[WebRTCManager] Successfully rolled back local offer on collision');
+      } catch (e) {
+        OmniCastLogger.log('[WebRTCManager] Rollback attempt on offer collision: $e');
+      }
+    }
 
     final remoteDescription = RTCSessionDescription(sdp, 'offer');
     await pc.setRemoteDescription(remoteDescription);
