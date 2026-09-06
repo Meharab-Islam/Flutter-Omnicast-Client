@@ -117,7 +117,11 @@ class OmniCastStageGrid extends StatelessWidget {
     final isMuted = client.seats.isUserMuted(uId) || seat.isMuted;
     final isCameraOff = client.seats.isUserCameraOff(uId) || seat.isCameraOff;
     final isSelf = uId == client.state.userId;
-    final renderer = client.media.getRenderer(uId);
+    final renderer = isSelf ? client.media.localRenderer : client.media.getRenderer(uId);
+    final effectiveRenderer = renderer ??
+        (!isSelf && client.state.isHost && client.media.remoteRenderers.isNotEmpty
+            ? client.media.remoteRenderers.values.first
+            : null);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
@@ -135,13 +139,13 @@ class OmniCastStageGrid extends StatelessWidget {
             children: [
               // Video View or Avatar Placeholder
               Positioned.fill(
-                child: (!isCameraOff && renderer != null)
+                child: (!isCameraOff && effectiveRenderer != null)
                     ? ListenableBuilder(
-                        listenable: renderer,
+                        listenable: effectiveRenderer,
                         builder: (context, _) {
-                          if (renderer.srcObject != null || renderer.renderVideo) {
+                          if (effectiveRenderer.srcObject != null || effectiveRenderer.renderVideo) {
                             return RTCVideoView(
-                              renderer,
+                              effectiveRenderer,
                               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                               mirror: isSelf,
                             );

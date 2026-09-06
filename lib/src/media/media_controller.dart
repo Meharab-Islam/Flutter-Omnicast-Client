@@ -87,6 +87,8 @@ class MediaController with WidgetsBindingObserver {
     }
     return _mediaStreamManager.getRenderer(userId);
   }
+  Map<String, RTCVideoRenderer> get remoteRenderers => _mediaStreamManager.remoteRenderers;
+  Map<String, MediaStream> get remoteStreams => _mediaStreamManager.remoteStreams;
   VideoParameters get currentParameters => _mediaStreamManager.currentParameters;
   bool get isMicrophoneMuted => isMicrophoneMutedNotifier.value;
   bool get isCameraEnabled => isCameraEnabledNotifier.value;

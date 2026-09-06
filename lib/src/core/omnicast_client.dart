@@ -605,6 +605,7 @@ class OmniCastClient {
       final trackId = track.id ?? '';
       final hostId = _roomState.hostId;
       final roomId = _roomState.roomId;
+      final isCurrentHost = _roomState.isHost || (_roomState.userId != null && _roomState.userId == hostId);
 
       if (streamId.isNotEmpty) {
         await _mediaStreamManager.attachRemoteStream(streamId, stream);
@@ -628,15 +629,49 @@ class OmniCastClient {
         if (seat.isOccupied && seat.userId != null) {
           final uId = seat.userId!;
           if (streamId == uId || streamId.contains(uId) || trackId.contains(uId)) {
+            cohostUserId = uId;
             await _mediaStreamManager.attachRemoteStream(uId, stream);
             _roomState.addActiveRemoteUser(uId);
           }
         }
       }
 
-      // 3. If main host stream (not a cohost track)
+      // 3. Fallback matching for Host client:
+      // Any remote track received by the Host is GUARANTEED to be from a Co-Host!
+      if (isCurrentHost && cohostUserId.isEmpty) {
+        for (final seat in _roomState.activeSeats) {
+          if (seat.isOccupied && seat.userId != null && seat.userId != _roomState.userId) {
+            final uId = seat.userId!;
+            cohostUserId = uId;
+            await _mediaStreamManager.attachRemoteStream(uId, stream);
+            _roomState.addActiveRemoteUser(uId);
+            break;
+          }
+        }
+      }
+
+      // 4. Fallback matching for Viewer client when a second stream arrives
+      if (!isCurrentHost && cohostUserId.isEmpty) {
+        final hasHostStream = _mediaStreamManager.remoteStreams.containsKey('host') ||
+            (hostId != null && _mediaStreamManager.remoteStreams.containsKey(hostId));
+        if (hasHostStream && stream.getVideoTracks().isNotEmpty) {
+          for (final seat in _roomState.activeSeats) {
+            if (seat.isOccupied && seat.userId != null && seat.userId != hostId && seat.userId != _roomState.userId) {
+              final uId = seat.userId!;
+              if (!_mediaStreamManager.remoteStreams.containsKey(uId)) {
+                cohostUserId = uId;
+                await _mediaStreamManager.attachRemoteStream(uId, stream);
+                _roomState.addActiveRemoteUser(uId);
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // 5. If main host stream (only when not host, and not a cohost track)
       final isCoHost = cohostUserId.isNotEmpty || trackId.startsWith('cohost_');
-      if (!isCoHost) {
+      if (!isCurrentHost && !isCoHost) {
         if (roomId != null && roomId.isNotEmpty) {
           await _mediaStreamManager.attachRemoteStream(roomId, stream);
         }

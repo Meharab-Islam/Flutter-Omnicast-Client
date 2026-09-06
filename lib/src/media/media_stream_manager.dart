@@ -224,6 +224,12 @@ class MediaStreamManager {
     if (_remoteRenderers.containsKey(userId)) {
       return _remoteRenderers[userId];
     }
+    // Match partial user IDs or stream IDs
+    for (final entry in _remoteRenderers.entries) {
+      if (entry.key.contains(userId) || userId.contains(entry.key)) {
+        return entry.value;
+      }
+    }
     // Fallback for live broadcast viewers: if looking up host or if only 1 remote stream exists
     if (_remoteRenderers.isNotEmpty) {
       if (userId == 'host' || _remoteRenderers.length == 1) {
