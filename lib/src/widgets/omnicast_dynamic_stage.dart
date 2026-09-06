@@ -314,11 +314,6 @@ class OmniCastDynamicStage extends StatelessWidget {
         ? client.media.isMicrophoneMuted
         : (client.seats.isUserMuted(userId) ||
               client.state.isUserAudioMuted(userId));
-    final isCameraOff = isLocal
-        ? !client.media.isCameraEnabled
-        : (client.seats.isUserCameraOff(userId) ||
-              client.state.isUserCameraOff(userId));
-
     final RTCVideoRenderer? renderer;
     if (isLocal) {
       renderer = client.media.localRenderer;
@@ -331,6 +326,18 @@ class OmniCastDynamicStage extends StatelessWidget {
       renderer = client.media.getRenderer(userId);
     }
 
+    final isCameraOff = isLocal
+        ? !client.media.isCameraEnabled
+        : (client.seats.isUserCameraOff(userId) ||
+              client.state.isUserCameraOff(userId));
+
+    // If active video frames or enabled video tracks exist on the renderer, prioritize showing video
+    final hasActiveVideo = renderer != null &&
+        (renderer.renderVideo ||
+            (renderer.srcObject?.getVideoTracks().any((t) => t.enabled) ??
+                false));
+    final effectiveCameraOff = hasActiveVideo ? false : isCameraOff;
+
     return DynamicStageSlot(
       slotIndex: slotIndex,
       isOccupied: true,
@@ -342,7 +349,7 @@ class OmniCastDynamicStage extends StatelessWidget {
       isLocal: isLocal,
       isHost: isHost,
       isMuted: isMuted,
-      isCameraOff: isCameraOff,
+      isCameraOff: effectiveCameraOff,
       renderer: renderer,
     );
   }

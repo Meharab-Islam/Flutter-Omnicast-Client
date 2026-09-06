@@ -346,6 +346,13 @@ class SeatManager {
     );
 
     _roomState.updateRole(UserRole.coHost);
+    if (_roomState.userId != null) {
+      _roomState.updateUserMediaState(
+        _roomState.userId!,
+        isCameraOff: !video,
+        isMuted: !audio,
+      );
+    }
 
     _signalingClient.send(
       SignalingMessage(
@@ -355,6 +362,38 @@ class SeatManager {
         payload: {'sdp': offer.sdp, 'type': offer.type},
       ),
     );
+
+    // Broadcast initial active media states for the newly upgraded co-host
+    if (_roomState.isInRoom && _signalingClient.isConnected) {
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'media_state_changed',
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          payload: {
+            'type': 'video',
+            'kind': 'video',
+            'muted': !video,
+            'camera_off': !video,
+            'is_camera_off': !video,
+            'enabled': video,
+          },
+        ),
+      );
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'media_state_changed',
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          payload: {
+            'type': 'audio',
+            'kind': 'audio',
+            'muted': !audio,
+            'is_muted': !audio,
+          },
+        ),
+      );
+    }
   }
 
   /// Co-Host action: Voluntarily leaves the stage seat and returns to viewer mode.

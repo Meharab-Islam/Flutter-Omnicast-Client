@@ -55,6 +55,31 @@ void main() {
     });
 
     test(
+      'co-host turning off camera does not change host camera notifier or disable host remote track',
+      () async {
+        roomState.syncRoomInfo({
+          'room_id': 'room-101',
+          'host_id': 'host-alice',
+          'user_id': 'cohost-bob',
+        });
+
+        expect(mediaController.isHostCameraOffNotifier.value, isFalse);
+
+        // Simulate incoming media_state_changed from co-host turning camera off
+        await signalingClient.handleRawMessage(
+          '{"event":"media_state_changed","room_id":"room-101","user_id":"cohost-bob","payload":{"type":"video","muted":true,"camera_off":true}}',
+        );
+
+        // Host's camera notifier must remain false (host camera is NOT off)
+        expect(mediaController.isHostCameraOffNotifier.value, isFalse);
+
+        // Co-host user's camera state in roomState is marked as off
+        expect(roomState.isUserCameraOff('cohost-bob'), isTrue);
+        expect(roomState.isUserCameraOff('host-alice'), isFalse);
+      },
+    );
+
+    test(
       'AudioLevelDetector manages audio levels and active speaker state',
       () {
         final detector = mediaController.audioDetector;

@@ -360,29 +360,40 @@ class MediaController with WidgetsBindingObserver {
           }
         }
 
-        // Synchronize remote media stream tracks to immediately mute sound or disable video frames
-        if (type == 'audio') {
-          _mediaStreamManager.setRemoteTrackEnabled(
-            targetUserId.isNotEmpty ? targetUserId : null,
-            'audio',
-            !isMuted,
-          );
-        } else if (type == 'video') {
-          _mediaStreamManager.setRemoteTrackEnabled(
-            targetUserId.isNotEmpty ? targetUserId : null,
-            'video',
-            !isCameraOff,
-          );
+        // Synchronize remote media stream tracks to immediately mute sound or disable video frames.
+        // Skip for local user since local hardware tracks are managed independently.
+        if (targetUserId.isNotEmpty && targetUserId != _roomState.userId) {
+          if (type == 'audio') {
+            _mediaStreamManager.setRemoteTrackEnabled(
+              targetUserId,
+              'audio',
+              !isMuted,
+            );
+          } else if (type == 'video') {
+            _mediaStreamManager.setRemoteTrackEnabled(
+              targetUserId,
+              'video',
+              !isCameraOff,
+            );
+          }
         }
 
-        if (targetUserId == _roomState.hostId ||
-            targetUserId.isEmpty ||
-            _roomState.hostId == null) {
+        final isHostMessage = targetUserId.isNotEmpty &&
+            ((_roomState.hostId != null &&
+                    _roomState.hostId!.isNotEmpty &&
+                    targetUserId == _roomState.hostId) ||
+                (_roomState.hostId == null &&
+                    (targetUserId.toLowerCase().startsWith('host') ||
+                        payload['role'] == 'host' ||
+                        payload['is_host'] == true)));
+
+        if (isHostMessage) {
           if (type == 'video') {
             isHostCameraOffNotifier.value = isCameraOff;
           } else if (type == 'audio') {
             isHostMicrophoneMutedNotifier.value = isMuted;
           }
+          onHostMediaStateChanged?.call(type, isMuted);
         }
 
         if (targetUserId.isNotEmpty) {
@@ -401,8 +412,6 @@ class MediaController with WidgetsBindingObserver {
             );
           }
         }
-
-        onHostMediaStateChanged?.call(type, isMuted);
       }
     });
   }

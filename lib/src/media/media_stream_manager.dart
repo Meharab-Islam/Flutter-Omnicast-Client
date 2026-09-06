@@ -174,8 +174,24 @@ class MediaStreamManager implements Listenable {
 
   /// Explicitly mutes or unmutes a remote peer's media track by kind ('audio' or 'video').
   void setRemoteTrackEnabled(String? userId, String kind, bool enabled) {
-    if (userId != null && _remoteStreams.containsKey(userId)) {
-      final stream = _remoteStreams[userId]!;
+    if (userId == null || userId.isEmpty) {
+      return;
+    }
+
+    // 1. Try exact match
+    MediaStream? stream = _remoteStreams[userId];
+
+    // 2. Try partial match (streamId vs userId)
+    if (stream == null) {
+      for (final entry in _remoteStreams.entries) {
+        if (entry.key.contains(userId) || userId.contains(entry.key)) {
+          stream = entry.value;
+          break;
+        }
+      }
+    }
+
+    if (stream != null) {
       if (kind == 'audio') {
         for (final track in stream.getAudioTracks()) {
           track.enabled = enabled;
@@ -183,19 +199,6 @@ class MediaStreamManager implements Listenable {
       } else if (kind == 'video') {
         for (final track in stream.getVideoTracks()) {
           track.enabled = enabled;
-        }
-      }
-    } else {
-      // If userId is omitted or empty, apply to all remote streams
-      for (final stream in _remoteStreams.values) {
-        if (kind == 'audio') {
-          for (final track in stream.getAudioTracks()) {
-            track.enabled = enabled;
-          }
-        } else if (kind == 'video') {
-          for (final track in stream.getVideoTracks()) {
-            track.enabled = enabled;
-          }
         }
       }
     }

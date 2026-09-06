@@ -727,12 +727,13 @@ class OmniCastClient {
       }
 
       // 4. Fallback matching for Viewer client when a second stream arrives
+      final hasHostStream =
+          _mediaStreamManager.remoteStreams.containsKey('host') ||
+          (hostId != null &&
+              _mediaStreamManager.remoteStreams.containsKey(hostId));
+
       if (!isCurrentHost && cohostUserId.isEmpty) {
-        final hasHostStream =
-            _mediaStreamManager.remoteStreams.containsKey('host') ||
-            (hostId != null &&
-                _mediaStreamManager.remoteStreams.containsKey(hostId));
-        if (hasHostStream && stream.getVideoTracks().isNotEmpty) {
+        if (hasHostStream) {
           for (final seat in _roomState.activeSeats) {
             if (seat.isOccupied &&
                 seat.userId != null &&
@@ -750,9 +751,9 @@ class OmniCastClient {
         }
       }
 
-      // 5. If main host stream (only when not host, and not a cohost track)
+      // 5. If main host stream (only when not host, not a cohost track, and host stream is not yet attached)
       final isCoHost = cohostUserId.isNotEmpty || trackId.startsWith('cohost_');
-      if (!isCurrentHost && !isCoHost) {
+      if (!isCurrentHost && !isCoHost && !hasHostStream) {
         if (roomId != null && roomId.isNotEmpty) {
           await _mediaStreamManager.attachRemoteStream(roomId, stream);
         }
