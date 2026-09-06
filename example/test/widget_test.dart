@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:omnicast_example/main.dart';
 
 void main() {
-  testWidgets('OmniCastDemoApp renders LobbyScreen smoke test', (WidgetTester tester) async {
+  testWidgets('OmniCastDemoApp renders LobbyScreen smoke test', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const OmniCastDemoApp());
 
     expect(find.text('OmniCast Live'), findsOneWidget);

@@ -54,7 +54,11 @@ class _GiftModalState extends State<GiftModal> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white60, size: 20),
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.white60,
+                    size: 20,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -65,7 +69,11 @@ class _GiftModalState extends State<GiftModal> {
             if (widget.isPKActive && widget.opponentId != null) ...[
               const Text(
                 'Send Gift To:',
-                style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 6),
               Row(
@@ -75,7 +83,11 @@ class _GiftModalState extends State<GiftModal> {
                       label: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.person, size: 14, color: Colors.blueAccent),
+                          Icon(
+                            Icons.person,
+                            size: 14,
+                            color: Colors.blueAccent,
+                          ),
                           SizedBox(width: 4),
                           Text('Host A', style: TextStyle(fontSize: 12)),
                         ],
@@ -87,7 +99,9 @@ class _GiftModalState extends State<GiftModal> {
                       selectedColor: Colors.blueAccent.withValues(alpha: 0.3),
                       backgroundColor: const Color(0xFF141724),
                       labelStyle: TextStyle(
-                        color: _targetHostId == widget.hostId ? Colors.blueAccent : Colors.white60,
+                        color: _targetHostId == widget.hostId
+                            ? Colors.blueAccent
+                            : Colors.white60,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -98,19 +112,27 @@ class _GiftModalState extends State<GiftModal> {
                       label: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.local_fire_department, size: 14, color: Colors.pinkAccent),
+                          Icon(
+                            Icons.local_fire_department,
+                            size: 14,
+                            color: Colors.pinkAccent,
+                          ),
                           SizedBox(width: 4),
                           Text('Opponent B', style: TextStyle(fontSize: 12)),
                         ],
                       ),
                       selected: _targetHostId == widget.opponentId,
                       onSelected: (val) {
-                        if (val) setState(() => _targetHostId = widget.opponentId!);
+                        if (val) {
+                          setState(() => _targetHostId = widget.opponentId!);
+                        }
                       },
                       selectedColor: Colors.pinkAccent.withValues(alpha: 0.3),
                       backgroundColor: const Color(0xFF141724),
                       labelStyle: TextStyle(
-                        color: _targetHostId == widget.opponentId ? Colors.pinkAccent : Colors.white60,
+                        color: _targetHostId == widget.opponentId
+                            ? Colors.pinkAccent
+                            : Colors.white60,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -139,10 +161,14 @@ class _GiftModalState extends State<GiftModal> {
                   onTap: () => setState(() => _selectedGift = gift),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF6C5CE7).withValues(alpha: 0.25) : const Color(0xFF141724),
+                      color: isSelected
+                          ? const Color(0xFF6C5CE7).withValues(alpha: 0.25)
+                          : const Color(0xFF141724),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF6C5CE7) : Colors.transparent,
+                        color: isSelected
+                            ? const Color(0xFF6C5CE7)
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -153,11 +179,19 @@ class _GiftModalState extends State<GiftModal> {
                         const SizedBox(height: 4),
                         Text(
                           gift.name,
-                          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           '🪙 ${gift.coins}',
-                          style: const TextStyle(color: Colors.amberAccent, fontSize: 9, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.amberAccent,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -182,7 +216,9 @@ class _GiftModalState extends State<GiftModal> {
                 backgroundColor: const Color(0xFF6C5CE7),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],

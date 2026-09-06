@@ -545,6 +545,28 @@ class RoomManager {
     _pendingLeaves.add(userId);
 
     _roomState.removeParticipant(userId);
+    _roomState.removeActiveRemoteUser(userId);
+
+    // If user was occupying a seat, vacate it immediately
+    final currentSeats = _roomState.activeSeats;
+    if (currentSeats.any((s) => s.userId == userId)) {
+      final updated = currentSeats.map((s) {
+        if (s.userId == userId) {
+          return StageSeat(seatIndex: s.seatIndex, userId: null, user: null);
+        }
+        return s;
+      }).toList();
+      _roomState.updateActiveSeats(updated);
+    }
+
+    // If user was pinned to main stage, revert
+    if (_roomState.pinnedStageUserId == userId) {
+      _roomState.setPinnedStageUser(null);
+    }
+
+    // Clean up remote renderer for departed user
+    _webRTCManager.mediaStreamManager.removeRemoteRenderer(userId);
+
     _participantLeftController.add(userId);
     _flushParticipantBatch();
   }
@@ -856,6 +878,19 @@ class RoomManager {
     if (_roomState.isInRoom) {
       final rId = _roomState.roomId!;
       final uId = _roomState.userId!;
+
+      if (_roomState.isCoHost ||
+          _roomState.activeSeats.any((s) => s.userId == uId)) {
+        _signalingClient.send(
+          SignalingMessage(
+            event: 'seat_leave',
+            roomId: rId,
+            userId: uId,
+            payload: {'room_id': rId, 'user_id': uId, 'cohost_id': uId},
+          ),
+        );
+      }
+
       _signalingClient.send(
         SignalingMessage(
           event: SignalingEvents.leaveRoom,

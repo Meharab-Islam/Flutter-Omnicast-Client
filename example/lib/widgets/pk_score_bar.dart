@@ -23,7 +23,8 @@ class PKScoreBar extends StatelessWidget {
 
     final minutes = (remainingSeconds / 60).floor();
     final seconds = remainingSeconds % 60;
-    final timeStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    final timeStr =
+        '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -49,7 +50,11 @@ class PKScoreBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.flash_on_rounded, color: Colors.blueAccent, size: 16),
+                  const Icon(
+                    Icons.flash_on_rounded,
+                    color: Colors.blueAccent,
+                    size: 16,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     hostName,
@@ -66,11 +71,17 @@ class PKScoreBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.redAccent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: Colors.redAccent.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.timer_rounded, color: Colors.redAccent, size: 12),
+                    const Icon(
+                      Icons.timer_rounded,
+                      color: Colors.redAccent,
+                      size: 12,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       timeStr,
@@ -94,7 +105,11 @@ class PKScoreBar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.local_fire_department_rounded, color: Colors.pinkAccent, size: 16),
+                  const Icon(
+                    Icons.local_fire_department_rounded,
+                    color: Colors.pinkAccent,
+                    size: 16,
+                  ),
                 ],
               ),
             ],
@@ -140,11 +155,19 @@ class PKScoreBar extends StatelessWidget {
             children: [
               Text(
                 '🪙 $hostScore',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
               ),
               Text(
                 '🪙 $opponentScore',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),

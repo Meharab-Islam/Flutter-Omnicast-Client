@@ -76,13 +76,23 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
               children: [
                 // 1. Live Video View or Avatar Placeholder
                 if (isCameraEnabled && renderer != null)
-                  SizedBox.expand(
-                    child: RTCVideoView(
-                      renderer!,
-                      mirror: effectiveMirror,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    ),
+                  ListenableBuilder(
+                    listenable: renderer!,
+                    builder: (context, _) {
+                      final hasVideo =
+                          renderer!.renderVideo || renderer!.srcObject != null;
+                      if (!hasVideo && userId != 'local') {
+                        return _buildAvatarPlaceholder();
+                      }
+                      return SizedBox.expand(
+                        child: RTCVideoView(
+                          renderer!,
+                          mirror: effectiveMirror,
+                          objectFit:
+                              RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                        ),
+                      );
+                    },
                   )
                 else
                   _buildAvatarPlaceholder(),

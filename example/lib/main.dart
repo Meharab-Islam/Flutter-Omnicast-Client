@@ -26,11 +26,15 @@ class OmniCastDemoApp extends StatelessWidget {
         cardTheme: CardThemeData(
           color: const Color(0xFF1E2132),
           elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
         dialogTheme: DialogThemeData(
           backgroundColor: const Color(0xFF1E2132),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
         useMaterial3: true,
       ),

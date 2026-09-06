@@ -51,7 +51,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   Future<void> _initOmniCastSession() async {
     try {
-      final isLocal = widget.session.serverUrl.contains('localhost') ||
+      final isLocal =
+          widget.session.serverUrl.contains('localhost') ||
           widget.session.serverUrl.contains('127.0.0.1') ||
           widget.session.serverUrl.contains(':8080') ||
           RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(widget.session.serverUrl);
@@ -132,13 +133,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       _client.onGift.listen((event) {
         if (mounted) {
           setState(() {
-            _activeGiftNotification = '${event.senderName} sent ${event.giftId} 🎁';
+            _activeGiftNotification =
+                '${event.senderName} sent ${event.giftId} 🎁';
             _chatMessages.add(
               ChatMessage(
                 id: 'gift-${DateTime.now().millisecondsSinceEpoch}',
                 senderId: 'gift',
                 senderName: 'Gift Alert',
-                text: '${event.senderName} sent ${event.giftId} (🪙 ${event.coinValue})',
+                text:
+                    '${event.senderName} sent ${event.giftId} (🪙 ${event.coinValue})',
                 timestamp: DateTime.now(),
               ),
             );
@@ -199,7 +202,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             _pkOpponentHostId = null;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('PK Battle has ended!'), backgroundColor: Colors.indigo),
+            const SnackBar(
+              content: Text('PK Battle has ended!'),
+              backgroundColor: Colors.indigo,
+            ),
           );
         }
       }),
@@ -209,7 +215,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     _subscriptions.add(
       _client.onSeatUpdated.listen((_) {
         if (mounted) {
-          final amICoHost = _client.state.activeSeats.any((s) => s.userId == widget.session.userId);
+          final amICoHost = _client.state.activeSeats.any(
+            (s) => s.userId == widget.session.userId,
+          );
           setState(() {
             _isCoHost = amICoHost;
           });
@@ -219,11 +227,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
     _subscriptions.add(
       _client.onSeatKicked.listen((msg) {
-        final targetUser = msg.targetUser ?? (msg.payload is Map ? msg.payload['target_user'] : null);
-        if ((targetUser == widget.session.userId || msg.userId == widget.session.userId) && mounted) {
+        final targetUser =
+            msg.targetUser ??
+            (msg.payload is Map ? msg.payload['target_user'] : null);
+        if ((targetUser == widget.session.userId ||
+                msg.userId == widget.session.userId) &&
+            mounted) {
           setState(() => _isCoHost = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('You were stepped down from the co-host seat.'), backgroundColor: Colors.orange),
+            const SnackBar(
+              content: Text('You were stepped down from the co-host seat.'),
+              backgroundColor: Colors.orange,
+            ),
           );
         }
       }),
@@ -231,11 +246,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
     // 6. Media Notifiers
     _client.media.isMicrophoneMutedNotifier.addListener(() {
-      if (mounted) setState(() => _isMicMuted = _client.media.isMicrophoneMutedNotifier.value);
+      if (mounted) {
+        setState(
+          () => _isMicMuted = _client.media.isMicrophoneMutedNotifier.value,
+        );
+      }
     });
 
     _client.media.isCameraEnabledNotifier.addListener(() {
-      if (mounted) setState(() => _isCameraOff = !_client.media.isCameraEnabledNotifier.value);
+      if (mounted) {
+        setState(
+          () => _isCameraOff = !_client.media.isCameraEnabledNotifier.value,
+        );
+      }
     });
   }
 
@@ -299,7 +322,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       } else {
         _client.seats.requestSeat(seatIndex: 1);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Seat request sent to Host!'), backgroundColor: Colors.indigo),
+          const SnackBar(
+            content: Text('Seat request sent to Host!'),
+            backgroundColor: Colors.indigo,
+          ),
         );
       }
     }
@@ -310,7 +336,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E2132),
-        title: const Text('Co-Host Seats', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Co-Host Seats',
+          style: TextStyle(color: Colors.white),
+        ),
         content: SizedBox(
           width: double.maxFinite,
           child: ListenableBuilder(
@@ -318,20 +347,33 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             builder: (context, _) {
               final seats = _client.state.activeSeats;
               if (seats.isEmpty) {
-                return const Text('No active co-hosts currently.', style: TextStyle(color: Colors.white60));
+                return const Text(
+                  'No active co-hosts currently.',
+                  style: TextStyle(color: Colors.white60),
+                );
               }
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: seats.length,
                 itemBuilder: (context, index) {
                   final s = seats[index];
-                  final displayName = s.user?.displayName ?? s.userId ?? 'Seat ${s.seatIndex}';
+                  final displayName =
+                      s.user?.displayName ?? s.userId ?? 'Seat ${s.seatIndex}';
                   return ListTile(
                     leading: const CircleAvatar(child: Icon(Icons.person)),
-                    title: Text(displayName, style: const TextStyle(color: Colors.white)),
-                    subtitle: Text('Seat ${s.seatIndex}', style: const TextStyle(color: Colors.white54)),
+                    title: Text(
+                      displayName,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      'Seat ${s.seatIndex}',
+                      style: const TextStyle(color: Colors.white54),
+                    ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.person_remove_rounded, color: Colors.redAccent),
+                      icon: const Icon(
+                        Icons.person_remove_rounded,
+                        color: Colors.redAccent,
+                      ),
                       tooltip: 'Kick from seat',
                       onPressed: () {
                         if (s.userId != null) {
@@ -353,7 +395,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 Navigator.pop(ctx);
                 OmniCastSeatRequestsBottomSheet.show(context, client: _client);
               },
-              icon: const Icon(Icons.person_add_rounded, size: 16, color: Color(0xFF6C5CE7)),
+              icon: const Icon(
+                Icons.person_add_rounded,
+                size: 16,
+                color: Color(0xFF6C5CE7),
+              ),
               label: Text(
                 'Requests (${_client.seats.pendingSeatRequests.length})',
                 style: const TextStyle(color: Color(0xFF6C5CE7)),
@@ -361,7 +407,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close', style: TextStyle(color: Color(0xFF00CEC9))),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Color(0xFF00CEC9)),
+            ),
           ),
         ],
       ),
@@ -377,7 +426,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: const Color(0xFF1E2132),
-          title: const Text('Challenge Host to PK Battle', style: TextStyle(color: Colors.white)),
+          title: const Text(
+            'Challenge Host to PK Battle',
+            style: TextStyle(color: Colors.white),
+          ),
           content: TextField(
             controller: textController,
             style: const TextStyle(color: Colors.white),
@@ -389,7 +441,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white54),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
@@ -401,12 +456,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   );
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('PK Battle challenge sent to $targetRoom!'), backgroundColor: Colors.indigo),
+                    SnackBar(
+                      content: Text('PK Battle challenge sent to $targetRoom!'),
+                      backgroundColor: Colors.indigo,
+                    ),
                   );
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-              child: const Text('Challenge', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+              ),
+              child: const Text(
+                'Challenge',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -417,14 +480,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   void _selectLayer(String layer) {
     _client.setSimulcastLayer(layer);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Video layer switched to: $layer'), backgroundColor: Colors.indigo),
+      SnackBar(
+        content: Text('Video layer switched to: $layer'),
+        backgroundColor: Colors.indigo,
+      ),
     );
   }
 
   void _triggerICERestart() {
     _client.requestICERestart();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('ICE Restart renegotiation triggered!'), backgroundColor: Colors.teal),
+      const SnackBar(
+        content: Text('ICE Restart renegotiation triggered!'),
+        backgroundColor: Colors.teal,
+      ),
     );
   }
 
@@ -440,7 +509,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               const CircularProgressIndicator(color: Color(0xFF6C5CE7)),
               const SizedBox(height: 16),
               Text(
-                widget.session.isHost ? 'Starting Live Broadcast SFU...' : 'Connecting to Live Media Server...',
+                widget.session.isHost
+                    ? 'Starting Live Broadcast SFU...'
+                    : 'Connecting to Live Media Server...',
                 style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ],
@@ -459,15 +530,32 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                const Icon(
+                  Icons.error_outline_rounded,
+                  color: Colors.redAccent,
+                  size: 48,
+                ),
                 const SizedBox(height: 12),
-                const Text('Connection Failed', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Connection Failed',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(_errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                Text(
+                  _errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white60, fontSize: 13),
+                ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C5CE7)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C5CE7),
+                  ),
                   child: const Text('Back to Lobby'),
                 ),
               ],
@@ -482,17 +570,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       body: Stack(
         children: [
           // 1. Fullscreen Main Video Canvas
-          Positioned.fill(
-            child: _buildVideoCanvas(),
-          ),
+          Positioned.fill(child: _buildVideoCanvas()),
 
           // 2. Top Header Overlay (Room info, Viewers count, Host coins, Close button)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: _buildHeaderOverlay(),
-          ),
+          Positioned(top: 0, left: 0, right: 0, child: _buildHeaderOverlay()),
 
           // 3. PK Score Bar (if PK is active)
           if (_isPKActive)
@@ -515,17 +596,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               top: _isPKActive ? 175 : 100,
               left: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFFFF7675), Color(0xFFE84393)]),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF7675), Color(0xFFE84393)],
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 8),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 8,
+                    ),
                   ],
                 ),
                 child: Text(
                   _activeGiftNotification!,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
@@ -581,10 +674,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withValues(alpha: 0.8),
-            Colors.transparent,
-          ],
+          colors: [Colors.black.withValues(alpha: 0.8), Colors.transparent],
         ),
       ),
       child: SafeArea(
@@ -604,7 +694,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   const SizedBox(width: 4),
                   Text(
                     widget.session.roomId,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -617,16 +711,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               builder: (context, _) {
                 final count = _client.state.viewersCount;
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.visibility_rounded, color: Colors.white70, size: 14),
+                      const Icon(
+                        Icons.visibility_rounded,
+                        color: Colors.white70,
+                        size: 14,
+                      ),
                       const SizedBox(width: 4),
-                      Text('$count', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text(
+                        '$count',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -640,17 +748,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               builder: (context, _) {
                 final coins = _client.state.hostCoinBalance;
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
+                    border: Border.all(
+                      color: Colors.amber.withValues(alpha: 0.4),
+                    ),
                   ),
                   child: Row(
                     children: [
                       const Text('🪙', style: TextStyle(fontSize: 12)),
                       const SizedBox(width: 4),
-                      Text('$coins', style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text(
+                        '$coins',
+                        style: const TextStyle(
+                          color: Colors.amberAccent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -665,20 +785,34 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 builder: (context, requests) {
                   if (requests.isEmpty) return const SizedBox.shrink();
                   return GestureDetector(
-                    onTap: () => OmniCastSeatRequestsBottomSheet.show(context, client: _client),
+                    onTap: () => OmniCastSeatRequestsBottomSheet.show(
+                      context,
+                      client: _client,
+                    ),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orangeAccent,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.person_add_alt_1_rounded, color: Colors.black87, size: 14),
+                          const Icon(
+                            Icons.person_add_alt_1_rounded,
+                            color: Colors.black87,
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             '${requests.length}',
-                            style: const TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),

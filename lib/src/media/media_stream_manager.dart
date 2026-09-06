@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'video_parameters.dart';
@@ -5,7 +6,23 @@ import '../utils/omnicast_logger.dart';
 
 /// Manages local media hardware (camera, microphone) and maintains a dynamic
 /// registry of [RTCVideoRenderer] instances for local preview and all remote peers.
-class MediaStreamManager {
+class MediaStreamManager implements Listenable {
+  final ValueNotifier<int> _changeNotifier = ValueNotifier<int>(0);
+
+  @override
+  void addListener(VoidCallback listener) =>
+      _changeNotifier.addListener(listener);
+
+  @override
+  void removeListener(VoidCallback listener) =>
+      _changeNotifier.removeListener(listener);
+
+  void notifyListeners() {
+    if (!_isDisposed) {
+      _changeNotifier.value++;
+    }
+  }
+
   MediaStream? _localStream;
   RTCVideoRenderer? _localRenderer;
   final Map<String, RTCVideoRenderer> _remoteRenderers = {};
@@ -202,13 +219,40 @@ class MediaStreamManager {
   }
 
   /// Attaches a remote [MediaStream] to a remote peer's renderer.
+  /// Merges incoming audio/video tracks into any existing stream for [userId]
+  /// and ensures audio tracks do not clobber active video rendering.
   Future<RTCVideoRenderer> attachRemoteStream(
     String userId,
     MediaStream stream,
   ) async {
-    _remoteStreams[userId] = stream;
+    final existingStream = _remoteStreams[userId];
+    if (existingStream != null && existingStream != stream) {
+      for (final track in stream.getTracks()) {
+        final hasTrack = existingStream.getTracks().any(
+          (t) => t.id == track.id,
+        );
+        if (!hasTrack) {
+          existingStream.addTrack(track);
+        }
+      }
+    } else {
+      _remoteStreams[userId] = stream;
+    }
+
     final renderer = await getOrCreateRemoteRenderer(userId);
-    renderer.srcObject = stream;
+    final activeStream = _remoteStreams[userId]!;
+
+    // Only overwrite renderer.srcObject if activeStream has video tracks,
+    // or if renderer currently has no srcObject. This ensures incoming audio tracks
+    // never wipe out active video rendering!
+    if (activeStream.getVideoTracks().isNotEmpty ||
+        renderer.srcObject == null) {
+      renderer.srcObject = activeStream;
+    }
+
+    if (!_isDisposed) {
+      notifyListeners();
+    }
     return renderer;
   }
 
@@ -227,6 +271,10 @@ class MediaStreamManager {
       renderer.srcObject = null;
       await renderer.dispose();
     }
+
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
   /// Returns the [RTCVideoRenderer] associated with a given [userId].
@@ -244,11 +292,9 @@ class MediaStreamManager {
         return entry.value;
       }
     }
-    // Fallback for live broadcast viewers: if looking up host or if only 1 remote stream exists
-    if (_remoteRenderers.isNotEmpty) {
-      if (userId == 'host' || _remoteRenderers.length == 1) {
-        return _remoteRenderers.values.first;
-      }
+    // Fallback for live broadcast viewers: looking up 'host' specifically
+    if (userId == 'host' && _remoteRenderers.isNotEmpty) {
+      return _remoteRenderers['host'] ?? _remoteRenderers.values.first;
     }
     return null;
   }
@@ -300,5 +346,6 @@ class MediaStreamManager {
     }
     _remoteStreams.clear();
     _remoteRenderers.clear();
+    _changeNotifier.dispose();
   }
 }

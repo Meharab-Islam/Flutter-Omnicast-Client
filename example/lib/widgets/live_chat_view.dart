@@ -63,10 +63,7 @@ class _LiveChatViewState extends State<LiveChatView> {
                 ),
                 TextSpan(
                   text: msg.text,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ],
             ),

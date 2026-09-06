@@ -65,8 +65,6 @@ class OmniCastApi {
           .get(uri, headers: defaultHeaders)
           .timeout(timeout);
 
-      OmniCastLogger.log('[OmniCastApi] Raw Rooms Response: ${response.body}');
-
       if (response.statusCode == 200) {
         final body = response.body.trim();
         if (body.isEmpty || body == 'null') return [];

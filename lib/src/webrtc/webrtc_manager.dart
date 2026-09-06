@@ -164,6 +164,33 @@ class WebRTCManager {
     return lines.join(delimiter);
   }
 
+  /// Strips transport-cc RTCP feedback and header extensions from SDP to prevent
+  /// libwebrtc TransportFeedbackAdapter send time history lookup errors and
+  /// packet sequence desynchronization in multi-stream SFU broadcasting.
+  static String stripTransportCc(String sdp) {
+    if (sdp.isEmpty) return sdp;
+    final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
+    final lines = sdp.split(delimiter);
+    final filtered = <String>[];
+
+    for (final line in lines) {
+      final lower = line.toLowerCase();
+      // Remove transport-cc rtcp-fb lines
+      if (lower.startsWith('a=rtcp-fb:') && lower.contains('transport-cc')) {
+        continue;
+      }
+      // Remove transport-wide-cc header extensions
+      if (lower.startsWith('a=extmap:') &&
+          (lower.contains('transport-wide-cc') ||
+              lower.contains('transport_wide_cc'))) {
+        continue;
+      }
+      filtered.add(line);
+    }
+
+    return filtered.join(delimiter);
+  }
+
   /// Initializes a new [RTCPeerConnection] with standard configuration and sets up listeners.
   Future<RTCPeerConnection> initializePeerConnection() async {
     if (_peerConnection != null) {
@@ -489,7 +516,7 @@ class WebRTCManager {
         minKbps: 150,
         maxKbps: 600,
       );
-      processedSdp = enableOpusDtx(processedSdp);
+      processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
       final mungedOffer = RTCSessionDescription(
         processedSdp,
         offer.type ?? 'offer',
@@ -524,7 +551,7 @@ class WebRTCManager {
         minKbps: 150,
         maxKbps: 600,
       );
-      processedSdp = enableOpusDtx(processedSdp);
+      processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
       final mungedOffer = RTCSessionDescription(
         processedSdp,
         offer.type ?? 'offer',
@@ -595,7 +622,7 @@ class WebRTCManager {
       return;
     }
 
-    final description = RTCSessionDescription(sdp, 'answer');
+    final description = RTCSessionDescription(stripTransportCc(sdp), 'answer');
     await _peerConnection!.setRemoteDescription(description);
     await _processQueuedCandidates();
   }
@@ -629,7 +656,10 @@ class WebRTCManager {
       }
     }
 
-    final remoteDescription = RTCSessionDescription(sdp, 'offer');
+    final remoteDescription = RTCSessionDescription(
+      stripTransportCc(sdp),
+      'offer',
+    );
     await pc.setRemoteDescription(remoteDescription);
     await _processQueuedCandidates();
 
@@ -641,7 +671,7 @@ class WebRTCManager {
       minKbps: 150,
       maxKbps: 600,
     );
-    processedSdp = enableOpusDtx(processedSdp);
+    processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
     final mungedAnswer = RTCSessionDescription(
       processedSdp,
       answer.type ?? 'answer',
@@ -683,7 +713,7 @@ class WebRTCManager {
       minKbps: 150,
       maxKbps: 600,
     );
-    processedSdp = enableOpusDtx(processedSdp);
+    processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
     final mungedOffer = RTCSessionDescription(
       processedSdp,
       offer.type ?? 'offer',

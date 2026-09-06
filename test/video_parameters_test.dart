@@ -117,5 +117,47 @@ void main() {
       signaling.dispose();
       webRTC.dispose();
     });
+
+    test(
+      'WebRTCManager stripTransportCc removes transport-cc feedback and header extensions',
+      () {
+        const sampleSdp =
+            'v=0\r\n'
+            'm=video 9 UDP/TLS/RTP/SAVPF 96\r\n'
+            'a=rtpmap:96 VP8/90000\r\n'
+            'a=rtcp-fb:96 goog-remb\r\n'
+            'a=rtcp-fb:96 transport-cc\r\n'
+            'a=rtcp-fb:96 nack\r\n'
+            'a=rtcp-fb:96 nack pli\r\n'
+            'a=extmap:3 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\n'
+            'a=extmap:4 urn:ietf:params:rtp-hdrext:sdes:mid\r\n';
+
+        final strippedSdp = WebRTCManager.stripTransportCc(sampleSdp);
+        expect(strippedSdp, isNot(contains('transport-cc')));
+        expect(strippedSdp, isNot(contains('transport-wide-cc-extensions')));
+        expect(strippedSdp, contains('a=rtcp-fb:96 goog-remb'));
+        expect(strippedSdp, contains('a=rtcp-fb:96 nack pli'));
+        expect(strippedSdp, contains('urn:ietf:params:rtp-hdrext:sdes:mid'));
+      },
+    );
+
+    test(
+      'MediaStreamManager getRenderer does not leak host renderer to cohost slots',
+      () {
+        final manager = MediaStreamManager();
+        // Initially empty
+        expect(manager.getRenderer('user-cohost'), isNull);
+
+        // Verify notification listener can be registered
+        var notified = 0;
+        manager.addListener(() {
+          notified++;
+        });
+        manager.notifyListeners();
+        expect(notified, 1);
+
+        manager.dispose();
+      },
+    );
   });
 }

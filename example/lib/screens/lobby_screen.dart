@@ -13,7 +13,9 @@ class LobbyScreen extends StatefulWidget {
 }
 
 class _LobbyScreenState extends State<LobbyScreen> {
-  final _serverController = TextEditingController(text: AppConstants.defaultLocalhost);
+  final _serverController = TextEditingController(
+    text: AppConstants.defaultLocalhost,
+  );
   final _roomController = TextEditingController(text: 'room-101');
   final _nameController = TextEditingController();
   final _userIdController = TextEditingController();
@@ -36,7 +38,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     final server = _serverController.text.trim().isNotEmpty
         ? _serverController.text.trim()
         : AppConstants.defaultLocalhost;
-    final isLocal = server.contains('localhost') ||
+    final isLocal =
+        server.contains('localhost') ||
         server.contains('127.0.0.1') ||
         server.contains(':8080') ||
         RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(server);
@@ -87,7 +90,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
     if (server.isEmpty || roomId.isEmpty || userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter server address, room ID, and user details.'),
+          content: Text(
+            'Please enter server address, room ID, and user details.',
+          ),
           backgroundColor: Colors.orange,
         ),
       );
@@ -104,9 +109,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => LiveRoomScreen(session: session),
-      ),
+      MaterialPageRoute(builder: (_) => LiveRoomScreen(session: session)),
     );
   }
 
@@ -120,11 +123,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0F111A),
-              Color(0xFF191B28),
-              Color(0xFF0F111A),
-            ],
+            colors: [Color(0xFF0F111A), Color(0xFF191B28), Color(0xFF0F111A)],
           ),
         ),
         child: SafeArea(
@@ -137,7 +136,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   elevation: 12,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
                   ),
                   color: const Color(0xFF1E2132).withValues(alpha: 0.95),
                   child: Padding(
@@ -154,11 +155,16 @@ class _LobbyScreenState extends State<LobbyScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF6C5CE7), Color(0xFF00CEC9)],
+                                  colors: [
+                                    Color(0xFF6C5CE7),
+                                    Color(0xFF00CEC9),
+                                  ],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF6C5CE7).withValues(alpha: 0.4),
+                                    color: const Color(
+                                      0xFF6C5CE7,
+                                    ).withValues(alpha: 0.4),
                                     blurRadius: 16,
                                     offset: const Offset(0, 4),
                                   ),
@@ -185,7 +191,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         Text(
                           'WebRTC SFU Live Streaming & PK Engine',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 13),
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.55),
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: 24),
 
@@ -204,7 +213,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'e.g. 127.0.0.1:8080 or 192.168.1.x:8080',
-                            prefixIcon: const Icon(Icons.dns_rounded, color: Color(0xFF6C5CE7)),
+                            prefixIcon: const Icon(
+                              Icons.dns_rounded,
+                              color: Color(0xFF6C5CE7),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFF141724),
                             border: OutlineInputBorder(
@@ -218,22 +230,40 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           spacing: 8,
                           children: [
                             ActionChip(
-                              label: const Text('Localhost', style: TextStyle(fontSize: 11)),
-                              onPressed: () => _serverController.text = AppConstants.defaultLocalhost,
+                              label: const Text(
+                                'Localhost',
+                                style: TextStyle(fontSize: 11),
+                              ),
+                              onPressed: () => _serverController.text =
+                                  AppConstants.defaultLocalhost,
                               backgroundColor: const Color(0xFF141724),
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.1),
+                              ),
                             ),
                             ActionChip(
-                              label: const Text('Android Emulator', style: TextStyle(fontSize: 11)),
-                              onPressed: () => _serverController.text = AppConstants.defaultAndroidEmulator,
+                              label: const Text(
+                                'Android Emulator',
+                                style: TextStyle(fontSize: 11),
+                              ),
+                              onPressed: () => _serverController.text =
+                                  AppConstants.defaultAndroidEmulator,
                               backgroundColor: const Color(0xFF141724),
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.1),
+                              ),
                             ),
                             ActionChip(
-                              label: const Text('Real Phone (Wi-Fi)', style: TextStyle(fontSize: 11)),
-                              onPressed: () => _serverController.text = AppConstants.defaultLanIP,
+                              label: const Text(
+                                'Real Phone (Wi-Fi)',
+                                style: TextStyle(fontSize: 11),
+                              ),
+                              onPressed: () => _serverController.text =
+                                  AppConstants.defaultLanIP,
                               backgroundColor: const Color(0xFF141724),
-                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.1),
+                              ),
                             ),
                           ],
                         ),
@@ -254,7 +284,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'e.g. room-101',
-                            prefixIcon: const Icon(Icons.meeting_room_rounded, color: Color(0xFF00CEC9)),
+                            prefixIcon: const Icon(
+                              Icons.meeting_room_rounded,
+                              color: Color(0xFF00CEC9),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFF141724),
                             border: OutlineInputBorder(
@@ -280,7 +313,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Enter your name',
-                            prefixIcon: const Icon(Icons.person_rounded, color: Color(0xFFFF7675)),
+                            prefixIcon: const Icon(
+                              Icons.person_rounded,
+                              color: Color(0xFFFF7675),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFF141724),
                             border: OutlineInputBorder(
@@ -311,9 +347,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
                             children: [
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => setState(() => _selectedRole = 'host'),
+                                  onTap: () =>
+                                      setState(() => _selectedRole = 'host'),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: _selectedRole == 'host'
                                           ? const Color(0xFF6C5CE7)
@@ -321,12 +360,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.videocam_rounded,
                                           size: 18,
-                                          color: _selectedRole == 'host' ? Colors.white : Colors.white60,
+                                          color: _selectedRole == 'host'
+                                              ? Colors.white
+                                              : Colors.white60,
                                         ),
                                         const SizedBox(width: 6),
                                         Flexible(
@@ -335,7 +377,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                             child: Text(
                                               'Host (Broadcast)',
                                               style: TextStyle(
-                                                color: _selectedRole == 'host' ? Colors.white : Colors.white60,
+                                                color: _selectedRole == 'host'
+                                                    ? Colors.white
+                                                    : Colors.white60,
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 13,
                                               ),
@@ -349,9 +393,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
                               ),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => setState(() => _selectedRole = 'viewer'),
+                                  onTap: () =>
+                                      setState(() => _selectedRole = 'viewer'),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: _selectedRole == 'viewer'
                                           ? const Color(0xFF00CEC9)
@@ -359,12 +406,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.visibility_rounded,
                                           size: 18,
-                                          color: _selectedRole == 'viewer' ? Colors.black87 : Colors.white60,
+                                          color: _selectedRole == 'viewer'
+                                              ? Colors.black87
+                                              : Colors.white60,
                                         ),
                                         const SizedBox(width: 6),
                                         Flexible(
@@ -373,7 +423,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                             child: Text(
                                               'Viewer (Watch)',
                                               style: TextStyle(
-                                                color: _selectedRole == 'viewer' ? Colors.black87 : Colors.white60,
+                                                color: _selectedRole == 'viewer'
+                                                    ? Colors.black87
+                                                    : Colors.white60,
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 13,
                                               ),
@@ -401,17 +453,28 @@ class _LobbyScreenState extends State<LobbyScreen> {
                             backgroundColor: _selectedRole == 'host'
                                 ? const Color(0xFF6C5CE7)
                                 : const Color(0xFF00CEC9),
-                            foregroundColor: _selectedRole == 'host' ? Colors.white : Colors.black87,
+                            foregroundColor: _selectedRole == 'host'
+                                ? Colors.white
+                                : Colors.black87,
                             elevation: 8,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(_selectedRole == 'host' ? Icons.play_arrow_rounded : Icons.login_rounded),
+                              Icon(
+                                _selectedRole == 'host'
+                                    ? Icons.play_arrow_rounded
+                                    : Icons.login_rounded,
+                              ),
                               const SizedBox(width: 8),
                               Text(
-                                _selectedRole == 'host' ? 'Start Broadcasting' : 'Join Live Stream',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                _selectedRole == 'host'
+                                    ? 'Start Broadcasting'
+                                    : 'Join Live Stream',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
@@ -426,16 +489,28 @@ class _LobbyScreenState extends State<LobbyScreen> {
                             children: [
                               const Row(
                                 children: [
-                                  Icon(Icons.sensors_rounded, color: Colors.redAccent, size: 16),
+                                  Icon(
+                                    Icons.sensors_rounded,
+                                    color: Colors.redAccent,
+                                    size: 16,
+                                  ),
                                   SizedBox(width: 6),
                                   Text(
                                     'Active Live Rooms',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
                               IconButton(
-                                icon: const Icon(Icons.refresh_rounded, size: 18, color: Colors.white54),
+                                icon: const Icon(
+                                  Icons.refresh_rounded,
+                                  size: 18,
+                                  color: Colors.white54,
+                                ),
                                 tooltip: 'Refresh Rooms',
                                 onPressed: _refreshRooms,
                               ),
@@ -451,47 +526,70 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF141724),
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                    ),
                                   ),
                                   child: const Center(
                                     child: Text(
                                       'No active live streams on server.\nStart broadcasting to create one!',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(color: Colors.white38, fontSize: 12),
+                                      style: TextStyle(
+                                        color: Colors.white38,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 );
                               }
 
                               return ConstrainedBox(
-                                constraints: const BoxConstraints(maxHeight: 180),
+                                constraints: const BoxConstraints(
+                                  maxHeight: 180,
+                                ),
                                 child: ListView.separated(
                                   shrinkWrap: true,
                                   itemCount: rooms.length,
-                                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 8),
                                   itemBuilder: (context, index) {
                                     final room = rooms[index];
-                                    final isSelected = _roomController.text == room.roomId;
+                                    final isSelected =
+                                        _roomController.text == room.roomId;
                                     return Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: isSelected
-                                            ? const Color(0xFF6C5CE7).withValues(alpha: 0.25)
+                                            ? const Color(
+                                                0xFF6C5CE7,
+                                              ).withValues(alpha: 0.25)
                                             : const Color(0xFF141724),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
                                           color: isSelected
                                               ? const Color(0xFF6C5CE7)
-                                              : Colors.white.withValues(alpha: 0.06),
+                                              : Colors.white.withValues(
+                                                  alpha: 0.06,
+                                                ),
                                         ),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.live_tv_rounded, color: Colors.redAccent, size: 16),
+                                          const Icon(
+                                            Icons.live_tv_rounded,
+                                            color: Colors.redAccent,
+                                            size: 16,
+                                          ),
                                           const SizedBox(width: 10),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   room.roomId,
@@ -503,25 +601,41 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                 ),
                                                 Text(
                                                   'Host: ${room.hostId}',
-                                                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                                                  style: const TextStyle(
+                                                    color: Colors.white54,
+                                                    fontSize: 11,
+                                                  ),
                                                 ),
                                               ],
                                             ),
                                           ),
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withValues(alpha: 0.08),
-                                              borderRadius: BorderRadius.circular(8),
+                                              color: Colors.white.withValues(
+                                                alpha: 0.08,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                const Icon(Icons.visibility_rounded, color: Colors.white70, size: 12),
+                                                const Icon(
+                                                  Icons.visibility_rounded,
+                                                  color: Colors.white70,
+                                                  size: 12,
+                                                ),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   '${room.totalViewers}',
-                                                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 11,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -529,15 +643,25 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                           const SizedBox(width: 8),
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xFF00CEC9),
+                                              backgroundColor: const Color(
+                                                0xFF00CEC9,
+                                              ),
                                               foregroundColor: Colors.black87,
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 4,
+                                                  ),
                                               minimumSize: Size.zero,
-                                              textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                              textStyle: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                             onPressed: () {
                                               setState(() {
-                                                _roomController.text = room.roomId;
+                                                _roomController.text =
+                                                    room.roomId;
                                                 _selectedRole = 'viewer';
                                               });
                                             },

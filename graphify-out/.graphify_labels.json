@@ -53,7 +53,7 @@
   "51": "my_application.cc",
   "52": "media_control_bar.dart",
   "53": "lobby_screen.dart",
-  "54": "omnicast_config.dart",
+  "54": "omnicast_gifting_bottom_sheet.dart",
   "55": "pk_score_progress_bar.dart",
   "56": "omnicast_stage_grid.dart",
   "57": "gift_modal.dart",
@@ -78,5 +78,9 @@
   "76": "settings.gradle.kts",
   "77": "Runner-Bridging-Header.h",
   "78": "bool?",
-  "79": "String?"
+  "79": "String?",
+  "80": "video_parameters.dart",
+  "81": "bool get",
+  "82": "room_event_models.dart",
+  "83": "MediaStreamManager"
 }

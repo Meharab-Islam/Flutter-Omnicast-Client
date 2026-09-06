@@ -6,9 +6,27 @@ class AppConstants {
   static const List<DemoGift> availableGifts = [
     DemoGift(id: 'rose', name: 'Rose', icon: '🌹', coins: 10, points: 10),
     DemoGift(id: 'heart', name: 'Heart', icon: '💖', coins: 50, points: 50),
-    DemoGift(id: 'diamond', name: 'Diamond', icon: '💎', coins: 100, points: 100),
-    DemoGift(id: 'sports_car', name: 'Supercar', icon: '🏎️', coins: 500, points: 500),
-    DemoGift(id: 'rocket', name: 'Rocket', icon: '🚀', coins: 1000, points: 1000),
+    DemoGift(
+      id: 'diamond',
+      name: 'Diamond',
+      icon: '💎',
+      coins: 100,
+      points: 100,
+    ),
+    DemoGift(
+      id: 'sports_car',
+      name: 'Supercar',
+      icon: '🏎️',
+      coins: 500,
+      points: 500,
+    ),
+    DemoGift(
+      id: 'rocket',
+      name: 'Rocket',
+      icon: '🚀',
+      coins: 1000,
+      points: 1000,
+    ),
   ];
 }
 

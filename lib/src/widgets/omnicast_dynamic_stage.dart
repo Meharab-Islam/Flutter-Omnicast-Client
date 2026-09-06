@@ -69,6 +69,7 @@ class OmniCastDynamicStage extends StatelessWidget {
       listenable: Listenable.merge([
         client.state,
         client.seats.activeSeatsNotifier,
+        client.streamManager,
       ]),
       builder: (context, _) {
         final slots = _computeStageSlots();

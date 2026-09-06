@@ -64,7 +64,9 @@ class _MediaControlBarState extends State<MediaControlBar> {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.75),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -88,11 +90,21 @@ class _MediaControlBarState extends State<MediaControlBar> {
                       onSubmitted: (_) => _submitChat(),
                       decoration: InputDecoration(
                         hintText: 'Say something in live room...',
-                        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        hintStyle: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          fontSize: 12,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         border: InputBorder.none,
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.send_rounded, color: Color(0xFF00CEC9), size: 18),
+                          icon: const Icon(
+                            Icons.send_rounded,
+                            color: Color(0xFF00CEC9),
+                            size: 18,
+                          ),
                           onPressed: _submitChat,
                         ),
                       ),
@@ -113,9 +125,15 @@ class _MediaControlBarState extends State<MediaControlBar> {
 
                 // Seat / Co-Host Button
                 _buildCircleButton(
-                  icon: widget.isCoHost ? Icons.airline_seat_recline_normal_rounded : Icons.person_add_alt_1_rounded,
-                  color: widget.isCoHost ? Colors.amberAccent : const Color(0xFF6C5CE7),
-                  tooltip: widget.isHost ? 'Manage Seats' : (widget.isCoHost ? 'Leave Seat' : 'Request Seat'),
+                  icon: widget.isCoHost
+                      ? Icons.airline_seat_recline_normal_rounded
+                      : Icons.person_add_alt_1_rounded,
+                  color: widget.isCoHost
+                      ? Colors.amberAccent
+                      : const Color(0xFF6C5CE7),
+                  tooltip: widget.isHost
+                      ? 'Manage Seats'
+                      : (widget.isCoHost ? 'Leave Seat' : 'Request Seat'),
                   onTap: widget.onSeatAction,
                 ),
 
@@ -124,8 +142,12 @@ class _MediaControlBarState extends State<MediaControlBar> {
                   const SizedBox(width: 6),
                   _buildCircleButton(
                     icon: Icons.local_fire_department_rounded,
-                    color: widget.isPKActive ? Colors.redAccent : Colors.orangeAccent,
-                    tooltip: widget.isPKActive ? 'End PK Battle' : 'Start PK Battle',
+                    color: widget.isPKActive
+                        ? Colors.redAccent
+                        : Colors.orangeAccent,
+                    tooltip: widget.isPKActive
+                        ? 'End PK Battle'
+                        : 'Start PK Battle',
                     onTap: widget.onPKAction,
                   ),
                 ],
@@ -142,16 +164,24 @@ class _MediaControlBarState extends State<MediaControlBar> {
                   Row(
                     children: [
                       _buildPillButton(
-                        icon: widget.isMicMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
+                        icon: widget.isMicMuted
+                            ? Icons.mic_off_rounded
+                            : Icons.mic_rounded,
                         label: widget.isMicMuted ? 'Muted' : 'Mic',
-                        color: widget.isMicMuted ? Colors.redAccent : Colors.white70,
+                        color: widget.isMicMuted
+                            ? Colors.redAccent
+                            : Colors.white70,
                         onTap: widget.onToggleMic,
                       ),
                       const SizedBox(width: 8),
                       _buildPillButton(
-                        icon: widget.isCameraOff ? Icons.videocam_off_rounded : Icons.videocam_rounded,
+                        icon: widget.isCameraOff
+                            ? Icons.videocam_off_rounded
+                            : Icons.videocam_rounded,
                         label: widget.isCameraOff ? 'Cam Off' : 'Camera',
-                        color: widget.isCameraOff ? Colors.redAccent : Colors.white70,
+                        color: widget.isCameraOff
+                            ? Colors.redAccent
+                            : Colors.white70,
                         onTap: widget.onToggleCamera,
                       ),
                       const SizedBox(width: 8),
@@ -170,10 +200,34 @@ class _MediaControlBarState extends State<MediaControlBar> {
                     onSelected: widget.onSelectLayer,
                     color: const Color(0xFF1E2132),
                     itemBuilder: (context) => const [
-                      PopupMenuItem(value: 'auto', child: Text('Auto (Dynacast/ABR)', style: TextStyle(color: Colors.white))),
-                      PopupMenuItem(value: 'f', child: Text('High (720p HD)', style: TextStyle(color: Colors.white))),
-                      PopupMenuItem(value: 'h', child: Text('Medium (360p)', style: TextStyle(color: Colors.white))),
-                      PopupMenuItem(value: 'q', child: Text('Low (180p)', style: TextStyle(color: Colors.white))),
+                      PopupMenuItem(
+                        value: 'auto',
+                        child: Text(
+                          'Auto (Dynacast/ABR)',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'f',
+                        child: Text(
+                          'High (720p HD)',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'h',
+                        child: Text(
+                          'Medium (360p)',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'q',
+                        child: Text(
+                          'Low (180p)',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ],
                     child: _buildPillButton(
                       icon: Icons.hd_rounded,
@@ -245,7 +299,14 @@ class _MediaControlBarState extends State<MediaControlBar> {
           children: [
             Icon(icon, color: color, size: 16),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
