@@ -220,6 +220,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
                               backgroundColor: const Color(0xFF141724),
                               side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                             ),
+                            ActionChip(
+                              label: const Text('Real Phone (Wi-Fi)', style: TextStyle(fontSize: 11)),
+                              onPressed: () => _serverController.text = AppConstants.defaultLanIP,
+                              backgroundColor: const Color(0xFF141724),
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),

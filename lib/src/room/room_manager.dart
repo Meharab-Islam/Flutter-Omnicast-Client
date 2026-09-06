@@ -64,21 +64,27 @@ class RoomManager {
     _roomState.addListener(_syncGranularNotifiers);
   }
 
+  bool _isDisposed = false;
+  bool get isDisposed => _isDisposed;
+
   void _syncGranularNotifiers() {
-    if (totalViewerCount.value != _roomState.viewersCount) {
-      totalViewerCount.value = _roomState.viewersCount;
-    }
-    if (connectionStateNotifier.value != _roomState.connectionState) {
-      connectionStateNotifier.value = _roomState.connectionState;
-    }
-    if (roleNotifier.value != _roomState.role) {
-      roleNotifier.value = _roomState.role;
-    }
-    if (pinnedUserNotifier.value != _roomState.pinnedStageUserId) {
-      pinnedUserNotifier.value = _roomState.pinnedStageUserId;
-    }
-    activeSeatsNotifier.value = _roomState.activeSeats;
-    activeViewersList.value = _roomState.viewers;
+    if (_isDisposed) return;
+    try {
+      if (totalViewerCount.value != _roomState.viewersCount) {
+        totalViewerCount.value = _roomState.viewersCount;
+      }
+      if (connectionStateNotifier.value != _roomState.connectionState) {
+        connectionStateNotifier.value = _roomState.connectionState;
+      }
+      if (roleNotifier.value != _roomState.role) {
+        roleNotifier.value = _roomState.role;
+      }
+      if (pinnedUserNotifier.value != _roomState.pinnedStageUserId) {
+        pinnedUserNotifier.value = _roomState.pinnedStageUserId;
+      }
+      activeSeatsNotifier.value = _roomState.activeSeats;
+      activeViewersList.value = _roomState.viewers;
+    } catch (_) {}
   }
 
   final _roomClosedByHostController = StreamController<String>.broadcast();
@@ -771,7 +777,9 @@ class RoomManager {
 
     await _webRTCManager.closePeerConnection();
     await _webRTCManager.mediaStreamManager.stopLocalMedia();
-    _roomState.reset();
+    if (!_roomState.isDisposed) {
+      _roomState.reset();
+    }
   }
 
   /// Host action: Explicitly terminates the live stream and forcefully ejects all viewers.
@@ -812,6 +820,8 @@ class RoomManager {
 
   /// Disposes granular notifiers, timers, and subscriptions.
   void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
     _batchDebounceTimer?.cancel();
     _signalingSubscription?.cancel();
     _roomState.removeListener(_syncGranularNotifiers);
@@ -821,11 +831,11 @@ class RoomManager {
     _participantJoinedController.close();
     _participantLeftController.close();
 
-    totalViewerCount.dispose();
-    activeViewersList.dispose();
-    connectionStateNotifier.dispose();
-    roleNotifier.dispose();
-    activeSeatsNotifier.dispose();
-    pinnedUserNotifier.dispose();
+    try { totalViewerCount.dispose(); } catch (_) {}
+    try { activeViewersList.dispose(); } catch (_) {}
+    try { connectionStateNotifier.dispose(); } catch (_) {}
+    try { roleNotifier.dispose(); } catch (_) {}
+    try { activeSeatsNotifier.dispose(); } catch (_) {}
+    try { pinnedUserNotifier.dispose(); } catch (_) {}
   }
 }

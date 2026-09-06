@@ -1,7 +1,7 @@
 class AppConstants {
   static const String defaultLocalhost = '127.0.0.1:8080';
   static const String defaultAndroidEmulator = '10.0.2.2:8080';
-  static const String defaultLanIP = '192.168.1.100:8080';
+  static const String defaultLanIP = '192.168.0.116:8080';
 
   static const List<DemoGift> availableGifts = [
     DemoGift(id: 'rose', name: 'Rose', icon: '🌹', coins: 10, points: 10),

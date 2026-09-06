@@ -39,9 +39,23 @@ class RoomState extends ChangeNotifier {
   final ValueNotifier<List<StageSeat>> activeSeatsNotifier = ValueNotifier<List<StageSeat>>(const []);
   final ValueNotifier<int> occupiedSeatsCountNotifier = ValueNotifier<int>(0);
 
+  bool _isDisposed = false;
+
+  /// Returns whether this state container has been disposed.
+  bool get isDisposed => _isDisposed;
+
+  @override
+  void notifyListeners() {
+    if (_isDisposed) return;
+    super.notifyListeners();
+  }
+
   // Getters
   bool get showJoinMessages => showJoinMessagesNotifier.value;
-  set showJoinMessages(bool val) => showJoinMessagesNotifier.value = val;
+  set showJoinMessages(bool val) {
+    if (_isDisposed) return;
+    showJoinMessagesNotifier.value = val;
+  }
 
   String? get roomId => _roomId;
   String? get hostId => _hostId;
@@ -267,8 +281,11 @@ class RoomState extends ChangeNotifier {
   }
 
   void _syncSeatNotifiers() {
-    activeSeatsNotifier.value = List.unmodifiable(_activeSeats);
-    occupiedSeatsCountNotifier.value = _activeSeats.where((s) => s.isOccupied).length;
+    if (_isDisposed) return;
+    try {
+      activeSeatsNotifier.value = List.unmodifiable(_activeSeats);
+      occupiedSeatsCountNotifier.value = _activeSeats.where((s) => s.isOccupied).length;
+    } catch (_) {}
   }
 
   /// Updates the viewer count and list of active viewers.
@@ -647,13 +664,26 @@ class RoomState extends ChangeNotifier {
 
   /// Resets state when disconnecting or leaving room.
   void reset() {
+    if (_isDisposed) return;
     _roomId = null;
     _hostId = null;
     _userId = null;
     _role = UserRole.viewer;
     _roomMode = RoomMode.solo;
-    roomModeNotifier.value = RoomMode.solo;
-    pkScoreNotifier.value = const PkScore();
+    if (!_isDisposed) {
+      try {
+        roomModeNotifier.value = RoomMode.solo;
+      } catch (_) {}
+      try {
+        pkScoreNotifier.value = const PkScore();
+      } catch (_) {}
+      try {
+        activeSeatsNotifier.value = const [];
+      } catch (_) {}
+      try {
+        occupiedSeatsCountNotifier.value = 0;
+      } catch (_) {}
+    }
     _viewersCount = 0;
     _hostCoinBalance = 0;
     _userCoinBalance = 0;
@@ -671,8 +701,23 @@ class RoomState extends ChangeNotifier {
 
   @override
   void dispose() {
-    roomModeNotifier.dispose();
-    pkScoreNotifier.dispose();
+    if (_isDisposed) return;
+    _isDisposed = true;
+    try {
+      roomModeNotifier.dispose();
+    } catch (_) {}
+    try {
+      pkScoreNotifier.dispose();
+    } catch (_) {}
+    try {
+      showJoinMessagesNotifier.dispose();
+    } catch (_) {}
+    try {
+      activeSeatsNotifier.dispose();
+    } catch (_) {}
+    try {
+      occupiedSeatsCountNotifier.dispose();
+    } catch (_) {}
     super.dispose();
   }
 }

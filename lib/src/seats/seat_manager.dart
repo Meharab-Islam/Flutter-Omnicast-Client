@@ -83,11 +83,17 @@ class SeatManager {
     _roomState.addListener(_syncSeatNotifiers);
   }
 
+  bool _isDisposed = false;
+  bool get isDisposed => _isDisposed;
+
   void _syncSeatNotifiers() {
-    activeCoHostsList.value = _roomState.activeSeats;
-    pendingSeatRequestsNotifier.value = _roomState.pendingSeatRequests;
-    pendingInvitesNotifier.value = _roomState.pendingInvites;
-    occupiedSeatsCountNotifier.value = _roomState.occupiedSeatsCount;
+    if (_isDisposed) return;
+    try {
+      activeCoHostsList.value = _roomState.activeSeats;
+      pendingSeatRequestsNotifier.value = _roomState.pendingSeatRequests;
+      pendingInvitesNotifier.value = _roomState.pendingInvites;
+      occupiedSeatsCountNotifier.value = _roomState.occupiedSeatsCount;
+    } catch (_) {}
   }
 
   void _bindSignalingListeners() {
@@ -468,15 +474,17 @@ class SeatManager {
 
   /// Disposes streams, listeners, and notifiers.
   Future<void> dispose() async {
+    if (_isDisposed) return;
+    _isDisposed = true;
     _roomState.removeListener(_syncSeatNotifiers);
     for (final sub in _subscriptions) {
       await sub.cancel();
     }
     _subscriptions.clear();
 
-    activeCoHostsList.dispose();
-    pendingSeatRequestsNotifier.dispose();
-    pendingInvitesNotifier.dispose();
+    try { activeCoHostsList.dispose(); } catch (_) {}
+    try { pendingSeatRequestsNotifier.dispose(); } catch (_) {}
+    try { pendingInvitesNotifier.dispose(); } catch (_) {}
 
     await _seatRequestController.close();
     await _seatInviteController.close();

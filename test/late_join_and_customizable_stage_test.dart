@@ -196,5 +196,17 @@ void main() {
       expect(find.text('Seat 2'), findsOneWidget);
       expect(find.text('Seat 3'), findsOneWidget);
     });
+
+    test('RoomState does not throw if reset or notifyListeners called after dispose', () {
+      final state = RoomState();
+      state.dispose();
+      expect(state.isDisposed, true);
+
+      // Should safely return without throwing FlutterError: A RoomState was used after being disposed
+      expect(() => state.reset(), returnsNormally);
+      expect(() => state.notifyListeners(), returnsNormally);
+      expect(() => state.updateViewers(count: 10), returnsNormally);
+      expect(() => state.dispose(), returnsNormally);
+    });
   });
 }

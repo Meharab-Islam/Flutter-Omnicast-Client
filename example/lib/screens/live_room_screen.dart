@@ -239,7 +239,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     for (final sub in _subscriptions) {
       sub.cancel();
     }
-    _client.room.leaveRoom();
     _client.dispose();
     super.dispose();
   }

@@ -714,6 +714,12 @@ class OmniCastClient {
 
     stopWatchingRooms();
 
+    if (_roomState.isInRoom) {
+      try {
+        await _roomManager.leaveRoom();
+      } catch (_) {}
+    }
+
     for (final sub in _subscriptions) {
       try {
         sub.cancel();
