@@ -516,6 +516,28 @@ class WebRTCManager {
     return mungedOffer;
   }
 
+  /// Seamlessly downgrades a Co-Host back to Viewer mode without destroying downlink subscriptions.
+  Future<void> downgradeCoHostToViewer() async {
+    // 1. Stop hardware camera and microphone
+    await mediaStreamManager.stopLocalMedia();
+
+    // 2. Remove local audio and video senders from active PeerConnection
+    if (_peerConnection != null) {
+      if (_videoSender != null) {
+        try {
+          await _peerConnection!.removeTrack(_videoSender!);
+        } catch (_) {}
+        _videoSender = null;
+      }
+      if (_audioSender != null) {
+        try {
+          await _peerConnection!.removeTrack(_audioSender!);
+        } catch (_) {}
+        _audioSender = null;
+      }
+    }
+  }
+
   /// Queues or adds remote ICE candidates safely after remote description is set.
   Future<void> addRemoteCandidate(dynamic candidate) async {
     RTCIceCandidate? iceCandidate;

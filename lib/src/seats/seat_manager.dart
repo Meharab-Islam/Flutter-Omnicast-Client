@@ -140,21 +140,9 @@ class SeatManager {
           final targetUser = msg.targetUser ??
               (msg.payload is Map ? msg.payload['target_user'] : null);
           if (targetUser == _roomState.userId && _roomState.isCoHost) {
-            OmniCastLogger.log('[SeatManager] Co-host demoted to viewer -> Teardown local tracks and switch to viewer');
-            await _webRTCManager.mediaStreamManager.stopLocalMedia();
+            OmniCastLogger.log('[SeatManager] Co-host demoted to viewer -> Teardown local publishing tracks seamlessly');
+            await _webRTCManager.downgradeCoHostToViewer();
             _roomState.updateRole(UserRole.viewer);
-            await _webRTCManager.setupViewerTransceivers();
-            final offer = await _webRTCManager.createAndSetLocalOffer();
-            _signalingClient.send(SignalingMessage(
-              event: SignalingEvents.joinRoom,
-              roomId: _roomState.roomId!,
-              userId: _roomState.userId!,
-              payload: {
-                'sdp': offer.sdp,
-                'type': offer.type,
-                'renegotiate': true,
-              },
-            ));
           }
         }
       }),
@@ -183,6 +171,12 @@ class SeatManager {
           if (leftId.isNotEmpty) {
             final updatedSeats = _roomState.activeSeats.where((s) => s.userId != leftId).toList();
             _roomState.updateActiveSeats(updatedSeats);
+
+            // Clean up remote renderer for the departed co-host, NEVER touching the host stream
+            if (leftId != _roomState.hostId && leftId != 'host' && leftId != _roomState.roomId) {
+              _webRTCManager.mediaStreamManager.removeRemoteRenderer(leftId);
+              _roomState.removeActiveRemoteUser(leftId);
+            }
           }
         }
       }),
@@ -351,19 +345,9 @@ class SeatManager {
       userId: _roomState.userId!,
     ));
 
-    await _webRTCManager.mediaStreamManager.stopLocalMedia();
+    OmniCastLogger.log('[SeatManager] Stepping down from co-host seat -> Teardown local publishing tracks seamlessly');
+    await _webRTCManager.downgradeCoHostToViewer();
     _roomState.updateRole(UserRole.viewer);
-    await _webRTCManager.setupViewerTransceivers();
-    final offer = await _webRTCManager.createAndSetLocalOffer();
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.joinRoom,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: {
-        'sdp': offer.sdp,
-        'type': offer.type,
-      },
-    ));
   }
 
   /// Host action: Demotes a co-host back to a viewer seat without kicking them from the room.

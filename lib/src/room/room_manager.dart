@@ -199,7 +199,6 @@ class RoomManager {
         case 'peer_left':
         case 'peer_disconnected':
         case 'participant_removed':
-        case 'cohost_left':
           final payloadMap = msg.payload is Map<String, dynamic>
               ? msg.payload as Map<String, dynamic>
               : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
