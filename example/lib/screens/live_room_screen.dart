@@ -608,11 +608,24 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Widget _buildVideoCanvas() {
     if (widget.session.isHost) {
       final renderer = _client.media.localRenderer;
-      if (renderer != null && (renderer.srcObject != null || renderer.renderVideo)) {
-        return RTCVideoView(
-          renderer,
-          objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-          mirror: true,
+      if (renderer != null) {
+        return ListenableBuilder(
+          listenable: renderer,
+          builder: (context, _) {
+            if (renderer.srcObject != null || renderer.renderVideo) {
+              return RTCVideoView(
+                renderer,
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                mirror: true,
+              );
+            }
+            return Container(
+              color: const Color(0xFF1E2132),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF6C5CE7)),
+              ),
+            );
+          },
         );
       }
       return Container(
@@ -623,25 +636,50 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       );
     } else {
       // Viewer Mode: Subscribed Host Stream
-      final renderer = _client.media.getRenderer(widget.session.roomId);
-      if (renderer != null && (renderer.srcObject != null || renderer.renderVideo)) {
-        return RTCVideoView(
-          renderer,
-          objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-        );
-      }
-      return Container(
-        color: const Color(0xFF141724),
-        child: const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(color: Color(0xFF00CEC9)),
-              SizedBox(height: 12),
-              Text('Receiving live video stream...', style: TextStyle(color: Colors.white54, fontSize: 13)),
-            ],
-          ),
-        ),
+      return ListenableBuilder(
+        listenable: _client.state,
+        builder: (context, _) {
+          final renderer = _client.media.getRenderer(widget.session.roomId);
+          if (renderer != null) {
+            return ListenableBuilder(
+              listenable: renderer,
+              builder: (context, _) {
+                if (renderer.srcObject != null || renderer.renderVideo) {
+                  return RTCVideoView(
+                    renderer,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  );
+                }
+                return Container(
+                  color: const Color(0xFF141724),
+                  child: const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(color: Color(0xFF00CEC9)),
+                        SizedBox(height: 12),
+                        Text('Receiving live video stream...', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+          return Container(
+            color: const Color(0xFF141724),
+            child: const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(color: Color(0xFF00CEC9)),
+                  SizedBox(height: 12),
+                  Text('Connecting to host broadcast...', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                ],
+              ),
+            ),
+          );
+        },
       );
     }
   }

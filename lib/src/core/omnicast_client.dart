@@ -61,47 +61,60 @@ class OmniCastClient {
   final ValueNotifier<List<RoomModel>> liveRoomsNotifier =
       ValueNotifier<List<RoomModel>>(const []);
 
-  OmniCastClient.custom({
+  OmniCastClient._internal({
     required this.config,
     this.mediaConfig = const GlobalMediaConfig(),
-    SignalingClient? signalingClient,
-    MediaStreamManager? mediaStreamManager,
-    WebRTCManager? webRTCManager,
-    RoomState? roomState,
-  })  : _mediaStreamManager = mediaStreamManager ?? MediaStreamManager(),
-        _signalingClient = signalingClient ??
-            SignalingClient(
-              heartbeatInterval: config.heartbeatInterval,
-            ),
-        _roomState = roomState ?? RoomState(),
-        _webRTCManager = webRTCManager ??
-            WebRTCManager(
-              mediaStreamManager: mediaStreamManager ?? MediaStreamManager(),
-              configuration: {
-                'iceServers': config.iceServers,
-                'sdpSemantics': 'unified-plan',
-              },
-            ) {
+    required SignalingClient signalingClient,
+    required MediaStreamManager mediaStreamManager,
+    required WebRTCManager webRTCManager,
+    required RoomState roomState,
+  })  : _signalingClient = signalingClient,
+        _mediaStreamManager = mediaStreamManager,
+        _webRTCManager = webRTCManager,
+        _roomState = roomState {
     instance = this;
     _initSubManagers();
     _bindInternalEventListeners();
   }
 
-  OmniCastClient._({
+  factory OmniCastClient.custom({
     required OmniCastConfig config,
     GlobalMediaConfig mediaConfig = const GlobalMediaConfig(),
     SignalingClient? signalingClient,
     MediaStreamManager? mediaStreamManager,
     WebRTCManager? webRTCManager,
     RoomState? roomState,
-  }) : this.custom(
-          config: config,
-          mediaConfig: mediaConfig,
-          signalingClient: signalingClient,
-          mediaStreamManager: mediaStreamManager,
-          webRTCManager: webRTCManager,
-          roomState: roomState,
+  }) {
+    final effectiveMediaStreamManager =
+        mediaStreamManager ?? MediaStreamManager();
+    final effectiveSignalingClient = signalingClient ??
+        SignalingClient(
+          heartbeatInterval: config.heartbeatInterval,
         );
+    final effectiveRoomState = roomState ?? RoomState();
+    final effectiveWebRTCManager = webRTCManager ??
+        WebRTCManager(
+          mediaStreamManager: effectiveMediaStreamManager,
+          configuration: {
+            'iceServers': config.iceServers,
+            'sdpSemantics': 'unified-plan',
+          },
+        );
+
+    return OmniCastClient._internal(
+      config: config,
+      mediaConfig: mediaConfig,
+      signalingClient: effectiveSignalingClient,
+      mediaStreamManager: effectiveMediaStreamManager,
+      webRTCManager: effectiveWebRTCManager,
+      roomState: effectiveRoomState,
+    );
+  }
+
+  factory OmniCastClient._({
+    required OmniCastConfig config,
+    GlobalMediaConfig mediaConfig,
+  }) = OmniCastClient.custom;
 
   /// Master toggle for console logs across the SDK (WebRTC, signaling, media).
   static bool get enableLogging => OmniCastLogger.enableLogging;
