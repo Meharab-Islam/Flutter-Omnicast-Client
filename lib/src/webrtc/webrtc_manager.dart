@@ -157,11 +157,24 @@ class WebRTCManager {
       return _peerConnection!;
     }
 
+    // Ensure WebRTC native engine ignores loopback interface and silences internal C++ logs
+    try {
+      await WebRTC.initialize(options: {
+        'logSeverity': OmniCastLogger.enableLogging ? 'warning' : 'none',
+        'networkIgnoreMask': ['adapterTypeLoopback'],
+      });
+    } catch (_) {}
+
     final pc = await createPeerConnection(rtcConfiguration);
     _peerConnection = pc;
 
     pc.onIceCandidate = (candidate) {
       if (candidate.candidate != null && candidate.candidate!.isNotEmpty) {
+        final c = candidate.candidate!.toLowerCase();
+        // Ignore loopback candidates to eliminate invalid STUN ping failures
+        if (c.contains('127.0.0.') || c.contains('::1') || c.contains('.local')) {
+          return;
+        }
         onLocalIceCandidate?.call(candidate);
       }
     };
@@ -622,6 +635,11 @@ class WebRTCManager {
 
     if (iceCandidate == null) return;
 
+    final c = (iceCandidate.candidate ?? '').toLowerCase();
+    if (c.contains('127.0.0.') || c.contains('::1') || c.contains('.local')) {
+      return;
+    }
+
     if (_peerConnection == null) {
       _queuedRemoteCandidates.add(iceCandidate);
       return;
@@ -638,6 +656,10 @@ class WebRTCManager {
   Future<void> _processQueuedCandidates() async {
     if (_peerConnection == null) return;
     for (final candidate in _queuedRemoteCandidates) {
+      final c = (candidate.candidate ?? '').toLowerCase();
+      if (c.contains('127.0.0.') || c.contains('::1') || c.contains('.local')) {
+        continue;
+      }
       await _peerConnection!.addCandidate(candidate);
     }
     _queuedRemoteCandidates.clear();

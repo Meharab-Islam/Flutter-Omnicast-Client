@@ -154,6 +154,14 @@ class OmniCastClient {
   }) async {
     OmniCastLogger.enableLogging = enableLogging;
 
+    // Initialize WebRTC engine with loopback adapter ignored and internal C++ logs silenced
+    try {
+      await WebRTC.initialize(options: {
+        'logSeverity': enableLogging ? 'warning' : 'none',
+        'networkIgnoreMask': ['adapterTypeLoopback'],
+      });
+    } catch (_) {}
+
     final config = OmniCastConfig.fromServer(
       serverUrl: serverUrl,
       hostUrl: hostUrl,
