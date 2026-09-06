@@ -71,6 +71,19 @@ class RoomState extends ChangeNotifier {
   int get userCoinBalance => _userCoinBalance;
   String? get pinnedStageUserId => _pinnedStageUserId;
 
+  /// Returns the user ID of the participant occupying the Main Seat.
+  /// Defaults to [_hostId] if no specific co-host is pinned.
+  String? get mainSeatUserId =>
+      (_pinnedStageUserId != null && _pinnedStageUserId!.isNotEmpty)
+          ? _pinnedStageUserId
+          : _hostId;
+
+  /// Returns whether the Host is currently occupying the Main Seat.
+  bool get isHostInMainSeat =>
+      _pinnedStageUserId == null ||
+      _pinnedStageUserId!.isEmpty ||
+      _pinnedStageUserId == _hostId;
+
   List<Participant> get viewers => List.unmodifiable(_viewers);
   List<StageSeat> get activeSeats => List.unmodifiable(_activeSeats);
   List<StageSeat> get occupiedSeats => _activeSeats.where((s) => s.isOccupied).toList();
@@ -179,7 +192,13 @@ class RoomState extends ChangeNotifier {
         (data['host_coins'] as num?)?.toInt() ??
         (data['host_score'] as num?)?.toInt() ??
         _hostCoinBalance;
-    _pinnedStageUserId = data['pinned_user_id'] as String? ?? _pinnedStageUserId;
+    final mainSeat = data['main_seat_id'] as String?;
+    final pinned = data['pinned_user_id'] as String?;
+    if (pinned != null) {
+      _pinnedStageUserId = pinned.isNotEmpty ? pinned : null;
+    } else if (mainSeat != null) {
+      _pinnedStageUserId = (mainSeat.isNotEmpty && mainSeat != _hostId) ? mainSeat : null;
+    }
 
     // Populate active users/viewers from viewers, viewers_list, or participants
     final viewersData = data['viewers'] ?? data['viewers_list'] ?? data['participants'];

@@ -804,8 +804,11 @@ class OmniCastClient {
       _signalingClient.onMessage.listen((msg) {
         if (msg.event == SignalingEvents.seatInvite && msg.payload is Map<String, dynamic>) {
           _roomState.addInvite(CoHostInvite.fromJson(msg.payload as Map<String, dynamic>));
-        } else if (msg.event == SignalingEvents.pinStage && msg.payload is Map<String, dynamic>) {
-          _roomState.setPinnedStageUser(msg.payload['pinned_user_id'] as String?);
+        } else if ((msg.event == SignalingEvents.pinStage || msg.event == 'main_seat_changed') && msg.payload is Map) {
+          final payload = Map<String, dynamic>.from(msg.payload as Map);
+          final pinned = payload['pinned_user_id'] as String? ??
+              (payload['target_id'] != _roomState.hostId ? payload['target_id'] as String? : null);
+          _roomState.setPinnedStageUser(pinned != null && pinned.isNotEmpty ? pinned : null);
         } else if (msg.event == 'new_cohost' && msg.payload is Map) {
           final payload = msg.payload as Map;
           final cohostId = payload['cohost_id']?.toString() ?? msg.userId;

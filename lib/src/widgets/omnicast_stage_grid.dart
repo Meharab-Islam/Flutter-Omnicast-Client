@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../core/omnicast_client.dart';
 import '../models/seat_models.dart';
+export 'omnicast_dynamic_stage.dart';
 
 /// Highly customizable builder widget providing real-time multi-guest stage data.
 ///

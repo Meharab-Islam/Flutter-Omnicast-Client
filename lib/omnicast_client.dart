@@ -48,6 +48,7 @@ export 'src/widgets/omnicast_gifting_bottom_sheet.dart';
 export 'src/widgets/omnicast_viewers_bottom_sheet.dart';
 export 'src/widgets/omnicast_room_list_view.dart';
 export 'src/widgets/omnicast_stage_grid.dart';
+export 'src/widgets/omnicast_dynamic_stage.dart';
 export 'src/widgets/omnicast_seat_requests_bottom_sheet.dart';
 export 'src/utils/omnicast_logger.dart';
 export 'package:permission_handler/permission_handler.dart';

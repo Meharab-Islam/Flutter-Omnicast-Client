@@ -414,12 +414,25 @@ class SeatManager {
       event: SignalingEvents.pinStage,
       roomId: _roomState.roomId!,
       userId: _roomState.userId!,
+      targetUser: targetUserId,
       payload: {
         'pinned_user_id': targetUserId,
+        'target_id': targetUserId,
+        'main_seat_id': targetUserId,
       },
     ));
 
     _roomState.setPinnedStageUser(targetUserId);
+  }
+
+  /// Host action: Promotes/sets any co-host to the Main Seat (Slot 0).
+  void setMainSeat(String? targetUserId) {
+    pinToMainStage(targetUserId);
+  }
+
+  /// Host action: Removes co-host from Main Seat and restores Host to Main Seat (Slot 0).
+  void restoreHostMainSeat() {
+    pinToMainStage(null);
   }
 
   /// Host action: Kicks a co-host from their assigned stage seat.

@@ -530,45 +530,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ),
             ),
 
-          // 4.1 Guest Stage Overlay (Multi-Seat Stage)
-          Positioned(
-            right: 12,
-            top: _isPKActive ? 180 : 95,
-            width: 140,
-            child: OmniCastStageBuilder(
-              client: _client,
-              builder: (context, seats, count) {
-                return Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white12),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          'Stage ($count/4)',
-                          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      OmniCastStageGrid(
-                        client: _client,
-                        maxSeats: 4,
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.9,
-                        padding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-
           // 5. Floating Live Chat Feed
           Positioned(
             left: 0,
@@ -606,83 +567,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   }
 
   Widget _buildVideoCanvas() {
-    if (widget.session.isHost) {
-      final renderer = _client.media.localRenderer;
-      if (renderer != null) {
-        return ListenableBuilder(
-          listenable: renderer,
-          builder: (context, _) {
-            if (renderer.srcObject != null || renderer.renderVideo) {
-              return RTCVideoView(
-                renderer,
-                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                mirror: true,
-              );
-            }
-            return Container(
-              color: const Color(0xFF1E2132),
-              child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF6C5CE7)),
-              ),
-            );
-          },
-        );
-      }
-      return Container(
-        color: const Color(0xFF1E2132),
-        child: const Center(
-          child: Icon(Icons.videocam_rounded, size: 64, color: Colors.white24),
-        ),
-      );
-    } else {
-      // Viewer Mode: Subscribed Host Stream
-      return ListenableBuilder(
-        listenable: _client.state,
-        builder: (context, _) {
-          final renderer = _client.media.getRenderer(widget.session.roomId) ??
-              _client.media.getRenderer('host');
-          if (renderer != null) {
-            return ListenableBuilder(
-              listenable: renderer,
-              builder: (context, _) {
-                if (renderer.srcObject != null || renderer.renderVideo) {
-                  return RTCVideoView(
-                    renderer,
-                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                  );
-                }
-                return Container(
-                  color: const Color(0xFF141724),
-                  child: const Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(color: Color(0xFF00CEC9)),
-                        SizedBox(height: 12),
-                        Text('Receiving live video stream...', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-          return Container(
-            color: const Color(0xFF141724),
-            child: const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(color: Color(0xFF00CEC9)),
-                  SizedBox(height: 12),
-                  Text('Connecting to host broadcast...', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    }
+    return OmniCastDynamicStage(
+      client: _client,
+      mirrorLocal: true,
+      mirrorRemote: false,
+    );
   }
 
   Widget _buildHeaderOverlay() {
