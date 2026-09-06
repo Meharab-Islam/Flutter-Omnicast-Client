@@ -47,7 +47,8 @@ class StageSeat {
           : null,
       isLocked: json['is_locked'] as bool? ?? false,
       isMuted: json['is_muted'] as bool? ?? json['muted'] as bool? ?? false,
-      isCameraOff: json['is_camera_off'] as bool? ??
+      isCameraOff:
+          json['is_camera_off'] as bool? ??
           json['is_video_muted'] as bool? ??
           json['camera_off'] as bool? ??
           false,
@@ -55,13 +56,13 @@ class StageSeat {
   }
 
   Map<String, dynamic> toJson() => {
-        'seat_index': seatIndex,
-        'user_id': userId,
-        'user': user?.toJson(),
-        'is_locked': isLocked,
-        'is_muted': isMuted,
-        'is_camera_off': isCameraOff,
-      };
+    'seat_index': seatIndex,
+    'user_id': userId,
+    'user': user?.toJson(),
+    'is_locked': isLocked,
+    'is_muted': isMuted,
+    'is_camera_off': isCameraOff,
+  };
 }
 
 /// Co-host invitation from the host to a viewer.
@@ -93,12 +94,12 @@ class CoHostInvite {
   }
 
   Map<String, dynamic> toJson() => {
-        'invite_id': inviteId,
-        'host_id': hostId,
-        'target_user_id': targetUserId,
-        'seat_index': seatIndex,
-        'created_at': createdAt.toIso8601String(),
-      };
+    'invite_id': inviteId,
+    'host_id': hostId,
+    'target_user_id': targetUserId,
+    'seat_index': seatIndex,
+    'created_at': createdAt.toIso8601String(),
+  };
 }
 
 /// Viewer's request to take a co-host seat on stage.
@@ -119,7 +120,8 @@ class SeatRequest {
 
   factory SeatRequest.fromJson(Map<String, dynamic> json) {
     return SeatRequest(
-      requesterId: json['requester_id'] as String? ?? json['user_id'] as String? ?? '',
+      requesterId:
+          json['requester_id'] as String? ?? json['user_id'] as String? ?? '',
       requesterName: json['requester_name'] as String?,
       requesterAvatar: json['requester_avatar'] as String?,
       preferredSeatIndex: (json['preferred_seat_index'] as num?)?.toInt(),
@@ -130,10 +132,10 @@ class SeatRequest {
   }
 
   Map<String, dynamic> toJson() => {
-        'requester_id': requesterId,
-        'requester_name': requesterName,
-        'requester_avatar': requesterAvatar,
-        'preferred_seat_index': preferredSeatIndex,
-        'timestamp': requestedAt.toIso8601String(),
-      };
+    'requester_id': requesterId,
+    'requester_name': requesterName,
+    'requester_avatar': requesterAvatar,
+    'preferred_seat_index': preferredSeatIndex,
+    'timestamp': requestedAt.toIso8601String(),
+  };
 }

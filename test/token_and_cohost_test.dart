@@ -16,7 +16,10 @@ void main() {
       );
 
       expect(token, isNotEmpty);
-      expect(token.split('.').length, 3); // Standard JWT Header.Payload.Signature
+      expect(
+        token.split('.').length,
+        3,
+      ); // Standard JWT Header.Payload.Signature
     });
   });
 
@@ -48,53 +51,69 @@ void main() {
       roomState.dispose();
     });
 
-    test('Viewer requesting seat updates pending list and notifies listeners', () {
-      roomState.setSession(
-        roomId: 'room_1',
-        userId: 'host_1',
-        role: UserRole.host,
-      );
+    test(
+      'Viewer requesting seat updates pending list and notifies listeners',
+      () {
+        roomState.setSession(
+          roomId: 'room_1',
+          userId: 'host_1',
+          role: UserRole.host,
+        );
 
-      roomState.addSeatRequest(SeatRequest(
-        requesterId: 'viewer_99',
-        requesterName: 'Viewer 99',
-        preferredSeatIndex: 2,
-        requestedAt: DateTime.now(),
-      ));
+        roomState.addSeatRequest(
+          SeatRequest(
+            requesterId: 'viewer_99',
+            requesterName: 'Viewer 99',
+            preferredSeatIndex: 2,
+            requestedAt: DateTime.now(),
+          ),
+        );
 
-      expect(roomState.pendingSeatRequests.length, 1);
-      expect(seatManager.pendingSeatRequestsNotifier.value.length, 1);
-      expect(seatManager.pendingSeatRequestsNotifier.value.first.requesterId, 'viewer_99');
+        expect(roomState.pendingSeatRequests.length, 1);
+        expect(seatManager.pendingSeatRequestsNotifier.value.length, 1);
+        expect(
+          seatManager.pendingSeatRequestsNotifier.value.first.requesterId,
+          'viewer_99',
+        );
 
-      // Host accepts seat request
-      seatManager.acceptSeatRequest('viewer_99', seatIndex: 2);
-      expect(roomState.pendingSeatRequests, isEmpty);
-      expect(seatManager.pendingSeatRequestsNotifier.value, isEmpty);
-    });
+        // Host accepts seat request
+        seatManager.acceptSeatRequest('viewer_99', seatIndex: 2);
+        expect(roomState.pendingSeatRequests, isEmpty);
+        expect(seatManager.pendingSeatRequestsNotifier.value, isEmpty);
+      },
+    );
 
-    test('Host inviting viewer updates pending invites list and notifies listeners', () {
-      roomState.setSession(
-        roomId: 'room_1',
-        userId: 'viewer_88',
-        role: UserRole.viewer,
-      );
+    test(
+      'Host inviting viewer updates pending invites list and notifies listeners',
+      () {
+        roomState.setSession(
+          roomId: 'room_1',
+          userId: 'viewer_88',
+          role: UserRole.viewer,
+        );
 
-      roomState.addInvite(CoHostInvite(
-        inviteId: 'inv_101',
-        hostId: 'host_1',
-        targetUserId: 'viewer_88',
-        seatIndex: 1,
-        createdAt: DateTime.now(),
-      ));
+        roomState.addInvite(
+          CoHostInvite(
+            inviteId: 'inv_101',
+            hostId: 'host_1',
+            targetUserId: 'viewer_88',
+            seatIndex: 1,
+            createdAt: DateTime.now(),
+          ),
+        );
 
-      expect(roomState.pendingInvites.length, 1);
-      expect(seatManager.pendingInvitesNotifier.value.length, 1);
-      expect(seatManager.pendingInvitesNotifier.value.first.inviteId, 'inv_101');
+        expect(roomState.pendingInvites.length, 1);
+        expect(seatManager.pendingInvitesNotifier.value.length, 1);
+        expect(
+          seatManager.pendingInvitesNotifier.value.first.inviteId,
+          'inv_101',
+        );
 
-      // Viewer rejects invite
-      seatManager.rejectCoHostInvite(inviteId: 'inv_101');
-      expect(roomState.pendingInvites, isEmpty);
-      expect(seatManager.pendingInvitesNotifier.value, isEmpty);
-    });
+        // Viewer rejects invite
+        seatManager.rejectCoHostInvite(inviteId: 'inv_101');
+        expect(roomState.pendingInvites, isEmpty);
+        expect(seatManager.pendingInvitesNotifier.value, isEmpty);
+      },
+    );
   });
 }

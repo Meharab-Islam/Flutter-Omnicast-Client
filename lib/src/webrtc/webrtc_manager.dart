@@ -7,7 +7,8 @@ import '../utils/omnicast_logger.dart';
 import 'webrtc_stats_monitor.dart';
 
 typedef OnLocalIceCandidateCallback = void Function(RTCIceCandidate candidate);
-typedef OnRemoteTrackCallback = void Function(MediaStreamTrack track, MediaStream stream);
+typedef OnRemoteTrackCallback =
+    void Function(MediaStreamTrack track, MediaStream stream);
 typedef OnIceRestartNeededCallback = void Function();
 
 /// Manages [RTCPeerConnection] initialization, simulcast/SVC transceivers,
@@ -35,17 +36,18 @@ class WebRTCManager {
   WebRTCManager({
     required this.mediaStreamManager,
     Map<String, dynamic>? configuration,
-  })  : rtcConfiguration = configuration ??
-            {
-              'iceServers': [
-                {'urls': 'stun:stun.l.google.com:19302'},
-                {'urls': 'stun:stun1.l.google.com:19302'},
-              ],
-              'sdpSemantics': 'unified-plan',
-              'iceTransportPolicy': 'all',
-              'bundlePolicy': 'max-bundle',
-              'rtcpMuxPolicy': 'require',
-            } {
+  }) : rtcConfiguration =
+           configuration ??
+           {
+             'iceServers': [
+               {'urls': 'stun:stun.l.google.com:19302'},
+               {'urls': 'stun:stun1.l.google.com:19302'},
+             ],
+             'sdpSemantics': 'unified-plan',
+             'iceTransportPolicy': 'all',
+             'bundlePolicy': 'max-bundle',
+             'rtcpMuxPolicy': 'require',
+           } {
     _statsMonitor = WebRTCStatsMonitor(
       getPeerConnection: () async => _peerConnection,
     );
@@ -80,7 +82,8 @@ class WebRTCManager {
 
     for (final pt in payloadTypes) {
       final rtpmap = lines.firstWhere(
-        (l) => l.toLowerCase().startsWith('a=rtpmap:$pt ${codec.toLowerCase()}'),
+        (l) =>
+            l.toLowerCase().startsWith('a=rtpmap:$pt ${codec.toLowerCase()}'),
         orElse: () => '',
       );
       if (rtpmap.isNotEmpty) {
@@ -92,13 +95,19 @@ class WebRTCManager {
 
     if (codecPayloads.isEmpty) return sdp;
 
-    lines[mVideoIndex] = '${header.join(' ')} ${codecPayloads.join(' ')} ${otherPayloads.join(' ')}';
+    lines[mVideoIndex] =
+        '${header.join(' ')} ${codecPayloads.join(' ')} ${otherPayloads.join(' ')}';
     return lines.join(delimiter);
   }
 
   /// Injects initial starting bitrate (500 kbps) and max bitrate constraints directly into SDP
   /// to eliminate the initial bandwidth burst and allow smooth TWCC ramp-up.
-  static String setInitialBitrate(String sdp, {int startKbps = 500, int minKbps = 150, int maxKbps = 600}) {
+  static String setInitialBitrate(
+    String sdp, {
+    int startKbps = 500,
+    int minKbps = 150,
+    int maxKbps = 600,
+  }) {
     if (sdp.isEmpty) return sdp;
     final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
     final lines = sdp.split(delimiter);
@@ -108,7 +117,8 @@ class WebRTCManager {
       final line = lines[i];
       if (line.startsWith('a=fmtp:')) {
         if (!line.contains('x-google-start-bitrate=')) {
-          lines[i] = '$line;x-google-start-bitrate=$startKbps;x-google-min-bitrate=$minKbps;x-google-max-bitrate=$maxKbps';
+          lines[i] =
+              '$line;x-google-start-bitrate=$startKbps;x-google-min-bitrate=$minKbps;x-google-max-bitrate=$maxKbps';
         }
       }
     }
@@ -126,7 +136,10 @@ class WebRTCManager {
 
     for (final line in lines) {
       if (line.toLowerCase().contains('opus/48000')) {
-        final match = RegExp(r'a=rtpmap:(\d+)\s+opus', caseSensitive: false).firstMatch(line);
+        final match = RegExp(
+          r'a=rtpmap:(\d+)\s+opus',
+          caseSensitive: false,
+        ).firstMatch(line);
         if (match != null) {
           opusPayloadTypes.add(match.group(1)!);
         }
@@ -159,10 +172,12 @@ class WebRTCManager {
 
     // Ensure WebRTC native engine ignores loopback interface and silences internal C++ logs
     try {
-      await WebRTC.initialize(options: {
-        'logSeverity': OmniCastLogger.enableLogging ? 'warning' : 'none',
-        'networkIgnoreMask': ['adapterTypeLoopback'],
-      });
+      await WebRTC.initialize(
+        options: {
+          'logSeverity': OmniCastLogger.enableLogging ? 'warning' : 'none',
+          'networkIgnoreMask': ['adapterTypeLoopback'],
+        },
+      );
     } catch (_) {}
 
     final pc = await createPeerConnection(rtcConfiguration);
@@ -172,7 +187,9 @@ class WebRTCManager {
       if (candidate.candidate != null && candidate.candidate!.isNotEmpty) {
         final c = candidate.candidate!.toLowerCase();
         // Ignore loopback candidates to eliminate invalid STUN ping failures
-        if (c.contains('127.0.0.') || c.contains('::1') || c.contains('.local')) {
+        if (c.contains('127.0.0.') ||
+            c.contains('::1') ||
+            c.contains('.local')) {
           return;
         }
         onLocalIceCandidate?.call(candidate);
@@ -185,17 +202,22 @@ class WebRTCManager {
         _iceDisconnectTimer?.cancel();
         // 1-2s seamless ICE restart window during WiFi <-> Cellular handoffs
         _iceDisconnectTimer = Timer(const Duration(milliseconds: 1500), () {
-          OmniCastLogger.log('[WebRTCManager] ICE disconnected for >1.5s -> Triggering seamless ICE Restart');
+          OmniCastLogger.log(
+            '[WebRTCManager] ICE disconnected for >1.5s -> Triggering seamless ICE Restart',
+          );
           onIceRestartNeeded?.call();
         });
-      } else if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
+      } else if (state ==
+              RTCIceConnectionState.RTCIceConnectionStateConnected ||
           state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
         _iceDisconnectTimer?.cancel();
         _iceDisconnectTimer = null;
       } else if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
         _iceDisconnectTimer?.cancel();
         _iceDisconnectTimer = null;
-        OmniCastLogger.log('[WebRTCManager] ICE Failed -> Triggering Immediate ICE Restart');
+        OmniCastLogger.log(
+          '[WebRTCManager] ICE Failed -> Triggering Immediate ICE Restart',
+        );
         onIceRestartNeeded?.call();
       }
     };
@@ -206,23 +228,29 @@ class WebRTCManager {
         _iceDisconnectTimer?.cancel();
         // 1.5s seamless ICE restart window
         _iceDisconnectTimer = Timer(const Duration(milliseconds: 1500), () {
-          OmniCastLogger.log('[WebRTCManager] Connection state disconnected for >1.5s -> Triggering seamless ICE Restart');
+          OmniCastLogger.log(
+            '[WebRTCManager] Connection state disconnected for >1.5s -> Triggering seamless ICE Restart',
+          );
           onIceRestartNeeded?.call();
         });
-      } else if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      } else if (state ==
+          RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
         _iceDisconnectTimer?.cancel();
         _iceDisconnectTimer = null;
       } else if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
         _iceDisconnectTimer?.cancel();
         _iceDisconnectTimer = null;
-        OmniCastLogger.log('[WebRTCManager] Connection state Failed -> Triggering Immediate ICE Restart');
+        OmniCastLogger.log(
+          '[WebRTCManager] Connection state Failed -> Triggering Immediate ICE Restart',
+        );
         onIceRestartNeeded?.call();
       }
     };
 
     pc.onTrack = (RTCTrackEvent event) {
       OmniCastLogger.log(
-          '[WebRTCManager] onTrack: kind=${event.track.kind}, streams=${event.streams.length}, id=${event.track.id}');
+        '[WebRTCManager] onTrack: kind=${event.track.kind}, streams=${event.streams.length}, id=${event.track.id}',
+      );
 
       // Force immediate zero-latency playout on incoming remote tracks (bypasses jitter buffer delay)
       try {
@@ -238,10 +266,12 @@ class WebRTCManager {
         final stream = event.streams.first;
         onRemoteTrack?.call(event.track, stream);
       } else {
-        createLocalMediaStream('stream_${event.track.id}').then((stream) {
-          stream.addTrack(event.track);
-          onRemoteTrack?.call(event.track, stream);
-        }).catchError((_) {});
+        createLocalMediaStream('stream_${event.track.id}')
+            .then((stream) {
+              stream.addTrack(event.track);
+              onRemoteTrack?.call(event.track, stream);
+            })
+            .catchError((_) {});
       }
     };
 
@@ -254,16 +284,12 @@ class WebRTCManager {
 
     await pc.addTransceiver(
       kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-      init: RTCRtpTransceiverInit(
-        direction: TransceiverDirection.RecvOnly,
-      ),
+      init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
     );
 
     await pc.addTransceiver(
       kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-      init: RTCRtpTransceiverInit(
-        direction: TransceiverDirection.RecvOnly,
-      ),
+      init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
     );
   }
 
@@ -300,12 +326,18 @@ class WebRTCManager {
         );
         final capabilities = await getRtpSenderCapabilities('video');
         if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
-          final sortedCodecs = List<RTCRtpCodecCapability>.from(capabilities.codecs!);
+          final sortedCodecs = List<RTCRtpCodecCapability>.from(
+            capabilities.codecs!,
+          );
           sortedCodecs.sort((a, b) {
             final mimeA = a.mimeType.toLowerCase();
             final mimeB = b.mimeType.toLowerCase();
-            int scoreA = mimeA.contains('vp8') ? 0 : (mimeA.contains('vp9') ? 1 : 2);
-            int scoreB = mimeB.contains('vp8') ? 0 : (mimeB.contains('vp9') ? 1 : 2);
+            int scoreA = mimeA.contains('vp8')
+                ? 0
+                : (mimeA.contains('vp9') ? 1 : 2);
+            int scoreB = mimeB.contains('vp8')
+                ? 0
+                : (mimeB.contains('vp9') ? 1 : 2);
             return scoreA.compareTo(scoreB);
           });
           await videoTransceiver.setCodecPreferences(sortedCodecs);
@@ -325,7 +357,8 @@ class WebRTCManager {
         videoSender ??= _videoSender;
         if (videoSender != null) {
           final params = videoSender.parameters;
-          params.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
+          params.degradationPreference =
+              RTCDegradationPreference.MAINTAIN_FRAMERATE;
           if (params.encodings != null && params.encodings!.isNotEmpty) {
             params.encodings![0].maxBitrate = 600000;
             params.encodings![0].minBitrate = 150000;
@@ -333,10 +366,14 @@ class WebRTCManager {
             params.encodings![0].scalabilityMode = 'L1T3';
           }
           await videoSender.setParameters(params);
-          OmniCastLogger.log('[WebRTCManager] Configured clean VP8 video track with maxBitrate: 600 kbps');
+          OmniCastLogger.log(
+            '[WebRTCManager] Configured clean VP8 video track with maxBitrate: 600 kbps',
+          );
         }
       } catch (e) {
-        OmniCastLogger.error('[WebRTCManager] Set single-stream parameters notice: $e');
+        OmniCastLogger.error(
+          '[WebRTCManager] Set single-stream parameters notice: $e',
+        );
       }
     }
   }
@@ -358,7 +395,9 @@ class WebRTCManager {
           }
         }
       } catch (e) {
-        OmniCastLogger.error('[WebRTCManager] Error setting sender track enabled: $e');
+        OmniCastLogger.error(
+          '[WebRTCManager] Error setting sender track enabled: $e',
+        );
       }
     }
   }
@@ -376,7 +415,9 @@ class WebRTCManager {
         if (encoding.rid == rid && encoding.active != active) {
           encoding.active = active;
           updated = true;
-          OmniCastLogger.log('[WebRTCManager Dynacast] Set layer $rid active=$active');
+          OmniCastLogger.log(
+            '[WebRTCManager Dynacast] Set layer $rid active=$active',
+          );
         }
       }
 
@@ -384,7 +425,9 @@ class WebRTCManager {
         await _videoSender!.setParameters(params);
       }
     } catch (e) {
-      OmniCastLogger.error('[WebRTCManager Dynacast] Error setting layer active: $e');
+      OmniCastLogger.error(
+        '[WebRTCManager Dynacast] Error setting layer active: $e',
+      );
     }
   }
 
@@ -393,23 +436,31 @@ class WebRTCManager {
     if (_peerConnection == null) return;
     try {
       final senders = await _peerConnection!.getSenders();
-      final videoSenders = senders.where((s) => s.track?.kind == 'video' || s == _videoSender);
+      final videoSenders = senders.where(
+        (s) => s.track?.kind == 'video' || s == _videoSender,
+      );
       for (final sender in videoSenders) {
         final parameters = sender.parameters;
         if (parameters.encodings != null && parameters.encodings!.isNotEmpty) {
           for (final encoding in parameters.encodings!) {
             encoding.maxBitrate = maxBitrate;
-            if (encoding.minBitrate != null && encoding.minBitrate! > maxBitrate) {
+            if (encoding.minBitrate != null &&
+                encoding.minBitrate! > maxBitrate) {
               encoding.minBitrate = maxBitrate ~/ 2;
             }
           }
-          parameters.degradationPreference = RTCDegradationPreference.MAINTAIN_FRAMERATE;
+          parameters.degradationPreference =
+              RTCDegradationPreference.MAINTAIN_FRAMERATE;
           await sender.setParameters(parameters);
-          OmniCastLogger.log('[WebRTCManager] Enforced maxVideoBitrate: $maxBitrate bps on sender');
+          OmniCastLogger.log(
+            '[WebRTCManager] Enforced maxVideoBitrate: $maxBitrate bps on sender',
+          );
         }
       }
     } catch (e) {
-      OmniCastLogger.error('[WebRTCManager] Error enforcing max video bitrate: $e');
+      OmniCastLogger.error(
+        '[WebRTCManager] Error enforcing max video bitrate: $e',
+      );
     }
   }
 
@@ -432,9 +483,17 @@ class WebRTCManager {
     try {
       final offer = await pc.createOffer(constraints);
       var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
+      processedSdp = setInitialBitrate(
+        processedSdp,
+        startKbps: 500,
+        minKbps: 150,
+        maxKbps: 600,
+      );
       processedSdp = enableOpusDtx(processedSdp);
-      final mungedOffer = RTCSessionDescription(processedSdp, offer.type ?? 'offer');
+      final mungedOffer = RTCSessionDescription(
+        processedSdp,
+        offer.type ?? 'offer',
+      );
       await pc.setLocalDescription(mungedOffer);
       return mungedOffer;
     } finally {
@@ -459,9 +518,17 @@ class WebRTCManager {
     try {
       final offer = await pc.createOffer(constraints);
       var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-      processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
+      processedSdp = setInitialBitrate(
+        processedSdp,
+        startKbps: 500,
+        minKbps: 150,
+        maxKbps: 600,
+      );
       processedSdp = enableOpusDtx(processedSdp);
-      final mungedOffer = RTCSessionDescription(processedSdp, offer.type ?? 'offer');
+      final mungedOffer = RTCSessionDescription(
+        processedSdp,
+        offer.type ?? 'offer',
+      );
       await pc.setLocalDescription(mungedOffer);
       return mungedOffer;
     } finally {
@@ -515,12 +582,16 @@ class WebRTCManager {
   /// Handles a remote SDP Answer received from the signaling server.
   Future<void> handleRemoteAnswer(dynamic rawSdp) async {
     if (_peerConnection == null) {
-      throw StateError('Cannot handle remote answer without an active PeerConnection');
+      throw StateError(
+        'Cannot handle remote answer without an active PeerConnection',
+      );
     }
 
     final sdp = sanitizeSdp(rawSdp);
     if (sdp.isEmpty) {
-      OmniCastLogger.error('[WebRTCManager] handleRemoteAnswer received empty SDP');
+      OmniCastLogger.error(
+        '[WebRTCManager] handleRemoteAnswer received empty SDP',
+      );
       return;
     }
 
@@ -530,10 +601,14 @@ class WebRTCManager {
   }
 
   /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
-  Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(dynamic rawSdp) async {
+  Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(
+    dynamic rawSdp,
+  ) async {
     final sdp = sanitizeSdp(rawSdp);
     if (sdp.isEmpty) {
-      throw ArgumentError('Cannot handle remote offer with empty or invalid SDP: $rawSdp');
+      throw ArgumentError(
+        'Cannot handle remote offer with empty or invalid SDP: $rawSdp',
+      );
     }
 
     final pc = await initializePeerConnection();
@@ -544,9 +619,13 @@ class WebRTCManager {
     if (state == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
       try {
         await pc.setLocalDescription(RTCSessionDescription('', 'rollback'));
-        OmniCastLogger.log('[WebRTCManager] Successfully rolled back local offer on collision');
+        OmniCastLogger.log(
+          '[WebRTCManager] Successfully rolled back local offer on collision',
+        );
       } catch (e) {
-        OmniCastLogger.log('[WebRTCManager] Rollback attempt on offer collision: $e');
+        OmniCastLogger.log(
+          '[WebRTCManager] Rollback attempt on offer collision: $e',
+        );
       }
     }
 
@@ -556,9 +635,17 @@ class WebRTCManager {
 
     final answer = await pc.createAnswer({});
     var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
-    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
+    processedSdp = setInitialBitrate(
+      processedSdp,
+      startKbps: 500,
+      minKbps: 150,
+      maxKbps: 600,
+    );
     processedSdp = enableOpusDtx(processedSdp);
-    final mungedAnswer = RTCSessionDescription(processedSdp, answer.type ?? 'answer');
+    final mungedAnswer = RTCSessionDescription(
+      processedSdp,
+      answer.type ?? 'answer',
+    );
     await pc.setLocalDescription(mungedAnswer);
 
     return mungedAnswer;
@@ -572,7 +659,9 @@ class WebRTCManager {
     VideoParameters? parameters,
   }) async {
     if (_peerConnection == null) {
-      throw StateError('Cannot upgrade to co-host without an active PeerConnection');
+      throw StateError(
+        'Cannot upgrade to co-host without an active PeerConnection',
+      );
     }
 
     // 1. Capture local camera/microphone
@@ -588,9 +677,17 @@ class WebRTCManager {
     // 3. Create renegotiation offer with VP8 and Opus DTX preference
     final offer = await _peerConnection!.createOffer({});
     var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-    processedSdp = setInitialBitrate(processedSdp, startKbps: 500, minKbps: 150, maxKbps: 600);
+    processedSdp = setInitialBitrate(
+      processedSdp,
+      startKbps: 500,
+      minKbps: 150,
+      maxKbps: 600,
+    );
     processedSdp = enableOpusDtx(processedSdp);
-    final mungedOffer = RTCSessionDescription(processedSdp, offer.type ?? 'offer');
+    final mungedOffer = RTCSessionDescription(
+      processedSdp,
+      offer.type ?? 'offer',
+    );
     await _peerConnection!.setLocalDescription(mungedOffer);
 
     return mungedOffer;
@@ -672,10 +769,16 @@ class WebRTCManager {
     _iceDisconnectTimer = null;
     if (_peerConnection != null) {
       try {
-        await _peerConnection!.close().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+        await _peerConnection!.close().timeout(
+          const Duration(milliseconds: 250),
+          onTimeout: () {},
+        );
       } catch (_) {}
       try {
-        await _peerConnection!.dispose().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+        await _peerConnection!.dispose().timeout(
+          const Duration(milliseconds: 250),
+          onTimeout: () {},
+        );
       } catch (_) {}
       _peerConnection = null;
     }

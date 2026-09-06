@@ -31,11 +31,19 @@ class MediaController with WidgetsBindingObserver {
   bool _wasCameraEnabledBeforePause = false;
 
   // Granular ValueNotifiers for headless UI reactivity
-  final ValueNotifier<bool> isMicrophoneMutedNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> isMicrophoneMutedNotifier = ValueNotifier<bool>(
+    false,
+  );
   final ValueNotifier<bool> isCameraEnabledNotifier = ValueNotifier<bool>(true);
-  final ValueNotifier<String> simulcastLayerNotifier = ValueNotifier<String>('f');
-  final ValueNotifier<bool> isHostCameraOffNotifier = ValueNotifier<bool>(false);
-  final ValueNotifier<bool> isHostMicrophoneMutedNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<String> simulcastLayerNotifier = ValueNotifier<String>(
+    'f',
+  );
+  final ValueNotifier<bool> isHostCameraOffNotifier = ValueNotifier<bool>(
+    false,
+  );
+  final ValueNotifier<bool> isHostMicrophoneMutedNotifier = ValueNotifier<bool>(
+    false,
+  );
 
   /// Callback triggered when remote host changes their audio/video state.
   void Function(String type, bool isMuted)? onHostMediaStateChanged;
@@ -51,13 +59,14 @@ class MediaController with WidgetsBindingObserver {
     GlobalMediaConfig? globalConfig,
     OmniCastConfig? config,
     bool autoPauseOnBackground = true,
-  })  : _mediaStreamManager = mediaStreamManager,
-        _signalingClient = signalingClient,
-        _webRTCManager = webRTCManager,
-        _roomState = roomState,
-        _globalConfig = globalConfig ?? const GlobalMediaConfig(),
-        _config = config,
-        _autoPauseOnBackground = globalConfig?.autoPauseOnBackground ?? autoPauseOnBackground {
+  }) : _mediaStreamManager = mediaStreamManager,
+       _signalingClient = signalingClient,
+       _webRTCManager = webRTCManager,
+       _roomState = roomState,
+       _globalConfig = globalConfig ?? const GlobalMediaConfig(),
+       _config = config,
+       _autoPauseOnBackground =
+           globalConfig?.autoPauseOnBackground ?? autoPauseOnBackground {
     _adaptiveStreamingEnabled = _globalConfig.enableAdaptiveStreaming;
     _dynacastEnabled = _globalConfig.enableDynacast;
     _audioLevelDetector = AudioLevelDetector(webRTCManager: _webRTCManager);
@@ -77,19 +86,26 @@ class MediaController with WidgetsBindingObserver {
   WebRTCManager get webRTCManager => _webRTCManager;
   GlobalMediaConfig get globalConfig => _globalConfig;
   AudioLevelDetector get audioDetector => _audioLevelDetector;
-  ValueNotifier<Map<String, double>> get audioLevelsNotifier => _audioLevelDetector.audioLevelsNotifier;
-  ValueNotifier<String?> get activeSpeakerNotifier => _audioLevelDetector.activeSpeakerNotifier;
+  ValueNotifier<Map<String, double>> get audioLevelsNotifier =>
+      _audioLevelDetector.audioLevelsNotifier;
+  ValueNotifier<String?> get activeSpeakerNotifier =>
+      _audioLevelDetector.activeSpeakerNotifier;
   RTCVideoRenderer? get localRenderer => _mediaStreamManager.localRenderer;
-  Future<RTCVideoRenderer> initLocalRenderer() => _mediaStreamManager.initLocalRenderer();
+  Future<RTCVideoRenderer> initLocalRenderer() =>
+      _mediaStreamManager.initLocalRenderer();
   RTCVideoRenderer? getRenderer(String? userId) {
     if (userId == null || userId == 'local' || userId == _roomState.userId) {
       return _mediaStreamManager.localRenderer;
     }
     return _mediaStreamManager.getRenderer(userId);
   }
-  Map<String, RTCVideoRenderer> get remoteRenderers => _mediaStreamManager.remoteRenderers;
-  Map<String, MediaStream> get remoteStreams => _mediaStreamManager.remoteStreams;
-  VideoParameters get currentParameters => _mediaStreamManager.currentParameters;
+
+  Map<String, RTCVideoRenderer> get remoteRenderers =>
+      _mediaStreamManager.remoteRenderers;
+  Map<String, MediaStream> get remoteStreams =>
+      _mediaStreamManager.remoteStreams;
+  VideoParameters get currentParameters =>
+      _mediaStreamManager.currentParameters;
   bool get isMicrophoneMuted => isMicrophoneMutedNotifier.value;
   bool get isCameraEnabled => isCameraEnabledNotifier.value;
   bool get adaptiveStreamingEnabled => _adaptiveStreamingEnabled;
@@ -107,16 +123,21 @@ class MediaController with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!_autoPauseOnBackground || _roomState.isAudioOnly) return;
 
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       if (isCameraEnabled) {
         _wasCameraEnabledBeforePause = true;
-        OmniCastLogger.log('[MediaController Lifecycle] App paused -> Pausing local camera');
+        OmniCastLogger.log(
+          '[MediaController Lifecycle] App paused -> Pausing local camera',
+        );
         setCameraEnabled(false);
       }
     } else if (state == AppLifecycleState.resumed) {
       if (_wasCameraEnabledBeforePause) {
         _wasCameraEnabledBeforePause = false;
-        OmniCastLogger.log('[MediaController Lifecycle] App resumed -> Resuming local camera');
+        OmniCastLogger.log(
+          '[MediaController Lifecycle] App resumed -> Resuming local camera',
+        );
         setCameraEnabled(true);
       }
     }
@@ -127,10 +148,12 @@ class MediaController with WidgetsBindingObserver {
     _dynacastSubscription = _signalingClient.onMessage.listen((msg) {
       if (!_dynacastEnabled || _roomState.isAudioOnly) return;
 
-      if (msg.event == 'dynacast_layer_update' || msg.event == 'publisher_layers_update') {
+      if (msg.event == 'dynacast_layer_update' ||
+          msg.event == 'publisher_layers_update') {
         if (msg.payload is Map<String, dynamic>) {
           final payload = msg.payload as Map<String, dynamic>;
-          final subscribedLayers = payload['subscribed_layers'] as List<dynamic>? ?? [];
+          final subscribedLayers =
+              payload['subscribed_layers'] as List<dynamic>? ?? [];
 
           final hasFullSubscribers = subscribedLayers.contains('f');
           final hasHalfSubscribers = subscribedLayers.contains('h');
@@ -138,7 +161,10 @@ class MediaController with WidgetsBindingObserver {
 
           _webRTCManager.setPublisherLayerActive('f', hasFullSubscribers);
           _webRTCManager.setPublisherLayerActive('h', hasHalfSubscribers);
-          _webRTCManager.setPublisherLayerActive('q', hasQuarterSubscribers || !hasFullSubscribers && !hasHalfSubscribers);
+          _webRTCManager.setPublisherLayerActive(
+            'q',
+            hasQuarterSubscribers || !hasFullSubscribers && !hasHalfSubscribers,
+          );
         }
       }
     });
@@ -172,16 +198,17 @@ class MediaController with WidgetsBindingObserver {
     final effectiveToken = (token != null && token.isNotEmpty)
         ? token
         : (_config?.generateToken(
-              roomId: roomId,
-              userId: userId,
-              role: 'host',
-              metadata: metadata,
-            ) ??
-            '');
+                roomId: roomId,
+                userId: userId,
+                role: 'host',
+                metadata: metadata,
+              ) ??
+              '');
 
     final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
     if (wsUrl != null) {
-      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
+      if (!_signalingClient.isConnected ||
+          _signalingClient.token != effectiveToken) {
         await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
       }
     }
@@ -190,7 +217,9 @@ class MediaController with WidgetsBindingObserver {
     final isAudioOnly = roomType == RoomType.audio || _roomState.isAudioOnly;
 
     final params = videoParameters ?? _globalConfig.defaultResolution;
-    final simulcast = isAudioOnly ? false : (enableSimulcast ?? _globalConfig.enableSimulcast);
+    final simulcast = isAudioOnly
+        ? false
+        : (enableSimulcast ?? _globalConfig.enableSimulcast);
 
     // Automated Track Disabling: Enforce video: false in getUserMedia constraints for audio-only
     await _mediaStreamManager.openUserMedia(
@@ -201,25 +230,25 @@ class MediaController with WidgetsBindingObserver {
 
     isCameraEnabledNotifier.value = !isAudioOnly;
 
-    await _webRTCManager.addLocalMediaTracks(
-      enableSimulcast: simulcast,
-    );
+    await _webRTCManager.addLocalMediaTracks(enableSimulcast: simulcast);
 
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.publish,
-      roomId: roomId,
-      userId: userId,
-      payload: {
-        'token': effectiveToken,
-        'sdp': offer.sdp,
-        'type': offer.type,
-        'room_type': roomType.name,
-        'simulcast': simulcast,
-        'metadata': ?metadata,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.publish,
+        roomId: roomId,
+        userId: userId,
+        payload: {
+          'token': effectiveToken,
+          'sdp': offer.sdp,
+          'type': offer.type,
+          'room_type': roomType.name,
+          'simulcast': simulcast,
+          'metadata': ?metadata,
+        },
+      ),
+    );
   }
 
   /// Toggles or sets microphone mute state (Host/Co-host control).
@@ -238,18 +267,20 @@ class MediaController with WidgetsBindingObserver {
     }
 
     if (_roomState.isInRoom && _signalingClient.isConnected) {
-      _signalingClient.send(SignalingMessage(
-        event: 'media_state_changed',
-        roomId: _roomState.roomId ?? '',
-        userId: _roomState.userId ?? '',
-        payload: {
-          'type': 'audio',
-          'kind': 'audio',
-          'muted': muted,
-          'is_muted': muted,
-          'audio_muted': muted,
-        },
-      ));
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'media_state_changed',
+          roomId: _roomState.roomId ?? '',
+          userId: _roomState.userId ?? '',
+          payload: {
+            'type': 'audio',
+            'kind': 'audio',
+            'muted': muted,
+            'is_muted': muted,
+            'audio_muted': muted,
+          },
+        ),
+      );
     }
   }
 
@@ -263,43 +294,57 @@ class MediaController with WidgetsBindingObserver {
     isCameraEnabledNotifier.value = enabled;
 
     if (_roomState.userId != null) {
-      _roomState.updateUserMediaState(_roomState.userId!, isCameraOff: !enabled);
+      _roomState.updateUserMediaState(
+        _roomState.userId!,
+        isCameraOff: !enabled,
+      );
     }
 
     if (_roomState.isInRoom && _signalingClient.isConnected) {
-      _signalingClient.send(SignalingMessage(
-        event: 'media_state_changed',
-        roomId: _roomState.roomId ?? '',
-        userId: _roomState.userId ?? '',
-        payload: {
-          'type': 'video',
-          'kind': 'video',
-          'muted': !enabled,
-          'video_muted': !enabled,
-          'camera_off': !enabled,
-          'is_camera_off': !enabled,
-          'enabled': enabled,
-        },
-      ));
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'media_state_changed',
+          roomId: _roomState.roomId ?? '',
+          userId: _roomState.userId ?? '',
+          payload: {
+            'type': 'video',
+            'kind': 'video',
+            'muted': !enabled,
+            'video_muted': !enabled,
+            'camera_off': !enabled,
+            'is_camera_off': !enabled,
+            'enabled': enabled,
+          },
+        ),
+      );
     }
   }
 
   /// Listens for remote media state change events from the host/co-hosts.
   void _bindMediaStateSignaling() {
-    _mediaStateSubscription = _signalingClient.onMediaStateChanged.listen((msg) {
+    _mediaStateSubscription = _signalingClient.onMediaStateChanged.listen((
+      msg,
+    ) {
       final payload = msg.payload;
-      final targetUserId = msg.userId.isNotEmpty ? msg.userId : (msg.targetUser ?? '');
+      final targetUserId = msg.userId.isNotEmpty
+          ? msg.userId
+          : (msg.targetUser ?? '');
 
       if (payload is Map<String, dynamic>) {
-        final type = payload['type'] as String? ?? payload['kind'] as String? ?? '';
-        final isMuted = (payload['muted'] as bool?) ??
+        final type =
+            payload['type'] as String? ?? payload['kind'] as String? ?? '';
+        final isMuted =
+            (payload['muted'] as bool?) ??
             (payload['is_muted'] as bool?) ??
             (payload['audio_muted'] as bool?) ??
             false;
-        final isCameraOff = (payload['camera_off'] as bool?) ??
+        final isCameraOff =
+            (payload['camera_off'] as bool?) ??
             (payload['is_camera_off'] as bool?) ??
             (payload['video_muted'] as bool?) ??
-            (payload['enabled'] is bool ? !(payload['enabled'] as bool) : null) ??
+            (payload['enabled'] is bool
+                ? !(payload['enabled'] as bool)
+                : null) ??
             (type == 'video' ? isMuted : false);
 
         // If the host force-muted or disabled the camera of this local user
@@ -317,12 +362,22 @@ class MediaController with WidgetsBindingObserver {
 
         // Synchronize remote media stream tracks to immediately mute sound or disable video frames
         if (type == 'audio') {
-          _mediaStreamManager.setRemoteTrackEnabled(targetUserId.isNotEmpty ? targetUserId : null, 'audio', !isMuted);
+          _mediaStreamManager.setRemoteTrackEnabled(
+            targetUserId.isNotEmpty ? targetUserId : null,
+            'audio',
+            !isMuted,
+          );
         } else if (type == 'video') {
-          _mediaStreamManager.setRemoteTrackEnabled(targetUserId.isNotEmpty ? targetUserId : null, 'video', !isCameraOff);
+          _mediaStreamManager.setRemoteTrackEnabled(
+            targetUserId.isNotEmpty ? targetUserId : null,
+            'video',
+            !isCameraOff,
+          );
         }
 
-        if (targetUserId == _roomState.hostId || targetUserId.isEmpty || _roomState.hostId == null) {
+        if (targetUserId == _roomState.hostId ||
+            targetUserId.isEmpty ||
+            _roomState.hostId == null) {
           if (type == 'video') {
             isHostCameraOffNotifier.value = isCameraOff;
           } else if (type == 'audio') {
@@ -332,7 +387,10 @@ class MediaController with WidgetsBindingObserver {
 
         if (targetUserId.isNotEmpty) {
           if (type == 'video') {
-            _roomState.updateUserMediaState(targetUserId, isCameraOff: isCameraOff);
+            _roomState.updateUserMediaState(
+              targetUserId,
+              isCameraOff: isCameraOff,
+            );
           } else if (type == 'audio') {
             _roomState.updateUserMediaState(targetUserId, isMuted: isMuted);
           } else {
@@ -365,17 +423,19 @@ class MediaController with WidgetsBindingObserver {
       _ => 'f',
     };
     simulcastLayerNotifier.value = normalized;
-    _signalingClient.send(SignalingMessage(
-      event: 'request_layer',
-      roomId: _roomState.roomId ?? '',
-      userId: _roomState.userId ?? '',
-      targetUser: targetUserId,
-      payload: {
-        'layer': normalized,
-        'rid': normalized,
-        'target_user': targetUserId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'request_layer',
+        roomId: _roomState.roomId ?? '',
+        userId: _roomState.userId ?? '',
+        targetUser: targetUserId,
+        payload: {
+          'layer': normalized,
+          'rid': normalized,
+          'target_user': targetUserId,
+        },
+      ),
+    );
   }
 
   /// Enables or disables adaptive streaming bandwidth management for viewers.
@@ -394,7 +454,10 @@ class MediaController with WidgetsBindingObserver {
   }
 
   /// Requests a specific simulcast layer from the SFU for a given remote peer.
-  void requestLayerForUser({required String targetUserId, required String layer}) {
+  void requestLayerForUser({
+    required String targetUserId,
+    required String layer,
+  }) {
     if (_roomState.isAudioOnly) return;
     final normalized = switch (layer.toLowerCase()) {
       'f' || 'high' => 'f',
@@ -403,44 +466,57 @@ class MediaController with WidgetsBindingObserver {
       _ => 'f',
     };
 
-    _signalingClient.send(SignalingMessage(
-      event: 'request_layer',
-      roomId: _roomState.roomId ?? '',
-      userId: _roomState.userId ?? '',
-      targetUser: targetUserId,
-      payload: {
-        'layer': normalized,
-        'rid': normalized,
-        'target_user': targetUserId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'request_layer',
+        roomId: _roomState.roomId ?? '',
+        userId: _roomState.userId ?? '',
+        targetUser: targetUserId,
+        payload: {
+          'layer': normalized,
+          'rid': normalized,
+          'target_user': targetUserId,
+        },
+      ),
+    );
   }
 
   /// Requests the SFU to dynamically pause/resume a remote peer's video track and configure viewport dimension.
-  void setRemoteTrackVisibility(String targetUserId, bool isVisible, {int width = 0, int height = 0}) {
+  void setRemoteTrackVisibility(
+    String targetUserId,
+    bool isVisible, {
+    int width = 0,
+    int height = 0,
+  }) {
     if (!_dynacastEnabled || _roomState.isAudioOnly) return;
     final rId = _roomState.roomId ?? '';
     final uId = _roomState.userId ?? '';
 
-    _signalingClient.send(SignalingMessage(
-      event: 'set_viewport',
-      roomId: rId,
-      userId: uId,
-      targetUser: targetUserId,
-      payload: {
-        'target_user': targetUserId,
-        'visible': isVisible,
-        'width': width,
-        'height': height,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'set_viewport',
+        roomId: rId,
+        userId: uId,
+        targetUser: targetUserId,
+        payload: {
+          'target_user': targetUserId,
+          'visible': isVisible,
+          'width': width,
+          'height': height,
+        },
+      ),
+    );
 
-    _signalingClient.send(SignalingMessage(
-      event: isVisible ? SignalingEvents.trackResume : SignalingEvents.trackPause,
-      roomId: rId,
-      userId: uId,
-      targetUser: targetUserId,
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: isVisible
+            ? SignalingEvents.trackResume
+            : SignalingEvents.trackPause,
+        roomId: rId,
+        userId: uId,
+        targetUser: targetUserId,
+      ),
+    );
   }
 
   /// Explicitly requests an ICE restart for seamless network handoff or recovery.
@@ -448,32 +524,41 @@ class MediaController with WidgetsBindingObserver {
     if (!_roomState.isInRoom || !_signalingClient.isConnected) return;
     try {
       final restartOffer = await _webRTCManager.createIceRestartOffer();
-      final eventName = _roomState.isHost ? SignalingEvents.createRoom : SignalingEvents.joinRoom;
-      _signalingClient.send(SignalingMessage(
-        event: eventName,
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-        payload: {
-          'token': _signalingClient.token,
-          'sdp': restartOffer.sdp,
-          'type': restartOffer.type,
-          'ice_restart': true,
-          'reconnect': true,
-        },
-      ));
+      final eventName = _roomState.isHost
+          ? SignalingEvents.createRoom
+          : SignalingEvents.joinRoom;
+      _signalingClient.send(
+        SignalingMessage(
+          event: eventName,
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          payload: {
+            'token': _signalingClient.token,
+            'sdp': restartOffer.sdp,
+            'type': restartOffer.type,
+            'ice_restart': true,
+            'reconnect': true,
+          },
+        ),
+      );
     } catch (e) {
-      _signalingClient.send(SignalingMessage(
-        event: 'ice_restart',
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-      ));
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'ice_restart',
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+        ),
+      );
     }
   }
 
   /// Built-in hardware permission requester for Camera and Microphone.
   ///
   /// Automatically prompts the operating system (Android & iOS) to grant camera and audio access.
-  Future<bool> requestPermissions({bool camera = true, bool microphone = true}) async {
+  Future<bool> requestPermissions({
+    bool camera = true,
+    bool microphone = true,
+  }) async {
     try {
       final permissions = <Permission>[];
       if (camera) permissions.add(Permission.camera);
@@ -489,9 +574,12 @@ class MediaController with WidgetsBindingObserver {
         video: camera,
         audio: microphone,
       );
-      return stream.getVideoTracks().isNotEmpty || stream.getAudioTracks().isNotEmpty;
+      return stream.getVideoTracks().isNotEmpty ||
+          stream.getAudioTracks().isNotEmpty;
     } catch (e) {
-      OmniCastLogger.error('[MediaController] Permission or media access failed: $e');
+      OmniCastLogger.error(
+        '[MediaController] Permission or media access failed: $e',
+      );
       return false;
     }
   }

@@ -33,10 +33,17 @@ class RoomState extends ChangeNotifier {
   PKBattleInfo? _activePK;
 
   // Native Reactive ValueNotifiers for headless UI canvas binding
-  final ValueNotifier<RoomMode> roomModeNotifier = ValueNotifier<RoomMode>(RoomMode.solo);
-  final ValueNotifier<PkScore> pkScoreNotifier = ValueNotifier<PkScore>(const PkScore());
-  final ValueNotifier<bool> showJoinMessagesNotifier = ValueNotifier<bool>(true);
-  final ValueNotifier<List<StageSeat>> activeSeatsNotifier = ValueNotifier<List<StageSeat>>(const []);
+  final ValueNotifier<RoomMode> roomModeNotifier = ValueNotifier<RoomMode>(
+    RoomMode.solo,
+  );
+  final ValueNotifier<PkScore> pkScoreNotifier = ValueNotifier<PkScore>(
+    const PkScore(),
+  );
+  final ValueNotifier<bool> showJoinMessagesNotifier = ValueNotifier<bool>(
+    true,
+  );
+  final ValueNotifier<List<StageSeat>> activeSeatsNotifier =
+      ValueNotifier<List<StageSeat>>(const []);
   final ValueNotifier<int> occupiedSeatsCountNotifier = ValueNotifier<int>(0);
 
   bool _isDisposed = false;
@@ -75,8 +82,8 @@ class RoomState extends ChangeNotifier {
   /// Defaults to [_hostId] if no specific co-host is pinned.
   String? get mainSeatUserId =>
       (_pinnedStageUserId != null && _pinnedStageUserId!.isNotEmpty)
-          ? _pinnedStageUserId
-          : _hostId;
+      ? _pinnedStageUserId
+      : _hostId;
 
   /// Returns whether the Host is currently occupying the Main Seat.
   bool get isHostInMainSeat =>
@@ -86,7 +93,8 @@ class RoomState extends ChangeNotifier {
 
   List<Participant> get viewers => List.unmodifiable(_viewers);
   List<StageSeat> get activeSeats => List.unmodifiable(_activeSeats);
-  List<StageSeat> get occupiedSeats => _activeSeats.where((s) => s.isOccupied).toList();
+  List<StageSeat> get occupiedSeats =>
+      _activeSeats.where((s) => s.isOccupied).toList();
   int get occupiedSeatsCount => _activeSeats.where((s) => s.isOccupied).length;
   Set<String> get activeRemoteUserIds => Set.unmodifiable(_activeRemoteUserIds);
   List<ChatMessage> get chatHistory => List.unmodifiable(_chatHistory);
@@ -95,8 +103,10 @@ class RoomState extends ChangeNotifier {
       List.unmodifiable(_pendingSeatRequests);
   List<SeatRequest> get waitingList => List.unmodifiable(_pendingSeatRequests);
   List<CoHostInvite> get pendingInvites => List.unmodifiable(_pendingInvites);
-  Map<String, bool> get userAudioMuteStates => Map.unmodifiable(_userAudioMuteStates);
-  Map<String, bool> get userCameraOffStates => Map.unmodifiable(_userCameraOffStates);
+  Map<String, bool> get userAudioMuteStates =>
+      Map.unmodifiable(_userAudioMuteStates);
+  Map<String, bool> get userCameraOffStates =>
+      Map.unmodifiable(_userCameraOffStates);
 
   /// Returns the [StageSeat] at [seatIndex] (1-indexed or 0-indexed as provided), or null if not found.
   StageSeat? getSeat(int seatIndex) {
@@ -151,6 +161,7 @@ class RoomState extends ChangeNotifier {
     _role = role;
     _roomType = roomType;
     _hostId = hostId ?? (role == UserRole.host ? userId : null);
+    _pinnedStageUserId = null;
     notifyListeners();
   }
 
@@ -178,30 +189,40 @@ class RoomState extends ChangeNotifier {
   /// Synchronizes full room info on join or late-join (`room_info_sync`).
   void syncRoomInfo(Map<String, dynamic> data) {
     _roomId = data['room_id'] as String? ?? _roomId;
-    _hostId = data['host_id'] as String? ?? _hostId;
+    final host = data['host_id'] as String?;
+    if (host != null && host.isNotEmpty) {
+      _hostId = host;
+    }
     final typeStr = data['room_type'] as String?;
     if (typeStr != null) {
-      _roomType = typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video;
+      _roomType = typeStr.toLowerCase() == 'audio'
+          ? RoomType.audio
+          : RoomType.video;
     }
-    _viewersCount = (data['viewers_count'] as num?)?.toInt() ??
+    _viewersCount =
+        (data['viewers_count'] as num?)?.toInt() ??
         (data['viewer_count'] as num?)?.toInt() ??
         (data['total_viewers'] as num?)?.toInt() ??
         (data['count'] as num?)?.toInt() ??
         _viewersCount;
-    _hostCoinBalance = (data['host_coin_balance'] as num?)?.toInt() ??
+    _hostCoinBalance =
+        (data['host_coin_balance'] as num?)?.toInt() ??
         (data['host_coins'] as num?)?.toInt() ??
         (data['host_score'] as num?)?.toInt() ??
         _hostCoinBalance;
     final mainSeat = data['main_seat_id'] as String?;
     final pinned = data['pinned_user_id'] as String?;
-    if (pinned != null) {
-      _pinnedStageUserId = pinned.isNotEmpty ? pinned : null;
-    } else if (mainSeat != null) {
-      _pinnedStageUserId = (mainSeat.isNotEmpty && mainSeat != _hostId) ? mainSeat : null;
+    if (pinned != null && pinned.isNotEmpty && pinned != _hostId) {
+      _pinnedStageUserId = pinned;
+    } else if (mainSeat != null && mainSeat.isNotEmpty && mainSeat != _hostId) {
+      _pinnedStageUserId = mainSeat;
+    } else {
+      _pinnedStageUserId = null;
     }
 
     // Populate active users/viewers from viewers, viewers_list, or participants
-    final viewersData = data['viewers'] ?? data['viewers_list'] ?? data['participants'];
+    final viewersData =
+        data['viewers'] ?? data['viewers_list'] ?? data['participants'];
     if (viewersData is List) {
       _viewers.clear();
       for (final item in viewersData) {
@@ -210,12 +231,14 @@ class RoomState extends ChangeNotifier {
         } else if (item is Map) {
           _viewers.add(Participant.fromJson(Map<String, dynamic>.from(item)));
         } else if (item is String && item.isNotEmpty) {
-          _viewers.add(Participant(
-            userId: item,
-            displayName: item,
-            role: item == _hostId ? UserRole.host : UserRole.viewer,
-            joinedAt: DateTime.now(),
-          ));
+          _viewers.add(
+            Participant(
+              userId: item,
+              displayName: item,
+              role: item == _hostId ? UserRole.host : UserRole.viewer,
+              joinedAt: DateTime.now(),
+            ),
+          );
         }
       }
     }
@@ -225,7 +248,8 @@ class RoomState extends ChangeNotifier {
       final states = data['media_states'] as Map<String, dynamic>;
       states.forEach((uId, stateMap) {
         if (stateMap is Map) {
-          final isMuted = (stateMap['muted_audio'] as bool?) ??
+          final isMuted =
+              (stateMap['muted_audio'] as bool?) ??
               (stateMap['muted'] as bool?) ??
               (stateMap['is_muted'] as bool?) ??
               (stateMap['audio_muted'] as bool?);
@@ -233,7 +257,8 @@ class RoomState extends ChangeNotifier {
             _userAudioMuteStates[uId] = isMuted;
           }
 
-          final isCamOff = (stateMap['muted_video'] as bool?) ??
+          final isCamOff =
+              (stateMap['muted_video'] as bool?) ??
               (stateMap['camera_off'] as bool?) ??
               (stateMap['is_camera_off'] as bool?) ??
               (stateMap['is_video_muted'] as bool?) ??
@@ -254,9 +279,11 @@ class RoomState extends ChangeNotifier {
     if (data['waiting_list'] is List ||
         data['pending_requests'] is List ||
         data['seat_requests'] is List) {
-      final list = (data['waiting_list'] ??
-          data['pending_requests'] ??
-          data['seat_requests']) as List;
+      final list =
+          (data['waiting_list'] ??
+                  data['pending_requests'] ??
+                  data['seat_requests'])
+              as List;
       _pendingSeatRequests.clear();
       for (final item in list) {
         if (item is Map<String, dynamic>) {
@@ -287,7 +314,9 @@ class RoomState extends ChangeNotifier {
 
     // Populate active PK
     if (data['active_pk'] is Map<String, dynamic>) {
-      _activePK = PKBattleInfo.fromJson(data['active_pk'] as Map<String, dynamic>);
+      _activePK = PKBattleInfo.fromJson(
+        data['active_pk'] as Map<String, dynamic>,
+      );
       if (_activePK != null && _activePK!.opponentUserId.isNotEmpty) {
         _activeRemoteUserIds.add(_activePK!.opponentUserId);
       }
@@ -303,15 +332,14 @@ class RoomState extends ChangeNotifier {
     if (_isDisposed) return;
     try {
       activeSeatsNotifier.value = List.unmodifiable(_activeSeats);
-      occupiedSeatsCountNotifier.value = _activeSeats.where((s) => s.isOccupied).length;
+      occupiedSeatsCountNotifier.value = _activeSeats
+          .where((s) => s.isOccupied)
+          .length;
     } catch (_) {}
   }
 
   /// Updates the viewer count and list of active viewers.
-  void updateViewers({
-    required int count,
-    List<Participant>? viewersList,
-  }) {
+  void updateViewers({required int count, List<Participant>? viewersList}) {
     _viewersCount = count;
     if (viewersList != null) {
       _viewers.clear();
@@ -389,7 +417,8 @@ class RoomState extends ChangeNotifier {
     } else if (activeSeatsData is Map) {
       activeSeatsData.forEach((k, v) {
         final seatIndex = int.tryParse(k.toString()) ?? 0;
-        final uId = (v is Map ? (v['user_id'] ?? v['userId']) : v)?.toString() ?? '';
+        final uId =
+            (v is Map ? (v['user_id'] ?? v['userId']) : v)?.toString() ?? '';
         if (uId.isNotEmpty) {
           Participant? userProfile;
           try {
@@ -457,11 +486,14 @@ class RoomState extends ChangeNotifier {
 
     // Atomically bump PK battle points if a PK is active
     if (_activePK != null && isInPKBattle) {
-      final points = event.coinValue > 0 ? (event.coinValue * event.amount) : event.amount;
+      final points = event.coinValue > 0
+          ? (event.coinValue * event.amount)
+          : event.amount;
       int newHostScore = _activePK!.hostScore;
       int newOpponentScore = _activePK!.opponentScore;
 
-      if (event.targetUserId == _activePK!.hostUserId || event.targetUserId == _hostId) {
+      if (event.targetUserId == _activePK!.hostUserId ||
+          event.targetUserId == _hostId) {
         newHostScore += points;
       } else if (event.targetUserId == _activePK!.opponentUserId) {
         newOpponentScore += points;
@@ -576,7 +608,9 @@ class RoomState extends ChangeNotifier {
 
   /// Adds a pending seat request from a viewer.
   void addSeatRequest(SeatRequest request) {
-    _pendingSeatRequests.removeWhere((r) => r.requesterId == request.requesterId);
+    _pendingSeatRequests.removeWhere(
+      (r) => r.requesterId == request.requesterId,
+    );
     _pendingSeatRequests.add(request);
     notifyListeners();
   }
@@ -608,7 +642,10 @@ class RoomState extends ChangeNotifier {
     }
     _roomMode = RoomMode.pk;
     roomModeNotifier.value = RoomMode.pk;
-    pkScoreNotifier.value = PkScore(hostScore: pkInfo.hostScore, opponentScore: pkInfo.opponentScore);
+    pkScoreNotifier.value = PkScore(
+      hostScore: pkInfo.hostScore,
+      opponentScore: pkInfo.opponentScore,
+    );
     notifyListeners();
   }
 
@@ -630,7 +667,10 @@ class RoomState extends ChangeNotifier {
       remainingSeconds: _activePK!.remainingSeconds,
       startedAt: _activePK!.startedAt,
     );
-    pkScoreNotifier.value = PkScore(hostScore: scoreUpdate.hostScore, opponentScore: scoreUpdate.opponentScore);
+    pkScoreNotifier.value = PkScore(
+      hostScore: scoreUpdate.hostScore,
+      opponentScore: scoreUpdate.opponentScore,
+    );
     notifyListeners();
   }
 

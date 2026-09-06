@@ -9,7 +9,8 @@ import '../models/signaling_message.dart';
 import '../utils/omnicast_logger.dart';
 
 /// Top-level function for offloading heavy JSON parsing to a background Dart Isolate.
-SignalingMessage? _parseJsonPayload(String raw) => SignalingMessage.tryDeserialize(raw);
+SignalingMessage? _parseJsonPayload(String raw) =>
+    SignalingMessage.tryDeserialize(raw);
 
 /// Manages WebSocket signaling connection, JSON framing, keep-alive heartbeats,
 /// and incoming/outgoing event routing for the OmniCast SFU engine with Isolate parsing.
@@ -34,9 +35,12 @@ class SignalingClient {
   final _answerController = StreamController<SignalingMessage>.broadcast();
   final _iceController = StreamController<SignalingMessage>.broadcast();
   final _roomInfoController = StreamController<SignalingMessage>.broadcast();
-  final _viewerUpdateController = StreamController<SignalingMessage>.broadcast();
-  final _presenceUpdateController = StreamController<SignalingMessage>.broadcast();
-  final _userJoinedController = StreamController<OmniCastParticipant>.broadcast();
+  final _viewerUpdateController =
+      StreamController<SignalingMessage>.broadcast();
+  final _presenceUpdateController =
+      StreamController<SignalingMessage>.broadcast();
+  final _userJoinedController =
+      StreamController<OmniCastParticipant>.broadcast();
   final _userLeftController = StreamController<String>.broadcast();
   final _chatController = StreamController<ChatMessage>.broadcast();
   final _giftController = StreamController<GiftEvent>.broadcast();
@@ -51,10 +55,14 @@ class SignalingClient {
   final _pkStartedController = StreamController<SignalingMessage>.broadcast();
   final _pkScoreController = StreamController<SignalingMessage>.broadcast();
   final _pkEndedController = StreamController<SignalingMessage>.broadcast();
-  final _pkGiftOverlayController = StreamController<SignalingMessage>.broadcast();
-  final _layerSwitchedController = StreamController<SignalingMessage>.broadcast();
-  final _viewportUpdatedController = StreamController<SignalingMessage>.broadcast();
-  final _leaveAcknowledgedController = StreamController<SignalingMessage>.broadcast();
+  final _pkGiftOverlayController =
+      StreamController<SignalingMessage>.broadcast();
+  final _layerSwitchedController =
+      StreamController<SignalingMessage>.broadcast();
+  final _viewportUpdatedController =
+      StreamController<SignalingMessage>.broadcast();
+  final _leaveAcknowledgedController =
+      StreamController<SignalingMessage>.broadcast();
   final _roomCreatedController = StreamController<RoomModel>.broadcast();
   final _roomClosedController = StreamController<String>.broadcast();
   final _roomListController = StreamController<List<RoomModel>>.broadcast();
@@ -85,7 +93,8 @@ class SignalingClient {
   Stream<SignalingMessage> get onIceCandidate => _iceController.stream;
   Stream<SignalingMessage> get onRoomInfoSync => _roomInfoController.stream;
   Stream<SignalingMessage> get onViewerUpdate => _viewerUpdateController.stream;
-  Stream<SignalingMessage> get onPresenceUpdate => _presenceUpdateController.stream;
+  Stream<SignalingMessage> get onPresenceUpdate =>
+      _presenceUpdateController.stream;
   Stream<OmniCastParticipant> get onUserJoined => _userJoinedController.stream;
   Stream<String> get onUserLeft => _userLeftController.stream;
   Stream<ChatMessage> get onChat => _chatController.stream;
@@ -100,11 +109,16 @@ class SignalingClient {
   Stream<SignalingMessage> get onPKStarted => _pkStartedController.stream;
   Stream<SignalingMessage> get onPKScoreUpdate => _pkScoreController.stream;
   Stream<SignalingMessage> get onPKEnded => _pkEndedController.stream;
-  Stream<SignalingMessage> get onPKGiftOverlay => _pkGiftOverlayController.stream;
-  Stream<SignalingMessage> get onLayerSwitched => _layerSwitchedController.stream;
-  Stream<SignalingMessage> get onViewportUpdated => _viewportUpdatedController.stream;
-  Stream<SignalingMessage> get onLeaveAcknowledged => _leaveAcknowledgedController.stream;
-  Stream<SignalingMessage> get onMediaStateChanged => _mediaStateController.stream;
+  Stream<SignalingMessage> get onPKGiftOverlay =>
+      _pkGiftOverlayController.stream;
+  Stream<SignalingMessage> get onLayerSwitched =>
+      _layerSwitchedController.stream;
+  Stream<SignalingMessage> get onViewportUpdated =>
+      _viewportUpdatedController.stream;
+  Stream<SignalingMessage> get onLeaveAcknowledged =>
+      _leaveAcknowledgedController.stream;
+  Stream<SignalingMessage> get onMediaStateChanged =>
+      _mediaStateController.stream;
   Stream<RoomModel> get onRoomCreated => _roomCreatedController.stream;
   Stream<String> get onRoomClosed => _roomClosedController.stream;
   Stream<List<RoomModel>> get onRoomListReceived => _roomListController.stream;
@@ -139,7 +153,8 @@ class SignalingClient {
             final normalized = base64Url.normalize(parts[1]);
             final payloadJson = utf8.decode(base64Url.decode(normalized));
             final payload = jsonDecode(payloadJson) as Map<String, dynamic>;
-            final uId = payload['userId'] ?? payload['user_id'] ?? payload['sub'];
+            final uId =
+                payload['userId'] ?? payload['user_id'] ?? payload['sub'];
             final rId = payload['roomId'] ?? payload['room_id'];
             final role = payload['role'];
             if (uId != null && !queryParams.containsKey('userId')) {
@@ -232,11 +247,16 @@ class SignalingClient {
         if (msg.payload is List) {
           try {
             final list = (msg.payload as List)
-                .map((e) => RoomModel.fromJson(Map<String, dynamic>.from(e as Map)))
+                .map(
+                  (e) =>
+                      RoomModel.fromJson(Map<String, dynamic>.from(e as Map)),
+                )
                 .toList();
             _roomListController.add(list);
           } catch (e) {
-            OmniCastLogger.error('[SignalingClient] Failed to parse room_list: $e');
+            OmniCastLogger.error(
+              '[SignalingClient] Failed to parse room_list: $e',
+            );
           }
         }
         break;
@@ -256,12 +276,13 @@ class SignalingClient {
       case 'new_cohost':
       case 'host_reconnected':
         if (msg.payload is Map<String, dynamic>) {
-          _userJoinedController.add(OmniCastParticipant.fromJson(msg.payload as Map<String, dynamic>));
+          _userJoinedController.add(
+            OmniCastParticipant.fromJson(msg.payload as Map<String, dynamic>),
+          );
         } else {
-          _userJoinedController.add(OmniCastParticipant(
-            userId: msg.userId,
-            joinedAt: DateTime.now(),
-          ));
+          _userJoinedController.add(
+            OmniCastParticipant(userId: msg.userId, joinedAt: DateTime.now()),
+          );
         }
         break;
 
@@ -280,47 +301,61 @@ class SignalingClient {
       case SignalingEvents.chat:
       case SignalingEvents.chatMessage:
         if (msg.payload is Map<String, dynamic>) {
-          _chatController.add(ChatMessage.fromJson(msg.payload as Map<String, dynamic>));
+          _chatController.add(
+            ChatMessage.fromJson(msg.payload as Map<String, dynamic>),
+          );
         } else if (msg.payload is String) {
-          _chatController.add(ChatMessage(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            senderId: msg.userId,
-            senderName: msg.userId,
-            text: msg.payload as String,
-            timestamp: DateTime.now(),
-          ));
+          _chatController.add(
+            ChatMessage(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              senderId: msg.userId,
+              senderName: msg.userId,
+              text: msg.payload as String,
+              timestamp: DateTime.now(),
+            ),
+          );
         }
         break;
 
       case SignalingEvents.gift:
       case SignalingEvents.giftProcessed:
         if (msg.payload is Map<String, dynamic>) {
-          _giftController.add(GiftEvent.fromJson(msg.payload as Map<String, dynamic>));
+          _giftController.add(
+            GiftEvent.fromJson(msg.payload as Map<String, dynamic>),
+          );
         }
         break;
 
       case SignalingEvents.pkGiftOverlay:
         _pkGiftOverlayController.add(msg);
         if (msg.payload is Map<String, dynamic>) {
-          _giftController.add(GiftEvent.fromJson(msg.payload as Map<String, dynamic>));
+          _giftController.add(
+            GiftEvent.fromJson(msg.payload as Map<String, dynamic>),
+          );
         }
         break;
 
       case SignalingEvents.seatRequest:
         if (msg.payload is Map<String, dynamic>) {
-          _seatRequestController.add(SeatRequest.fromJson(msg.payload as Map<String, dynamic>));
+          _seatRequestController.add(
+            SeatRequest.fromJson(msg.payload as Map<String, dynamic>),
+          );
         } else {
-          _seatRequestController.add(SeatRequest(
-            requesterId: msg.userId,
-            requesterName: msg.userId,
-            requestedAt: DateTime.now(),
-          ));
+          _seatRequestController.add(
+            SeatRequest(
+              requesterId: msg.userId,
+              requesterName: msg.userId,
+              requestedAt: DateTime.now(),
+            ),
+          );
         }
         break;
 
       case SignalingEvents.seatInvite:
         if (msg.payload is Map<String, dynamic>) {
-          _seatInviteController.add(CoHostInvite.fromJson(msg.payload as Map<String, dynamic>));
+          _seatInviteController.add(
+            CoHostInvite.fromJson(msg.payload as Map<String, dynamic>),
+          );
         }
         break;
 
@@ -381,7 +416,9 @@ class SignalingClient {
 
       case SignalingEvents.roomCreated:
         if (msg.payload is Map<String, dynamic>) {
-          _roomCreatedController.add(RoomModel.fromJson(msg.payload as Map<String, dynamic>));
+          _roomCreatedController.add(
+            RoomModel.fromJson(msg.payload as Map<String, dynamic>),
+          );
         }
         break;
 
@@ -393,8 +430,10 @@ class SignalingClient {
         final closedRoomId = msg.roomId.isNotEmpty
             ? msg.roomId
             : (msg.payload is Map<String, dynamic>
-                ? (msg.payload['room_id'] as String? ?? msg.payload['roomId'] as String? ?? '')
-                : (msg.payload is String ? msg.payload as String : ''));
+                  ? (msg.payload['room_id'] as String? ??
+                        msg.payload['roomId'] as String? ??
+                        '')
+                  : (msg.payload is String ? msg.payload as String : ''));
         if (closedRoomId.isNotEmpty) {
           _roomClosedController.add(closedRoomId);
         }
@@ -402,12 +441,14 @@ class SignalingClient {
 
       case SignalingEvents.ping:
         // Automatically reply with pong
-        send(SignalingMessage(
-          event: SignalingEvents.pong,
-          roomId: msg.roomId,
-          userId: msg.userId,
-          payload: {'timestamp': DateTime.now().millisecondsSinceEpoch},
-        ));
+        send(
+          SignalingMessage(
+            event: SignalingEvents.pong,
+            roomId: msg.roomId,
+            userId: msg.userId,
+            payload: {'timestamp': DateTime.now().millisecondsSinceEpoch},
+          ),
+        );
         break;
 
       case SignalingEvents.pong:
@@ -428,11 +469,9 @@ class SignalingClient {
 
   /// Requests the active room list from the server over WebSocket signaling.
   void requestRoomList() {
-    send(SignalingMessage(
-      event: 'get_rooms',
-      roomId: '',
-      userId: _token ?? '',
-    ));
+    send(
+      SignalingMessage(event: 'get_rooms', roomId: '', userId: _token ?? ''),
+    );
   }
 
   void _scheduleReconnect() {
@@ -442,13 +481,12 @@ class SignalingClient {
     _reconnectAttempts++;
     final delaySeconds = (_reconnectAttempts <= 1)
         ? 1
-        : (_reconnectAttempts == 2
-            ? 2
-            : (_reconnectAttempts == 3 ? 3 : 5));
+        : (_reconnectAttempts == 2 ? 2 : (_reconnectAttempts == 3 ? 3 : 5));
     final delay = Duration(seconds: delaySeconds);
 
     OmniCastLogger.log(
-        '[SignalingClient] Network lost -> Scheduling auto-reconnect attempt #$_reconnectAttempts in ${delay.inSeconds}s');
+      '[SignalingClient] Network lost -> Scheduling auto-reconnect attempt #$_reconnectAttempts in ${delay.inSeconds}s',
+    );
 
     _reconnectTimer = Timer(delay, () async {
       if (_isDisposed || isConnected || _wsUrl == null) return;
@@ -457,9 +495,13 @@ class SignalingClient {
         await _establishConnection();
         _reconnectAttempts = 0;
         _reconnectedController.add(null);
-        OmniCastLogger.log('[SignalingClient] WebSocket successfully reconnected!');
+        OmniCastLogger.log(
+          '[SignalingClient] WebSocket successfully reconnected!',
+        );
       } catch (e) {
-        OmniCastLogger.error('[SignalingClient] Auto-reconnect retry failed ($e), retrying...');
+        OmniCastLogger.error(
+          '[SignalingClient] Auto-reconnect retry failed ($e), retrying...',
+        );
         _scheduleReconnect();
       }
     });
@@ -489,12 +531,14 @@ class SignalingClient {
 
     _heartbeatTimer = Timer.periodic(heartbeatInterval, (_) {
       if (isConnected) {
-        send(SignalingMessage(
-          event: SignalingEvents.ping,
-          roomId: '',
-          userId: '',
-          payload: {'timestamp': DateTime.now().millisecondsSinceEpoch},
-        ));
+        send(
+          SignalingMessage(
+            event: SignalingEvents.ping,
+            roomId: '',
+            userId: '',
+            payload: {'timestamp': DateTime.now().millisecondsSinceEpoch},
+          ),
+        );
       }
     });
   }
@@ -502,7 +546,9 @@ class SignalingClient {
   /// Sends a strongly-typed signaling message over the WebSocket channel.
   bool send(SignalingMessage message) {
     if (_channel == null || !isConnected) {
-      OmniCastLogger.log('[SignalingClient] Cannot send, client is not connected.');
+      OmniCastLogger.log(
+        '[SignalingClient] Cannot send, client is not connected.',
+      );
       return false;
     }
 

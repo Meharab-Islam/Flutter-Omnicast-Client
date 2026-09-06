@@ -42,13 +42,15 @@ void main() {
 
     test('handles chat messages and truncates above capacity', () {
       for (var i = 0; i < 210; i++) {
-        roomState.addChatMessage(ChatMessage(
-          id: 'msg_$i',
-          senderId: 'user_$i',
-          senderName: 'User $i',
-          text: 'Message $i',
-          timestamp: DateTime.now(),
-        ));
+        roomState.addChatMessage(
+          ChatMessage(
+            id: 'msg_$i',
+            senderId: 'user_$i',
+            senderName: 'User $i',
+            text: 'Message $i',
+            timestamp: DateTime.now(),
+          ),
+        );
       }
 
       expect(roomState.chatHistory.length, 200);
@@ -93,13 +95,15 @@ void main() {
         role: UserRole.host,
       );
       roomState.addActiveRemoteUser('peer_1');
-      roomState.addChatMessage(ChatMessage(
-        id: '1',
-        senderId: 'user_1',
-        senderName: 'Host',
-        text: 'Hi',
-        timestamp: DateTime.now(),
-      ));
+      roomState.addChatMessage(
+        ChatMessage(
+          id: '1',
+          senderId: 'user_1',
+          senderName: 'Host',
+          text: 'Hi',
+          timestamp: DateTime.now(),
+        ),
+      );
 
       roomState.reset();
 

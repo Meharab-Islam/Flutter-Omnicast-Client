@@ -164,7 +164,11 @@ class OmniCastPKBattleView extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isWinning) ...[
-                  const Icon(Icons.emoji_events, size: 13, color: Colors.amberAccent),
+                  const Icon(
+                    Icons.emoji_events,
+                    size: 13,
+                    color: Colors.amberAccent,
+                  ),
                   const SizedBox(width: 4),
                 ],
                 Text(

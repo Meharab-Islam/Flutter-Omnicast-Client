@@ -12,14 +12,18 @@ class OmniCastFlyingHeartsOverlay extends StatefulWidget {
     super.key,
     this.reactionNotifier,
     this.reactionStream,
-  }) : assert(reactionNotifier != null || reactionStream != null,
-            'Must provide either reactionNotifier or reactionStream');
+  }) : assert(
+         reactionNotifier != null || reactionStream != null,
+         'Must provide either reactionNotifier or reactionStream',
+       );
 
   @override
-  State<OmniCastFlyingHeartsOverlay> createState() => _OmniCastFlyingHeartsOverlayState();
+  State<OmniCastFlyingHeartsOverlay> createState() =>
+      _OmniCastFlyingHeartsOverlayState();
 }
 
-class _OmniCastFlyingHeartsOverlayState extends State<OmniCastFlyingHeartsOverlay>
+class _OmniCastFlyingHeartsOverlayState
+    extends State<OmniCastFlyingHeartsOverlay>
     with TickerProviderStateMixin {
   final List<_FloatingHeartItem> _hearts = [];
   final Random _random = Random();
@@ -86,7 +90,9 @@ class _OmniCastFlyingHeartsOverlayState extends State<OmniCastFlyingHeartsOverla
               final size = MediaQuery.of(context).size;
 
               final offsetY = -progress * (size.height * 0.65);
-              final offsetX = (size.width * heart.startX) + (sin(progress * pi * 2) * heart.drift);
+              final offsetX =
+                  (size.width * heart.startX) +
+                  (sin(progress * pi * 2) * heart.drift);
               final opacity = (1.0 - progress).clamp(0.0, 1.0);
 
               return Positioned(

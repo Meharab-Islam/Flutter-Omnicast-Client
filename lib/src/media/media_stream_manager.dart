@@ -22,7 +22,8 @@ class MediaStreamManager {
   VideoParameters get currentParameters => _currentParameters;
   Map<String, RTCVideoRenderer> get remoteRenderers =>
       Map.unmodifiable(_remoteRenderers);
-  Map<String, MediaStream> get remoteStreams => Map.unmodifiable(_remoteStreams);
+  Map<String, MediaStream> get remoteStreams =>
+      Map.unmodifiable(_remoteStreams);
 
   bool get isAudioMuted => _isAudioMuted;
   bool get isVideoMuted => _isVideoMuted;
@@ -49,12 +50,17 @@ class MediaStreamManager {
     String? facingMode,
   }) async {
     if (_isDisposed) {
-      throw StateError('Cannot open user media on a disposed MediaStreamManager');
+      throw StateError(
+        'Cannot open user media on a disposed MediaStreamManager',
+      );
     }
 
     if (parameters != null) {
       _currentParameters = parameters;
-    } else if (width != null || height != null || frameRate != null || facingMode != null) {
+    } else if (width != null ||
+        height != null ||
+        frameRate != null ||
+        facingMode != null) {
       _currentParameters = VideoParameters.custom(
         width: width ?? _currentParameters.width,
         height: height ?? _currentParameters.height,
@@ -85,14 +91,20 @@ class MediaStreamManager {
     try {
       stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     } catch (e) {
-      OmniCastLogger.error('[MediaStreamManager] Primary getUserMedia failed ($e), attempting baseline fallback constraints');
+      OmniCastLogger.error(
+        '[MediaStreamManager] Primary getUserMedia failed ($e), attempting baseline fallback constraints',
+      );
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           'audio': audio,
-          'video': video ? {'facingMode': _currentParameters.facingMode} : false,
+          'video': video
+              ? {'facingMode': _currentParameters.facingMode}
+              : false,
         });
       } catch (fallbackError) {
-        OmniCastLogger.error('[MediaStreamManager] Fallback getUserMedia failed: $fallbackError');
+        OmniCastLogger.error(
+          '[MediaStreamManager] Fallback getUserMedia failed: $fallbackError',
+        );
         rethrow;
       }
     }
@@ -191,7 +203,9 @@ class MediaStreamManager {
 
   /// Attaches a remote [MediaStream] to a remote peer's renderer.
   Future<RTCVideoRenderer> attachRemoteStream(
-      String userId, MediaStream stream) async {
+    String userId,
+    MediaStream stream,
+  ) async {
     _remoteStreams[userId] = stream;
     final renderer = await getOrCreateRemoteRenderer(userId);
     renderer.srcObject = stream;
@@ -244,11 +258,17 @@ class MediaStreamManager {
     if (_localStream != null) {
       for (final track in _localStream!.getTracks()) {
         try {
-          await track.stop().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+          await track.stop().timeout(
+            const Duration(milliseconds: 250),
+            onTimeout: () {},
+          );
         } catch (_) {}
       }
       try {
-        await _localStream!.dispose().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+        await _localStream!.dispose().timeout(
+          const Duration(milliseconds: 250),
+          onTimeout: () {},
+        );
       } catch (_) {}
       _localStream = null;
     }
@@ -266,7 +286,10 @@ class MediaStreamManager {
 
     if (_localRenderer != null) {
       try {
-        await _localRenderer!.dispose().timeout(const Duration(milliseconds: 250), onTimeout: () {});
+        await _localRenderer!.dispose().timeout(
+          const Duration(milliseconds: 250),
+          onTimeout: () {},
+        );
       } catch (_) {}
       _localRenderer = null;
     }

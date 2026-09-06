@@ -71,16 +71,18 @@ class OmniCastVideoCanvas extends StatelessWidget {
     final localRenderer = client.streamManager.localRenderer;
     final isHost = client.state.isHost;
     final primaryTrackId = isHost ? 'local' : (client.state.hostId ?? 'host');
-    final renderer = isHost ? localRenderer : client.streamManager.getRenderer(primaryTrackId);
+    final renderer = isHost
+        ? localRenderer
+        : client.streamManager.getRenderer(primaryTrackId);
 
     final isCameraEnabled = isHost
         ? client.media.isCameraEnabled
         : (!client.media.isHostCameraOffNotifier.value &&
-            !client.state.isUserCameraOff(primaryTrackId));
+              !client.state.isUserCameraOff(primaryTrackId));
     final isMicMuted = isHost
         ? client.media.isMicrophoneMuted
         : (client.media.isHostMicrophoneMutedNotifier.value ||
-            client.state.isUserAudioMuted(primaryTrackId));
+              client.state.isUserAudioMuted(primaryTrackId));
 
     return OmniCastSpeakingVideoTile(
       key: const ValueKey('solo_canvas'),
@@ -109,10 +111,12 @@ class OmniCastVideoCanvas extends StatelessWidget {
 
     final isHostCameraEnabled = client.state.isHost
         ? client.media.isCameraEnabled
-        : (!client.media.isHostCameraOffNotifier.value && !client.state.isUserCameraOff(hostId));
+        : (!client.media.isHostCameraOffNotifier.value &&
+              !client.state.isUserCameraOff(hostId));
     final isHostMicMuted = client.state.isHost
         ? client.media.isMicrophoneMuted
-        : (client.media.isHostMicrophoneMutedNotifier.value || client.state.isUserAudioMuted(hostId));
+        : (client.media.isHostMicrophoneMutedNotifier.value ||
+              client.state.isUserAudioMuted(hostId));
 
     final isOpponentCameraEnabled = !client.state.isUserCameraOff(opponentId);
     final isOpponentMicMuted = client.state.isUserAudioMuted(opponentId);
@@ -123,7 +127,12 @@ class OmniCastVideoCanvas extends StatelessWidget {
         // Left 50% - Host A (Blue Team)
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(top: 96, bottom: 80, left: 6, right: 3),
+            padding: const EdgeInsets.only(
+              top: 96,
+              bottom: 80,
+              left: 6,
+              right: 3,
+            ),
             child: OmniCastSpeakingVideoTile(
               userId: hostId,
               trackId: hostId,
@@ -141,11 +150,17 @@ class OmniCastVideoCanvas extends StatelessWidget {
         // Right 50% - Host B (Red Team)
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(top: 96, bottom: 80, left: 3, right: 6),
+            padding: const EdgeInsets.only(
+              top: 96,
+              bottom: 80,
+              left: 3,
+              right: 6,
+            ),
             child: OmniCastSpeakingVideoTile(
               userId: opponentId,
               trackId: opponentId,
-              userName: activePK?.opponentDisplayName ?? opponentName ?? 'Opponent',
+              userName:
+                  activePK?.opponentDisplayName ?? opponentName ?? 'Opponent',
               avatarUrl: activePK?.opponentAvatarUrl ?? opponentAvatarUrl,
               renderer: opponentRenderer,
               isCameraEnabled: isOpponentCameraEnabled,
@@ -185,7 +200,10 @@ class OmniCastVideoCanvas extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(12),
@@ -274,17 +292,10 @@ class AnimatedFlexible extends StatelessWidget {
   final int flex;
   final Widget child;
 
-  const AnimatedFlexible({
-    super.key,
-    required this.flex,
-    required this.child,
-  });
+  const AnimatedFlexible({super.key, required this.flex, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      flex: flex,
-      child: child,
-    );
+    return Flexible(flex: flex, child: child);
   }
 }

@@ -16,8 +16,9 @@ void main() {
       await mediaStreamManager.dispose();
     });
 
-    testWidgets('renders custom placeholder when video is not ready',
-        (tester) async {
+    testWidgets('renders custom placeholder when video is not ready', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -33,20 +34,22 @@ void main() {
       expect(find.text('Connecting Video...'), findsOneWidget);
     });
 
-    testWidgets('renders lightweight SizedBox.shrink when no placeholder is passed',
-        (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: OmniCastVideoView(
-              mediaStreamManager: mediaStreamManager,
-              userId: 'local',
+    testWidgets(
+      'renders lightweight SizedBox.shrink when no placeholder is passed',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: OmniCastVideoView(
+                mediaStreamManager: mediaStreamManager,
+                userId: 'local',
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(SizedBox), findsWidgets);
-    });
+        expect(find.byType(SizedBox), findsWidgets);
+      },
+    );
   });
 }

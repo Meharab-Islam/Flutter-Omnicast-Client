@@ -49,7 +49,7 @@ class OmniCastConfig {
     this.reconnectDelay = const Duration(seconds: 3),
     this.maxReconnectAttempts = 5,
     this.enableLogging = false,
-  })  : jwtSecret = jwtSecret ?? apiSecret;
+  }) : jwtSecret = jwtSecret ?? apiSecret;
 
   /// Factory constructor that automatically normalizes any server domain or URL.
   factory OmniCastConfig.fromServer({
@@ -70,17 +70,23 @@ class OmniCastConfig {
   }) {
     final effectiveHostUrl = hostUrl != null
         ? (hostUrl.startsWith('ws')
-            ? hostUrl
-            : deriveWebSocketUrl(hostUrl, wsPath: wsPath, useSsl: isSecure))
-        : deriveWebSocketUrl(serverUrl ?? '127.0.0.1:8080',
-            wsPath: wsPath, useSsl: isSecure);
+              ? hostUrl
+              : deriveWebSocketUrl(hostUrl, wsPath: wsPath, useSsl: isSecure))
+        : deriveWebSocketUrl(
+            serverUrl ?? '127.0.0.1:8080',
+            wsPath: wsPath,
+            useSsl: isSecure,
+          );
 
     final effectiveApiUrl = apiUrl != null
         ? (apiUrl.startsWith('http')
-            ? apiUrl
-            : deriveApiUrl(apiUrl, apiPath: apiPath, useSsl: isSecure))
-        : deriveApiUrl(serverUrl ?? hostUrl ?? '127.0.0.1:8080',
-            apiPath: apiPath, useSsl: isSecure);
+              ? apiUrl
+              : deriveApiUrl(apiUrl, apiPath: apiPath, useSsl: isSecure))
+        : deriveApiUrl(
+            serverUrl ?? hostUrl ?? '127.0.0.1:8080',
+            apiPath: apiPath,
+            useSsl: isSecure,
+          );
 
     return OmniCastConfig(
       hostUrl: effectiveHostUrl,
@@ -88,7 +94,8 @@ class OmniCastConfig {
       apiKey: apiKey,
       apiSecret: apiSecret,
       jwtSecret: jwtSecret ?? apiSecret,
-      iceServers: iceServers ??
+      iceServers:
+          iceServers ??
           const [
             {'urls': 'stun:stun.l.google.com:19302'},
             {'urls': 'stun:stun1.l.google.com:19302'},
@@ -159,7 +166,9 @@ class OmniCastConfig {
     if (raw.isEmpty) return 'http://127.0.0.1:8080/api';
 
     if (raw.startsWith('http://') || raw.startsWith('https://')) {
-      if (!raw.endsWith('/api') && !raw.contains('/api/') && raw.endsWith('/')) {
+      if (!raw.endsWith('/api') &&
+          !raw.contains('/api/') &&
+          raw.endsWith('/')) {
         return '${raw.substring(0, raw.length - 1)}$apiPath';
       }
       return raw.contains('/api') ? raw : '$raw$apiPath';

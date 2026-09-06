@@ -96,7 +96,8 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
         renderer.srcObject = widget.mediaStreamManager.localStream;
       }
     } else {
-      final remoteStream = widget.mediaStreamManager.remoteStreams[widget.userId!];
+      final remoteStream =
+          widget.mediaStreamManager.remoteStreams[widget.userId!];
       if (remoteStream != null) {
         renderer.srcObject = remoteStream;
       }
@@ -123,7 +124,8 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
 
     final width = constraints.maxWidth;
     final height = constraints.maxHeight;
-    if (width.isInfinite || height.isInfinite || width <= 0 || height <= 0) return;
+    if (width.isInfinite || height.isInfinite || width <= 0 || height <= 0)
+      return;
 
     final maxDim = width > height ? width : height;
     final targetLayer = maxDim <= 360 ? 'q' : (maxDim <= 720 ? 'h' : 'f');

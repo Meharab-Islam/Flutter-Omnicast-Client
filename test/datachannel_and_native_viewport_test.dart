@@ -51,45 +51,48 @@ void main() {
   });
 
   group('OmniCastNativeViewportTracker Widget', () {
-    testWidgets('calculates visible vs hidden track IDs mathematically on scroll', (tester) async {
-      final List<String> testTracks = List.generate(10, (i) => 'track_$i');
-      List<String> lastVisible = [];
-      List<String> lastHidden = [];
+    testWidgets(
+      'calculates visible vs hidden track IDs mathematically on scroll',
+      (tester) async {
+        final List<String> testTracks = List.generate(10, (i) => 'track_$i');
+        List<String> lastVisible = [];
+        List<String> lastHidden = [];
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              height: 400,
-              child: OmniCastNativeViewportTracker(
-                trackIds: testTracks,
-                itemHeight: 200,
-                crossAxisCount: 2,
-                onVisibilityChanged: (visible, hidden) {
-                  lastVisible = visible;
-                  lastHidden = hidden;
-                },
-                child: ListView.builder(
-                  itemCount: testTracks.length,
-                  itemBuilder: (context, index) => SizedBox(
-                    height: 100,
-                    child: Text('Item $index'),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                height: 400,
+                child: OmniCastNativeViewportTracker(
+                  trackIds: testTracks,
+                  itemHeight: 200,
+                  crossAxisCount: 2,
+                  onVisibilityChanged: (visible, hidden) {
+                    lastVisible = visible;
+                    lastHidden = hidden;
+                  },
+                  child: ListView.builder(
+                    itemCount: testTracks.length,
+                    itemBuilder: (context, index) =>
+                        SizedBox(height: 100, child: Text('Item $index')),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('Item 0'), findsOneWidget);
-      expect(lastVisible, isEmpty);
-      expect(lastHidden, isEmpty);
-    });
+        expect(find.text('Item 0'), findsOneWidget);
+        expect(lastVisible, isEmpty);
+        expect(lastHidden, isEmpty);
+      },
+    );
   });
 
   group('OmniCastFlyingHeartsOverlay Widget', () {
-    testWidgets('renders and animates floating reaction particles', (tester) async {
+    testWidgets('renders and animates floating reaction particles', (
+      tester,
+    ) async {
       final reactionNotifier = ValueNotifier<DataChannelReaction?>(null);
 
       await tester.pumpWidget(

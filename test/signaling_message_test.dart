@@ -32,7 +32,8 @@ void main() {
     });
 
     test('deserializes messages without optional targetUser or payload', () {
-      const rawJson = '{"event":"leave_room","room_id":"room_1","user_id":"user_2"}';
+      const rawJson =
+          '{"event":"leave_room","room_id":"room_1","user_id":"user_2"}';
       final parsed = SignalingMessage.tryDeserialize(rawJson);
 
       expect(parsed, isNotNull);
@@ -67,7 +68,10 @@ void main() {
       expect(parsed.senderId, 'user_1');
       expect(parsed.senderName, 'Alice');
       expect(parsed.text, 'Hello OmniCast!');
-      expect(parsed.timestamp.millisecondsSinceEpoch, now.millisecondsSinceEpoch);
+      expect(
+        parsed.timestamp.millisecondsSinceEpoch,
+        now.millisecondsSinceEpoch,
+      );
     });
 
     test('GiftEvent json serialization', () {

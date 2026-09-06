@@ -110,10 +110,7 @@ class _CircleControlButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: color,
-                width: 1.5,
-              ),
+              border: Border.all(color: color, width: 1.5),
             ),
             child: Icon(
               icon,

@@ -28,15 +28,19 @@ class RoomManager {
       ValueNotifier<List<OmniCastParticipant>>(const []);
   final ValueNotifier<ClientConnectionState> connectionStateNotifier =
       ValueNotifier<ClientConnectionState>(ClientConnectionState.disconnected);
-  final ValueNotifier<UserRole> roleNotifier =
-      ValueNotifier<UserRole>(UserRole.viewer);
+  final ValueNotifier<UserRole> roleNotifier = ValueNotifier<UserRole>(
+    UserRole.viewer,
+  );
   final ValueNotifier<List<StageSeat>> activeSeatsNotifier =
       ValueNotifier<List<StageSeat>>(const []);
-  final ValueNotifier<String?> pinnedUserNotifier = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> pinnedUserNotifier = ValueNotifier<String?>(
+    null,
+  );
 
   // Backward compatibility alias getters
   ValueNotifier<int> get viewerCountNotifier => totalViewerCount;
-  ValueNotifier<List<OmniCastParticipant>> get viewersNotifier => activeViewersList;
+  ValueNotifier<List<OmniCastParticipant>> get viewersNotifier =>
+      activeViewersList;
 
   // Internal high-frequency event batching queue
   final List<OmniCastParticipant> _pendingJoins = [];
@@ -51,11 +55,13 @@ class RoomManager {
     required RoomState roomState,
     OmniCastConfig? config,
     OmniCastApi? api,
-  })  : _signalingClient = signalingClient,
-        _webRTCManager = webRTCManager,
-        _roomState = roomState,
-        _config = config,
-        _api = api ?? OmniCastApi(config: config ?? const OmniCastConfig(hostUrl: '')) {
+  }) : _signalingClient = signalingClient,
+       _webRTCManager = webRTCManager,
+       _roomState = roomState,
+       _config = config,
+       _api =
+           api ??
+           OmniCastApi(config: config ?? const OmniCastConfig(hostUrl: '')) {
     _bindSignalingEvents();
     _bindStateNotifiers();
   }
@@ -90,7 +96,8 @@ class RoomManager {
   final _roomClosedByHostController = StreamController<String>.broadcast();
   final _kickedFromRoomController = StreamController<KickedEvent>.broadcast();
   final _userKickedController = StreamController<String>.broadcast();
-  final _participantJoinedController = StreamController<OmniCastParticipant>.broadcast();
+  final _participantJoinedController =
+      StreamController<OmniCastParticipant>.broadcast();
   final _participantLeftController = StreamController<String>.broadcast();
 
   /// Stream emitting when the room is terminated/closed by the host.
@@ -103,13 +110,15 @@ class RoomManager {
   Stream<String> get onUserKicked => _userKickedController.stream;
 
   /// Stream emitting whenever a new participant joins the live broadcast room.
-  Stream<OmniCastParticipant> get onParticipantJoined => _participantJoinedController.stream;
+  Stream<OmniCastParticipant> get onParticipantJoined =>
+      _participantJoinedController.stream;
 
   /// Stream emitting the userId whenever a participant leaves the live broadcast room.
   Stream<String> get onParticipantLeft => _participantLeftController.stream;
 
   /// Stream aliases for seamless developer experience
-  Stream<OmniCastParticipant> get onUserJoined => _participantJoinedController.stream;
+  Stream<OmniCastParticipant> get onUserJoined =>
+      _participantJoinedController.stream;
   Stream<String> get onUserLeft => _participantLeftController.stream;
 
   /// Listens to real-time participant signaling events with high-performance debouncing.
@@ -157,18 +166,18 @@ class RoomManager {
         case 'join':
           final payloadMap = msg.payload is Map<String, dynamic>
               ? msg.payload as Map<String, dynamic>
-              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
-          final effectivePayload = {
-            'user_id': msg.userId,
-            ...payloadMap,
-          };
+              : (msg.payload is Map
+                    ? Map<String, dynamic>.from(msg.payload as Map)
+                    : <String, dynamic>{});
+          final effectivePayload = {'user_id': msg.userId, ...payloadMap};
           final participant = OmniCastParticipant.fromJson(effectivePayload);
           if (participant.userId.isNotEmpty) {
             _queueUserJoined(participant);
           }
 
           // Real-time viewer count sync if delivered with join event
-          final joinCount = (payloadMap['total_viewers'] as num?)?.toInt() ??
+          final joinCount =
+              (payloadMap['total_viewers'] as num?)?.toInt() ??
               (payloadMap['viewers_count'] as num?)?.toInt() ??
               (payloadMap['count'] as num?)?.toInt();
           if (joinCount != null) {
@@ -201,19 +210,24 @@ class RoomManager {
         case 'participant_removed':
           final payloadMap = msg.payload is Map<String, dynamic>
               ? msg.payload as Map<String, dynamic>
-              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
-          final leftUserId = payloadMap['user_id']?.toString() ??
+              : (msg.payload is Map
+                    ? Map<String, dynamic>.from(msg.payload as Map)
+                    : <String, dynamic>{});
+          final leftUserId =
+              payloadMap['user_id']?.toString() ??
               payloadMap['userId']?.toString() ??
               msg.userId;
           if (leftUserId.isNotEmpty) {
-            if (event == 'participant_removed' && leftUserId == _roomState.userId) {
+            if (event == 'participant_removed' &&
+                leftUserId == _roomState.userId) {
               _handleUserKicked(leftUserId, msg);
             } else {
               _queueUserLeft(leftUserId);
             }
           }
 
-          final leaveCount = (payloadMap['total_viewers'] as num?)?.toInt() ??
+          final leaveCount =
+              (payloadMap['total_viewers'] as num?)?.toInt() ??
               (payloadMap['viewers_count'] as num?)?.toInt() ??
               (payloadMap['count'] as num?)?.toInt();
           if (leaveCount != null) {
@@ -225,18 +239,27 @@ class RoomManager {
         case 'participant_reconnecting':
           final reconnMap = msg.payload is Map<String, dynamic>
               ? msg.payload as Map<String, dynamic>
-              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
+              : (msg.payload is Map
+                    ? Map<String, dynamic>.from(msg.payload as Map)
+                    : <String, dynamic>{});
           final reconnUserId = reconnMap['user_id']?.toString() ?? msg.userId;
           final reconnTimeout = (reconnMap['timeout'] as num?)?.toInt() ?? 20;
-          OmniCastLogger.log('[RoomManager] Participant $reconnUserId is reconnecting (grace period: ${reconnTimeout}s)...');
+          OmniCastLogger.log(
+            '[RoomManager] Participant $reconnUserId is reconnecting (grace period: ${reconnTimeout}s)...',
+          );
           break;
 
         case 'participant_reconnected':
           final reconnectedMap = msg.payload is Map<String, dynamic>
               ? msg.payload as Map<String, dynamic>
-              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
-          final reconnectedUserId = reconnectedMap['user_id']?.toString() ?? msg.userId;
-          OmniCastLogger.log('[RoomManager] Participant $reconnectedUserId reconnected within grace period! Connection restored smoothly.');
+              : (msg.payload is Map
+                    ? Map<String, dynamic>.from(msg.payload as Map)
+                    : <String, dynamic>{});
+          final reconnectedUserId =
+              reconnectedMap['user_id']?.toString() ?? msg.userId;
+          OmniCastLogger.log(
+            '[RoomManager] Participant $reconnectedUserId reconnected within grace period! Connection restored smoothly.',
+          );
           break;
 
         // 4. Batch Viewer Count Sync & Presence Updates
@@ -250,7 +273,8 @@ class RoomManager {
         case 'viewers':
           if (msg.payload is Map<String, dynamic>) {
             final payload = msg.payload as Map<String, dynamic>;
-            final count = (payload['total_viewers'] as num?)?.toInt() ??
+            final count =
+                (payload['total_viewers'] as num?)?.toInt() ??
                 (payload['viewers_count'] as num?)?.toInt() ??
                 (payload['viewer_count'] as num?)?.toInt() ??
                 (payload['count'] as num?)?.toInt() ??
@@ -262,7 +286,8 @@ class RoomManager {
             }
           } else if (msg.payload is Map) {
             final payload = Map<String, dynamic>.from(msg.payload as Map);
-            final count = (payload['total_viewers'] as num?)?.toInt() ??
+            final count =
+                (payload['total_viewers'] as num?)?.toInt() ??
                 (payload['viewers_count'] as num?)?.toInt() ??
                 (payload['viewer_count'] as num?)?.toInt() ??
                 (payload['count'] as num?)?.toInt() ??
@@ -282,9 +307,12 @@ class RoomManager {
         case 'presenceupdate':
           final pMap = msg.payload is Map<String, dynamic>
               ? msg.payload as Map<String, dynamic>
-              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
-          
-          final presenceCount = (pMap['total_viewers'] as num?)?.toInt() ??
+              : (msg.payload is Map
+                    ? Map<String, dynamic>.from(msg.payload as Map)
+                    : <String, dynamic>{});
+
+          final presenceCount =
+              (pMap['total_viewers'] as num?)?.toInt() ??
               (pMap['count'] as num?)?.toInt() ??
               (pMap['viewers_count'] as num?)?.toInt();
           if (presenceCount != null) {
@@ -294,22 +322,28 @@ class RoomManager {
           if (pMap['joined'] is List) {
             for (final j in pMap['joined'] as List) {
               if (j is Map) {
-                final p = OmniCastParticipant.fromJson(Map<String, dynamic>.from(j));
+                final p = OmniCastParticipant.fromJson(
+                  Map<String, dynamic>.from(j),
+                );
                 if (p.userId.isNotEmpty) _queueUserJoined(p);
               } else if (j is String && j.isNotEmpty) {
-                _queueUserJoined(OmniCastParticipant(
-                  userId: j,
-                  displayName: j,
-                  role: UserRole.viewer,
-                  joinedAt: DateTime.now(),
-                ));
+                _queueUserJoined(
+                  OmniCastParticipant(
+                    userId: j,
+                    displayName: j,
+                    role: UserRole.viewer,
+                    joinedAt: DateTime.now(),
+                  ),
+                );
               }
             }
           }
 
           if (pMap['left'] is List) {
             for (final l in pMap['left'] as List) {
-              final leftId = l is Map ? (l['user_id'] ?? l['userId'] ?? '').toString() : l.toString();
+              final leftId = l is Map
+                  ? (l['user_id'] ?? l['userId'] ?? '').toString()
+                  : l.toString();
               if (leftId.isNotEmpty) _queueUserLeft(leftId);
             }
           }
@@ -321,7 +355,9 @@ class RoomManager {
           break;
 
         case 'leave_acknowledged':
-          OmniCastLogger.log('[RoomManager] Server acknowledged room exit for ${msg.userId}');
+          OmniCastLogger.log(
+            '[RoomManager] Server acknowledged room exit for ${msg.userId}',
+          );
           break;
 
         // 5. Host Terminated Room / Room Closed Event
@@ -334,10 +370,17 @@ class RoomManager {
           final closedRoomId = msg.roomId.isNotEmpty
               ? msg.roomId
               : (msg.payload is Map<String, dynamic>
-                  ? (msg.payload['room_id'] as String? ?? msg.payload['roomId'] as String? ?? '')
-                  : (msg.payload is String ? msg.payload as String : ''));
-          if (_roomState.isInRoom && (closedRoomId.isEmpty || closedRoomId == _roomState.roomId)) {
-            _handleHostClosedRoom(closedRoomId.isNotEmpty ? closedRoomId : (_roomState.roomId ?? ''));
+                    ? (msg.payload['room_id'] as String? ??
+                          msg.payload['roomId'] as String? ??
+                          '')
+                    : (msg.payload is String ? msg.payload as String : ''));
+          if (_roomState.isInRoom &&
+              (closedRoomId.isEmpty || closedRoomId == _roomState.roomId)) {
+            _handleHostClosedRoom(
+              closedRoomId.isNotEmpty
+                  ? closedRoomId
+                  : (_roomState.roomId ?? ''),
+            );
           }
           break;
 
@@ -348,9 +391,11 @@ class RoomManager {
         case 'kicked':
         case 'user_ejected':
         case 'ejected':
-          final targetUser = msg.targetUser ??
+          final targetUser =
+              msg.targetUser ??
               (msg.payload is Map<String, dynamic>
-                  ? (msg.payload['target_user'] as String? ?? msg.payload['user_id'] as String?)
+                  ? (msg.payload['target_user'] as String? ??
+                        msg.payload['user_id'] as String?)
                   : msg.userId);
           if (targetUser != null && targetUser.isNotEmpty) {
             _handleUserKicked(targetUser, msg);
@@ -360,7 +405,10 @@ class RoomManager {
     });
   }
 
-  Future<void> _handleUserKicked(String targetUserId, SignalingMessage msg) async {
+  Future<void> _handleUserKicked(
+    String targetUserId,
+    SignalingMessage msg,
+  ) async {
     final payloadMap = msg.payload is Map<String, dynamic>
         ? msg.payload as Map<String, dynamic>
         : <String, dynamic>{};
@@ -375,21 +423,25 @@ class RoomManager {
     // If the local user is the one who was kicked:
     if (_roomState.userId == targetUserId) {
       OmniCastLogger.log(
-          '[RoomManager] Local user $targetUserId was kicked from room ${_roomState.roomId} by host');
+        '[RoomManager] Local user $targetUserId was kicked from room ${_roomState.roomId} by host',
+      );
       _kickedFromRoomController.add(event);
       await _webRTCManager.closePeerConnection();
       await _webRTCManager.mediaStreamManager.stopLocalMedia();
       _roomState.reset();
     } else {
       // Remote participant was kicked: remove from local viewer and seat state
-      OmniCastLogger.log('[RoomManager] Participant $targetUserId was kicked from room ${_roomState.roomId}');
+      OmniCastLogger.log(
+        '[RoomManager] Participant $targetUserId was kicked from room ${_roomState.roomId}',
+      );
       _queueUserLeft(targetUserId);
     }
   }
 
   Future<void> _handleHostClosedRoom(String roomId) async {
     OmniCastLogger.log(
-        '[RoomManager] Host closed room $roomId -> Forcefully ejecting participants & clearing WebRTC resources');
+      '[RoomManager] Host closed room $roomId -> Forcefully ejecting participants & clearing WebRTC resources',
+    );
     _roomClosedByHostController.add(roomId);
     await _webRTCManager.closePeerConnection();
     await _webRTCManager.mediaStreamManager.stopLocalMedia();
@@ -400,38 +452,49 @@ class RoomManager {
     final root = data['data'] is Map<String, dynamic>
         ? data['data'] as Map<String, dynamic>
         : (data['room'] is Map<String, dynamic>
-            ? data['room'] as Map<String, dynamic>
-            : (data['active_room'] is Map<String, dynamic>
-                ? data['active_room'] as Map<String, dynamic>
-                : data));
+              ? data['room'] as Map<String, dynamic>
+              : (data['active_room'] is Map<String, dynamic>
+                    ? data['active_room'] as Map<String, dynamic>
+                    : data));
 
-    final count = (root['total_viewers'] as num?)?.toInt() ??
+    final count =
+        (root['total_viewers'] as num?)?.toInt() ??
         (root['viewers_count'] as num?)?.toInt() ??
         (root['viewer_count'] as num?)?.toInt() ??
         (root['count'] as num?)?.toInt();
 
-    final viewersRaw = root['viewers_list'] ?? root['viewers'] ?? root['participants'] ?? root['members'];
+    final viewersRaw =
+        root['viewers_list'] ??
+        root['viewers'] ??
+        root['participants'] ??
+        root['members'];
     List<OmniCastParticipant>? parsedList;
 
     if (viewersRaw is List) {
       final list = <OmniCastParticipant>[];
       for (final item in viewersRaw) {
         if (item is Map) {
-          list.add(OmniCastParticipant.fromJson(Map<String, dynamic>.from(item)));
+          list.add(
+            OmniCastParticipant.fromJson(Map<String, dynamic>.from(item)),
+          );
         } else if (item is String && item.isNotEmpty) {
-          list.add(OmniCastParticipant(
-            userId: item,
-            displayName: item,
-            role: item == _roomState.hostId ? UserRole.host : UserRole.viewer,
-            joinedAt: DateTime.now(),
-          ));
+          list.add(
+            OmniCastParticipant(
+              userId: item,
+              displayName: item,
+              role: item == _roomState.hostId ? UserRole.host : UserRole.viewer,
+              joinedAt: DateTime.now(),
+            ),
+          );
         }
       }
       parsedList = list.take(maxViewersInMemory).toList();
       activeViewersList.value = List.unmodifiable(parsedList);
     }
 
-    final effectiveCount = count ?? (parsedList != null ? parsedList.length : totalViewerCount.value);
+    final effectiveCount =
+        count ??
+        (parsedList != null ? parsedList.length : totalViewerCount.value);
     totalViewerCount.value = effectiveCount;
     _roomState.updateViewers(count: effectiveCount, viewersList: parsedList);
     _roomState.syncRoomInfo(root);
@@ -441,19 +504,28 @@ class RoomManager {
     final parsed = <OmniCastParticipant>[];
     for (final item in rawList) {
       if (item is Map) {
-        parsed.add(OmniCastParticipant.fromJson(Map<String, dynamic>.from(item)));
+        parsed.add(
+          OmniCastParticipant.fromJson(Map<String, dynamic>.from(item)),
+        );
       } else if (item is String && item.isNotEmpty) {
-        parsed.add(OmniCastParticipant(
-          userId: item,
-          displayName: item,
-          role: item == _roomState.hostId ? UserRole.host : UserRole.viewer,
-          joinedAt: DateTime.now(),
-        ));
+        parsed.add(
+          OmniCastParticipant(
+            userId: item,
+            displayName: item,
+            role: item == _roomState.hostId ? UserRole.host : UserRole.viewer,
+            joinedAt: DateTime.now(),
+          ),
+        );
       }
     }
     if (parsed.isNotEmpty) {
-      activeViewersList.value = List.unmodifiable(parsed.take(maxViewersInMemory).toList());
-      _roomState.updateViewers(count: totalViewerCount.value, viewersList: parsed);
+      activeViewersList.value = List.unmodifiable(
+        parsed.take(maxViewersInMemory).toList(),
+      );
+      _roomState.updateViewers(
+        count: totalViewerCount.value,
+        viewersList: parsed,
+      );
     }
   }
 
@@ -516,20 +588,17 @@ class RoomManager {
     RoomOptions options = const RoomOptions(),
     Map<String, dynamic>? metadata,
   }) async {
-    final mergedMetadata = {
-      ...?options.metadata,
-      ...?metadata,
-    };
+    final mergedMetadata = {...?options.metadata, ...?metadata};
 
     final effectiveToken = (token != null && token.isNotEmpty)
         ? token
         : (_config?.generateToken(
-              roomId: roomId,
-              userId: userId,
-              role: 'host',
-              metadata: mergedMetadata,
-            ) ??
-            '');
+                roomId: roomId,
+                userId: userId,
+                role: 'host',
+                metadata: mergedMetadata,
+              ) ??
+              '');
 
     _roomState.setSession(
       roomId: roomId,
@@ -541,11 +610,13 @@ class RoomManager {
     // Initial Host Participant in Viewers List
     final hostParticipant = OmniCastParticipant(
       userId: userId,
-      displayName: mergedMetadata['displayName'] as String? ??
+      displayName:
+          mergedMetadata['displayName'] as String? ??
           mergedMetadata['user_name'] as String? ??
           mergedMetadata['name'] as String? ??
           userId,
-      avatarUrl: mergedMetadata['avatarUrl'] as String? ??
+      avatarUrl:
+          mergedMetadata['avatarUrl'] as String? ??
           mergedMetadata['avatar'] as String?,
       role: UserRole.host,
       joinedAt: DateTime.now(),
@@ -564,9 +635,7 @@ class RoomManager {
           audio: true,
           video: false,
         );
-        await _webRTCManager.addLocalMediaTracks(
-          enableSimulcast: false,
-        );
+        await _webRTCManager.addLocalMediaTracks(enableSimulcast: false);
       } else if (options.enableAudio || options.enableVideo) {
         await _webRTCManager.mediaStreamManager.openUserMedia(
           audio: options.enableAudio,
@@ -583,29 +652,34 @@ class RoomManager {
     // 2. Connect signaling WebSocket and publish room session
     final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
     if (wsUrl != null) {
-      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
+      if (!_signalingClient.isConnected ||
+          _signalingClient.token != effectiveToken) {
         try {
           await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
         } catch (e) {
-          OmniCastLogger.error('[RoomManager] WebSocket connection deferred or offline: $e');
+          OmniCastLogger.error(
+            '[RoomManager] WebSocket connection deferred or offline: $e',
+          );
         }
       }
     }
 
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.createRoom,
-      roomId: roomId,
-      userId: userId,
-      payload: {
-        'token': effectiveToken,
-        'options': options.toJson(),
-        'sdp': offer.sdp,
-        'type': offer.type,
-        'metadata': mergedMetadata.isEmpty ? null : mergedMetadata,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.createRoom,
+        roomId: roomId,
+        userId: userId,
+        payload: {
+          'token': effectiveToken,
+          'options': options.toJson(),
+          'sdp': offer.sdp,
+          'type': offer.type,
+          'metadata': mergedMetadata.isEmpty ? null : mergedMetadata,
+        },
+      ),
+    );
   }
 
   /// Joins an existing live room as a Viewer.
@@ -620,16 +694,17 @@ class RoomManager {
     final effectiveToken = (token != null && token.isNotEmpty)
         ? token
         : (_config?.generateToken(
-              roomId: roomId,
-              userId: userId,
-              role: 'viewer',
-              metadata: metadata,
-            ) ??
-            '');
+                roomId: roomId,
+                userId: userId,
+                role: 'viewer',
+                metadata: metadata,
+              ) ??
+              '');
 
     final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
     if (wsUrl != null) {
-      if (!_signalingClient.isConnected || _signalingClient.token != effectiveToken) {
+      if (!_signalingClient.isConnected ||
+          _signalingClient.token != effectiveToken) {
         await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
       }
     }
@@ -643,12 +718,13 @@ class RoomManager {
     // Initial Joining Viewer in Viewers List
     final joinParticipant = OmniCastParticipant(
       userId: userId,
-      displayName: metadata?['displayName'] as String? ??
+      displayName:
+          metadata?['displayName'] as String? ??
           metadata?['user_name'] as String? ??
           metadata?['name'] as String? ??
           userId,
-      avatarUrl: metadata?['avatarUrl'] as String? ??
-          metadata?['avatar'] as String?,
+      avatarUrl:
+          metadata?['avatarUrl'] as String? ?? metadata?['avatar'] as String?,
       role: UserRole.viewer,
       joinedAt: DateTime.now(),
       metadata: metadata ?? const {},
@@ -666,49 +742,54 @@ class RoomManager {
     await _webRTCManager.setupViewerTransceivers();
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
-    final dName = metadata?['displayName'] as String? ??
+    final dName =
+        metadata?['displayName'] as String? ??
         metadata?['user_name'] as String? ??
         metadata?['name'] as String? ??
         userId;
-    final aUrl = metadata?['avatarUrl'] as String? ??
-        metadata?['avatar'] as String?;
+    final aUrl =
+        metadata?['avatarUrl'] as String? ?? metadata?['avatar'] as String?;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.joinRoom,
-      roomId: roomId,
-      userId: userId,
-      payload: {
-        'token': effectiveToken,
-        'sdp': offer.sdp,
-        'type': offer.type,
-        'metadata': metadata,
-        'user_id': userId,
-        'userId': userId,
-        'displayName': dName,
-        'display_name': dName,
-        'name': dName,
-        'avatar': aUrl,
-        'avatar_url': aUrl,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.joinRoom,
+        roomId: roomId,
+        userId: userId,
+        payload: {
+          'token': effectiveToken,
+          'sdp': offer.sdp,
+          'type': offer.type,
+          'metadata': metadata,
+          'user_id': userId,
+          'userId': userId,
+          'displayName': dName,
+          'display_name': dName,
+          'name': dName,
+          'avatar': aUrl,
+          'avatar_url': aUrl,
+        },
+      ),
+    );
 
     // Also broadcast explicit user_joined notification to room peers
-    _signalingClient.send(SignalingMessage(
-      event: 'user_joined',
-      roomId: roomId,
-      userId: userId,
-      payload: {
-        'user_id': userId,
-        'userId': userId,
-        'displayName': dName,
-        'display_name': dName,
-        'name': dName,
-        'avatar': aUrl,
-        'avatar_url': aUrl,
-        'role': 'viewer',
-        'metadata': metadata,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'user_joined',
+        roomId: roomId,
+        userId: userId,
+        payload: {
+          'user_id': userId,
+          'userId': userId,
+          'displayName': dName,
+          'display_name': dName,
+          'name': dName,
+          'avatar': aUrl,
+          'avatar_url': aUrl,
+          'role': 'viewer',
+          'metadata': metadata,
+        },
+      ),
+    );
   }
 
   /// Periodically synchronizes room state, active seats, and viewers from backend.
@@ -734,12 +815,14 @@ class RoomManager {
     try {
       // 1. Send WebSocket sync request
       if (_signalingClient.isConnected) {
-        _signalingClient.send(SignalingMessage(
-          event: 'get_room_info',
-          roomId: rId,
-          userId: _roomState.userId ?? '',
-          payload: {'roomId': rId, 'room_id': rId},
-        ));
+        _signalingClient.send(
+          SignalingMessage(
+            event: 'get_room_info',
+            roomId: rId,
+            userId: _roomState.userId ?? '',
+            payload: {'roomId': rId, 'room_id': rId},
+          ),
+        );
       }
 
       // 2. Query REST API snapshot
@@ -754,15 +837,14 @@ class RoomManager {
   void requestRoomInfoSync() {
     final rId = _roomState.roomId;
     if (rId != null && rId.isNotEmpty && _signalingClient.isConnected) {
-      _signalingClient.send(SignalingMessage(
-        event: 'sync_state',
-        roomId: rId,
-        userId: _roomState.userId ?? '',
-        payload: {
-          'action': 'sync_state',
-          'room_id': rId,
-        },
-      ));
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'sync_state',
+          roomId: rId,
+          userId: _roomState.userId ?? '',
+          payload: {'action': 'sync_state', 'room_id': rId},
+        ),
+      );
     }
   }
 
@@ -774,26 +856,22 @@ class RoomManager {
     if (_roomState.isInRoom) {
       final rId = _roomState.roomId!;
       final uId = _roomState.userId!;
-      _signalingClient.send(SignalingMessage(
-        event: SignalingEvents.leaveRoom,
-        roomId: rId,
-        userId: uId,
-        payload: {
-          'action': 'leave_room',
-          'room_id': rId,
-          'user_id': uId,
-        },
-      ));
-      _signalingClient.send(SignalingMessage(
-        event: 'user_left',
-        roomId: rId,
-        userId: uId,
-        payload: {
-          'user_id': uId,
-          'userId': uId,
-          'room_id': rId,
-        },
-      ));
+      _signalingClient.send(
+        SignalingMessage(
+          event: SignalingEvents.leaveRoom,
+          roomId: rId,
+          userId: uId,
+          payload: {'action': 'leave_room', 'room_id': rId, 'user_id': uId},
+        ),
+      );
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'user_left',
+          roomId: rId,
+          userId: uId,
+          payload: {'user_id': uId, 'userId': uId, 'room_id': rId},
+        ),
+      );
     }
 
     await _webRTCManager.closePeerConnection();
@@ -806,15 +884,14 @@ class RoomManager {
   /// Host action: Explicitly terminates the live stream and forcefully ejects all viewers.
   Future<void> closeRoom() async {
     if (_roomState.isInRoom) {
-      _signalingClient.send(SignalingMessage(
-        event: SignalingEvents.roomClosed,
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-        payload: {
-          'room_id': _roomState.roomId!,
-          'reason': 'host_closed',
-        },
-      ));
+      _signalingClient.send(
+        SignalingMessage(
+          event: SignalingEvents.roomClosed,
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          payload: {'room_id': _roomState.roomId!, 'reason': 'host_closed'},
+        ),
+      );
     }
 
     await leaveRoom();
@@ -824,19 +901,21 @@ class RoomManager {
   void kickUser(String targetUserId, {String? reason}) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.kickUser,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: {
-        'room_id': _roomState.roomId!,
-        'target_user': targetUserId,
-        'user_id': targetUserId,
-        'reason': reason ?? 'Kicked by host',
-        'kicked_by': _roomState.userId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.kickUser,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: {
+          'room_id': _roomState.roomId!,
+          'target_user': targetUserId,
+          'user_id': targetUserId,
+          'reason': reason ?? 'Kicked by host',
+          'kicked_by': _roomState.userId,
+        },
+      ),
+    );
   }
 
   /// Disposes granular notifiers, timers, and subscriptions.
@@ -852,11 +931,23 @@ class RoomManager {
     _participantJoinedController.close();
     _participantLeftController.close();
 
-    try { totalViewerCount.dispose(); } catch (_) {}
-    try { activeViewersList.dispose(); } catch (_) {}
-    try { connectionStateNotifier.dispose(); } catch (_) {}
-    try { roleNotifier.dispose(); } catch (_) {}
-    try { activeSeatsNotifier.dispose(); } catch (_) {}
-    try { pinnedUserNotifier.dispose(); } catch (_) {}
+    try {
+      totalViewerCount.dispose();
+    } catch (_) {}
+    try {
+      activeViewersList.dispose();
+    } catch (_) {}
+    try {
+      connectionStateNotifier.dispose();
+    } catch (_) {}
+    try {
+      roleNotifier.dispose();
+    } catch (_) {}
+    try {
+      activeSeatsNotifier.dispose();
+    } catch (_) {}
+    try {
+      pinnedUserNotifier.dispose();
+    } catch (_) {}
   }
 }

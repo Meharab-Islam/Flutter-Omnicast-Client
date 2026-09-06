@@ -73,8 +73,17 @@ class OmniCastDynamicStage extends StatelessWidget {
       builder: (context, _) {
         final slots = _computeStageSlots();
         final occupiedCount = slots.where((s) => s.isOccupied).length;
+        final localUserId = client.state.userId;
+        final isLocalCoHost =
+            !client.state.isHost &&
+            (client.state.isCoHost ||
+                client.seats.occupiedSeats.any((s) => s.userId == localUserId));
 
-        if (occupiedCount <= 1) {
+        // Fullscreen solo view is ONLY for when there is strictly 1 broadcaster (the Host)
+        // AND the local user is NOT a co-host on stage!
+        // A co-host must NEVER see solo view - they must see the 2x2 grid with Host in Slot 0
+        // and themselves in Slot 1.
+        if (occupiedCount <= 1 && !isLocalCoHost) {
           // 1 Person: Fullscreen Single Broadcaster View
           final singleSlot = slots.firstWhere(
             (s) => s.isOccupied,
@@ -91,10 +100,12 @@ class OmniCastDynamicStage extends StatelessWidget {
 
   String _getUserDisplayName(String userId, {String fallback = 'User'}) {
     final viewer = client.state.viewers.cast<Participant?>().firstWhere(
-          (p) => p?.userId == userId,
-          orElse: () => null,
-        );
-    if (viewer != null && viewer.displayName != null && viewer.displayName!.isNotEmpty) {
+      (p) => p?.userId == userId,
+      orElse: () => null,
+    );
+    if (viewer != null &&
+        viewer.displayName != null &&
+        viewer.displayName!.isNotEmpty) {
       return viewer.displayName!;
     }
     if (userId == (client.state.hostId ?? 'host')) return 'Host';
@@ -103,49 +114,72 @@ class OmniCastDynamicStage extends StatelessWidget {
 
   String? _getUserAvatarUrl(String userId) {
     final viewer = client.state.viewers.cast<Participant?>().firstWhere(
-          (p) => p?.userId == userId,
-          orElse: () => null,
-        );
+      (p) => p?.userId == userId,
+      orElse: () => null,
+    );
     return viewer?.avatarUrl;
   }
 
   /// Organizes the 4 stage slots such that Slot 0 is ALWAYS the Main Seat.
+  /// Under no circumstances will a Co-Host appear in Slot 0 (not even on their own device)
+  /// unless and until the Host explicitly promotes them to the Main Seat.
   List<DynamicStageSlot> _computeStageSlots() {
-    final hostId = client.state.hostId ??
-        (client.state.isHost ? client.state.userId ?? 'host' : 'host');
+    final localUserId = client.state.userId;
+    final isLocalHost = client.state.isHost;
+    final hostId =
+        client.state.hostId ?? (isLocalHost ? localUserId ?? 'host' : 'host');
     final pinnedUserId = client.state.pinnedStageUserId;
-    final isHostInMainSeat = client.state.isHostInMainSeat;
 
     // Retrieve all active co-host seats
     final occupiedSeats = client.seats.occupiedSeats
         .where((s) => s.userId != null && s.userId!.isNotEmpty)
         .toList();
 
+    final isLocalCoHost =
+        !isLocalHost &&
+        (client.state.isCoHost ||
+            occupiedSeats.any((s) => s.userId == localUserId));
+
     // Map of user IDs on stage
     final stageUsers = <String>{hostId};
     for (final seat in occupiedSeats) {
       if (seat.userId != null) stageUsers.add(seat.userId!);
     }
+    if (isLocalCoHost && localUserId != null && localUserId.isNotEmpty) {
+      stageUsers.add(localUserId);
+    }
+
+    // A Co-Host is in Main Seat ONLY IF:
+    // Host explicitly promoted them, so pinnedUserId is non-empty, NOT hostId,
+    // and pinnedUserId is a participant on stage.
+    final bool isCoHostPromotedToMain =
+        pinnedUserId != null &&
+        pinnedUserId.isNotEmpty &&
+        pinnedUserId != hostId &&
+        !client.state.isHostInMainSeat &&
+        stageUsers.contains(pinnedUserId);
 
     // 1. Identify Main Seat participant (Slot 0)
     final DynamicStageSlot mainSlot;
-    if (!isHostInMainSeat && pinnedUserId != null && stageUsers.contains(pinnedUserId)) {
-      // Co-host promoted to Main Seat
+    if (isCoHostPromotedToMain) {
+      // Co-host explicitly promoted to Main Seat by Host
       final coHostSeat = occupiedSeats.cast<StageSeat?>().firstWhere(
-            (s) => s?.userId == pinnedUserId,
-            orElse: () => null,
-          );
+        (s) => s?.userId == pinnedUserId,
+        orElse: () => null,
+      );
       mainSlot = _createSlot(
         slotIndex: 0,
         isMainSeat: true,
         userId: pinnedUserId,
-        displayName: coHostSeat?.user?.displayName ?? _getUserDisplayName(pinnedUserId),
-        avatarUrl: coHostSeat?.user?.avatarUrl ?? _getUserAvatarUrl(pinnedUserId),
+        displayName:
+            coHostSeat?.user?.displayName ?? _getUserDisplayName(pinnedUserId),
+        avatarUrl:
+            coHostSeat?.user?.avatarUrl ?? _getUserAvatarUrl(pinnedUserId),
         seatIndex: coHostSeat?.seatIndex,
         isHost: false,
       );
     } else {
-      // Host is in Main Seat
+      // Host is in Main Seat (Slot 0)
       final hostDisplayName = _getUserDisplayName(hostId, fallback: 'Host');
       mainSlot = _createSlot(
         slotIndex: 0,
@@ -161,34 +195,66 @@ class OmniCastDynamicStage extends StatelessWidget {
     // 2. Identify remaining stage participants for Slots 1, 2, 3
     final remainingParticipants = <DynamicStageSlot>[];
 
-    // If host was demoted from slot 0, host takes a co-host slot
-    if (!isHostInMainSeat && mainSlot.userId != hostId) {
+    // If host was demoted from slot 0 (because host promoted a co-host), host takes slot 1
+    if (isCoHostPromotedToMain && mainSlot.userId != hostId) {
       final hostDisplayName = _getUserDisplayName(hostId, fallback: 'Host');
-      remainingParticipants.add(_createSlot(
-        slotIndex: 1,
-        isMainSeat: false,
-        userId: hostId,
-        displayName: hostDisplayName,
-        avatarUrl: _getUserAvatarUrl(hostId),
-        seatIndex: 0,
-        isHost: true,
-      ));
+      remainingParticipants.add(
+        _createSlot(
+          slotIndex: 1,
+          isMainSeat: false,
+          userId: hostId,
+          displayName: hostDisplayName,
+          avatarUrl: _getUserAvatarUrl(hostId),
+          seatIndex: 0,
+          isHost: true,
+        ),
+      );
     }
 
-    // Add other occupied co-hosts
+    // If local user is a Co-Host and NOT in the main slot, ensure local user is in stage slots!
+    // This provides instantaneous responsive UI on the co-host's device even before
+    // server active_seats broadcast arrives.
+    if (isLocalCoHost &&
+        mainSlot.userId != localUserId &&
+        localUserId != null &&
+        localUserId.isNotEmpty) {
+      final mySeat = occupiedSeats.cast<StageSeat?>().firstWhere(
+        (s) => s?.userId == localUserId,
+        orElse: () => null,
+      );
+      remainingParticipants.add(
+        _createSlot(
+          slotIndex: remainingParticipants.length + 1,
+          isMainSeat: false,
+          userId: localUserId,
+          displayName:
+              mySeat?.user?.displayName ??
+              _getUserDisplayName(localUserId, fallback: 'You (Co-Host)'),
+          avatarUrl: mySeat?.user?.avatarUrl ?? _getUserAvatarUrl(localUserId),
+          seatIndex: mySeat?.seatIndex ?? 1,
+          isHost: false,
+        ),
+      );
+    }
+
+    // Add all other occupied co-hosts
     for (final seat in occupiedSeats) {
-      if (seat.userId == mainSlot.userId) continue;
-      if (seat.userId == hostId) continue;
       final uId = seat.userId!;
-      remainingParticipants.add(_createSlot(
-        slotIndex: remainingParticipants.length + 1,
-        isMainSeat: false,
-        userId: uId,
-        displayName: seat.user?.displayName ?? uId,
-        avatarUrl: seat.user?.avatarUrl,
-        seatIndex: seat.seatIndex,
-        isHost: false,
-      ));
+      if (uId == mainSlot.userId) continue;
+      if (uId == hostId) continue;
+      if (uId == localUserId) continue; // Already added above if local co-host
+
+      remainingParticipants.add(
+        _createSlot(
+          slotIndex: remainingParticipants.length + 1,
+          isMainSeat: false,
+          userId: uId,
+          displayName: seat.user?.displayName ?? _getUserDisplayName(uId),
+          avatarUrl: seat.user?.avatarUrl ?? _getUserAvatarUrl(uId),
+          seatIndex: seat.seatIndex,
+          isHost: false,
+        ),
+      );
     }
 
     // Build the 4 slots of the 2x2 grid
@@ -197,28 +263,32 @@ class OmniCastDynamicStage extends StatelessWidget {
     for (int i = 0; i < 3; i++) {
       if (i < remainingParticipants.length) {
         final item = remainingParticipants[i];
-        result.add(DynamicStageSlot(
-          slotIndex: i + 1,
-          isOccupied: true,
-          isMainSeat: false,
-          userId: item.userId,
-          displayName: item.displayName,
-          avatarUrl: item.avatarUrl,
-          seatIndex: item.seatIndex,
-          isLocal: item.isLocal,
-          isHost: item.isHost,
-          isMuted: item.isMuted,
-          isCameraOff: item.isCameraOff,
-          renderer: item.renderer,
-        ));
+        result.add(
+          DynamicStageSlot(
+            slotIndex: i + 1,
+            isOccupied: true,
+            isMainSeat: false,
+            userId: item.userId,
+            displayName: item.displayName,
+            avatarUrl: item.avatarUrl,
+            seatIndex: item.seatIndex,
+            isLocal: item.isLocal,
+            isHost: item.isHost,
+            isMuted: item.isMuted,
+            isCameraOff: item.isCameraOff,
+            renderer: item.renderer,
+          ),
+        );
       } else {
         // Empty Slot
-        result.add(DynamicStageSlot(
-          slotIndex: i + 1,
-          isOccupied: false,
-          isMainSeat: false,
-          seatIndex: i + 2,
-        ));
+        result.add(
+          DynamicStageSlot(
+            slotIndex: i + 1,
+            isOccupied: false,
+            isMainSeat: false,
+            seatIndex: i + 2,
+          ),
+        );
       }
     }
 
@@ -234,21 +304,26 @@ class OmniCastDynamicStage extends StatelessWidget {
     int? seatIndex,
     required bool isHost,
   }) {
-    final isLocal = userId == client.state.userId;
+    // isLocal is true ONLY if this slot matches the local user ID AND
+    // if isHost is true, only if the current client is indeed the Host!
+    final isLocal =
+        (userId == client.state.userId) &&
+        (isHost ? client.state.isHost : true);
     final isMuted = isLocal
         ? client.media.isMicrophoneMuted
         : (client.seats.isUserMuted(userId) ||
-            client.state.isUserAudioMuted(userId));
+              client.state.isUserAudioMuted(userId));
     final isCameraOff = isLocal
         ? !client.media.isCameraEnabled
         : (client.seats.isUserCameraOff(userId) ||
-            client.state.isUserCameraOff(userId));
+              client.state.isUserCameraOff(userId));
 
     final RTCVideoRenderer? renderer;
     if (isLocal) {
       renderer = client.media.localRenderer;
     } else if (isHost) {
-      renderer = client.media.getRenderer(userId) ??
+      renderer =
+          client.media.getRenderer(userId) ??
           client.media.getRenderer('host') ??
           client.media.getRenderer(client.state.roomId);
     } else {
@@ -290,11 +365,7 @@ class OmniCastDynamicStage extends StatelessWidget {
           ),
         ),
         // Subtle badge overlay at top-left
-        Positioned(
-          top: 90,
-          left: 16,
-          child: _buildMainSeatBadge(isSolo: true),
-        ),
+        Positioned(top: 90, left: 16, child: _buildMainSeatBadge(isSolo: true)),
       ],
     );
   }
@@ -305,7 +376,8 @@ class OmniCastDynamicStage extends StatelessWidget {
       child: Padding(
         padding: padding,
         child: AspectRatio(
-          aspectRatio: 0.95, // Clean balanced proportion for 2x2 grid in portrait
+          aspectRatio:
+              0.95, // Clean balanced proportion for 2x2 grid in portrait
           child: GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -387,7 +459,11 @@ class OmniCastDynamicStage extends StatelessWidget {
                 color: Colors.redAccent.withValues(alpha: 0.85),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.mic_off_rounded, size: 11, color: Colors.white),
+              child: const Icon(
+                Icons.mic_off_rounded,
+                size: 11,
+                color: Colors.white,
+              ),
             ),
           ),
       ],
@@ -486,7 +562,7 @@ class OmniCastDynamicStage extends StatelessWidget {
         border: Border.all(color: Colors.white24, width: 0.5),
       ),
       child: Text(
-        'Slot ${slotIndex + 1}',
+        'CO-HOST $slotIndex',
         style: const TextStyle(
           color: Colors.white70,
           fontSize: 9.5,
@@ -532,16 +608,22 @@ class OmniCastDynamicStage extends StatelessWidget {
                           ? slot.displayName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   title: Text(
                     slot.displayName,
                     style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   subtitle: Text(
-                    slot.isMainSeat ? '👑 Current Main Seat' : 'Co-Host on Stage',
+                    slot.isMainSeat
+                        ? '👑 Current Main Seat'
+                        : 'Co-Host on Stage',
                     style: TextStyle(
                       color: slot.isMainSeat
                           ? const Color(0xFFFFD700)
@@ -555,20 +637,29 @@ class OmniCastDynamicStage extends StatelessWidget {
                 // Promotion / Swap to Main Seat
                 if (!slot.isMainSeat && !isTargetHost)
                   ListTile(
-                    leading: const Icon(Icons.stars_rounded, color: Color(0xFFFFD700)),
-                    title: const Text('Set as Main Seat',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    leading: const Icon(
+                      Icons.stars_rounded,
+                      color: Color(0xFFFFD700),
+                    ),
+                    title: const Text(
+                      'Set as Main Seat',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     subtitle: const Text(
-                        'Promote to primary stage speaker (Slot 0)',
-                        style: TextStyle(color: Colors.white54, fontSize: 11)),
+                      'Promote to primary stage speaker (Slot 0)',
+                      style: TextStyle(color: Colors.white54, fontSize: 11),
+                    ),
                     onTap: () {
                       Navigator.pop(sheetContext);
                       client.seats.setMainSeat(slot.userId);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              '${slot.displayName} is now in the Main Seat 👑'),
+                            '${slot.displayName} is now in the Main Seat 👑',
+                          ),
                           backgroundColor: const Color(0xFF6C5CE7),
                         ),
                       );
@@ -578,12 +669,21 @@ class OmniCastDynamicStage extends StatelessWidget {
                 // Restore Host to Main Seat (if a Co-Host currently holds Main Seat)
                 if (slot.isMainSeat && !isHostMain)
                   ListTile(
-                    leading: const Icon(Icons.replay_rounded, color: Color(0xFFFFD700)),
-                    title: const Text('Restore Host to Main Seat',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
-                    subtitle: const Text('Reclaim Main Seat (Slot 0) for Host',
-                        style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    leading: const Icon(
+                      Icons.replay_rounded,
+                      color: Color(0xFFFFD700),
+                    ),
+                    title: const Text(
+                      'Restore Host to Main Seat',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Reclaim Main Seat (Slot 0) for Host',
+                      style: TextStyle(color: Colors.white54, fontSize: 11),
+                    ),
                     onTap: () {
                       Navigator.pop(sheetContext);
                       client.seats.restoreHostMainSeat();
@@ -599,14 +699,21 @@ class OmniCastDynamicStage extends StatelessWidget {
                 // Remove / Kick from Stage (only for co-hosts, not host)
                 if (!isTargetHost)
                   ListTile(
-                    leading: const Icon(Icons.exit_to_app_rounded,
-                        color: Colors.redAccent),
-                    title: const Text('Remove from Stage',
-                        style: TextStyle(
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.bold)),
-                    subtitle: const Text('Demote co-host back to viewer',
-                        style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    leading: const Icon(
+                      Icons.exit_to_app_rounded,
+                      color: Colors.redAccent,
+                    ),
+                    title: const Text(
+                      'Remove from Stage',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Demote co-host back to viewer',
+                      style: TextStyle(color: Colors.white54, fontSize: 11),
+                    ),
                     onTap: () {
                       Navigator.pop(sheetContext);
                       client.seats.kickSeat(
@@ -615,7 +722,9 @@ class OmniCastDynamicStage extends StatelessWidget {
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${slot.displayName} removed from stage'),
+                          content: Text(
+                            '${slot.displayName} removed from stage',
+                          ),
                           backgroundColor: Colors.redAccent,
                         ),
                       );
@@ -643,8 +752,10 @@ class OmniCastDynamicStage extends StatelessWidget {
         context: context,
         builder: (dialogContext) => AlertDialog(
           backgroundColor: const Color(0xFF1E2132),
-          title: const Text('Join Stage?',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          title: const Text(
+            'Join Stage?',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
           content: Text(
             'Request to take Seat ${slot.slotIndex + 1} as a co-host?',
             style: const TextStyle(color: Colors.white70),
@@ -652,7 +763,10 @@ class OmniCastDynamicStage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white54),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -660,7 +774,9 @@ class OmniCastDynamicStage extends StatelessWidget {
               ),
               onPressed: () {
                 Navigator.pop(dialogContext);
-                client.seats.requestSeat(seatIndex: slot.seatIndex ?? slot.slotIndex + 1);
+                client.seats.requestSeat(
+                  seatIndex: slot.seatIndex ?? slot.slotIndex + 1,
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Seat request sent to host!'),

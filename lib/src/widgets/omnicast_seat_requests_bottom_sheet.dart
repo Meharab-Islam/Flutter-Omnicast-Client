@@ -5,7 +5,8 @@ import '../models/seat_models.dart';
 /// Highly customizable builder widget providing real-time pending co-host seat requests.
 class OmniCastSeatRequestsBuilder extends StatelessWidget {
   final OmniCastClient client;
-  final Widget Function(BuildContext context, List<SeatRequest> requests) builder;
+  final Widget Function(BuildContext context, List<SeatRequest> requests)
+  builder;
 
   const OmniCastSeatRequestsBuilder({
     super.key,
@@ -32,7 +33,8 @@ class OmniCastSeatRequestsBottomSheet extends StatelessWidget {
     SeatRequest request,
     VoidCallback onAccept,
     VoidCallback onDecline,
-  )? itemBuilder;
+  )?
+  itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
 
   const OmniCastSeatRequestsBottomSheet({
@@ -51,7 +53,8 @@ class OmniCastSeatRequestsBottomSheet extends StatelessWidget {
       SeatRequest request,
       VoidCallback onAccept,
       VoidCallback onDecline,
-    )? itemBuilder,
+    )?
+    itemBuilder,
     Widget Function(BuildContext context)? emptyBuilder,
   }) {
     return showModalBottomSheet(
@@ -94,7 +97,10 @@ class OmniCastSeatRequestsBottomSheet extends StatelessWidget {
                     valueListenable: client.seats.pendingSeatRequestsNotifier,
                     builder: (context, requests, _) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(10),
@@ -155,7 +161,9 @@ class OmniCastSeatRequestsBottomSheet extends StatelessWidget {
                       final name = req.requesterName ?? req.requesterId;
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
+                          backgroundColor: const Color(
+                            0xFF6C5CE7,
+                          ).withValues(alpha: 0.3),
                           child: Text(
                             name.isNotEmpty ? name[0].toUpperCase() : '?',
                             style: const TextStyle(color: Colors.white),
@@ -163,19 +171,28 @@ class OmniCastSeatRequestsBottomSheet extends StatelessWidget {
                         ),
                         title: Text(
                           name,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         subtitle: Text(
                           req.preferredSeatIndex != null
                               ? 'Requested Seat ${req.preferredSeatIndex}'
                               : 'Requested Any Seat',
-                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.close_rounded, color: Colors.white60),
+                              icon: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.white60,
+                              ),
                               tooltip: 'Decline',
                               onPressed: onDecline,
                             ),
@@ -183,11 +200,20 @@ class OmniCastSeatRequestsBottomSheet extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF6C5CE7),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 minimumSize: Size.zero,
                               ),
                               onPressed: onAccept,
-                              child: const Text('Accept', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              child: const Text(
+                                'Accept',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ],
                         ),

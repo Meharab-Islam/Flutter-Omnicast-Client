@@ -10,7 +10,12 @@ export 'omnicast_dynamic_stage.dart';
 /// bottom row, floating avatar bubbles, custom overlays) using this builder.
 class OmniCastStageBuilder extends StatelessWidget {
   final OmniCastClient client;
-  final Widget Function(BuildContext context, List<StageSeat> seats, int occupiedCount) builder;
+  final Widget Function(
+    BuildContext context,
+    List<StageSeat> seats,
+    int occupiedCount,
+  )
+  builder;
 
   const OmniCastStageBuilder({
     super.key,
@@ -47,9 +52,11 @@ class OmniCastStageGrid extends StatelessWidget {
   final double childAspectRatio;
   final EdgeInsetsGeometry padding;
   final void Function(StageSeat seat, int seatIndex)? onSeatTap;
-  final Widget Function(BuildContext context, StageSeat seat, int index)? seatBuilder;
+  final Widget Function(BuildContext context, StageSeat seat, int index)?
+  seatBuilder;
   final Widget Function(BuildContext context, int seatIndex)? emptySeatBuilder;
-  final Widget Function(BuildContext context, StageSeat seat)? occupiedSeatBuilder;
+  final Widget Function(BuildContext context, StageSeat seat)?
+  occupiedSeatBuilder;
 
   const OmniCastStageGrid({
     super.key,
@@ -118,9 +125,14 @@ class OmniCastStageGrid extends StatelessWidget {
     final isMuted = client.seats.isUserMuted(uId) || seat.isMuted;
     final isCameraOff = client.seats.isUserCameraOff(uId) || seat.isCameraOff;
     final isSelf = uId == client.state.userId;
-    final renderer = isSelf ? client.media.localRenderer : client.media.getRenderer(uId);
-    final effectiveRenderer = renderer ??
-        (!isSelf && client.state.isHost && client.media.remoteRenderers.isNotEmpty
+    final renderer = isSelf
+        ? client.media.localRenderer
+        : client.media.getRenderer(uId);
+    final effectiveRenderer =
+        renderer ??
+        (!isSelf &&
+                client.state.isHost &&
+                client.media.remoteRenderers.isNotEmpty
             ? client.media.remoteRenderers.values.first
             : null);
 
@@ -144,10 +156,12 @@ class OmniCastStageGrid extends StatelessWidget {
                     ? ListenableBuilder(
                         listenable: effectiveRenderer,
                         builder: (context, _) {
-                          if (effectiveRenderer.srcObject != null || effectiveRenderer.renderVideo) {
+                          if (effectiveRenderer.srcObject != null ||
+                              effectiveRenderer.renderVideo) {
                             return RTCVideoView(
                               effectiveRenderer,
-                              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                              objectFit: RTCVideoViewObjectFit
+                                  .RTCVideoViewObjectFitCover,
                               mirror: isSelf,
                             );
                           }
@@ -156,9 +170,13 @@ class OmniCastStageGrid extends StatelessWidget {
                             child: Center(
                               child: CircleAvatar(
                                 radius: 22,
-                                backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
+                                backgroundColor: const Color(
+                                  0xFF6C5CE7,
+                                ).withValues(alpha: 0.3),
                                 child: Text(
-                                  displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+                                  displayName.isNotEmpty
+                                      ? displayName[0].toUpperCase()
+                                      : '?',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -175,9 +193,13 @@ class OmniCastStageGrid extends StatelessWidget {
                         child: Center(
                           child: CircleAvatar(
                             radius: 22,
-                            backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
+                            backgroundColor: const Color(
+                              0xFF6C5CE7,
+                            ).withValues(alpha: 0.3),
                             child: Text(
-                              displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+                              displayName.isNotEmpty
+                                  ? displayName[0].toUpperCase()
+                                  : '?',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -194,14 +216,21 @@ class OmniCastStageGrid extends StatelessWidget {
                 top: 6,
                 left: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '${seat.seatIndex}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -220,7 +249,11 @@ class OmniCastStageGrid extends StatelessWidget {
                           color: Colors.redAccent.withValues(alpha: 0.8),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.mic_off_rounded, size: 10, color: Colors.white),
+                        child: const Icon(
+                          Icons.mic_off_rounded,
+                          size: 10,
+                          color: Colors.white,
+                        ),
                       ),
                     if (isCameraOff) ...[
                       const SizedBox(width: 4),
@@ -230,7 +263,11 @@ class OmniCastStageGrid extends StatelessWidget {
                           color: Colors.black.withValues(alpha: 0.6),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.videocam_off_rounded, size: 10, color: Colors.white70),
+                        child: const Icon(
+                          Icons.videocam_off_rounded,
+                          size: 10,
+                          color: Colors.white70,
+                        ),
                       ),
                     ],
                   ],
@@ -243,7 +280,10 @@ class OmniCastStageGrid extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
@@ -256,7 +296,11 @@ class OmniCastStageGrid extends StatelessWidget {
                   ),
                   child: Text(
                     displayName,
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -294,11 +338,18 @@ class OmniCastStageGrid extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_rounded, size: 24, color: Colors.white.withValues(alpha: 0.4)),
+              Icon(
+                Icons.add_rounded,
+                size: 24,
+                color: Colors.white.withValues(alpha: 0.4),
+              ),
               const SizedBox(height: 4),
               Text(
                 'Seat $seatIndex',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 11),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  fontSize: 11,
+                ),
               ),
             ],
           ),
@@ -315,7 +366,10 @@ class OmniCastStageGrid extends StatelessWidget {
     } else {
       client.seats.requestSeat(seatIndex: seatIndex);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Requested seat $seatIndex from Host!'), backgroundColor: Colors.indigo),
+        SnackBar(
+          content: Text('Requested seat $seatIndex from Host!'),
+          backgroundColor: Colors.indigo,
+        ),
       );
     }
   }
@@ -335,16 +389,31 @@ class OmniCastStageGrid extends StatelessWidget {
           children: [
             ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person)),
-              title: Text(seat.user?.displayName ?? seat.userId ?? 'Guest', style: const TextStyle(color: Colors.white)),
-              subtitle: Text('Seat ${seat.seatIndex}', style: const TextStyle(color: Colors.white54)),
+              title: Text(
+                seat.user?.displayName ?? seat.userId ?? 'Guest',
+                style: const TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                'Seat ${seat.seatIndex}',
+                style: const TextStyle(color: Colors.white54),
+              ),
             ),
             const Divider(color: Colors.white12),
             ListTile(
-              leading: const Icon(Icons.person_remove_rounded, color: Colors.redAccent),
-              title: const Text('Kick from Seat', style: TextStyle(color: Colors.redAccent)),
+              leading: const Icon(
+                Icons.person_remove_rounded,
+                color: Colors.redAccent,
+              ),
+              title: const Text(
+                'Kick from Seat',
+                style: TextStyle(color: Colors.redAccent),
+              ),
               onTap: () {
                 Navigator.pop(ctx);
-                client.seats.kickSeat(seat.seatIndex, targetUserId: seat.userId);
+                client.seats.kickSeat(
+                  seat.seatIndex,
+                  targetUserId: seat.userId,
+                );
               },
             ),
           ],

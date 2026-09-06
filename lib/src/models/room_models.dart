@@ -1,25 +1,15 @@
 /// Room broadcasting modality (Video vs. Audio-Only).
-enum RoomType {
-  video,
-  audio,
-}
+enum RoomType { video, audio }
 
 /// High-level layout and broadcast state mode.
-enum RoomMode {
-  solo,
-  coHost,
-  pk,
-}
+enum RoomMode { solo, coHost, pk }
 
 /// Real-time Host vs Opponent PK Battle score points.
 class PkScore {
   final int hostScore;
   final int opponentScore;
 
-  const PkScore({
-    this.hostScore = 0,
-    this.opponentScore = 0,
-  });
+  const PkScore({this.hostScore = 0, this.opponentScore = 0});
 
   double get hostRatio {
     final total = hostScore + opponentScore;
@@ -35,19 +25,10 @@ class PkScore {
 }
 
 /// User role in a live room session.
-enum UserRole {
-  viewer,
-  host,
-  coHost,
-}
+enum UserRole { viewer, host, coHost }
 
 /// Connection lifecycle state of the SDK client.
-enum ClientConnectionState {
-  disconnected,
-  connecting,
-  connected,
-  reconnecting,
-}
+enum ClientConnectionState { disconnected, connecting, connected, reconnecting }
 
 /// Options passed when creating a new live broadcasting room.
 class RoomOptions {
@@ -76,27 +57,33 @@ class RoomOptions {
   bool get isAudioOnly => roomType == RoomType.audio;
 
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'room_type': roomType.name,
-        'enable_audio': enableAudio,
-        'enable_video': isAudioOnly ? false : enableVideo,
-        'enable_simulcast': isAudioOnly ? false : enableSimulcast,
-        'enable_dynacast': enableDynacast,
-        'max_co_hosts': maxCoHosts,
-        'show_join_messages': showJoinMessages,
-        'metadata': ?metadata,
-      };
+    'title': title,
+    'room_type': roomType.name,
+    'enable_audio': enableAudio,
+    'enable_video': isAudioOnly ? false : enableVideo,
+    'enable_simulcast': isAudioOnly ? false : enableSimulcast,
+    'enable_dynacast': enableDynacast,
+    'max_co_hosts': maxCoHosts,
+    'show_join_messages': showJoinMessages,
+    'metadata': ?metadata,
+  };
 
   factory RoomOptions.fromJson(Map<String, dynamic> json) {
     final typeStr = json['room_type'] as String? ?? 'video';
-    final roomType = typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video;
+    final roomType = typeStr.toLowerCase() == 'audio'
+        ? RoomType.audio
+        : RoomType.video;
 
     return RoomOptions(
       title: json['title'] as String? ?? 'Live Stream',
       roomType: roomType,
       enableAudio: json['enable_audio'] as bool? ?? true,
-      enableVideo: roomType == RoomType.audio ? false : (json['enable_video'] as bool? ?? true),
-      enableSimulcast: roomType == RoomType.audio ? false : (json['enable_simulcast'] as bool? ?? true),
+      enableVideo: roomType == RoomType.audio
+          ? false
+          : (json['enable_video'] as bool? ?? true),
+      enableSimulcast: roomType == RoomType.audio
+          ? false
+          : (json['enable_simulcast'] as bool? ?? true),
       enableDynacast: json['enable_dynacast'] as bool? ?? true,
       maxCoHosts: (json['max_co_hosts'] as num?)?.toInt() ?? 4,
       showJoinMessages: json['show_join_messages'] as bool? ?? true,
@@ -145,28 +132,36 @@ class OmniCastParticipant {
     if (json['isVip'] != null) meta['is_vip'] = json['isVip'];
     if (json['badge'] != null) meta['badge'] = json['badge'];
 
-    final userId = (json['user_id'] ?? json['userId'] ?? json['id'] ?? json['sub'] ?? '').toString();
-    final displayName = (json['display_name'] ??
-            json['displayName'] ??
-            json['user_name'] ??
-            json['userName'] ??
-            json['name'] ??
-            json['nickname'])
-        ?.toString();
-    final avatarUrl = (json['avatar_url'] ??
-            json['avatarUrl'] ??
-            json['avatar'] ??
-            json['profile_pic'] ??
-            json['image'])
-        ?.toString();
+    final userId =
+        (json['user_id'] ?? json['userId'] ?? json['id'] ?? json['sub'] ?? '')
+            .toString();
+    final displayName =
+        (json['display_name'] ??
+                json['displayName'] ??
+                json['user_name'] ??
+                json['userName'] ??
+                json['name'] ??
+                json['nickname'])
+            ?.toString();
+    final avatarUrl =
+        (json['avatar_url'] ??
+                json['avatarUrl'] ??
+                json['avatar'] ??
+                json['profile_pic'] ??
+                json['image'])
+            ?.toString();
 
     return OmniCastParticipant(
       userId: userId,
       displayName: displayName,
       avatarUrl: avatarUrl,
       role: role,
-      isAudioMuted: json['is_audio_muted'] as bool? ?? json['is_muted'] as bool? ?? false,
-      isVideoMuted: json['is_video_muted'] as bool? ?? json['is_camera_off'] as bool? ?? false,
+      isAudioMuted:
+          json['is_audio_muted'] as bool? ?? json['is_muted'] as bool? ?? false,
+      isVideoMuted:
+          json['is_video_muted'] as bool? ??
+          json['is_camera_off'] as bool? ??
+          false,
       joinedAt: json['joined_at'] != null
           ? DateTime.tryParse(json['joined_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
@@ -175,15 +170,15 @@ class OmniCastParticipant {
   }
 
   Map<String, dynamic> toJson() => {
-        'user_id': userId,
-        'display_name': displayName,
-        'avatar_url': avatarUrl,
-        'role': role.name,
-        'is_audio_muted': isAudioMuted,
-        'is_video_muted': isVideoMuted,
-        'joined_at': joinedAt.toIso8601String(),
-        'metadata': metadata,
-      };
+    'user_id': userId,
+    'display_name': displayName,
+    'avatar_url': avatarUrl,
+    'role': role.name,
+    'is_audio_muted': isAudioMuted,
+    'is_video_muted': isVideoMuted,
+    'joined_at': joinedAt.toIso8601String(),
+    'metadata': metadata,
+  };
 
   OmniCastParticipant copyWith({
     String? userId,
@@ -256,18 +251,19 @@ class RoomModel {
     final meta = json['metadata'] is Map<String, dynamic>
         ? json['metadata'] as Map<String, dynamic>
         : (json['options'] is Map<String, dynamic>
-            ? json['options'] as Map<String, dynamic>
-            : <String, dynamic>{});
+              ? json['options'] as Map<String, dynamic>
+              : <String, dynamic>{});
 
     // 2. Extract host sub-object if present
     final hostMap = json['host'] is Map<String, dynamic>
         ? json['host'] as Map<String, dynamic>
         : (json['owner'] is Map<String, dynamic>
-            ? json['owner'] as Map<String, dynamic>
-            : <String, dynamic>{});
+              ? json['owner'] as Map<String, dynamic>
+              : <String, dynamic>{});
 
     // 3. Room ID (Supports snake_case, camelCase, id, name)
-    final roomId = json['room_id']?.toString() ??
+    final roomId =
+        json['room_id']?.toString() ??
         json['roomId']?.toString() ??
         json['id']?.toString() ??
         json['channel_id']?.toString() ??
@@ -275,7 +271,8 @@ class RoomModel {
         '';
 
     // 4. Stream Title
-    final title = json['room_name']?.toString() ??
+    final title =
+        json['room_name']?.toString() ??
         json['title']?.toString() ??
         json['room_title']?.toString() ??
         json['roomTitle']?.toString() ??
@@ -284,7 +281,8 @@ class RoomModel {
         (roomId.isNotEmpty ? roomId : 'Live Broadcast');
 
     // 5. Host ID & Name
-    final hostId = json['host_id']?.toString() ??
+    final hostId =
+        json['host_id']?.toString() ??
         json['hostId']?.toString() ??
         json['user_id']?.toString() ??
         json['userId']?.toString() ??
@@ -292,7 +290,8 @@ class RoomModel {
         hostMap['user_id']?.toString() ??
         'Host';
 
-    final hostName = json['host_name']?.toString() ??
+    final hostName =
+        json['host_name']?.toString() ??
         json['hostDisplayName']?.toString() ??
         json['host_display_name']?.toString() ??
         meta['displayName']?.toString() ??
@@ -303,7 +302,8 @@ class RoomModel {
         (hostId.isNotEmpty ? hostId : 'Broadcaster');
 
     // 6. Host Avatar
-    final hostAvatar = json['host_avatar']?.toString() ??
+    final hostAvatar =
+        json['host_avatar']?.toString() ??
         json['hostAvatar']?.toString() ??
         json['avatar_url']?.toString() ??
         json['avatarUrl']?.toString() ??
@@ -314,13 +314,15 @@ class RoomModel {
         hostMap['avatar_url']?.toString();
 
     // 7. Room Type (Video vs Audio)
-    final typeStr = json['room_type']?.toString() ??
+    final typeStr =
+        json['room_type']?.toString() ??
         json['roomType']?.toString() ??
         json['type']?.toString() ??
         meta['room_type']?.toString() ??
         'video';
-    final roomType =
-        typeStr.toLowerCase() == 'audio' ? RoomType.audio : RoomType.video;
+    final roomType = typeStr.toLowerCase() == 'audio'
+        ? RoomType.audio
+        : RoomType.video;
 
     // 8. Viewer Count (Supports int, double, string number, or viewers/participants list length)
     int viewerCount = 0;
@@ -340,7 +342,8 @@ class RoomModel {
 
     // 9. Created At
     DateTime createdAt = DateTime.now();
-    final rawDate = json['created_at'] ?? json['createdAt'] ?? json['timestamp'];
+    final rawDate =
+        json['created_at'] ?? json['createdAt'] ?? json['timestamp'];
     if (rawDate != null) {
       if (rawDate is int) {
         createdAt = rawDate > 1000000000000
@@ -365,16 +368,16 @@ class RoomModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'room_id': roomId,
-        'title': title,
-        'host_id': hostId,
-        'host_name': hostName,
-        'host_avatar': hostAvatar,
-        'room_type': roomType.name,
-        'viewer_count': viewerCount,
-        'created_at': createdAt.toIso8601String(),
-        'metadata': metadata,
-      };
+    'room_id': roomId,
+    'title': title,
+    'host_id': hostId,
+    'host_name': hostName,
+    'host_avatar': hostAvatar,
+    'room_type': roomType.name,
+    'viewer_count': viewerCount,
+    'created_at': createdAt.toIso8601String(),
+    'metadata': metadata,
+  };
 }
 
 /// Backward compatibility alias for [RoomModel].
@@ -396,10 +399,23 @@ class KickedEvent {
     required this.timestamp,
   });
 
-  factory KickedEvent.fromJson(Map<String, dynamic> json, {String? defaultRoomId, String? defaultUserId}) {
+  factory KickedEvent.fromJson(
+    Map<String, dynamic> json, {
+    String? defaultRoomId,
+    String? defaultUserId,
+  }) {
     return KickedEvent(
-      roomId: json['room_id'] as String? ?? json['roomId'] as String? ?? defaultRoomId ?? '',
-      userId: json['target_user'] as String? ?? json['user_id'] as String? ?? json['userId'] as String? ?? defaultUserId ?? '',
+      roomId:
+          json['room_id'] as String? ??
+          json['roomId'] as String? ??
+          defaultRoomId ??
+          '',
+      userId:
+          json['target_user'] as String? ??
+          json['user_id'] as String? ??
+          json['userId'] as String? ??
+          defaultUserId ??
+          '',
       reason: json['reason'] as String? ?? json['message'] as String?,
       kickedBy: json['kicked_by'] as String? ?? json['host_id'] as String?,
       timestamp: DateTime.now(),
@@ -407,11 +423,10 @@ class KickedEvent {
   }
 
   Map<String, dynamic> toJson() => {
-        'room_id': roomId,
-        'user_id': userId,
-        'reason': reason,
-        'kicked_by': kickedBy,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'room_id': roomId,
+    'user_id': userId,
+    'reason': reason,
+    'kicked_by': kickedBy,
+    'timestamp': timestamp.toIso8601String(),
+  };
 }
-

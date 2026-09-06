@@ -4,14 +4,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../utils/omnicast_logger.dart';
 
 /// Rating describing WebRTC network stream quality.
-enum NetworkQualityRating {
-  excellent,
-  good,
-  fair,
-  poor,
-  bad,
-  unknown,
-}
+enum NetworkQualityRating { excellent, good, fair, poor, bad, unknown }
 
 /// Snapshot of real-time WebRTC network metrics (packet loss, jitter, RTT, bitrate).
 class NetworkQualityStats {
@@ -38,22 +31,20 @@ class NetworkQualityStats {
   });
 
   factory NetworkQualityStats.initial() {
-    return NetworkQualityStats(
-      timestamp: DateTime.now(),
-    );
+    return NetworkQualityStats(timestamp: DateTime.now());
   }
 
   Map<String, dynamic> toJson() => {
-        'packet_loss_percent': packetLossPercent,
-        'jitter_ms': jitterMs,
-        'rtt_ms': rttMs,
-        'bitrate_kbps': bitrateKbps,
-        'total_packets_lost': totalPacketsLost,
-        'total_packets_received': totalPacketsReceived,
-        'total_packets_sent': totalPacketsSent,
-        'rating': rating.name,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'packet_loss_percent': packetLossPercent,
+    'jitter_ms': jitterMs,
+    'rtt_ms': rttMs,
+    'bitrate_kbps': bitrateKbps,
+    'total_packets_lost': totalPacketsLost,
+    'total_packets_received': totalPacketsReceived,
+    'total_packets_sent': totalPacketsSent,
+    'rating': rating.name,
+    'timestamp': timestamp.toIso8601String(),
+  };
 }
 
 /// Periodically polls [RTCPeerConnection.getStats] to extract real-time jitter, packet loss, RTT, and bitrate.
@@ -79,7 +70,8 @@ class WebRTCStatsMonitor {
   }) : _getPeerConnection = getPeerConnection;
 
   NetworkQualityStats get currentStats => qualityNotifier.value;
-  Stream<NetworkQualityStats> get onStatsUpdated => _statsStreamController.stream;
+  Stream<NetworkQualityStats> get onStatsUpdated =>
+      _statsStreamController.stream;
 
   /// Starts the periodic stats polling loop.
   void start() {
@@ -129,13 +121,16 @@ class WebRTCStatsMonitor {
           if (jitter > maxJitter) {
             maxJitter = jitter;
           }
-        } else if (type == 'outbound-rtp' || values.containsKey('packetsSent')) {
+        } else if (type == 'outbound-rtp' ||
+            values.containsKey('packetsSent')) {
           final sent = (values['packetsSent'] as num?)?.toInt() ?? 0;
           final bytes = (values['bytesSent'] as num?)?.toInt() ?? 0;
           packetsSent += sent;
           currentBytesSent += bytes;
-        } else if (type == 'candidate-pair' || values.containsKey('currentRoundTripTime')) {
-          final rtt = (values['currentRoundTripTime'] as num?)?.toDouble() ??
+        } else if (type == 'candidate-pair' ||
+            values.containsKey('currentRoundTripTime')) {
+          final rtt =
+              (values['currentRoundTripTime'] as num?)?.toDouble() ??
               (values['roundTripTime'] as num?)?.toDouble() ??
               0.0;
           if (rtt > currentRtt) {
@@ -147,9 +142,12 @@ class WebRTCStatsMonitor {
       final now = DateTime.now();
       double bitrateKbps = 0.0;
       if (_lastTimestamp != null) {
-        final durationSeconds = now.difference(_lastTimestamp!).inMilliseconds / 1000.0;
+        final durationSeconds =
+            now.difference(_lastTimestamp!).inMilliseconds / 1000.0;
         if (durationSeconds > 0) {
-          final deltaBytes = (currentBytesReceived - _lastBytesReceived) + (currentBytesSent - _lastBytesSent);
+          final deltaBytes =
+              (currentBytesReceived - _lastBytesReceived) +
+              (currentBytesSent - _lastBytesSent);
           if (deltaBytes > 0) {
             bitrateKbps = (deltaBytes * 8.0) / (durationSeconds * 1000.0);
           }
@@ -162,7 +160,9 @@ class WebRTCStatsMonitor {
 
       // Compute packet loss percentage
       final totalPackets = packetsLost + packetsReceived;
-      final packetLossPercent = totalPackets > 0 ? (packetsLost / totalPackets) * 100.0 : 0.0;
+      final packetLossPercent = totalPackets > 0
+          ? (packetsLost / totalPackets) * 100.0
+          : 0.0;
 
       // Jitter in ms (WebRTC report may give seconds e.g. 0.015s = 15ms)
       final jitterMs = maxJitter > 1.0 ? maxJitter : maxJitter * 1000.0;

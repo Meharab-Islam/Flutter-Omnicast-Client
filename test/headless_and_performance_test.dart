@@ -48,71 +48,86 @@ void main() {
       roomState.dispose();
     });
 
-    test('viewerCountNotifier updates atomically without rebuilding entire state', () {
-      expect(roomManager.viewerCountNotifier.value, 0);
+    test(
+      'viewerCountNotifier updates atomically without rebuilding entire state',
+      () {
+        expect(roomManager.viewerCountNotifier.value, 0);
 
-      var notifiedCount = 0;
-      roomManager.viewerCountNotifier.addListener(() => notifiedCount++);
+        var notifiedCount = 0;
+        roomManager.viewerCountNotifier.addListener(() => notifiedCount++);
 
-      roomState.updateViewers(count: 42);
-      expect(roomManager.viewerCountNotifier.value, 42);
-      expect(notifiedCount, 1);
-    });
+        roomState.updateViewers(count: 42);
+        expect(roomManager.viewerCountNotifier.value, 42);
+        expect(notifiedCount, 1);
+      },
+    );
 
-    test('pkStateNotifier and timerNotifier update on battle state changes', () {
-      expect(pkManager.pkStateNotifier.value.isPKActive, isFalse);
+    test(
+      'pkStateNotifier and timerNotifier update on battle state changes',
+      () {
+        expect(pkManager.pkStateNotifier.value.isPKActive, isFalse);
 
-      roomState.updatePKBattle(PKBattleInfo(
-        battleId: 'pk_100',
-        hostRoomId: 'room_1',
-        hostUserId: 'host_1',
-        opponentRoomId: 'room_2',
-        opponentUserId: 'opp_2',
-        hostScore: 50,
-        opponentScore: 20,
-        remainingSeconds: 240,
-        startedAt: DateTime.now(),
-      ));
+        roomState.updatePKBattle(
+          PKBattleInfo(
+            battleId: 'pk_100',
+            hostRoomId: 'room_1',
+            hostUserId: 'host_1',
+            opponentRoomId: 'room_2',
+            opponentUserId: 'opp_2',
+            hostScore: 50,
+            opponentScore: 20,
+            remainingSeconds: 240,
+            startedAt: DateTime.now(),
+          ),
+        );
 
-      expect(pkManager.pkStateNotifier.value.isPKActive, isTrue);
-      expect(pkManager.isPKActiveNotifier.value, isTrue);
-      expect(pkManager.timerNotifier.value, 240);
-      expect(pkManager.pkStateNotifier.value.myScore, 50);
-    });
+        expect(pkManager.pkStateNotifier.value.isPKActive, isTrue);
+        expect(pkManager.isPKActiveNotifier.value, isTrue);
+        expect(pkManager.timerNotifier.value, 240);
+        expect(pkManager.pkStateNotifier.value.myScore, 50);
+      },
+    );
 
-    test('userBalanceNotifier and hostCoinBalanceNotifier update on balance and gift sync', () {
-      expect(interactionManager.userBalanceNotifier.value, 0);
-      expect(interactionManager.hostCoinBalanceNotifier.value, 0);
+    test(
+      'userBalanceNotifier and hostCoinBalanceNotifier update on balance and gift sync',
+      () {
+        expect(interactionManager.userBalanceNotifier.value, 0);
+        expect(interactionManager.hostCoinBalanceNotifier.value, 0);
 
-      roomState.setSession(
-        roomId: 'room_1',
-        userId: 'user_99',
-        role: UserRole.viewer,
-        hostId: 'host_1',
-      );
+        roomState.setSession(
+          roomId: 'room_1',
+          userId: 'user_99',
+          role: UserRole.viewer,
+          hostId: 'host_1',
+        );
 
-      roomState.updateBalance(const BalanceUpdate(
-        userId: 'user_99',
-        newBalance: 1500,
-        delta: 500,
-        reason: 'purchase',
-      ));
+        roomState.updateBalance(
+          const BalanceUpdate(
+            userId: 'user_99',
+            newBalance: 1500,
+            delta: 500,
+            reason: 'purchase',
+          ),
+        );
 
-      expect(interactionManager.userBalanceNotifier.value, 1500);
+        expect(interactionManager.userBalanceNotifier.value, 1500);
 
-      roomState.processGift(GiftEvent(
-        giftId: 'rose',
-        giftName: 'Rose',
-        senderId: 'user_99',
-        senderName: 'Fan',
-        amount: 10,
-        coinValue: 10,
-        hostTotalCoins: 8000,
-        timestamp: DateTime.now(),
-      ));
+        roomState.processGift(
+          GiftEvent(
+            giftId: 'rose',
+            giftName: 'Rose',
+            senderId: 'user_99',
+            senderName: 'Fan',
+            amount: 10,
+            coinValue: 10,
+            hostTotalCoins: 8000,
+            timestamp: DateTime.now(),
+          ),
+        );
 
-      expect(interactionManager.hostCoinBalanceNotifier.value, 8000);
-    });
+        expect(interactionManager.hostCoinBalanceNotifier.value, 8000);
+      },
+    );
   });
 
   group('Extreme Hardware Optimization & App Lifecycle', () {

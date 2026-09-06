@@ -12,7 +12,8 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
   final OmniCastClient client;
   final String title;
   final bool enableHostKick;
-  final void Function(OmniCastParticipant participant, String reason)? onUserKicked;
+  final void Function(OmniCastParticipant participant, String reason)?
+  onUserKicked;
 
   const OmniCastViewersBottomSheet({
     super.key,
@@ -43,7 +44,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.70,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 16.0,
+            ),
             child: OmniCastViewersBottomSheet(
               client: client,
               title: title,
@@ -94,7 +98,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
               valueListenable: client.totalViewerCount,
               builder: (context, count, _) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF334155),
                     borderRadius: BorderRadius.circular(20),
@@ -139,7 +146,11 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.people_outline, color: Colors.white30, size: 48),
+                      Icon(
+                        Icons.people_outline,
+                        color: Colors.white30,
+                        size: 48,
+                      ),
                       SizedBox(height: 8),
                       Text(
                         'No other viewers yet',
@@ -152,14 +163,14 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
 
               return ListView.separated(
                 itemCount: viewers.length,
-                separatorBuilder: (context, index) => const Divider(
-                  color: Colors.white10,
-                  height: 1,
-                ),
+                separatorBuilder: (context, index) =>
+                    const Divider(color: Colors.white10, height: 1),
                 itemBuilder: (context, index) {
                   final viewer = viewers[index];
                   final isSelf = viewer.userId == currentUserId;
-                  final isVip = viewer.metadata['is_vip'] == true || viewer.metadata['isVip'] == true;
+                  final isVip =
+                      viewer.metadata['is_vip'] == true ||
+                      viewer.metadata['isVip'] == true;
                   final level = viewer.metadata['level'] ?? 1;
 
                   return Padding(
@@ -225,7 +236,9 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                                         vertical: 1,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                                        color: const Color(
+                                          0xFF6366F1,
+                                        ).withValues(alpha: 0.3),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: const Text(
@@ -251,7 +264,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
-                                        colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
+                                        colors: [
+                                          Color(0xFF8B5CF6),
+                                          Color(0xFFEC4899),
+                                        ],
                                       ),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -287,10 +303,8 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                               size: 22,
                             ),
                             tooltip: 'Kick Participant',
-                            onPressed: () => _showKickConfirmationDialog(
-                              context,
-                              viewer,
-                            ),
+                            onPressed: () =>
+                                _showKickConfirmationDialog(context, viewer),
                           ),
                       ],
                     ),
@@ -304,7 +318,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
     );
   }
 
-  void _showKickConfirmationDialog(BuildContext context, OmniCastParticipant participant) {
+  void _showKickConfirmationDialog(
+    BuildContext context,
+    OmniCastParticipant participant,
+  ) {
     String selectedReason = 'Violated community guidelines';
     final reasons = [
       'Violated community guidelines',
@@ -334,7 +351,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                   const SizedBox(width: 10),
                   const Text(
                     'Kick Participant',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -363,7 +383,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: const Color(0xFF0F172A),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -386,7 +409,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white54),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -394,7 +420,10 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                   ),
                   onPressed: () {
                     Navigator.pop(dialogContext); // Close confirmation dialog
@@ -406,16 +435,23 @@ class OmniCastViewersBottomSheet extends StatelessWidget {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Ejected "${participant.displayName ?? participant.userId}" from the room'),
+                        content: Text(
+                          'Ejected "${participant.displayName ?? participant.userId}" from the room',
+                        ),
                         backgroundColor: const Color(0xFFEF4444),
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     );
                   },
                   child: const Text(
                     'Kick User',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

@@ -9,10 +9,8 @@ class OmniCastApi {
   final OmniCastConfig config;
   final http.Client _client;
 
-  OmniCastApi({
-    required this.config,
-    http.Client? client,
-  }) : _client = client ?? http.Client();
+  OmniCastApi({required this.config, http.Client? client})
+    : _client = client ?? http.Client();
 
   /// Headers automatically computed from the SDK initialization credentials.
   Map<String, String> get defaultHeaders {
@@ -42,25 +40,30 @@ class OmniCastApi {
     final host = config.hostUrl.trim();
     if (host.startsWith('wss://')) {
       final replaced = host.replaceFirst('wss://', 'https://');
-      return replaced.replaceAll(RegExp(r'/ws$'), '').replaceAll(RegExp(r'/+$'), '');
+      return replaced
+          .replaceAll(RegExp(r'/ws$'), '')
+          .replaceAll(RegExp(r'/+$'), '');
     } else if (host.startsWith('ws://')) {
       final replaced = host.replaceFirst('ws://', 'http://');
-      return replaced.replaceAll(RegExp(r'/ws$'), '').replaceAll(RegExp(r'/+$'), '');
+      return replaced
+          .replaceAll(RegExp(r'/ws$'), '')
+          .replaceAll(RegExp(r'/+$'), '');
     }
     return host.replaceAll(RegExp(r'/+$'), '');
   }
 
   /// Fetches active live broadcasting rooms from the backend (`GET /rooms`).
-  Future<List<RoomModel>> getLiveRooms({Duration timeout = const Duration(seconds: 10)}) async {
+  Future<List<RoomModel>> getLiveRooms({
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
     final baseUrl = baseApiUrl;
     final urlString = '$baseUrl/rooms';
     final uri = Uri.parse(urlString);
 
     try {
-      final response = await _client.get(
-        uri,
-        headers: defaultHeaders,
-      ).timeout(timeout);
+      final response = await _client
+          .get(uri, headers: defaultHeaders)
+          .timeout(timeout);
 
       OmniCastLogger.log('[OmniCastApi] Raw Rooms Response: ${response.body}');
 
@@ -78,7 +81,8 @@ class OmniCastApi {
             if (decoded['rooms'] is List) {
               roomList = decoded['rooms'] as List;
             } else if (decoded['rooms'] is Map<String, dynamic>) {
-              roomList = (decoded['rooms'] as Map<String, dynamic>).values.toList();
+              roomList = (decoded['rooms'] as Map<String, dynamic>).values
+                  .toList();
             } else if (decoded['data'] is List) {
               roomList = decoded['data'] as List;
             } else if (decoded['active_rooms'] is List) {
@@ -101,7 +105,9 @@ class OmniCastApi {
       } else if (response.statusCode == 404 || response.statusCode == 204) {
         return [];
       } else {
-        throw Exception('OmniCastApi.getLiveRooms failed: ${response.statusCode} - ${response.body}');
+        throw Exception(
+          'OmniCastApi.getLiveRooms failed: ${response.statusCode} - ${response.body}',
+        );
       }
     } catch (e) {
       OmniCastLogger.error('[OmniCastApi] Error fetching live rooms: $e');
@@ -110,13 +116,20 @@ class OmniCastApi {
   }
 
   /// Fetches a single room's details including active viewers (`GET /rooms/{roomId}`).
-  Future<Map<String, dynamic>?> getRoom(String roomId, {Duration timeout = const Duration(seconds: 5)}) async {
+  Future<Map<String, dynamic>?> getRoom(
+    String roomId, {
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
     final baseUrl = baseApiUrl;
-    final urlString = baseUrl.endsWith('/api') ? '$baseUrl/rooms/$roomId' : '$baseUrl/rooms/$roomId';
+    final urlString = baseUrl.endsWith('/api')
+        ? '$baseUrl/rooms/$roomId'
+        : '$baseUrl/rooms/$roomId';
     final uri = Uri.parse(urlString);
 
     try {
-      final response = await _client.get(uri, headers: defaultHeaders).timeout(timeout);
+      final response = await _client
+          .get(uri, headers: defaultHeaders)
+          .timeout(timeout);
       if (response.statusCode == 200 && response.body.isNotEmpty) {
         final decoded = jsonDecode(response.body);
         if (decoded is Map<String, dynamic>) {

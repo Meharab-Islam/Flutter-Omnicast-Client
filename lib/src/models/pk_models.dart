@@ -1,12 +1,5 @@
 /// Lifecycle status of a host PK battle.
-enum PKStatus {
-  idle,
-  requested,
-  matched,
-  inProgress,
-  punishment,
-  ended,
-}
+enum PKStatus { idle, requested, matched, inProgress, punishment, ended }
 
 /// Reactive snapshot representing the current PK battle state.
 class PKState {
@@ -67,7 +60,9 @@ class PKState {
   factory PKState.fromBattleInfo(PKBattleInfo info, {String? currentUserId}) {
     final isHost = currentUserId == null || currentUserId == info.hostUserId;
     return PKState(
-      isPKActive: info.status == PKStatus.inProgress || info.status == PKStatus.punishment,
+      isPKActive:
+          info.status == PKStatus.inProgress ||
+          info.status == PKStatus.punishment,
       battleId: info.battleId,
       hostRoomId: info.hostRoomId,
       hostUserId: info.hostUserId,
@@ -182,20 +177,20 @@ class PKBattleInfo {
   }
 
   Map<String, dynamic> toJson() => {
-        'battle_id': battleId,
-        'host_room_id': hostRoomId,
-        'host_user_id': hostUserId,
-        'opponent_room_id': opponentRoomId,
-        'opponent_user_id': opponentUserId,
-        'opponent_display_name': opponentDisplayName,
-        'opponent_avatar_url': opponentAvatarUrl,
-        'status': status.name,
-        'host_score': hostScore,
-        'opponent_score': opponentScore,
-        'duration_seconds': durationSeconds,
-        'remaining_seconds': remainingSeconds,
-        'started_at': startedAt.toIso8601String(),
-      };
+    'battle_id': battleId,
+    'host_room_id': hostRoomId,
+    'host_user_id': hostUserId,
+    'opponent_room_id': opponentRoomId,
+    'opponent_user_id': opponentUserId,
+    'opponent_display_name': opponentDisplayName,
+    'opponent_avatar_url': opponentAvatarUrl,
+    'status': status.name,
+    'host_score': hostScore,
+    'opponent_score': opponentScore,
+    'duration_seconds': durationSeconds,
+    'remaining_seconds': remainingSeconds,
+    'started_at': startedAt.toIso8601String(),
+  };
 }
 
 /// Real-time PK score update event.
@@ -225,12 +220,12 @@ class PKScoreUpdate {
   }
 
   Map<String, dynamic> toJson() => {
-        'battle_id': battleId,
-        'host_score': hostScore,
-        'opponent_score': opponentScore,
-        'last_gift_sender_id': lastGiftSenderId,
-        'delta_points': deltaPoints,
-      };
+    'battle_id': battleId,
+    'host_score': hostScore,
+    'opponent_score': opponentScore,
+    'last_gift_sender_id': lastGiftSenderId,
+    'delta_points': deltaPoints,
+  };
 }
 
 /// Periodic PK timer tick event.
@@ -254,8 +249,8 @@ class PKTimerTick {
   }
 
   Map<String, dynamic> toJson() => {
-        'battle_id': battleId,
-        'remaining_seconds': remainingSeconds,
-        'is_punishment_phase': isPunishmentPhase,
-      };
+    'battle_id': battleId,
+    'remaining_seconds': remainingSeconds,
+    'is_punishment_phase': isPunishmentPhase,
+  };
 }

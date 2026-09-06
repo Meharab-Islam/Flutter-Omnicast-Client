@@ -31,16 +31,34 @@ class OmniCastGiftingBottomSheet extends StatefulWidget {
     this.gifts = const [
       VirtualGiftItem(id: 'rose', name: 'Rose', emoji: '🌹', coinPrice: 1),
       VirtualGiftItem(id: 'heart', name: 'Heart', emoji: '💖', coinPrice: 5),
-      VirtualGiftItem(id: 'diamond', name: 'Diamond', emoji: '💎', coinPrice: 20),
-      VirtualGiftItem(id: 'rocket', name: 'Rocket', emoji: '🚀', coinPrice: 100),
-      VirtualGiftItem(id: 'dragon', name: 'Dragon', emoji: '🐉', coinPrice: 500),
+      VirtualGiftItem(
+        id: 'diamond',
+        name: 'Diamond',
+        emoji: '💎',
+        coinPrice: 20,
+      ),
+      VirtualGiftItem(
+        id: 'rocket',
+        name: 'Rocket',
+        emoji: '🚀',
+        coinPrice: 100,
+      ),
+      VirtualGiftItem(
+        id: 'dragon',
+        name: 'Dragon',
+        emoji: '🐉',
+        coinPrice: 500,
+      ),
     ],
     this.onGiftSent,
     this.onSendGift,
   });
 
   /// Static helper to open the modal bottom sheet smoothly.
-  static Future<void> show(BuildContext context, {required OmniCastClient client}) {
+  static Future<void> show(
+    BuildContext context, {
+    required OmniCastClient client,
+  }) {
     return showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -50,10 +68,12 @@ class OmniCastGiftingBottomSheet extends StatefulWidget {
   }
 
   @override
-  State<OmniCastGiftingBottomSheet> createState() => _OmniCastGiftingBottomSheetState();
+  State<OmniCastGiftingBottomSheet> createState() =>
+      _OmniCastGiftingBottomSheetState();
 }
 
-class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet> {
+class _OmniCastGiftingBottomSheetState
+    extends State<OmniCastGiftingBottomSheet> {
   int _selectedGiftIndex = 0;
   String _selectedTarget = 'host_a'; // 'host_a' or 'host_b'
 
@@ -97,19 +117,30 @@ class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet>
                 ),
               ),
               ValueListenableBuilder<int>(
-                valueListenable: ValueNotifier(widget.client.state.userCoinBalance),
+                valueListenable: ValueNotifier(
+                  widget.client.state.userCoinBalance,
+                ),
                 builder: (context, balance, _) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.amber.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
+                      border: Border.all(
+                        color: Colors.amber.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.monetization_on, color: Colors.amber, size: 14),
+                        const Icon(
+                          Icons.monetization_on,
+                          color: Colors.amber,
+                          size: 14,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '$balance Coins',
@@ -218,7 +249,9 @@ class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet>
                           : const Color(0xFF1E293B),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF3B82F6) : Colors.white10,
+                        color: isSelected
+                            ? const Color(0xFF3B82F6)
+                            : Colors.white10,
                         width: isSelected ? 2.0 : 1.0,
                       ),
                     ),
@@ -229,7 +262,10 @@ class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet>
                         const SizedBox(height: 4),
                         Text(
                           gift.name,
-                          style: const TextStyle(color: Colors.white, fontSize: 11),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
                         ),
                         Text(
                           '${gift.coinPrice} 🪙',
@@ -256,8 +292,8 @@ class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet>
               style: ElevatedButton.styleFrom(
                 backgroundColor: isPK
                     ? (_selectedTarget == 'host_a'
-                        ? const Color(0xFF3B82F6)
-                        : const Color(0xFFEF4444))
+                          ? const Color(0xFF3B82F6)
+                          : const Color(0xFFEF4444))
                     : const Color(0xFFEC4899),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(22),
@@ -265,7 +301,9 @@ class _OmniCastGiftingBottomSheetState extends State<OmniCastGiftingBottomSheet>
               ),
               onPressed: () {
                 final gift = widget.gifts[_selectedGiftIndex];
-                final targetHostId = _selectedTarget == 'host_a' ? hostAId : hostBId;
+                final targetHostId = _selectedTarget == 'host_a'
+                    ? hostAId
+                    : hostBId;
 
                 widget.client.interaction.sendGift(
                   giftId: gift.id,

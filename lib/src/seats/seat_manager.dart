@@ -28,10 +28,12 @@ class SeatManager {
   ValueNotifier<List<StageSeat>> get activeSeatsNotifier => activeCoHostsList;
 
   // Waiting list alias notifier
-  ValueNotifier<List<SeatRequest>> get waitingListNotifier => pendingSeatRequestsNotifier;
+  ValueNotifier<List<SeatRequest>> get waitingListNotifier =>
+      pendingSeatRequestsNotifier;
 
   /// Returns currently pending co-host seat requests.
-  List<SeatRequest> get pendingSeatRequests => pendingSeatRequestsNotifier.value;
+  List<SeatRequest> get pendingSeatRequests =>
+      pendingSeatRequestsNotifier.value;
 
   /// Returns list of all stage seats.
   List<StageSeat> get activeSeats => activeCoHostsList.value;
@@ -66,15 +68,16 @@ class SeatManager {
     required SignalingClient signalingClient,
     required WebRTCManager webRTCManager,
     required RoomState roomState,
-  })  : _signalingClient = signalingClient,
-        _webRTCManager = webRTCManager,
-        _roomState = roomState {
+  }) : _signalingClient = signalingClient,
+       _webRTCManager = webRTCManager,
+       _roomState = roomState {
     _bindSignalingListeners();
     _bindStateNotifiers();
   }
 
   // Stream Getters
-  Stream<SeatRequest> get onSeatRequestReceived => _seatRequestController.stream;
+  Stream<SeatRequest> get onSeatRequestReceived =>
+      _seatRequestController.stream;
   Stream<CoHostInvite> get onSeatInviteReceived => _seatInviteController.stream;
   Stream<SignalingMessage> get onSeatAccepted => _seatAcceptController.stream;
   Stream<SignalingMessage> get onSeatRejected => _seatRejectController.stream;
@@ -120,7 +123,9 @@ class SeatManager {
 
         // If this current user was the viewer whose request was accepted by host
         if (msg.targetUser == _roomState.userId && _roomState.isViewer) {
-          OmniCastLogger.log('[SeatManager] Seat request accepted by host -> Triggering seamless WebRTC upgrade');
+          OmniCastLogger.log(
+            '[SeatManager] Seat request accepted by host -> Triggering seamless WebRTC upgrade',
+          );
           await upgradeToCoHost();
         }
       }),
@@ -136,11 +141,16 @@ class SeatManager {
     // 5. Seat kick / demote response (host demotes co-host to viewer)
     _subscriptions.add(
       _signalingClient.onMessage.listen((msg) async {
-        if (msg.event == SignalingEvents.seatKick || msg.event == 'seat_demote' || msg.event == 'seat_kicked') {
-          final targetUser = msg.targetUser ??
+        if (msg.event == SignalingEvents.seatKick ||
+            msg.event == 'seat_demote' ||
+            msg.event == 'seat_kicked') {
+          final targetUser =
+              msg.targetUser ??
               (msg.payload is Map ? msg.payload['target_user'] : null);
           if (targetUser == _roomState.userId && _roomState.isCoHost) {
-            OmniCastLogger.log('[SeatManager] Co-host demoted to viewer -> Teardown local publishing tracks seamlessly');
+            OmniCastLogger.log(
+              '[SeatManager] Co-host demoted to viewer -> Teardown local publishing tracks seamlessly',
+            );
             await _webRTCManager.downgradeCoHostToViewer();
             _roomState.updateRole(UserRole.viewer);
           }
@@ -151,8 +161,8 @@ class SeatManager {
     // 6. Real-time seat updates across room (9-seat sync)
     _subscriptions.add(
       _signalingClient.onSeatUpdated.listen((msg) {
-        if (msg.payload is Map<String, dynamic>) {
-          final payload = msg.payload as Map<String, dynamic>;
+        if (msg.payload is Map) {
+          final payload = Map<String, dynamic>.from(msg.payload as Map);
           final seats = payload['active_seats'] ?? payload['seats'];
           if (seats != null) {
             _roomState.updateActiveSeats(seats);
@@ -166,14 +176,19 @@ class SeatManager {
       _signalingClient.onMessage.listen((msg) {
         if (msg.event == 'cohost_left' || msg.event == 'seat_left') {
           final leftId = msg.payload is Map
-              ? (msg.payload['user_id'] ?? msg.payload['userId'] ?? '').toString()
+              ? (msg.payload['user_id'] ?? msg.payload['userId'] ?? '')
+                    .toString()
               : msg.userId;
           if (leftId.isNotEmpty) {
-            final updatedSeats = _roomState.activeSeats.where((s) => s.userId != leftId).toList();
+            final updatedSeats = _roomState.activeSeats
+                .where((s) => s.userId != leftId)
+                .toList();
             _roomState.updateActiveSeats(updatedSeats);
 
             // Clean up remote renderer for the departed co-host, NEVER touching the host stream
-            if (leftId != _roomState.hostId && leftId != 'host' && leftId != _roomState.roomId) {
+            if (leftId != _roomState.hostId &&
+                leftId != 'host' &&
+                leftId != _roomState.roomId) {
               _webRTCManager.mediaStreamManager.removeRemoteRenderer(leftId);
               _roomState.removeActiveRemoteUser(leftId);
             }
@@ -196,12 +211,14 @@ class SeatManager {
 
     _roomState.addSeatRequest(req);
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatRequest,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: req.toJson(),
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatRequest,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: req.toJson(),
+      ),
+    );
   }
 
   /// Viewer action: Cancels their own pending seat request from the waiting list.
@@ -210,11 +227,13 @@ class SeatManager {
 
     _roomState.removeSeatRequest(_roomState.userId!);
 
-    _signalingClient.send(SignalingMessage(
-      event: 'cancel_seat_request',
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'cancel_seat_request',
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+      ),
+    );
   }
 
   /// Host action: Accepts a viewer's seat request and triggers their upgrade.
@@ -223,15 +242,15 @@ class SeatManager {
 
     _roomState.removeSeatRequest(userId);
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatAccept,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: userId,
-      payload: {
-        'seat_index': ?seatIndex,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatAccept,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: userId,
+        payload: {'seat_index': ?seatIndex},
+      ),
+    );
   }
 
   /// Host action: Rejects a viewer's seat request.
@@ -240,12 +259,14 @@ class SeatManager {
 
     _roomState.removeSeatRequest(userId);
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatReject,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: userId,
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatReject,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: userId,
+      ),
+    );
   }
 
   /// Host action: Invites a specific viewer to take a co-host seat on stage.
@@ -260,13 +281,15 @@ class SeatManager {
       createdAt: DateTime.now(),
     );
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatInvite,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: invite.toJson(),
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatInvite,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: invite.toJson(),
+      ),
+    );
   }
 
   /// Viewer action: Accepts a co-host invitation and triggers seamless in-place WebRTC upgrade.
@@ -281,14 +304,14 @@ class SeatManager {
       _roomState.removeInvite(inviteId);
     }
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatAccept,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: {
-        'invite_id': ?inviteId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatAccept,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {'invite_id': ?inviteId},
+      ),
+    );
 
     await upgradeToCoHost(video: video, audio: audio);
   }
@@ -301,14 +324,14 @@ class SeatManager {
       _roomState.removeInvite(inviteId);
     }
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatReject,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: {
-        'invite_id': ?inviteId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatReject,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {'invite_id': ?inviteId},
+      ),
+    );
   }
 
   /// Seamlessly upgrades the active user to a Co-Host without destroying [RTCPeerConnection].
@@ -324,28 +347,31 @@ class SeatManager {
 
     _roomState.updateRole(UserRole.coHost);
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.publish,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: {
-        'sdp': offer.sdp,
-        'type': offer.type,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.publish,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {'sdp': offer.sdp, 'type': offer.type},
+      ),
+    );
   }
 
   /// Co-Host action: Voluntarily leaves the stage seat and returns to viewer mode.
   Future<void> leaveSeat() async {
     if (!_roomState.isInRoom || !_roomState.isCoHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatLeave,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatLeave,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+      ),
+    );
 
-    OmniCastLogger.log('[SeatManager] Stepping down from co-host seat -> Teardown local publishing tracks seamlessly');
+    OmniCastLogger.log(
+      '[SeatManager] Stepping down from co-host seat -> Teardown local publishing tracks seamlessly',
+    );
     await _webRTCManager.downgradeCoHostToViewer();
     _roomState.updateRole(UserRole.viewer);
   }
@@ -354,12 +380,14 @@ class SeatManager {
   void demoteToViewer(String targetUserId) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatKick,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatKick,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+      ),
+    );
   }
 
   /// Host action alias: Demotes a co-host back to a viewer seat without kicking them from the room.
@@ -369,58 +397,64 @@ class SeatManager {
   void muteCoHost(String targetUserId, {bool mute = true}) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.mediaStateChanged,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: {
-        'target_user': targetUserId,
-        'type': 'audio',
-        'kind': 'audio',
-        'muted': mute,
-        'is_muted': mute,
-        'forced_by_host': true,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.mediaStateChanged,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: {
+          'target_user': targetUserId,
+          'type': 'audio',
+          'kind': 'audio',
+          'muted': mute,
+          'is_muted': mute,
+          'forced_by_host': true,
+        },
+      ),
+    );
   }
 
   /// Host action: Remotely disables a co-host's camera track.
   void disableCoHostCamera(String targetUserId) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.mediaStateChanged,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: {
-        'target_user': targetUserId,
-        'type': 'video',
-        'kind': 'video',
-        'muted': true,
-        'camera_off': true,
-        'is_camera_off': true,
-        'forced_by_host': true,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.mediaStateChanged,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: {
+          'target_user': targetUserId,
+          'type': 'video',
+          'kind': 'video',
+          'muted': true,
+          'camera_off': true,
+          'is_camera_off': true,
+          'forced_by_host': true,
+        },
+      ),
+    );
   }
 
   /// Host action: Pins a specific user to the main stage layout for all viewers.
   void pinToMainStage(String? targetUserId) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.pinStage,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: {
-        'pinned_user_id': targetUserId,
-        'target_id': targetUserId,
-        'main_seat_id': targetUserId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.pinStage,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: {
+          'pinned_user_id': targetUserId,
+          'target_id': targetUserId,
+          'main_seat_id': targetUserId,
+        },
+      ),
+    );
 
     _roomState.setPinnedStageUser(targetUserId);
   }
@@ -439,34 +473,35 @@ class SeatManager {
   void kickSeat(int seatIndex, {String? targetUserId}) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.seatKick,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: {
-        'seat_index': seatIndex,
-        'seat_id': seatIndex.toString(),
-        'target_user': targetUserId,
-        'user_id': targetUserId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.seatKick,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: {
+          'seat_index': seatIndex,
+          'seat_id': seatIndex.toString(),
+          'target_user': targetUserId,
+          'user_id': targetUserId,
+        },
+      ),
+    );
   }
 
   /// Viewer action: Explicitly requests to subscribe to a co-host's media tracks.
   void subscribeCoHost(String coHostUserId) {
     if (!_roomState.isInRoom) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: 'subscribe_cohost',
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: coHostUserId,
-      payload: {
-        'target_user': coHostUserId,
-        'cohost_id': coHostUserId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'subscribe_cohost',
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: coHostUserId,
+        payload: {'target_user': coHostUserId, 'cohost_id': coHostUserId},
+      ),
+    );
   }
 
   /// Disposes streams, listeners, and notifiers.
@@ -479,9 +514,15 @@ class SeatManager {
     }
     _subscriptions.clear();
 
-    try { activeCoHostsList.dispose(); } catch (_) {}
-    try { pendingSeatRequestsNotifier.dispose(); } catch (_) {}
-    try { pendingInvitesNotifier.dispose(); } catch (_) {}
+    try {
+      activeCoHostsList.dispose();
+    } catch (_) {}
+    try {
+      pendingSeatRequestsNotifier.dispose();
+    } catch (_) {}
+    try {
+      pendingInvitesNotifier.dispose();
+    } catch (_) {}
 
     await _seatRequestController.close();
     await _seatInviteController.close();

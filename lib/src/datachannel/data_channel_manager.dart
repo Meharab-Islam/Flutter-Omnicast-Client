@@ -22,20 +22,22 @@ class DataChannelReaction {
     required this.timestamp,
   });
 
-  factory DataChannelReaction.fromJson(Map<String, dynamic> json) => DataChannelReaction(
+  factory DataChannelReaction.fromJson(Map<String, dynamic> json) =>
+      DataChannelReaction(
         userId: json['user_id'] as String? ?? 'unknown',
         emoji: json['emoji'] as String? ?? '❤️',
         xOffset: (json['x_offset'] as num?)?.toDouble() ?? 0.5,
-        timestamp: json['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+        timestamp:
+            json['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch,
       );
 
   Map<String, dynamic> toJson() => {
-        'type': 'reaction',
-        'user_id': userId,
-        'emoji': emoji,
-        'x_offset': xOffset,
-        'timestamp': timestamp,
-      };
+    'type': 'reaction',
+    'user_id': userId,
+    'emoji': emoji,
+    'x_offset': xOffset,
+    'timestamp': timestamp,
+  };
 }
 
 /// Zero-latency in-room messaging and flying reactions manager powered by WebRTC DataChannels (UDP/SCTP).
@@ -47,7 +49,8 @@ class DataChannelManager {
   bool _isDisposed = false;
 
   // Reactive Streams & ValueNotifiers
-  final StreamController<ChatMessage> _chatController = StreamController<ChatMessage>.broadcast();
+  final StreamController<ChatMessage> _chatController =
+      StreamController<ChatMessage>.broadcast();
   final StreamController<DataChannelReaction> _reactionController =
       StreamController<DataChannelReaction>.broadcast();
 
@@ -58,18 +61,20 @@ class DataChannelManager {
   DataChannelManager({
     required WebRTCManager webRTCManager,
     required RoomState roomState,
-  })  : _webRTCManager = webRTCManager,
-        _roomState = roomState;
+  }) : _webRTCManager = webRTCManager,
+       _roomState = roomState;
 
   Stream<ChatMessage> get onChatMessage => _chatController.stream;
-  Stream<DataChannelReaction> get onReactionReceived => _reactionController.stream;
+  Stream<DataChannelReaction> get onReactionReceived =>
+      _reactionController.stream;
   bool get isChannelOpen => isChannelOpenNotifier.value;
 
   /// Initializes an outgoing DataChannel for a host/publisher.
   Future<void> createPublisherChannel({String label = 'room-events'}) async {
     final pc = await _webRTCManager.initializePeerConnection();
     final init = RTCDataChannelInit()
-      ..ordered = false // Unordered UDP delivery for sub-millisecond reactions and chat
+      ..ordered =
+          false // Unordered UDP delivery for sub-millisecond reactions and chat
       ..maxRetransmits = 0;
 
     final channel = await pc.createDataChannel(label, init);
@@ -79,7 +84,9 @@ class DataChannelManager {
   /// Binds incoming DataChannel from the SFU or remote peer for a viewer.
   void attachIncomingChannel(RTCPeerConnection pc) {
     pc.onDataChannel = (RTCDataChannel channel) {
-      OmniCastLogger.log('[DataChannel] Received remote DataChannel: ${channel.label}');
+      OmniCastLogger.log(
+        '[DataChannel] Received remote DataChannel: ${channel.label}',
+      );
       _bindDataChannel(channel);
     };
   }
@@ -90,7 +97,8 @@ class DataChannelManager {
     channel.onDataChannelState = (RTCDataChannelState state) {
       OmniCastLogger.log('[DataChannel] State: $state');
       if (!_isDisposed) {
-        isChannelOpenNotifier.value = (state == RTCDataChannelState.RTCDataChannelOpen);
+        isChannelOpenNotifier.value =
+            (state == RTCDataChannelState.RTCDataChannelOpen);
       }
     };
 
@@ -110,12 +118,15 @@ class DataChannelManager {
 
         if (type == 'chat') {
           final msg = ChatMessage(
-            id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
+            id:
+                json['id'] as String? ??
+                DateTime.now().millisecondsSinceEpoch.toString(),
             senderId: json['user_id'] as String? ?? 'unknown',
             senderName: json['user_name'] as String? ?? 'Guest',
             text: json['text'] as String? ?? '',
             timestamp: DateTime.fromMillisecondsSinceEpoch(
-              json['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+              json['timestamp'] as int? ??
+                  DateTime.now().millisecondsSinceEpoch,
             ),
           );
           _chatController.add(msg);
@@ -127,9 +138,17 @@ class DataChannelManager {
         } else if (type == 'room_mode_changed') {
           final mode = json['mode'] as String? ?? 'solo';
           if (mode == 'pk') {
-            final opponentId = json['linked_host_id'] as String? ?? json['opponent_user_id'] as String? ?? '';
-            final opponentRoomId = json['linked_room_id'] as String? ?? json['opponent_room_id'] as String? ?? '';
-            final battleId = json['battle_id'] as String? ?? 'pk_${DateTime.now().millisecondsSinceEpoch}';
+            final opponentId =
+                json['linked_host_id'] as String? ??
+                json['opponent_user_id'] as String? ??
+                '';
+            final opponentRoomId =
+                json['linked_room_id'] as String? ??
+                json['opponent_room_id'] as String? ??
+                '';
+            final battleId =
+                json['battle_id'] as String? ??
+                'pk_${DateTime.now().millisecondsSinceEpoch}';
 
             final battle = PKBattleInfo(
               battleId: battleId,
@@ -138,10 +157,18 @@ class DataChannelManager {
               opponentRoomId: opponentRoomId,
               opponentUserId: opponentId,
               status: PKStatus.inProgress,
-              hostScore: (json['host_score'] as num?)?.toInt() ?? (json['host_a'] as num?)?.toInt() ?? 0,
-              opponentScore: (json['opponent_score'] as num?)?.toInt() ?? (json['host_b'] as num?)?.toInt() ?? 0,
-              durationSeconds: (json['duration_seconds'] as num?)?.toInt() ?? 300,
-              remainingSeconds: (json['remaining_seconds'] as num?)?.toInt() ?? 300,
+              hostScore:
+                  (json['host_score'] as num?)?.toInt() ??
+                  (json['host_a'] as num?)?.toInt() ??
+                  0,
+              opponentScore:
+                  (json['opponent_score'] as num?)?.toInt() ??
+                  (json['host_b'] as num?)?.toInt() ??
+                  0,
+              durationSeconds:
+                  (json['duration_seconds'] as num?)?.toInt() ?? 300,
+              remainingSeconds:
+                  (json['remaining_seconds'] as num?)?.toInt() ?? 300,
               startedAt: DateTime.now(),
             );
             _roomState.updatePKBattle(battle);
@@ -150,9 +177,18 @@ class DataChannelManager {
           }
         } else if (type == 'pk_score_update') {
           final score = PKScoreUpdate(
-            battleId: json['battle_id'] as String? ?? _roomState.activePK?.battleId ?? '',
-            hostScore: (json['host_score'] as num?)?.toInt() ?? (json['host_a'] as num?)?.toInt() ?? 0,
-            opponentScore: (json['opponent_score'] as num?)?.toInt() ?? (json['host_b'] as num?)?.toInt() ?? 0,
+            battleId:
+                json['battle_id'] as String? ??
+                _roomState.activePK?.battleId ??
+                '',
+            hostScore:
+                (json['host_score'] as num?)?.toInt() ??
+                (json['host_a'] as num?)?.toInt() ??
+                0,
+            opponentScore:
+                (json['opponent_score'] as num?)?.toInt() ??
+                (json['host_b'] as num?)?.toInt() ??
+                0,
           );
           _roomState.updatePKScore(score);
         } else if (type == 'pk_gift_overlay') {
@@ -163,10 +199,14 @@ class DataChannelManager {
             amount: (json['amount'] as num?)?.toInt() ?? 1,
             senderId: json['sender_id'] as String? ?? 'user',
             senderName: json['sender_name'] as String? ?? 'Viewer',
-            targetUserId: json['target_host_id'] as String? ?? _roomState.hostId ?? '',
-            hostTotalCoins: (json['host_total_coins'] as num?)?.toInt() ?? _roomState.hostCoinBalance,
+            targetUserId:
+                json['target_host_id'] as String? ?? _roomState.hostId ?? '',
+            hostTotalCoins:
+                (json['host_total_coins'] as num?)?.toInt() ??
+                _roomState.hostCoinBalance,
             timestamp: DateTime.fromMillisecondsSinceEpoch(
-              json['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+              json['timestamp'] as int? ??
+                  DateTime.now().millisecondsSinceEpoch,
             ),
           );
           _roomState.processGift(event);
@@ -181,7 +221,9 @@ class DataChannelManager {
   void sendChat({required String text, String? senderName}) {
     if (_dataChannel == null ||
         _dataChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
-      OmniCastLogger.log('[DataChannel] Cannot send chat: DataChannel is not open');
+      OmniCastLogger.log(
+        '[DataChannel] Cannot send chat: DataChannel is not open',
+      );
       return;
     }
 
@@ -221,7 +263,8 @@ class DataChannelManager {
     }
 
     final userId = _roomState.userId ?? 'local_user';
-    final offset = xOffset ?? (0.6 + (0.3 * (DateTime.now().millisecond % 10) / 10.0));
+    final offset =
+        xOffset ?? (0.6 + (0.3 * (DateTime.now().millisecond % 10) / 10.0));
 
     final reaction = DataChannelReaction(
       userId: userId,

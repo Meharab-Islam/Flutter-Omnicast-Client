@@ -14,7 +14,8 @@ class InteractionManager {
   // Granular atomic ValueNotifiers for headless UI reactivity
   final ValueNotifier<int> userBalanceNotifier = ValueNotifier<int>(0);
   final ValueNotifier<int> hostCoinBalanceNotifier = ValueNotifier<int>(0);
-  final ValueNotifier<GiftEvent?> latestGiftNotifier = ValueNotifier<GiftEvent?>(null);
+  final ValueNotifier<GiftEvent?> latestGiftNotifier =
+      ValueNotifier<GiftEvent?>(null);
 
   // Pure Streams
   final _chatController = StreamController<ChatMessage>.broadcast();
@@ -24,8 +25,8 @@ class InteractionManager {
   InteractionManager({
     required SignalingClient signalingClient,
     required RoomState roomState,
-  })  : _signalingClient = signalingClient,
-        _roomState = roomState {
+  }) : _signalingClient = signalingClient,
+       _roomState = roomState {
     _bindStreams();
     _bindStateNotifiers();
   }
@@ -34,7 +35,8 @@ class InteractionManager {
   Stream<ChatMessage> get chatStream => _chatController.stream;
   Stream<GiftEvent> get giftStream => _giftReceivedController.stream;
   Stream<GiftEvent> get onGiftReceived => _giftReceivedController.stream;
-  Stream<BalanceUpdate> get onBalanceUpdated => _balanceUpdatedController.stream;
+  Stream<BalanceUpdate> get onBalanceUpdated =>
+      _balanceUpdatedController.stream;
   Stream<BalanceUpdate> get balanceStream => _balanceUpdatedController.stream;
 
   void _bindStateNotifiers() {
@@ -62,8 +64,11 @@ class InteractionManager {
     });
 
     _signalingClient.onMessage.listen((msg) {
-      if (msg.event == SignalingEvents.balanceUpdate && msg.payload is Map<String, dynamic>) {
-        final update = BalanceUpdate.fromJson(msg.payload as Map<String, dynamic>);
+      if (msg.event == SignalingEvents.balanceUpdate &&
+          msg.payload is Map<String, dynamic>) {
+        final update = BalanceUpdate.fromJson(
+          msg.payload as Map<String, dynamic>,
+        );
         _balanceUpdatedController.add(update);
         _roomState.updateBalance(update);
       }
@@ -82,12 +87,14 @@ class InteractionManager {
       timestamp: DateTime.now(),
     );
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.chat,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: msg.toJson(),
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.chat,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: msg.toJson(),
+      ),
+    );
 
     _chatController.add(msg);
     _roomState.addChatMessage(msg);
@@ -115,13 +122,15 @@ class InteractionManager {
       timestamp: DateTime.now(),
     );
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.gift,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetUserId,
-      payload: giftEvent.toJson(),
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.gift,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetUserId,
+        payload: giftEvent.toJson(),
+      ),
+    );
   }
 
   /// Disposes internal controllers and notifiers.

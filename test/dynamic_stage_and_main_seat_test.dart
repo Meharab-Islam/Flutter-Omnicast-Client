@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:omnicast_client/omnicast_client.dart';
 
@@ -68,5 +67,64 @@ void main() {
       expect(roomState.isHostInMainSeat, isTrue);
       expect(roomState.mainSeatUserId, 'host_99');
     });
+
+    test(
+      'co-host is never considered main seat on own device when joining without host promotion',
+      () {
+        // Co-host session on their own device
+        roomState.setSession(
+          roomId: 'room_101',
+          userId: 'cohost_me',
+          role: UserRole.coHost,
+          hostId: 'main_host_1',
+        );
+
+        // Verify host is in main seat
+        expect(roomState.isHostInMainSeat, isTrue);
+        expect(roomState.mainSeatUserId, 'main_host_1');
+        expect(roomState.pinnedStageUserId, isNull);
+
+        // Active seats has both host and co-host
+        roomState.updateActiveSeats({'0': 'main_host_1', '1': 'cohost_me'});
+
+        // Host is still main seat
+        expect(roomState.isHostInMainSeat, isTrue);
+        expect(roomState.mainSeatUserId, 'main_host_1');
+        expect(roomState.pinnedStageUserId, isNull);
+
+        // Only if host explicitly promotes co-host
+        roomState.setPinnedStageUser('cohost_me');
+        expect(roomState.isHostInMainSeat, isFalse);
+        expect(roomState.mainSeatUserId, 'cohost_me');
+
+        // Host demotes/restores main seat
+        roomState.setPinnedStageUser(null);
+        expect(roomState.isHostInMainSeat, isTrue);
+        expect(roomState.mainSeatUserId, 'main_host_1');
+      },
+    );
+
+    test(
+      'syncRoomInfo ignores empty or host pinned_user_id and keeps host in main seat',
+      () {
+        roomState.setSession(
+          roomId: 'room_101',
+          userId: 'cohost_me',
+          role: UserRole.coHost,
+          hostId: 'host_abc',
+        );
+
+        roomState.syncRoomInfo({
+          'room_id': 'room_101',
+          'host_id': 'host_abc',
+          'pinned_user_id': '',
+          'main_seat_id': 'host_abc',
+        });
+
+        expect(roomState.isHostInMainSeat, isTrue);
+        expect(roomState.mainSeatUserId, 'host_abc');
+        expect(roomState.pinnedStageUserId, isNull);
+      },
+    );
   });
 }

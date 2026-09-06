@@ -54,96 +54,104 @@ void main() {
       expect(mediaController.isCameraEnabled, isTrue);
     });
 
-    test('AudioLevelDetector manages audio levels and active speaker state', () {
-      final detector = mediaController.audioDetector;
-      expect(detector.audioLevelsNotifier.value, isEmpty);
-      expect(detector.activeSpeakerNotifier.value, isNull);
+    test(
+      'AudioLevelDetector manages audio levels and active speaker state',
+      () {
+        final detector = mediaController.audioDetector;
+        expect(detector.audioLevelsNotifier.value, isEmpty);
+        expect(detector.activeSpeakerNotifier.value, isNull);
 
-      detector.audioLevelsNotifier.value = {
-        'user_1': 0.15,
-        'user_2': 0.02,
-      };
-      detector.activeSpeakerNotifier.value = 'user_1';
+        detector.audioLevelsNotifier.value = {'user_1': 0.15, 'user_2': 0.02};
+        detector.activeSpeakerNotifier.value = 'user_1';
 
-      expect(detector.audioLevelsNotifier.value['user_1'], 0.15);
-      expect(detector.activeSpeakerNotifier.value, 'user_1');
-    });
+        expect(detector.audioLevelsNotifier.value['user_1'], 0.15);
+        expect(detector.activeSpeakerNotifier.value, 'user_1');
+      },
+    );
   });
 
   group('OmniCastSpeakingVideoTile Widget', () {
-    testWidgets('renders avatar placeholder when camera is off and shows mute icon', (tester) async {
-      final streamManager = MediaStreamManager();
-      final webRTCManager = WebRTCManager(mediaStreamManager: streamManager);
-      final detector = AudioLevelDetector(webRTCManager: webRTCManager);
+    testWidgets(
+      'renders avatar placeholder when camera is off and shows mute icon',
+      (tester) async {
+        final streamManager = MediaStreamManager();
+        final webRTCManager = WebRTCManager(mediaStreamManager: streamManager);
+        final detector = AudioLevelDetector(webRTCManager: webRTCManager);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 200,
-              height: 250,
-              child: OmniCastSpeakingVideoTile(
-                userId: 'user_alice',
-                trackId: 'track_alice_1',
-                userName: 'Alice',
-                renderer: null,
-                isCameraEnabled: false,
-                isMicMuted: true,
-                audioDetector: detector,
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 200,
+                height: 250,
+                child: OmniCastSpeakingVideoTile(
+                  userId: 'user_alice',
+                  trackId: 'track_alice_1',
+                  userName: 'Alice',
+                  renderer: null,
+                  isCameraEnabled: false,
+                  isMicMuted: true,
+                  audioDetector: detector,
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('Alice'), findsOneWidget);
-      expect(find.text('Camera Off'), findsOneWidget);
-      expect(find.byIcon(Icons.mic_off), findsOneWidget);
+        expect(find.text('Alice'), findsOneWidget);
+        expect(find.text('Camera Off'), findsOneWidget);
+        expect(find.byIcon(Icons.mic_off), findsOneWidget);
 
-      detector.dispose();
-      await webRTCManager.dispose();
-      await streamManager.dispose();
-    });
+        detector.dispose();
+        await webRTCManager.dispose();
+        await streamManager.dispose();
+      },
+    );
 
-    testWidgets('shows active speaking glow when audioLevel exceeds threshold', (tester) async {
-      final streamManager = MediaStreamManager();
-      final webRTCManager = WebRTCManager(mediaStreamManager: streamManager);
-      final detector = AudioLevelDetector(webRTCManager: webRTCManager);
+    testWidgets(
+      'shows active speaking glow when audioLevel exceeds threshold',
+      (tester) async {
+        final streamManager = MediaStreamManager();
+        final webRTCManager = WebRTCManager(mediaStreamManager: streamManager);
+        final detector = AudioLevelDetector(webRTCManager: webRTCManager);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 200,
-              height: 250,
-              child: OmniCastSpeakingVideoTile(
-                userId: 'user_bob',
-                trackId: 'track_bob_1',
-                userName: 'Bob',
-                renderer: null,
-                isCameraEnabled: false,
-                isMicMuted: false,
-                audioDetector: detector,
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 200,
+                height: 250,
+                child: OmniCastSpeakingVideoTile(
+                  userId: 'user_bob',
+                  trackId: 'track_bob_1',
+                  userName: 'Bob',
+                  renderer: null,
+                  isCameraEnabled: false,
+                  isMicMuted: false,
+                  audioDetector: detector,
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Simulate Bob speaking at 0.35 volume
-      detector.audioLevelsNotifier.value = {'track_bob_1': 0.35};
-      await tester.pumpAndSettle();
+        // Simulate Bob speaking at 0.35 volume
+        detector.audioLevelsNotifier.value = {'track_bob_1': 0.35};
+        await tester.pumpAndSettle();
 
-      expect(find.text('Bob'), findsOneWidget);
+        expect(find.text('Bob'), findsOneWidget);
 
-      detector.dispose();
-      await webRTCManager.dispose();
-      await streamManager.dispose();
-    });
+        detector.dispose();
+        await webRTCManager.dispose();
+        await streamManager.dispose();
+      },
+    );
   });
 
   group('OmniCastMediaControlBar Widget', () {
-    testWidgets('renders Mic, Camera, and Flip buttons and handles taps', (tester) async {
+    testWidgets('renders Mic, Camera, and Flip buttons and handles taps', (
+      tester,
+    ) async {
       final signaling = SignalingClient();
       final streamManager = MediaStreamManager();
       final webRTCManager = WebRTCManager(mediaStreamManager: streamManager);

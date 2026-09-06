@@ -32,7 +32,8 @@ class OmniCastLiveRoomsBuilder extends StatelessWidget {
 class OmniCastRoomListView extends StatelessWidget {
   final OmniCastClient client;
   final void Function(RoomModel room)? onRoomTap;
-  final Widget Function(BuildContext context, RoomModel room, int index)? itemBuilder;
+  final Widget Function(BuildContext context, RoomModel room, int index)?
+  itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
   final Widget Function(BuildContext context, int count)? headerBuilder;
   final EdgeInsetsGeometry padding;
@@ -99,7 +100,11 @@ class OmniCastRoomListView extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
-                child: const Icon(Icons.live_tv_rounded, color: Color(0xFF6C5CE7), size: 24),
+                child: const Icon(
+                  Icons.live_tv_rounded,
+                  color: Color(0xFF6C5CE7),
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 14),
 
@@ -109,7 +114,9 @@ class OmniCastRoomListView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      room.roomName.isNotEmpty ? room.roomName : 'Room: ${room.roomId}',
+                      room.roomName.isNotEmpty
+                          ? room.roomName
+                          : 'Room: ${room.roomId}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -121,7 +128,10 @@ class OmniCastRoomListView extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Host: ${room.hostId}',
-                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 12,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -134,11 +144,16 @@ class OmniCastRoomListView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.redAccent.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
+                      border: Border.all(
+                        color: Colors.redAccent.withValues(alpha: 0.5),
+                      ),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -160,11 +175,18 @@ class OmniCastRoomListView extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.visibility_rounded, color: Colors.white54, size: 14),
+                      const Icon(
+                        Icons.visibility_rounded,
+                        color: Colors.white54,
+                        size: 14,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${room.totalViewers}',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -184,11 +206,19 @@ class OmniCastRoomListView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.tv_off_rounded, size: 48, color: Colors.white.withValues(alpha: 0.3)),
+            Icon(
+              Icons.tv_off_rounded,
+              size: 48,
+              color: Colors.white.withValues(alpha: 0.3),
+            ),
             const SizedBox(height: 12),
             const Text(
               'No active rooms right now',
-              style: TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 6),
             const Text(

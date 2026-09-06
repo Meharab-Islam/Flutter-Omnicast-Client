@@ -5,33 +5,42 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('GlobalMediaConfig & Initialization', () {
-    test('default GlobalMediaConfig has standard Smooth480p and enabled features', () {
-      const config = GlobalMediaConfig();
-      expect(config.defaultResolution, VideoParameters.presetSmooth480p);
-      expect(config.enableSimulcast, isFalse);
-      expect(config.enableDynacast, isTrue);
-      expect(config.enableAdaptiveStreaming, isTrue);
-      expect(config.autoPauseOnBackground, isTrue);
-    });
+    test(
+      'default GlobalMediaConfig has standard Smooth480p and enabled features',
+      () {
+        const config = GlobalMediaConfig();
+        expect(config.defaultResolution, VideoParameters.presetSmooth480p);
+        expect(config.enableSimulcast, isFalse);
+        expect(config.enableDynacast, isTrue);
+        expect(config.enableAdaptiveStreaming, isTrue);
+        expect(config.autoPauseOnBackground, isTrue);
+      },
+    );
 
-    test('custom GlobalMediaConfig overrides defaults in OmniCastClient', () async {
-      final client = await OmniCastClient.init(
-        hostUrl: 'wss://omnilive.lolipoplive.top/ws',
-        autoConnect: false,
-        mediaConfig: const GlobalMediaConfig(
-          defaultResolution: VideoParameters.presetFHD1080p,
-          enableSimulcast: false,
-          enableDynacast: false,
-          enableAdaptiveStreaming: false,
-        ),
-      );
+    test(
+      'custom GlobalMediaConfig overrides defaults in OmniCastClient',
+      () async {
+        final client = await OmniCastClient.init(
+          hostUrl: 'wss://omnilive.lolipoplive.top/ws',
+          autoConnect: false,
+          mediaConfig: const GlobalMediaConfig(
+            defaultResolution: VideoParameters.presetFHD1080p,
+            enableSimulcast: false,
+            enableDynacast: false,
+            enableAdaptiveStreaming: false,
+          ),
+        );
 
-      expect(client.mediaConfig.defaultResolution, VideoParameters.presetFHD1080p);
-      expect(client.media.dynacastEnabled, isFalse);
-      expect(client.media.adaptiveStreamingEnabled, isFalse);
+        expect(
+          client.mediaConfig.defaultResolution,
+          VideoParameters.presetFHD1080p,
+        );
+        expect(client.media.dynacastEnabled, isFalse);
+        expect(client.media.adaptiveStreamingEnabled, isFalse);
 
-      await client.dispose();
-    });
+        await client.dispose();
+      },
+    );
   });
 
   group('Audio-Only Room Logic (Zero Video Bandwidth)', () {
@@ -63,21 +72,24 @@ void main() {
       roomState.dispose();
     });
 
-    test('RoomOptions audio-only serialization sets video and simulcast to false', () {
-      const audioOptions = RoomOptions(
-        title: 'Clubhouse Audio Space 🎙️',
-        roomType: RoomType.audio,
-        enableAudio: true,
-        enableVideo: true, // Should be overridden by isAudioOnly
-        enableSimulcast: true,
-      );
+    test(
+      'RoomOptions audio-only serialization sets video and simulcast to false',
+      () {
+        const audioOptions = RoomOptions(
+          title: 'Clubhouse Audio Space 🎙️',
+          roomType: RoomType.audio,
+          enableAudio: true,
+          enableVideo: true, // Should be overridden by isAudioOnly
+          enableSimulcast: true,
+        );
 
-      expect(audioOptions.isAudioOnly, isTrue);
-      final json = audioOptions.toJson();
-      expect(json['room_type'], 'audio');
-      expect(json['enable_video'], isFalse);
-      expect(json['enable_simulcast'], isFalse);
-    });
+        expect(audioOptions.isAudioOnly, isTrue);
+        final json = audioOptions.toJson();
+        expect(json['room_type'], 'audio');
+        expect(json['enable_video'], isFalse);
+        expect(json['enable_simulcast'], isFalse);
+      },
+    );
 
     test('MediaController enforces camera disabled in audio-only rooms', () {
       roomState.setSession(

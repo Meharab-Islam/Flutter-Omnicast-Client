@@ -50,10 +50,14 @@ void main() {
             'room_type': 'audio',
             'viewer_count': 18,
             'created_at': '2026-08-30T10:30:00Z',
-          }
+          },
         ];
 
-        return http.Response(jsonEncode(sampleJson), 200, headers: {'content-type': 'application/json'});
+        return http.Response(
+          jsonEncode(sampleJson),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
       });
 
       const config = OmniCastConfig(
@@ -99,25 +103,28 @@ void main() {
       expect(OmniCastClient.instance, isNull);
     });
 
-    test('OmniCastConfig automatically derives http and ws for LAN IP addresses', () {
-      expect(
-        OmniCastConfig.deriveWebSocketUrl('192.168.0.116:8080'),
-        'ws://192.168.0.116:8080/ws',
-      );
-      expect(
-        OmniCastConfig.deriveApiUrl('192.168.0.116:8080'),
-        'http://192.168.0.116:8080/api',
-      );
+    test(
+      'OmniCastConfig automatically derives http and ws for LAN IP addresses',
+      () {
+        expect(
+          OmniCastConfig.deriveWebSocketUrl('192.168.0.116:8080'),
+          'ws://192.168.0.116:8080/ws',
+        );
+        expect(
+          OmniCastConfig.deriveApiUrl('192.168.0.116:8080'),
+          'http://192.168.0.116:8080/api',
+        );
 
-      // Domain names should still default to wss and https
-      expect(
-        OmniCastConfig.deriveWebSocketUrl('live.example.com'),
-        'wss://live.example.com/ws',
-      );
-      expect(
-        OmniCastConfig.deriveApiUrl('live.example.com'),
-        'https://live.example.com/api',
-      );
-    });
+        // Domain names should still default to wss and https
+        expect(
+          OmniCastConfig.deriveWebSocketUrl('live.example.com'),
+          'wss://live.example.com/ws',
+        );
+        expect(
+          OmniCastConfig.deriveApiUrl('live.example.com'),
+          'https://live.example.com/api',
+        );
+      },
+    );
   });
 }

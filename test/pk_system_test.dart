@@ -34,8 +34,9 @@ void main() {
   });
 
   group('PK & Gift UI Widgets', () {
-    testWidgets('PKScoreProgressBar renders score counters and VS badge',
-        (tester) async {
+    testWidgets('PKScoreProgressBar renders score counters and VS badge', (
+      tester,
+    ) async {
       const pkState = PKState(
         isPKActive: true,
         myScore: 500,
@@ -45,9 +46,7 @@ void main() {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: PKScoreProgressBar(pkState: pkState),
-          ),
+          home: Scaffold(body: PKScoreProgressBar(pkState: pkState)),
         ),
       );
 
@@ -57,8 +56,9 @@ void main() {
       expect(find.text('02:00'), findsOneWidget);
     });
 
-    testWidgets('OmniCastPKBattleView renders host and opponent video panes',
-        (tester) async {
+    testWidgets('OmniCastPKBattleView renders host and opponent video panes', (
+      tester,
+    ) async {
       final mediaManager = MediaStreamManager();
 
       await tester.pumpWidget(
@@ -88,8 +88,9 @@ void main() {
       await mediaManager.dispose();
     });
 
-    testWidgets('GiftOverlayManager renders animated sliding gift banner',
-        (tester) async {
+    testWidgets('GiftOverlayManager renders animated sliding gift banner', (
+      tester,
+    ) async {
       final giftController = StreamController<GiftEvent>.broadcast();
 
       await tester.pumpWidget(
@@ -107,16 +108,18 @@ void main() {
       expect(find.text('Sent Rocket'), findsNothing);
 
       // Fire a gift event
-      giftController.add(GiftEvent(
-        giftId: 'rocket',
-        giftName: 'Rocket',
-        senderId: 'fan_1',
-        senderName: 'TopFan',
-        amount: 2,
-        coinValue: 50,
-        hostTotalCoins: 1000,
-        timestamp: DateTime.now(),
-      ));
+      giftController.add(
+        GiftEvent(
+          giftId: 'rocket',
+          giftName: 'Rocket',
+          senderId: 'fan_1',
+          senderName: 'TopFan',
+          amount: 2,
+          coinValue: 50,
+          hostTotalCoins: 1000,
+          timestamp: DateTime.now(),
+        ),
+      );
 
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
@@ -138,31 +141,35 @@ void main() {
         role: UserRole.host,
       );
 
-      roomState.updatePKBattle(PKBattleInfo(
-        battleId: 'pk_1',
-        hostRoomId: 'room_1',
-        hostUserId: 'host_1',
-        opponentRoomId: 'room_2',
-        opponentUserId: 'opponent_2',
-        hostScore: 100,
-        opponentScore: 100,
-        startedAt: DateTime.now(),
-      ));
+      roomState.updatePKBattle(
+        PKBattleInfo(
+          battleId: 'pk_1',
+          hostRoomId: 'room_1',
+          hostUserId: 'host_1',
+          opponentRoomId: 'room_2',
+          opponentUserId: 'opponent_2',
+          hostScore: 100,
+          opponentScore: 100,
+          startedAt: DateTime.now(),
+        ),
+      );
 
       expect(roomState.pkState.myScore, 100);
 
       // Process gift to host
-      roomState.processGift(GiftEvent(
-        giftId: 'dragon',
-        giftName: 'Golden Dragon',
-        senderId: 'donor_1',
-        senderName: 'Donor',
-        targetUserId: 'host_1',
-        amount: 3,
-        coinValue: 100,
-        hostTotalCoins: 5000,
-        timestamp: DateTime.now(),
-      ));
+      roomState.processGift(
+        GiftEvent(
+          giftId: 'dragon',
+          giftName: 'Golden Dragon',
+          senderId: 'donor_1',
+          senderName: 'Donor',
+          targetUserId: 'host_1',
+          amount: 3,
+          coinValue: 100,
+          hostTotalCoins: 5000,
+          timestamp: DateTime.now(),
+        ),
+      );
 
       // 100 + (3 * 100) = 400
       expect(roomState.pkState.myScore, 400);

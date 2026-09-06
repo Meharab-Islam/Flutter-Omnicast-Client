@@ -42,7 +42,9 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
       child: ValueListenableBuilder<Map<String, double>>(
         valueListenable: audioDetector.audioLevelsNotifier,
         builder: (context, levels, child) {
-          final level = isMicMuted ? 0.0 : (levels[trackId] ?? levels[userId] ?? 0.0);
+          final level = isMicMuted
+              ? 0.0
+              : (levels[trackId] ?? levels[userId] ?? 0.0);
           final isSpeaking = level > 0.04;
 
           return AnimatedContainer(
@@ -52,13 +54,17 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
               color: const Color(0xFF1E293B),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSpeaking ? const Color(0xFF10B981) : Colors.white.withValues(alpha: 0.08),
+                color: isSpeaking
+                    ? const Color(0xFF10B981)
+                    : Colors.white.withValues(alpha: 0.08),
                 width: isSpeaking ? 2.5 : 1.0,
               ),
               boxShadow: isSpeaking
                   ? [
                       BoxShadow(
-                        color: const Color(0xFF10B981).withValues(alpha: (level * 2.5).clamp(0.3, 0.8)),
+                        color: const Color(
+                          0xFF10B981,
+                        ).withValues(alpha: (level * 2.5).clamp(0.3, 0.8)),
                         blurRadius: 10 + (level * 14),
                         spreadRadius: 2,
                       ),
@@ -74,7 +80,8 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
                     child: RTCVideoView(
                       renderer!,
                       mirror: effectiveMirror,
-                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                     ),
                   )
                 else
@@ -85,7 +92,10 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
                   bottom: 8,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.65),
                       borderRadius: BorderRadius.circular(8),
@@ -146,18 +156,27 @@ class OmniCastSpeakingVideoTile extends StatelessWidget {
           CircleAvatar(
             radius: 28,
             backgroundColor: const Color(0xFF3B82F6).withValues(alpha: 0.2),
-            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+            backgroundImage: avatarUrl != null
+                ? NetworkImage(avatarUrl!)
+                : null,
             child: avatarUrl == null
                 ? Text(
                     userName.isNotEmpty ? userName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   )
                 : null,
           ),
           const SizedBox(height: 6),
           Text(
             'Camera Off',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 11),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 11,
+            ),
           ),
         ],
       ),

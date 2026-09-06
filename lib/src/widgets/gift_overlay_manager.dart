@@ -39,11 +39,7 @@ class _ActiveGiftItem {
   int combo;
   Timer? timer;
 
-  _ActiveGiftItem({
-    required this.id,
-    required this.event,
-    this.combo = 1,
-  });
+  _ActiveGiftItem({required this.id, required this.event, this.combo = 1});
 }
 
 class _GiftOverlayManagerState extends State<GiftOverlayManager> {
@@ -89,7 +85,10 @@ class _GiftOverlayManagerState extends State<GiftOverlayManager> {
           combo: event.amount,
         );
 
-        newItem.timer = Timer(widget.displayDuration, () => _dismissGift(newItem.id));
+        newItem.timer = Timer(
+          widget.displayDuration,
+          () => _dismissGift(newItem.id),
+        );
         _activeGifts.add(newItem);
       }
     });
@@ -147,10 +146,7 @@ class _GiftOverlayManagerState extends State<GiftOverlayManager> {
 class _GiftBannerWidget extends StatelessWidget {
   final _ActiveGiftItem item;
 
-  const _GiftBannerWidget({
-    super.key,
-    required this.item,
-  });
+  const _GiftBannerWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -161,10 +157,7 @@ class _GiftBannerWidget extends StatelessWidget {
       builder: (context, val, child) {
         return Transform.translate(
           offset: Offset(-50 * (1.0 - val), 0),
-          child: Opacity(
-            opacity: val.clamp(0.0, 1.0),
-            child: child,
-          ),
+          child: Opacity(opacity: val.clamp(0.0, 1.0), child: child),
         );
       },
       child: Container(
@@ -209,17 +202,18 @@ class _GiftBannerWidget extends StatelessWidget {
                 ),
                 Text(
                   'Sent ${item.event.giftName}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 10,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 10),
                 ),
               ],
             ),
             const SizedBox(width: 10),
 
             // Gift Icon Badge
-            const Icon(Icons.card_giftcard, size: 20, color: Colors.amberAccent),
+            const Icon(
+              Icons.card_giftcard,
+              size: 20,
+              color: Colors.amberAccent,
+            ),
             const SizedBox(width: 6),
 
             // Animated Combo Badge

@@ -30,10 +30,7 @@ class SignalingMessage {
   factory SignalingMessage.fromJson(Map<String, dynamic> json) {
     dynamic payload = json['payload'];
     if (payload is Map<String, dynamic>) {
-      payload = <String, dynamic>{
-        ...json,
-        ...payload,
-      };
+      payload = <String, dynamic>{...json, ...payload};
     } else if (payload == null) {
       const standardKeys = {
         'event',
@@ -56,7 +53,8 @@ class SignalingMessage {
       event: json['event'] as String? ?? json['action'] as String? ?? '',
       roomId: json['room_id'] as String? ?? json['roomId'] as String? ?? '',
       userId: json['user_id'] as String? ?? json['userId'] as String? ?? '',
-      targetUser: json['target_user'] as String? ?? json['targetUser'] as String?,
+      targetUser:
+          json['target_user'] as String? ?? json['targetUser'] as String?,
       payload: payload,
     );
   }

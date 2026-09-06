@@ -9,7 +9,8 @@ class OmniCastNativeViewportTracker extends StatelessWidget {
   final double itemHeight;
   final int crossAxisCount;
   final MediaController? mediaController;
-  final void Function(List<String> visibleTracks, List<String> hiddenTracks)? onVisibilityChanged;
+  final void Function(List<String> visibleTracks, List<String> hiddenTracks)?
+  onVisibilityChanged;
 
   const OmniCastNativeViewportTracker({
     super.key,
@@ -25,7 +26,8 @@ class OmniCastNativeViewportTracker extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification scrollInfo) {
-        if (scrollInfo is ScrollUpdateNotification || scrollInfo is ScrollEndNotification) {
+        if (scrollInfo is ScrollUpdateNotification ||
+            scrollInfo is ScrollEndNotification) {
           _evaluateVisibility(
             scrollOffset: scrollInfo.metrics.pixels,
             viewportDimension: scrollInfo.metrics.viewportDimension,
@@ -46,8 +48,14 @@ class OmniCastNativeViewportTracker extends StatelessWidget {
     final firstRow = (scrollOffset / itemHeight).floor().clamp(0, 10000);
     final lastRow = ((scrollOffset + viewportDimension) / itemHeight).ceil();
 
-    final firstVisibleIndex = (firstRow * crossAxisCount).clamp(0, trackIds.length);
-    final lastVisibleIndex = (lastRow * crossAxisCount).clamp(0, trackIds.length);
+    final firstVisibleIndex = (firstRow * crossAxisCount).clamp(
+      0,
+      trackIds.length,
+    );
+    final lastVisibleIndex = (lastRow * crossAxisCount).clamp(
+      0,
+      trackIds.length,
+    );
 
     final visibleTrackIds = <String>[];
     final hiddenTrackIds = <String>[];

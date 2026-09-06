@@ -29,9 +29,15 @@ class ChatMessage {
     }
 
     return ChatMessage(
-      id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      senderId: json['sender_id'] as String? ?? json['user_id'] as String? ?? '',
-      senderName: json['sender_name'] as String? ?? json['user_name'] as String? ?? 'Anonymous',
+      id:
+          json['id'] as String? ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      senderId:
+          json['sender_id'] as String? ?? json['user_id'] as String? ?? '',
+      senderName:
+          json['sender_name'] as String? ??
+          json['user_name'] as String? ??
+          'Anonymous',
       senderAvatar: json['sender_avatar'] as String?,
       text: json['text'] as String? ?? json['message'] as String? ?? '',
       senderLevel: (json['sender_level'] as num?)?.toInt() ?? 1,
@@ -40,14 +46,14 @@ class ChatMessage {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'sender_id': senderId,
-        'sender_name': senderName,
-        'sender_avatar': senderAvatar,
-        'text': text,
-        'sender_level': senderLevel,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'id': id,
+    'sender_id': senderId,
+    'sender_name': senderName,
+    'sender_avatar': senderAvatar,
+    'text': text,
+    'sender_level': senderLevel,
+    'timestamp': timestamp.toIso8601String(),
+  };
 }
 
 /// Gift transaction event processed in the live room.
@@ -78,12 +84,14 @@ class GiftEvent {
 
   factory GiftEvent.fromJson(Map<String, dynamic> json) {
     final amount = (json['amount'] as num?)?.toInt() ?? 1;
-    final coinVal = (json['coin_value'] as num?)?.toInt() ??
+    final coinVal =
+        (json['coin_value'] as num?)?.toInt() ??
         (json['coins'] as num?)?.toInt() ??
         (json['points_added'] as num?)?.toInt() ??
         (json['points'] as num?)?.toInt() ??
         0;
-    final totalHostCoins = (json['host_total_coins'] as num?)?.toInt() ??
+    final totalHostCoins =
+        (json['host_total_coins'] as num?)?.toInt() ??
         (json['host_coin_balance'] as num?)?.toInt() ??
         (json['new_score'] as num?)?.toInt() ??
         (json['host_a_points'] as num?)?.toInt() ??
@@ -91,11 +99,23 @@ class GiftEvent {
 
     return GiftEvent(
       giftId: json['gift_id'] as String? ?? json['gift'] as String? ?? '',
-      giftName: json['gift_name'] as String? ?? json['gift'] as String? ?? json['gift_id'] as String? ?? 'Gift',
+      giftName:
+          json['gift_name'] as String? ??
+          json['gift'] as String? ??
+          json['gift_id'] as String? ??
+          'Gift',
       giftIconUrl: json['gift_icon_url'] as String?,
-      senderId: json['sender_id'] as String? ?? json['user_id'] as String? ?? json['sender'] as String? ?? '',
+      senderId:
+          json['sender_id'] as String? ??
+          json['user_id'] as String? ??
+          json['sender'] as String? ??
+          '',
       senderName: json['sender_name'] as String? ?? 'Anonymous',
-      targetUserId: json['target_user_id'] as String? ?? json['target_host_id'] as String? ?? json['receiver_id'] as String? ?? json['host_id'] as String?,
+      targetUserId:
+          json['target_user_id'] as String? ??
+          json['target_host_id'] as String? ??
+          json['receiver_id'] as String? ??
+          json['host_id'] as String?,
       amount: amount,
       coinValue: coinVal,
       hostTotalCoins: totalHostCoins,
@@ -144,7 +164,8 @@ class BalanceUpdate {
   factory BalanceUpdate.fromJson(Map<String, dynamic> json) {
     return BalanceUpdate(
       userId: json['user_id'] as String? ?? '',
-      newBalance: (json['new_balance'] as num?)?.toInt() ??
+      newBalance:
+          (json['new_balance'] as num?)?.toInt() ??
           (json['balance'] as num?)?.toInt() ??
           0,
       delta: (json['delta'] as num?)?.toInt() ?? 0,
@@ -153,9 +174,9 @@ class BalanceUpdate {
   }
 
   Map<String, dynamic> toJson() => {
-        'user_id': userId,
-        'new_balance': newBalance,
-        'delta': delta,
-        'reason': reason,
-      };
+    'user_id': userId,
+    'new_balance': newBalance,
+    'delta': delta,
+    'reason': reason,
+  };
 }

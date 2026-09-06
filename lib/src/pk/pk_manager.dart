@@ -16,7 +16,9 @@ class PKManager {
   final RoomState _roomState;
 
   // Granular atomic ValueNotifiers for headless UI composition
-  final ValueNotifier<PKState> pkStateNotifier = ValueNotifier<PKState>(PKState.idle);
+  final ValueNotifier<PKState> pkStateNotifier = ValueNotifier<PKState>(
+    PKState.idle,
+  );
   final ValueNotifier<int> timerNotifier = ValueNotifier<int>(0);
   final ValueNotifier<bool> isPKActiveNotifier = ValueNotifier<bool>(false);
 
@@ -31,9 +33,9 @@ class PKManager {
     required SignalingClient signalingClient,
     required WebRTCManager webRTCManager,
     required RoomState roomState,
-  })  : _signalingClient = signalingClient,
-        _webRTCManager = webRTCManager,
-        _roomState = roomState {
+  }) : _signalingClient = signalingClient,
+       _webRTCManager = webRTCManager,
+       _roomState = roomState {
     _bindStreams();
     _bindStateNotifiers();
   }
@@ -70,18 +72,25 @@ class PKManager {
         case 'pk_started':
         case SignalingEvents.pkStart:
           if (msg.payload is Map<String, dynamic>) {
-            final battle = PKBattleInfo.fromJson(msg.payload as Map<String, dynamic>);
+            final battle = PKBattleInfo.fromJson(
+              msg.payload as Map<String, dynamic>,
+            );
             _roomState.updatePKBattle(battle);
             _pkStartedController.add(battle);
 
             // Subscribe to opponent host's tracks from foreign room
-            _subscribeToOpponentTracks(battle.opponentRoomId, battle.opponentUserId);
+            _subscribeToOpponentTracks(
+              battle.opponentRoomId,
+              battle.opponentUserId,
+            );
           }
           break;
 
         case SignalingEvents.pkScoreUpdate:
           if (msg.payload is Map<String, dynamic>) {
-            final scoreUpdate = PKScoreUpdate.fromJson(msg.payload as Map<String, dynamic>);
+            final scoreUpdate = PKScoreUpdate.fromJson(
+              msg.payload as Map<String, dynamic>,
+            );
             _pkScoreController.add(scoreUpdate);
             _roomState.updatePKScore(scoreUpdate);
           }
@@ -89,7 +98,9 @@ class PKManager {
 
         case SignalingEvents.pkTimerTick:
           if (msg.payload is Map<String, dynamic>) {
-            final timerTick = PKTimerTick.fromJson(msg.payload as Map<String, dynamic>);
+            final timerTick = PKTimerTick.fromJson(
+              msg.payload as Map<String, dynamic>,
+            );
             _pkTimerController.add(timerTick);
             _roomState.updatePKTimer(timerTick);
           }
@@ -98,13 +109,17 @@ class PKManager {
         case SignalingEvents.pkGiftOverlay:
           if (msg.payload is Map<String, dynamic>) {
             final payload = msg.payload as Map<String, dynamic>;
-            final hostA = (payload['host_a_points'] as num?)?.toInt() ??
+            final hostA =
+                (payload['host_a_points'] as num?)?.toInt() ??
                 (payload['room_a_score'] as num?)?.toInt();
-            final hostB = (payload['host_b_points'] as num?)?.toInt() ??
+            final hostB =
+                (payload['host_b_points'] as num?)?.toInt() ??
                 (payload['room_b_score'] as num?)?.toInt();
             if (hostA != null && hostB != null) {
               final scoreUpdate = PKScoreUpdate(
-                battleId: payload['session_id'] as String? ?? (_roomState.activePK?.battleId ?? ''),
+                battleId:
+                    payload['session_id'] as String? ??
+                    (_roomState.activePK?.battleId ?? ''),
                 hostScore: hostA,
                 opponentScore: hostB,
               );
@@ -119,9 +134,17 @@ class PKManager {
             final payload = msg.payload as Map<String, dynamic>;
             final mode = payload['mode'] as String? ?? 'solo';
             if (mode == 'pk') {
-              final opponentId = payload['linked_host_id'] as String? ?? payload['opponent_user_id'] as String? ?? '';
-              final opponentRoomId = payload['linked_room_id'] as String? ?? payload['opponent_room_id'] as String? ?? '';
-              final battleId = payload['battle_id'] as String? ?? 'pk_${DateTime.now().millisecondsSinceEpoch}';
+              final opponentId =
+                  payload['linked_host_id'] as String? ??
+                  payload['opponent_user_id'] as String? ??
+                  '';
+              final opponentRoomId =
+                  payload['linked_room_id'] as String? ??
+                  payload['opponent_room_id'] as String? ??
+                  '';
+              final battleId =
+                  payload['battle_id'] as String? ??
+                  'pk_${DateTime.now().millisecondsSinceEpoch}';
 
               final battle = PKBattleInfo(
                 battleId: battleId,
@@ -131,9 +154,12 @@ class PKManager {
                 opponentUserId: opponentId,
                 status: PKStatus.inProgress,
                 hostScore: (payload['host_score'] as num?)?.toInt() ?? 0,
-                opponentScore: (payload['opponent_score'] as num?)?.toInt() ?? 0,
-                durationSeconds: (payload['duration_seconds'] as num?)?.toInt() ?? 300,
-                remainingSeconds: (payload['remaining_seconds'] as num?)?.toInt() ?? 300,
+                opponentScore:
+                    (payload['opponent_score'] as num?)?.toInt() ?? 0,
+                durationSeconds:
+                    (payload['duration_seconds'] as num?)?.toInt() ?? 300,
+                remainingSeconds:
+                    (payload['remaining_seconds'] as num?)?.toInt() ?? 300,
                 startedAt: DateTime.now(),
               );
               _roomState.updatePKBattle(battle);
@@ -169,18 +195,20 @@ class PKManager {
   }) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.pkRequest,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetRoomId,
-      payload: {
-        'target_room': targetRoomId,
-        'target_room_id': targetRoomId,
-        'target_host_id': targetHostId,
-        'duration_seconds': durationSeconds,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.pkRequest,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetRoomId,
+        payload: {
+          'target_room': targetRoomId,
+          'target_room_id': targetRoomId,
+          'target_host_id': targetHostId,
+          'duration_seconds': durationSeconds,
+        },
+      ),
+    );
   }
 
   /// Accepts an incoming PK battle challenge and notifies the SFU engine.
@@ -192,19 +220,21 @@ class PKManager {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
     final targetRoom = opponentRoomId ?? '';
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.pkAccept,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      targetUser: targetRoom,
-      payload: {
-        'target_room': targetRoom,
-        'from_room_id': targetRoom,
-        'battle_id': battleId,
-        'opponent_room_id': opponentRoomId,
-        'opponent_host_id': opponentHostId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.pkAccept,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        targetUser: targetRoom,
+        payload: {
+          'target_room': targetRoom,
+          'from_room_id': targetRoom,
+          'battle_id': battleId,
+          'opponent_room_id': opponentRoomId,
+          'opponent_host_id': opponentHostId,
+        },
+      ),
+    );
 
     if (opponentRoomId != null && opponentHostId != null) {
       _subscribeToOpponentTracks(opponentRoomId, opponentHostId);
@@ -215,50 +245,60 @@ class PKManager {
   void rejectPKRequest(String battleId) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.pkReject,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: {
-        'battle_id': battleId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.pkReject,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {'battle_id': battleId},
+      ),
+    );
   }
 
   /// Terminates an ongoing PK battle.
   void endPK(String battleId) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    _signalingClient.send(SignalingMessage(
-      event: SignalingEvents.pkStop,
-      roomId: _roomState.roomId!,
-      userId: _roomState.userId!,
-      payload: {
-        'action': 'pk_stop',
-        'room_id': _roomState.roomId!,
-        'battle_id': battleId,
-      },
-    ));
+    _signalingClient.send(
+      SignalingMessage(
+        event: SignalingEvents.pkStop,
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {
+          'action': 'pk_stop',
+          'room_id': _roomState.roomId!,
+          'battle_id': battleId,
+        },
+      ),
+    );
 
     _roomState.endPKBattle();
   }
 
   /// Signals the SFU engine to bridge and forward the opponent's cross-room WebRTC tracks.
-  void _subscribeToOpponentTracks(String opponentRoomId, String opponentUserId) {
+  void _subscribeToOpponentTracks(
+    String opponentRoomId,
+    String opponentUserId,
+  ) {
     OmniCastLogger.log(
-        '[PKManager] Subscribing to opponent tracks for room: $opponentRoomId, host: $opponentUserId');
+      '[PKManager] Subscribing to opponent tracks for room: $opponentRoomId, host: $opponentUserId',
+    );
 
-    if (_roomState.isInRoom && _roomState.roomId != null && _roomState.userId != null) {
-      _signalingClient.send(SignalingMessage(
-        event: 'subscribe_cross_room',
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-        targetUser: opponentUserId,
-        payload: {
-          'source_room_id': opponentRoomId,
-          'source_user_id': opponentUserId,
-        },
-      ));
+    if (_roomState.isInRoom &&
+        _roomState.roomId != null &&
+        _roomState.userId != null) {
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'subscribe_cross_room',
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          targetUser: opponentUserId,
+          payload: {
+            'source_room_id': opponentRoomId,
+            'source_user_id': opponentUserId,
+          },
+        ),
+      );
     }
 
     // Register active remote user so renderers get initialized immediately

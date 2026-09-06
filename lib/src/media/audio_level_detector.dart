@@ -13,10 +13,13 @@ class AudioLevelDetector {
   bool _isDisposed = false;
 
   /// Map of trackId or userId -> audioLevel (0.0 = silence, 1.0 = maximum volume)
-  final ValueNotifier<Map<String, double>> audioLevelsNotifier = ValueNotifier<Map<String, double>>({});
+  final ValueNotifier<Map<String, double>> audioLevelsNotifier =
+      ValueNotifier<Map<String, double>>({});
 
   /// Identifier of the currently loudest speaker
-  final ValueNotifier<String?> activeSpeakerNotifier = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> activeSpeakerNotifier = ValueNotifier<String?>(
+    null,
+  );
 
   AudioLevelDetector({
     required WebRTCManager webRTCManager,
@@ -43,8 +46,10 @@ class AudioLevelDetector {
 
       for (final report in stats) {
         if (report.values.containsKey('audioLevel')) {
-          final level = (report.values['audioLevel'] as num?)?.toDouble() ?? 0.0;
-          final trackId = report.values['trackIdentifier'] as String? ?? report.id;
+          final level =
+              (report.values['audioLevel'] as num?)?.toDouble() ?? 0.0;
+          final trackId =
+              report.values['trackIdentifier'] as String? ?? report.id;
 
           currentLevels[trackId] = level;
 

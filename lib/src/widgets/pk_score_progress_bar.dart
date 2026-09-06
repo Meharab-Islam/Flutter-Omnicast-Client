@@ -50,27 +50,22 @@ class PKScoreProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveHostGradient = hostGradient ??
-        const LinearGradient(
-          colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
-        );
+    final effectiveHostGradient =
+        hostGradient ??
+        const LinearGradient(colors: [Color(0xFF00C6FF), Color(0xFF0072FF)]);
 
-    final effectiveOpponentGradient = opponentGradient ??
-        const LinearGradient(
-          colors: [Color(0xFFFF0844), Color(0xFFFFB199)],
-        );
+    final effectiveOpponentGradient =
+        opponentGradient ??
+        const LinearGradient(colors: [Color(0xFFFF0844), Color(0xFFFFB199)]);
 
-    final defaultScoreStyle = scoreTextStyle ??
+    final defaultScoreStyle =
+        scoreTextStyle ??
         const TextStyle(
           color: Colors.white,
           fontSize: 13,
           fontWeight: FontWeight.w900,
           shadows: [
-            Shadow(
-              color: Colors.black54,
-              offset: Offset(0, 1),
-              blurRadius: 2,
-            ),
+            Shadow(color: Colors.black54, offset: Offset(0, 1), blurRadius: 2),
           ],
         );
 
@@ -112,7 +107,8 @@ class PKScoreProgressBar extends StatelessWidget {
                   pkState.isPunishmentPhase
                       ? 'PUNISHMENT: ${_formatTimer(pkState.remainingSeconds)}'
                       : _formatTimer(pkState.remainingSeconds),
-                  style: timerTextStyle ??
+                  style:
+                      timerTextStyle ??
                       const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
@@ -173,10 +169,7 @@ class PKScoreProgressBar extends StatelessWidget {
                   children: [
                     const Icon(Icons.star, size: 13, color: Colors.amberAccent),
                     const SizedBox(width: 3),
-                    Text(
-                      pkState.myScore.toString(),
-                      style: defaultScoreStyle,
-                    ),
+                    Text(pkState.myScore.toString(), style: defaultScoreStyle),
                   ],
                 ),
               ),

@@ -22,7 +22,9 @@ void main() {
       final roomState = RoomState();
       final signalingClient = SignalingClient();
       final mediaStreamManager = MediaStreamManager();
-      final webRTCManager = WebRTCManager(mediaStreamManager: mediaStreamManager);
+      final webRTCManager = WebRTCManager(
+        mediaStreamManager: mediaStreamManager,
+      );
 
       final roomManager = RoomManager(
         signalingClient: signalingClient,
