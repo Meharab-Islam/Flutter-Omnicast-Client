@@ -248,6 +248,9 @@ class RoomModel {
   /// Alias for stream title.
   String get roomName => title;
 
+  /// Alias for viewer count.
+  int get totalViewers => viewerCount;
+
   factory RoomModel.fromJson(Map<String, dynamic> json) {
     // 1. Extract nested metadata or options if present
     final meta = json['metadata'] is Map<String, dynamic>

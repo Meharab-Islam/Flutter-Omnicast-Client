@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:omnicast_example/main.dart';
 
@@ -10,5 +11,8 @@ void main() {
     expect(find.text('Host (Broadcast)'), findsOneWidget);
     expect(find.text('Viewer (Watch)'), findsOneWidget);
     expect(find.text('Start Broadcasting'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
   });
 }

@@ -54,6 +54,12 @@ class OmniCastClient {
 
   final List<StreamSubscription> _subscriptions = [];
   bool _isDisposed = false;
+  Timer? _roomsWatchTimer;
+
+  /// Reactive notifier holding the list of active live broadcasting rooms.
+  /// Automatically updated when [watchLiveRooms] is called or via signaling room events.
+  final ValueNotifier<List<RoomModel>> liveRoomsNotifier =
+      ValueNotifier<List<RoomModel>>(const []);
 
   OmniCastClient.custom({
     required this.config,
@@ -123,6 +129,8 @@ class OmniCastClient {
     String? token,
     bool autoConnect = true,
     bool enableLogging = false,
+    bool autoWatchRooms = false,
+    Duration watchRoomsInterval = const Duration(seconds: 5),
     List<Map<String, dynamic>>? iceServers,
     Duration heartbeatInterval = const Duration(seconds: 15),
     Duration reconnectDelay = const Duration(seconds: 3),
@@ -165,6 +173,9 @@ class OmniCastClient {
       } catch (e) {
         OmniCastLogger.error('[OmniCastClient] Initial connection deferred or offline: $e');
       }
+    }
+    if (autoWatchRooms) {
+      client.watchLiveRooms(interval: watchRoomsInterval);
     }
     return client;
   }
@@ -289,6 +300,7 @@ class OmniCastClient {
   Stream<SignalingMessage> get onLayerSwitched => _signalingClient.onLayerSwitched;
   Stream<SignalingMessage> get onViewportUpdated => _signalingClient.onViewportUpdated;
   Stream<SignalingMessage> get onLeaveAcknowledged => _signalingClient.onLeaveAcknowledged;
+  Stream<List<RoomModel>> get onLiveRoomsUpdated => _signalingClient.onRoomListReceived;
 
   // Real-time Reactive ValueListenable Notifiers for UI Composition
   ValueNotifier<List<OmniCastParticipant>> get viewersNotifier => _roomManager.activeViewersList;
@@ -298,6 +310,17 @@ class OmniCastClient {
   ValueNotifier<bool> get showJoinMessagesNotifier => _roomState.showJoinMessagesNotifier;
   bool get showJoinMessages => _roomState.showJoinMessages;
   set showJoinMessages(bool value) => _roomState.showJoinMessages = value;
+
+  // Stage Seat Facades
+  ValueNotifier<List<StageSeat>> get activeSeatsNotifier => _seatManager.activeSeatsNotifier;
+  ValueNotifier<List<SeatRequest>> get pendingSeatRequestsNotifier => _seatManager.pendingSeatRequestsNotifier;
+  ValueNotifier<int> get occupiedSeatsCountNotifier => _seatManager.occupiedSeatsCountNotifier;
+  List<StageSeat> get occupiedSeats => _seatManager.occupiedSeats;
+  int get occupiedSeatsCount => _seatManager.occupiedSeatsCount;
+  StageSeat? getSeat(int seatIndex) => _seatManager.getSeat(seatIndex);
+  StageSeat? getSeatOfUser(String userId) => _seatManager.getSeatOfUser(userId);
+  bool isUserMuted(String userId) => _seatManager.isUserMuted(userId);
+  bool isUserCameraOff(String userId) => _seatManager.isUserCameraOff(userId);
 
   /// Host action: Kicks/ejects a participant out of the live room.
   void kickUser(String targetUserId, {String? reason}) =>
@@ -349,6 +372,12 @@ class OmniCastClient {
   /// Viewer action: Subscribes to a co-host's media stream.
   void subscribeCoHost(String coHostUserId) =>
       _seatManager.subscribeCoHost(coHostUserId);
+
+  /// Returns currently pending co-host seat requests.
+  List<SeatRequest> get pendingSeatRequests => _seatManager.pendingSeatRequests;
+
+  /// Returns list of all active stage seats.
+  List<StageSeat> get activeSeats => _seatManager.activeSeats;
 
   // Social & Interactivity Facades
   /// Sends a real-time chat message to the room.
@@ -436,6 +465,38 @@ class OmniCastClient {
   /// Prompts Android and iOS to grant microphone/camera permissions without external plugins.
   Future<bool> requestPermissions({bool camera = true, bool microphone = true}) =>
       _mediaController.requestPermissions(camera: camera, microphone: microphone);
+
+  /// Automatically polls and syncs active live rooms in the background without manual API calls.
+  /// Updates [liveRoomsNotifier] in real-time.
+  Future<List<RoomModel>> watchLiveRooms({Duration interval = const Duration(seconds: 5)}) async {
+    _roomsWatchTimer?.cancel();
+    await refreshLiveRooms();
+    _roomsWatchTimer = Timer.periodic(interval, (_) async {
+      await refreshLiveRooms();
+    });
+    return liveRoomsNotifier.value;
+  }
+
+  /// Stops background polling of live rooms.
+  void stopWatchingRooms() {
+    _roomsWatchTimer?.cancel();
+    _roomsWatchTimer = null;
+  }
+
+  /// Refreshes the active live room list immediately and updates [liveRoomsNotifier].
+  Future<List<RoomModel>> refreshLiveRooms() async {
+    try {
+      final rooms = await _api.getLiveRooms();
+      liveRoomsNotifier.value = List.unmodifiable(rooms);
+      return rooms;
+    } catch (e) {
+      OmniCastLogger.error('[OmniCastClient] refreshLiveRooms error: $e');
+      if (_signalingClient.isConnected) {
+        _signalingClient.requestRoomList();
+      }
+      return liveRoomsNotifier.value;
+    }
+  }
 
   /// REST API: Fetches all active live broadcasting rooms from the backend (`GET /rooms`).
   Future<List<RoomModel>> getLiveRooms({Duration timeout = const Duration(seconds: 10)}) =>
@@ -637,12 +698,21 @@ class OmniCastClient {
         }
       }),
     );
+
+    // 11. Room List from WebSocket Signaling
+    _subscriptions.add(
+      _signalingClient.onRoomListReceived.listen((rooms) {
+        liveRoomsNotifier.value = List.unmodifiable(rooms);
+      }),
+    );
   }
 
   /// Permanently disposes the client, closing sub-managers, streams, peer connections, and WebSockets.
   Future<void> dispose() async {
     if (_isDisposed) return;
     _isDisposed = true;
+
+    stopWatchingRooms();
 
     for (final sub in _subscriptions) {
       try {

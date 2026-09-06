@@ -283,7 +283,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   void _handleSeatAction() {
     if (widget.session.isHost) {
-      _showHostSeatManagementDialog();
+      if (_client.seats.pendingSeatRequests.isNotEmpty) {
+        OmniCastSeatRequestsBottomSheet.show(context, client: _client);
+      } else {
+        _showHostSeatManagementDialog();
+      }
     } else {
       if (_isCoHost) {
         _client.seats.leaveSeat();
@@ -338,6 +342,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
         ),
         actions: [
+          if (_client.seats.pendingSeatRequests.isNotEmpty)
+            TextButton.icon(
+              onPressed: () {
+                Navigator.pop(ctx);
+                OmniCastSeatRequestsBottomSheet.show(context, client: _client);
+              },
+              icon: const Icon(Icons.person_add_rounded, size: 16, color: Color(0xFF6C5CE7)),
+              label: Text(
+                'Requests (${_client.seats.pendingSeatRequests.length})',
+                style: const TextStyle(color: Color(0xFF6C5CE7)),
+              ),
+            ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Close', style: TextStyle(color: Color(0xFF00CEC9))),
@@ -509,6 +525,45 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ),
             ),
 
+          // 4.1 Guest Stage Overlay (Multi-Seat Stage)
+          Positioned(
+            right: 12,
+            top: _isPKActive ? 180 : 95,
+            width: 140,
+            child: OmniCastStageBuilder(
+              client: _client,
+              builder: (context, seats, count) {
+                return Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white12),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          'Stage ($count/4)',
+                          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      OmniCastStageGrid(
+                        client: _client,
+                        maxSeats: 4,
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.9,
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+
           // 5. Floating Live Chat Feed
           Positioned(
             left: 0,
@@ -668,6 +723,37 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 );
               },
             ),
+
+            // Host Pending Seat Requests Badge
+            if (widget.session.isHost) ...[
+              const SizedBox(width: 8),
+              OmniCastSeatRequestsBuilder(
+                client: _client,
+                builder: (context, requests) {
+                  if (requests.isEmpty) return const SizedBox.shrink();
+                  return GestureDetector(
+                    onTap: () => OmniCastSeatRequestsBottomSheet.show(context, client: _client),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.orangeAccent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.person_add_alt_1_rounded, color: Colors.black87, size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${requests.length}',
+                            style: const TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
 
             const Spacer(),
 

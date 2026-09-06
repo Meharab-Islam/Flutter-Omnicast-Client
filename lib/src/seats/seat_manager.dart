@@ -22,12 +22,37 @@ class SeatManager {
       ValueNotifier<List<SeatRequest>>(const []);
   final ValueNotifier<List<CoHostInvite>> pendingInvitesNotifier =
       ValueNotifier<List<CoHostInvite>>(const []);
+  final ValueNotifier<int> occupiedSeatsCountNotifier = ValueNotifier<int>(0);
 
   // Backward compatibility alias
   ValueNotifier<List<StageSeat>> get activeSeatsNotifier => activeCoHostsList;
 
   // Waiting list alias notifier
   ValueNotifier<List<SeatRequest>> get waitingListNotifier => pendingSeatRequestsNotifier;
+
+  /// Returns currently pending co-host seat requests.
+  List<SeatRequest> get pendingSeatRequests => pendingSeatRequestsNotifier.value;
+
+  /// Returns list of all stage seats.
+  List<StageSeat> get activeSeats => activeCoHostsList.value;
+
+  /// Returns list of occupied stage seats.
+  List<StageSeat> get occupiedSeats => _roomState.occupiedSeats;
+
+  /// Returns the number of currently occupied stage seats.
+  int get occupiedSeatsCount => _roomState.occupiedSeatsCount;
+
+  /// Returns the [StageSeat] at [seatIndex], or null.
+  StageSeat? getSeat(int seatIndex) => _roomState.getSeat(seatIndex);
+
+  /// Returns the [StageSeat] occupied by [userId], or null.
+  StageSeat? getSeatOfUser(String userId) => _roomState.getSeatOfUser(userId);
+
+  /// Returns whether [userId] is audio muted.
+  bool isUserMuted(String userId) => _roomState.isUserMuted(userId);
+
+  /// Returns whether [userId] has camera off.
+  bool isUserCameraOff(String userId) => _roomState.isUserCameraOff(userId);
 
   // Pure Streams
   final _seatRequestController = StreamController<SeatRequest>.broadcast();
@@ -62,6 +87,7 @@ class SeatManager {
     activeCoHostsList.value = _roomState.activeSeats;
     pendingSeatRequestsNotifier.value = _roomState.pendingSeatRequests;
     pendingInvitesNotifier.value = _roomState.pendingInvites;
+    occupiedSeatsCountNotifier.value = _roomState.occupiedSeatsCount;
   }
 
   void _bindSignalingListeners() {

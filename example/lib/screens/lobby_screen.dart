@@ -19,8 +19,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   final _userIdController = TextEditingController();
 
   String _selectedRole = 'host'; // 'host' or 'viewer'
-  bool _isLoadingRooms = false;
-  List<RoomModel> _liveRooms = [];
+  OmniCastClient? _lobbyClient;
 
   @override
   void initState() {
@@ -28,10 +27,30 @@ class _LobbyScreenState extends State<LobbyScreen> {
     final randomId = Random().nextInt(9000) + 1000;
     _userIdController.text = 'user-$randomId';
     _nameController.text = 'User $randomId';
+    _initLobbyClient();
+  }
+
+  Future<void> _initLobbyClient() async {
+    _lobbyClient?.dispose();
+    final server = _serverController.text.trim().isNotEmpty
+        ? _serverController.text.trim()
+        : AppConstants.defaultLocalhost;
+    final client = await OmniCastClient.init(
+      serverUrl: server,
+      autoConnect: false,
+      autoWatchRooms: true,
+      watchRoomsInterval: const Duration(seconds: 4),
+    );
+    if (mounted) {
+      setState(() {
+        _lobbyClient = client;
+      });
+    }
   }
 
   @override
   void dispose() {
+    _lobbyClient?.dispose();
     _serverController.dispose();
     _roomController.dispose();
     _nameController.dispose();
@@ -39,41 +58,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
     super.dispose();
   }
 
-  Future<void> _fetchLiveRooms() async {
-    setState(() => _isLoadingRooms = true);
-    try {
-      final host = _serverController.text.trim();
-      final api = OmniCastApi(
-        config: OmniCastConfig.fromServer(
-          serverUrl: host,
-          apiKey: 'dev_api_key_123',
-          apiSecret: 'dev_api_secret_456',
-        ),
-      );
-      final rooms = await api.getLiveRooms();
-      setState(() {
-        _liveRooms = rooms;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Discovered ${_liveRooms.length} active room(s) on server!'),
-            backgroundColor: Colors.indigo,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to fetch rooms: $e'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoadingRooms = false);
-    }
+  void _refreshRooms() {
+    _lobbyClient?.refreshLiveRooms();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Checking live rooms on media server...'),
+        backgroundColor: Colors.indigo,
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   void _enterLiveRoom() {
@@ -410,80 +403,138 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         ),
                         const SizedBox(height: 14),
 
-                        // Discover Active Rooms Button
-                        OutlinedButton.icon(
-                          onPressed: _isLoadingRooms ? null : _fetchLiveRooms,
-                          icon: _isLoadingRooms
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Icon(Icons.explore_rounded),
-                          label: const Text('Discover Live Rooms on Server'),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            foregroundColor: Colors.white70,
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
+                        // Real-time Live Rooms Discovery (Zero manual REST API calls needed!)
+                        if (_lobbyClient != null) ...[
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Row(
+                                children: [
+                                  Icon(Icons.sensors_rounded, color: Colors.redAccent, size: 16),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Active Live Rooms',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.refresh_rounded, size: 18, color: Colors.white54),
+                                tooltip: 'Refresh Rooms',
+                                onPressed: _refreshRooms,
+                              ),
+                            ],
                           ),
-                        ),
-
-                        // Discovered Rooms List
-                        if (_liveRooms.isNotEmpty) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            'Active Live Rooms (${_liveRooms.length}):',
-                            style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 12),
-                          ),
-                          const SizedBox(height: 8),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxHeight: 140),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: _liveRooms.length,
-                              itemBuilder: (context, index) {
-                                final room = _liveRooms[index];
+                          const SizedBox(height: 6),
+                          OmniCastLiveRoomsBuilder(
+                            client: _lobbyClient!,
+                            builder: (context, rooms) {
+                              if (rooms.isEmpty) {
                                 return Container(
-                                  margin: const EdgeInsets.only(bottom: 6),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF141724),
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.live_tv_rounded, color: Colors.redAccent, size: 16),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          room.roomId,
-                                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                                        ),
-                                      ),
-                                      Text(
-                                        '👁️ ${room.viewerCount}',
-                                        style: const TextStyle(color: Colors.white70, fontSize: 12),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      TextButton(
-                                        onPressed: () {
-                                          _roomController.text = room.roomId;
-                                          setState(() => _selectedRole = 'viewer');
-                                        },
-                                        style: TextButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          visualDensity: VisualDensity.compact,
-                                        ),
-                                        child: const Text('Select', style: TextStyle(color: Color(0xFF00CEC9))),
-                                      ),
-                                    ],
+                                  child: const Center(
+                                    child: Text(
+                                      'No active live streams on server.\nStart broadcasting to create one!',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.white38, fontSize: 12),
+                                    ),
                                   ),
                                 );
-                              },
-                            ),
+                              }
+
+                              return ConstrainedBox(
+                                constraints: const BoxConstraints(maxHeight: 180),
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemCount: rooms.length,
+                                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                                  itemBuilder: (context, index) {
+                                    final room = rooms[index];
+                                    final isSelected = _roomController.text == room.roomId;
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? const Color(0xFF6C5CE7).withValues(alpha: 0.25)
+                                            : const Color(0xFF141724),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? const Color(0xFF6C5CE7)
+                                              : Colors.white.withValues(alpha: 0.06),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.live_tv_rounded, color: Colors.redAccent, size: 16),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  room.roomId,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'Host: ${room.hostId}',
+                                                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withValues(alpha: 0.08),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.visibility_rounded, color: Colors.white70, size: 12),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '${room.totalViewers}',
+                                                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: const Color(0xFF00CEC9),
+                                              foregroundColor: Colors.black87,
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                              minimumSize: Size.zero,
+                                              textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _roomController.text = room.roomId;
+                                                _selectedRole = 'viewer';
+                                              });
+                                            },
+                                            child: const Text('Join'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ],

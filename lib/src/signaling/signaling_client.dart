@@ -57,6 +57,7 @@ class SignalingClient {
   final _leaveAcknowledgedController = StreamController<SignalingMessage>.broadcast();
   final _roomCreatedController = StreamController<RoomModel>.broadcast();
   final _roomClosedController = StreamController<String>.broadcast();
+  final _roomListController = StreamController<List<RoomModel>>.broadcast();
 
   // Reconnection state
   bool autoReconnect;
@@ -106,6 +107,7 @@ class SignalingClient {
   Stream<SignalingMessage> get onMediaStateChanged => _mediaStateController.stream;
   Stream<RoomModel> get onRoomCreated => _roomCreatedController.stream;
   Stream<String> get onRoomClosed => _roomClosedController.stream;
+  Stream<List<RoomModel>> get onRoomListReceived => _roomListController.stream;
 
   /// Connects to the OmniCast WebSocket signaling server.
   Future<void> connect({required String wsUrl, String? token}) async {
@@ -219,7 +221,24 @@ class SignalingClient {
         break;
 
       case SignalingEvents.roomInfoSync:
+      case SignalingEvents.roomInfo:
+      case 'room_state':
+      case 'sync_state':
         _roomInfoController.add(msg);
+        break;
+
+      case 'room_list':
+      case 'rooms':
+        if (msg.payload is List) {
+          try {
+            final list = (msg.payload as List)
+                .map((e) => RoomModel.fromJson(Map<String, dynamic>.from(e as Map)))
+                .toList();
+            _roomListController.add(list);
+          } catch (e) {
+            OmniCastLogger.error('[SignalingClient] Failed to parse room_list: $e');
+          }
+        }
         break;
 
       case SignalingEvents.viewerUpdate:
@@ -407,6 +426,15 @@ class SignalingClient {
     _onDataReceived(rawData);
   }
 
+  /// Requests the active room list from the server over WebSocket signaling.
+  void requestRoomList() {
+    send(SignalingMessage(
+      event: 'get_rooms',
+      roomId: '',
+      userId: _token ?? '',
+    ));
+  }
+
   void _scheduleReconnect() {
     if (_isDisposed || !autoReconnect || _wsUrl == null) return;
     if (_reconnectTimer != null && _reconnectTimer!.isActive) return;
@@ -549,5 +577,6 @@ class SignalingClient {
     await _leaveAcknowledgedController.close();
     await _roomCreatedController.close();
     await _roomClosedController.close();
+    await _roomListController.close();
   }
 }
