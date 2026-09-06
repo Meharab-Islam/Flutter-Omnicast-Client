@@ -206,7 +206,11 @@ class RoomManager {
               payloadMap['userId']?.toString() ??
               msg.userId;
           if (leftUserId.isNotEmpty) {
-            _queueUserLeft(leftUserId);
+            if (event == 'participant_removed' && leftUserId == _roomState.userId) {
+              _handleUserKicked(leftUserId, msg);
+            } else {
+              _queueUserLeft(leftUserId);
+            }
           }
 
           final leaveCount = (payloadMap['total_viewers'] as num?)?.toInt() ??
@@ -215,6 +219,24 @@ class RoomManager {
           if (leaveCount != null) {
             totalViewerCount.value = leaveCount;
           }
+          break;
+
+        // 3.1 Participant Reconnecting & Reconnected Events
+        case 'participant_reconnecting':
+          final reconnMap = msg.payload is Map<String, dynamic>
+              ? msg.payload as Map<String, dynamic>
+              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
+          final reconnUserId = reconnMap['user_id']?.toString() ?? msg.userId;
+          final reconnTimeout = (reconnMap['timeout'] as num?)?.toInt() ?? 20;
+          OmniCastLogger.log('[RoomManager] Participant $reconnUserId is reconnecting (grace period: ${reconnTimeout}s)...');
+          break;
+
+        case 'participant_reconnected':
+          final reconnectedMap = msg.payload is Map<String, dynamic>
+              ? msg.payload as Map<String, dynamic>
+              : (msg.payload is Map ? Map<String, dynamic>.from(msg.payload as Map) : <String, dynamic>{});
+          final reconnectedUserId = reconnectedMap['user_id']?.toString() ?? msg.userId;
+          OmniCastLogger.log('[RoomManager] Participant $reconnectedUserId reconnected within grace period! Connection restored smoothly.');
           break;
 
         // 4. Batch Viewer Count Sync & Presence Updates
