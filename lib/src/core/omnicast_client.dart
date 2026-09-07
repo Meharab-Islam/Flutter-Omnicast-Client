@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../api/omnicast_api.dart';
 import '../datachannel/data_channel_manager.dart';
@@ -191,6 +192,34 @@ class OmniCastClient {
       mediaConfig: mediaConfig ?? const GlobalMediaConfig(),
     );
     instance = client;
+
+    // 🚀 Extract token claims and initialize session state immediately
+    if (token != null && token.isNotEmpty) {
+      try {
+        final parts = token.split('.');
+        if (parts.length >= 2) {
+          final normalized = base64Url.normalize(parts[1]);
+          final payload = jsonDecode(utf8.decode(base64Url.decode(normalized)))
+              as Map<String, dynamic>;
+          final uId =
+              (payload['userId'] ?? payload['user_id'] ?? payload['sub'])
+                  ?.toString();
+          final rId = (payload['roomId'] ?? payload['room_id'])?.toString();
+          final rRole = payload['role']?.toString();
+          if (uId != null && rId != null) {
+            final roleEnum = (rRole == 'host' || rRole == 'publisher')
+                ? UserRole.host
+                : (rRole == 'cohost' ? UserRole.coHost : UserRole.viewer);
+            client._roomState.setSession(
+              roomId: rId,
+              userId: uId,
+              role: roleEnum,
+            );
+          }
+        }
+      } catch (_) {}
+    }
+
     if (autoConnect) {
       try {
         await client._signalingClient.connect(
@@ -285,6 +314,9 @@ class OmniCastClient {
       webRTCManager: _webRTCManager,
       roomState: _roomState,
     );
+    _webRTCManager.onPeerConnectionCreated = (pc) {
+      _dataChannelManager.attachIncomingChannel(pc);
+    };
   }
 
   // Sub-module Getters
@@ -297,7 +329,11 @@ class OmniCastClient {
   DataChannelManager get dataChannel => _dataChannelManager;
   RoomState get state => _roomState;
   MediaStreamManager get streamManager => _mediaStreamManager;
+  MediaStreamManager get mediaStreamManager => _mediaStreamManager;
+  String? get userId => _roomState.userId;
+  String? get roomId => _roomState.roomId;
   SignalingClient get signaling => _signalingClient;
+  SignalingClient get signalingClient => _signalingClient;
   WebRTCManager get webrtc => _webRTCManager;
   RTCVideoRenderer? get localRenderer => _mediaController.localRenderer;
   RTCVideoRenderer? getRenderer(String? userId) =>
@@ -682,13 +718,16 @@ class OmniCastClient {
       // 1. If track ID has cohost_ prefix (e.g. cohost_user123_video), extract cohost user ID
       var cohostUserId = '';
       if (trackId.startsWith('cohost_')) {
-        final parts = trackId.split('_');
-        if (parts.length >= 3) {
-          cohostUserId = parts.sublist(1, parts.length - 1).join('_');
-          if (cohostUserId.isNotEmpty) {
-            await _mediaStreamManager.attachRemoteStream(cohostUserId, stream);
-            _roomState.addActiveRemoteUser(cohostUserId);
-          }
+        final withoutPrefix = trackId.substring('cohost_'.length);
+        final lastUnderscore = withoutPrefix.lastIndexOf('_');
+        if (lastUnderscore > 0) {
+          cohostUserId = withoutPrefix.substring(0, lastUnderscore);
+        } else {
+          cohostUserId = withoutPrefix;
+        }
+        if (cohostUserId.isNotEmpty) {
+          await _mediaStreamManager.attachRemoteStream(cohostUserId, stream);
+          _roomState.addActiveRemoteUser(cohostUserId);
         }
       }
 
@@ -754,18 +793,25 @@ class OmniCastClient {
         }
       }
 
-      // 5. If main host stream (only when not host, not a cohost track, and host stream is not yet attached)
+      // 5. If main host stream (only when not host, and not a cohost track)
       final isCoHost = cohostUserId.isNotEmpty || trackId.startsWith('cohost_');
-      if (!isCurrentHost && !isCoHost && !hasHostStream) {
+      if (!isCurrentHost && !isCoHost) {
         final hostKey =
             (hostId != null && hostId.isNotEmpty) ? hostId : 'host';
         await _mediaStreamManager.attachRemoteStream(hostKey, stream);
         _mediaStreamManager.registerAlias('host', hostKey);
+        _mediaStreamManager.registerAlias(hostKey, 'host');
+        if (hostId != null && hostId.isNotEmpty) {
+          _mediaStreamManager.registerAlias(hostId, 'host');
+          _mediaStreamManager.registerAlias('host', hostId);
+        }
         if (roomId != null && roomId.isNotEmpty) {
           _mediaStreamManager.registerAlias(roomId, hostKey);
+          _mediaStreamManager.registerAlias(hostKey, roomId);
         }
         if (streamId.isNotEmpty && streamId != hostKey) {
           _mediaStreamManager.registerAlias(streamId, hostKey);
+          _mediaStreamManager.registerAlias(hostKey, streamId);
         }
       }
 

@@ -93,6 +93,8 @@ class RoomOptions {
 }
 
 /// Information describing a participant / live viewer inside an OmniCast room.
+typedef Participant = OmniCastParticipant;
+
 class OmniCastParticipant {
   final String userId;
   final String? displayName;
@@ -212,9 +214,6 @@ class OmniCastParticipant {
   @override
   int get hashCode => userId.hashCode;
 }
-
-/// Backward compatibility alias for [OmniCastParticipant].
-typedef Participant = OmniCastParticipant;
 
 /// Represents an active live broadcasting room on the server.
 class RoomModel {

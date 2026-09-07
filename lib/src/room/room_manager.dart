@@ -41,6 +41,8 @@ class RoomManager {
   ValueNotifier<int> get viewerCountNotifier => totalViewerCount;
   ValueNotifier<List<OmniCastParticipant>> get viewersNotifier =>
       activeViewersList;
+  String? get userId => _roomState.userId;
+  String? get roomId => _roomState.roomId;
 
   // Internal high-frequency event batching queue
   final List<OmniCastParticipant> _pendingJoins = [];
@@ -518,15 +520,13 @@ class RoomManager {
         );
       }
     }
-    if (parsed.isNotEmpty) {
-      activeViewersList.value = List.unmodifiable(
-        parsed.take(maxViewersInMemory).toList(),
-      );
-      _roomState.updateViewers(
-        count: totalViewerCount.value,
-        viewersList: parsed,
-      );
-    }
+    activeViewersList.value = List.unmodifiable(
+      parsed.take(maxViewersInMemory).toList(),
+    );
+    _roomState.updateViewers(
+      count: totalViewerCount.value,
+      viewersList: parsed,
+    );
   }
 
   /// Queues user joined event with immediate in-memory reactivity and micro-batch throttle.

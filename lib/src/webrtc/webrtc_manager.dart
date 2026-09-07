@@ -23,6 +23,7 @@ class WebRTCManager {
   bool _isNegotiating = false;
   bool _simulcastEnabled = false;
   bool _isDisposed = false;
+  bool _isUpgradingViewer = false;
   Timer? _iceDisconnectTimer;
   late final WebRTCStatsMonitor _statsMonitor;
 
@@ -32,6 +33,7 @@ class WebRTCManager {
   OnLocalIceCandidateCallback? onLocalIceCandidate;
   OnRemoteTrackCallback? onRemoteTrack;
   OnIceRestartNeededCallback? onIceRestartNeeded;
+  Function(RTCPeerConnection pc)? onPeerConnectionCreated;
 
   WebRTCManager({
     required this.mediaStreamManager,
@@ -209,6 +211,7 @@ class WebRTCManager {
 
     final pc = await createPeerConnection(rtcConfiguration);
     _peerConnection = pc;
+    onPeerConnectionCreated?.call(pc);
 
     pc.onIceCandidate = (candidate) {
       if (candidate.candidate != null && candidate.candidate!.isNotEmpty) {
@@ -294,7 +297,8 @@ class WebRTCManager {
         onRemoteTrack?.call(event.track, stream);
       } else {
         createLocalMediaStream('stream_${event.track.id}')
-            .then((stream) {
+            .then((stream) async {
+              await stream.addTrack(event.track);
               onRemoteTrack?.call(event.track, stream);
             })
             .catchError((_) {});
@@ -330,10 +334,35 @@ class WebRTCManager {
 
     _simulcastEnabled = false;
 
+    final existingSenders = await pc.getSenders();
+    RTCRtpSender? existingAudioSender;
+    RTCRtpSender? existingVideoSender;
+    for (final s in existingSenders) {
+      if (s.track?.kind == 'audio' || s == _audioSender) {
+        existingAudioSender = s;
+      } else if (s.track?.kind == 'video' || s == _videoSender) {
+        existingVideoSender = s;
+      }
+    }
+
     // Add audio track
     final audioTracks = localStream.getAudioTracks();
     if (audioTracks.isNotEmpty) {
-      _audioSender = await pc.addTrack(audioTracks.first, localStream);
+      final audioTrack = audioTracks.first;
+      if (existingAudioSender != null) {
+        try {
+          await existingAudioSender.replaceTrack(audioTrack);
+          _audioSender = existingAudioSender;
+        } catch (e) {
+          OmniCastLogger.warn('[WebRTCManager] Failed to replaceTrack for audio: $e');
+        }
+      } else {
+        try {
+          _audioSender = await pc.addTrack(audioTrack, localStream);
+        } catch (e) {
+          OmniCastLogger.error('[WebRTCManager] Failed to addTrack for audio: $e');
+        }
+      }
     }
 
     // Add video track with mobile dynamic bitrate & zero-lag framerate preference
@@ -341,8 +370,20 @@ class WebRTCManager {
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
 
-      // Add single, highly-stable video track directly (VP8 software/native codec)
-      _videoSender = await pc.addTrack(videoTrack, localStream);
+      if (existingVideoSender != null) {
+        try {
+          await existingVideoSender.replaceTrack(videoTrack);
+          _videoSender = existingVideoSender;
+        } catch (e) {
+          OmniCastLogger.warn('[WebRTCManager] Failed to replaceTrack for video: $e');
+        }
+      } else {
+        try {
+          _videoSender = await pc.addTrack(videoTrack, localStream);
+        } catch (e) {
+          OmniCastLogger.error('[WebRTCManager] Failed to addTrack for video: $e');
+        }
+      }
 
       // Force VP8 codec preference over H264/VP9 for rock-solid packet loss & PLI resilience
       try {
@@ -693,33 +734,47 @@ class WebRTCManager {
       );
     }
 
-    // 1. Capture local camera/microphone
-    await mediaStreamManager.openUserMedia(
-      parameters: parameters,
-      video: video,
-      audio: audio,
-    );
+    if (_isUpgradingViewer) {
+      OmniCastLogger.warn(
+        '[WebRTCManager] upgradeViewerToCoHost is already in progress, returning active description',
+      );
+      final desc = await _peerConnection!.getLocalDescription();
+      if (desc != null) return desc;
+      return await _peerConnection!.createOffer({});
+    }
 
-    // 2. Add local tracks to existing PeerConnection
-    await addLocalMediaTracks(enableSimulcast: enableSimulcast);
+    _isUpgradingViewer = true;
+    try {
+      // 1. Capture local camera/microphone
+      await mediaStreamManager.openUserMedia(
+        parameters: parameters,
+        video: video,
+        audio: audio,
+      );
 
-    // 3. Create renegotiation offer with VP8 and Opus DTX preference
-    final offer = await _peerConnection!.createOffer({});
-    var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-    processedSdp = setInitialBitrate(
-      processedSdp,
-      startKbps: 500,
-      minKbps: 150,
-      maxKbps: 600,
-    );
-    processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
-    final mungedOffer = RTCSessionDescription(
-      processedSdp,
-      offer.type ?? 'offer',
-    );
-    await _peerConnection!.setLocalDescription(mungedOffer);
+      // 2. Add local tracks to existing PeerConnection
+      await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
-    return mungedOffer;
+      // 3. Create renegotiation offer with VP8 and Opus DTX preference
+      final offer = await _peerConnection!.createOffer({});
+      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+      processedSdp = setInitialBitrate(
+        processedSdp,
+        startKbps: 500,
+        minKbps: 150,
+        maxKbps: 600,
+      );
+      processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
+      final mungedOffer = RTCSessionDescription(
+        processedSdp,
+        offer.type ?? 'offer',
+      );
+      await _peerConnection!.setLocalDescription(mungedOffer);
+
+      return mungedOffer;
+    } finally {
+      _isUpgradingViewer = false;
+    }
   }
 
   /// Seamlessly downgrades a Co-Host back to Viewer mode without destroying downlink subscriptions.

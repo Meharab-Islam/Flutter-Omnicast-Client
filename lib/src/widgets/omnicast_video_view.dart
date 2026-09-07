@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import '../core/omnicast_client.dart';
 import '../media/media_controller.dart';
 import '../media/media_stream_manager.dart';
 
@@ -57,10 +58,20 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   bool _isMounted = false;
   String? _lastAdaptiveLayer;
 
+  bool get _isLocalUser {
+    final uid = widget.userId;
+    if (uid == null || uid.isEmpty || uid == 'local') return true;
+    final client = OmniCastClient.instance;
+    if (client != null) {
+      if (client.userId != null && client.userId == uid) return true;
+      if (client.room.userId != null && client.room.userId == uid) return true;
+    }
+    return false;
+  }
+
   bool get _effectiveMirror {
     if (widget.mirror != null) return widget.mirror!;
-    final isLocal = widget.userId == null || widget.userId == 'local';
-    return isLocal; // Local front camera = true, Remote streams = false (never mirrored)
+    return _isLocalUser; // Local front camera = true, Remote streams = false (never mirrored)
   }
 
   @override
@@ -73,7 +84,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
 
   void _onMediaManagerChanged() {
     if (!_isMounted) return;
-    final isLocal = widget.userId == null || widget.userId == 'local';
+    final isLocal = _isLocalUser;
     RTCVideoRenderer? r;
     if (isLocal) {
       r = widget.mediaStreamManager.localRenderer;
@@ -85,7 +96,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
         _renderer = r;
       });
       widget.onRendererReady?.call(r);
-    } else if (r == null && widget.userId != null) {
+    } else if (r == null && widget.userId != null && !isLocal) {
       _initializeLazyRenderer();
     } else if (_renderer != null && _renderer!.srcObject != null) {
       setState(() {});
@@ -109,7 +120,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   /// Lazy initialization: binds directly to shared renderer from MediaStreamManager
   /// to eliminate duplicate EGL contexts.
   Future<void> _initializeLazyRenderer() async {
-    final isLocal = widget.userId == null || widget.userId == 'local';
+    final isLocal = _isLocalUser;
     RTCVideoRenderer? renderer;
     if (isLocal) {
       renderer = widget.mediaStreamManager.localRenderer;
@@ -143,7 +154,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
     if (!widget.enableAdaptiveStreaming ||
         widget.mediaController == null ||
         widget.userId == null ||
-        widget.userId == 'local') {
+        _isLocalUser) {
       return;
     }
 

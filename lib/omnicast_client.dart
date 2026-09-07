@@ -28,7 +28,7 @@ export 'src/webrtc/webrtc_stats_monitor.dart';
 export 'src/state/room_state.dart';
 
 // Models
-export 'src/models/room_models.dart';
+export 'src/models/room_models.dart' hide Participant;
 export 'src/models/pk_models.dart';
 export 'src/models/interaction_models.dart';
 export 'src/models/seat_models.dart';
@@ -52,5 +52,5 @@ export 'src/widgets/omnicast_dynamic_stage.dart';
 export 'src/widgets/omnicast_seat_requests_bottom_sheet.dart';
 export 'src/utils/omnicast_logger.dart';
 export 'package:permission_handler/permission_handler.dart';
-export 'package:flutter_webrtc/flutter_webrtc.dart'
-    show RTCVideoRenderer, RTCVideoView, RTCVideoViewObjectFit;
+export 'package:flutter_webrtc/flutter_webrtc.dart';
+

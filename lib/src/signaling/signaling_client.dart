@@ -145,6 +145,11 @@ class SignalingClient {
 
     try {
       var uri = Uri.parse(_wsUrl!);
+      if (uri.scheme == 'http') {
+        uri = uri.replace(scheme: 'ws');
+      } else if (uri.scheme == 'https') {
+        uri = uri.replace(scheme: 'wss');
+      }
       final queryParams = Map<String, String>.from(uri.queryParameters);
 
       if (_token != null && _token!.isNotEmpty) {

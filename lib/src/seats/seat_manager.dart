@@ -63,6 +63,7 @@ class SeatManager {
   final _seatRejectController = StreamController<SignalingMessage>.broadcast();
 
   final List<StreamSubscription> _subscriptions = [];
+  bool _isUpgradingToCoHost = false;
 
   SeatManager({
     required SignalingClient signalingClient,
@@ -340,59 +341,84 @@ class SeatManager {
       throw StateError('Cannot upgrade to co-host when not in a room');
     }
 
-    final offer = await _webRTCManager.upgradeViewerToCoHost(
-      video: video,
-      audio: audio,
-    );
-
-    _roomState.updateRole(UserRole.coHost);
-    if (_roomState.userId != null) {
-      _roomState.updateUserMediaState(
-        _roomState.userId!,
-        isCameraOff: !video,
-        isMuted: !audio,
+    if (_roomState.isCoHost || _roomState.isHost) {
+      OmniCastLogger.log(
+        '[SeatManager] User is already co-host/host, ignoring duplicate upgrade',
       );
+      return;
     }
 
-    _signalingClient.send(
-      SignalingMessage(
-        event: SignalingEvents.publish,
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-        payload: {'sdp': offer.sdp, 'type': offer.type},
-      ),
-    );
+    if (_isUpgradingToCoHost) {
+      OmniCastLogger.log(
+        '[SeatManager] upgradeToCoHost already in progress, skipping concurrent call',
+      );
+      return;
+    }
 
-    // Broadcast initial active media states for the newly upgraded co-host
-    if (_roomState.isInRoom && _signalingClient.isConnected) {
+    _isUpgradingToCoHost = true;
+    try {
+      final offer = await _webRTCManager.upgradeViewerToCoHost(
+        video: video,
+        audio: audio,
+      );
+
+      _roomState.updateRole(UserRole.coHost);
+      if (_roomState.userId != null) {
+        _roomState.updateUserMediaState(
+          _roomState.userId!,
+          isCameraOff: !video,
+          isMuted: !audio,
+        );
+      }
+
       _signalingClient.send(
         SignalingMessage(
-          event: 'media_state_changed',
+          event: SignalingEvents.publish,
           roomId: _roomState.roomId!,
           userId: _roomState.userId!,
           payload: {
-            'type': 'video',
-            'kind': 'video',
-            'muted': !video,
-            'camera_off': !video,
-            'is_camera_off': !video,
-            'enabled': video,
+            'token': _signalingClient.token,
+            'sdp': offer.sdp,
+            'type': offer.type,
+            'role': 'cohost',
+            'room_type': video ? 'video' : 'audio',
           },
         ),
       );
-      _signalingClient.send(
-        SignalingMessage(
-          event: 'media_state_changed',
-          roomId: _roomState.roomId!,
-          userId: _roomState.userId!,
-          payload: {
-            'type': 'audio',
-            'kind': 'audio',
-            'muted': !audio,
-            'is_muted': !audio,
-          },
-        ),
-      );
+
+      // Broadcast initial active media states for the newly upgraded co-host
+      if (_roomState.isInRoom && _signalingClient.isConnected) {
+        _signalingClient.send(
+          SignalingMessage(
+            event: 'media_state_changed',
+            roomId: _roomState.roomId!,
+            userId: _roomState.userId!,
+            payload: {
+              'type': 'video',
+              'kind': 'video',
+              'muted': !video,
+              'camera_off': !video,
+              'is_camera_off': !video,
+              'enabled': video,
+            },
+          ),
+        );
+        _signalingClient.send(
+          SignalingMessage(
+            event: 'media_state_changed',
+            roomId: _roomState.roomId!,
+            userId: _roomState.userId!,
+            payload: {
+              'type': 'audio',
+              'kind': 'audio',
+              'muted': !audio,
+              'is_muted': !audio,
+            },
+          ),
+        );
+      }
+    } finally {
+      _isUpgradingToCoHost = false;
     }
   }
 

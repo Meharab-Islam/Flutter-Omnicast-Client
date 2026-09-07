@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "lib/src/webrtc/webrtc_manager.dart": {
-    "mtime": 1788786420.6244357,
-    "seen": 1788786442.58095,
-    "ast_hash": "fce00d384b7766f4c70217690e5965f6",
+    "mtime": 1788786531.476499,
+    "seen": 1788786724.50612,
+    "ast_hash": "5944b9bf21915e30610d38ca5ecdbac7",
     "semantic_hash": ""
   },
   "lib/src/widgets/omnicast_video_view.dart": {
