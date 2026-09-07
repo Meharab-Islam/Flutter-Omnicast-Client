@@ -204,29 +204,40 @@ class MediaStreamManager implements Listenable {
     }
   }
 
+  final Map<String, String> _aliases = {};
+
+  /// Resolves an alias or canonical userId.
+  String resolveUserId(String userId) {
+    return _aliases[userId] ?? userId;
+  }
+
   /// Registers an alias for an existing remote user/stream to avoid allocating duplicate renderers.
   void registerAlias(String alias, String targetUserId) {
-    if (alias == targetUserId) return;
-    if (_remoteStreams.containsKey(targetUserId)) {
-      _remoteStreams[alias] = _remoteStreams[targetUserId]!;
-    }
-    if (_remoteRenderers.containsKey(targetUserId)) {
-      _remoteRenderers[alias] = _remoteRenderers[targetUserId]!;
-    }
+    if (alias == targetUserId || alias.isEmpty || targetUserId.isEmpty) return;
+    _aliases[alias] = resolveUserId(targetUserId);
   }
 
   /// Retrieves or creates and initializes an [RTCVideoRenderer] for a given [userId].
   /// Reuses any existing renderer attached to the same [MediaStream] to prevent EGL context exhaustion.
   Future<RTCVideoRenderer> getOrCreateRemoteRenderer(String userId) async {
-    if (_remoteRenderers.containsKey(userId)) {
-      return _remoteRenderers[userId]!;
+    final canonicalId = resolveUserId(userId);
+    if (_remoteRenderers.containsKey(canonicalId)) {
+      final renderer = _remoteRenderers[canonicalId]!;
+      final targetStream = _remoteStreams[canonicalId];
+      if (targetStream != null && renderer.srcObject != targetStream) {
+        if (targetStream.getVideoTracks().isNotEmpty ||
+            renderer.srcObject == null) {
+          renderer.srcObject = targetStream;
+        }
+      }
+      return renderer;
     }
 
-    final targetStream = _remoteStreams[userId];
+    final targetStream = _remoteStreams[canonicalId];
     if (targetStream != null) {
       for (final entry in _remoteRenderers.entries) {
         if (entry.value.srcObject == targetStream) {
-          _remoteRenderers[userId] = entry.value;
+          _remoteRenderers[canonicalId] = entry.value;
           return entry.value;
         }
       }
@@ -234,7 +245,7 @@ class MediaStreamManager implements Listenable {
 
     final renderer = RTCVideoRenderer();
     await renderer.initialize();
-    _remoteRenderers[userId] = renderer;
+    _remoteRenderers[canonicalId] = renderer;
 
     if (targetStream != null) {
       renderer.srcObject = targetStream;
@@ -244,43 +255,30 @@ class MediaStreamManager implements Listenable {
   }
 
   /// Attaches a remote [MediaStream] to a remote peer's renderer.
-  /// Merges incoming audio/video tracks into any existing stream for [userId]
-  /// and ensures audio tracks do not clobber active video rendering.
+  /// Preserves video streams over audio-only streams and avoids calling addTrack on remote streams.
   Future<RTCVideoRenderer> attachRemoteStream(
     String userId,
     MediaStream stream,
   ) async {
-    final existingStream = _remoteStreams[userId];
-    if (existingStream != null && existingStream != stream) {
-      for (final track in stream.getTracks()) {
-        final hasTrack = existingStream.getTracks().any(
-          (t) => t.id == track.id,
-        );
-        if (!hasTrack) {
-          try {
-            existingStream.addTrack(track);
-          } catch (e) {
-            OmniCastLogger.log(
-              '[MediaStreamManager] addTrack failed ($e), falling back to replacing stream',
-            );
-            _remoteStreams[userId] = stream;
-            break;
-          }
-        }
-      }
-    } else {
-      _remoteStreams[userId] = stream;
+    final canonicalId = resolveUserId(userId);
+    final existingStream = _remoteStreams[canonicalId];
+    if (existingStream == null ||
+        stream.getVideoTracks().isNotEmpty ||
+        existingStream.getVideoTracks().isEmpty) {
+      _remoteStreams[canonicalId] = stream;
     }
 
-    final renderer = await getOrCreateRemoteRenderer(userId);
-    final activeStream = _remoteStreams[userId]!;
+    final renderer = await getOrCreateRemoteRenderer(canonicalId);
+    final activeStream = _remoteStreams[canonicalId]!;
 
     // Only overwrite renderer.srcObject if activeStream has video tracks,
     // or if renderer currently has no srcObject. This ensures incoming audio tracks
     // never wipe out active video rendering!
     if (activeStream.getVideoTracks().isNotEmpty ||
         renderer.srcObject == null) {
-      renderer.srcObject = activeStream;
+      if (renderer.srcObject != activeStream) {
+        renderer.srcObject = activeStream;
+      }
     }
 
     if (!_isDisposed) {
@@ -289,22 +287,14 @@ class MediaStreamManager implements Listenable {
     return renderer;
   }
 
-  /// Safely removes and disposes the [RTCVideoRenderer] and cached stream for a given [userId].
-  /// Does not prematurely dispose renderers that are still shared with aliases.
+  /// Safely removes and disposes the [RTCVideoRenderer] for a given [userId].
   Future<void> removeRemoteRenderer(String userId) async {
-    final stream = _remoteStreams.remove(userId);
-    if (stream != null && !_remoteStreams.values.contains(stream)) {
-      for (final track in stream.getTracks()) {
-        try {
-          await track.stop();
-        } catch (_) {}
-      }
-      try {
-        await stream.dispose();
-      } catch (_) {}
-    }
+    final canonicalId = resolveUserId(userId);
+    _aliases.removeWhere((key, val) => key == userId || val == canonicalId);
 
-    final renderer = _remoteRenderers.remove(userId);
+    _remoteStreams.remove(canonicalId);
+
+    final renderer = _remoteRenderers.remove(canonicalId);
     if (renderer != null) {
       final isShared = _remoteRenderers.values.contains(renderer);
       if (!isShared) {
@@ -329,18 +319,14 @@ class MediaStreamManager implements Listenable {
     if (userId == null || userId == 'local') {
       return _localRenderer;
     }
-    if (_remoteRenderers.containsKey(userId)) {
-      return _remoteRenderers[userId];
-    }
-    // Match partial user IDs or stream IDs
-    for (final entry in _remoteRenderers.entries) {
-      if (entry.key.contains(userId) || userId.contains(entry.key)) {
-        return entry.value;
-      }
+    final canonicalId = resolveUserId(userId);
+    if (_remoteRenderers.containsKey(canonicalId)) {
+      return _remoteRenderers[canonicalId];
     }
     // Fallback for live broadcast viewers: looking up 'host' specifically
-    if (userId == 'host' && _remoteRenderers.isNotEmpty) {
-      return _remoteRenderers['host'] ?? _remoteRenderers.values.first;
+    if (canonicalId == 'host' || userId == 'host') {
+      return _remoteRenderers['host'] ??
+          (_remoteRenderers.isNotEmpty ? _remoteRenderers.values.first : null);
     }
     return null;
   }
@@ -410,6 +396,7 @@ class MediaStreamManager implements Listenable {
       } catch (_) {}
     }
     _remoteRenderers.clear();
+    _aliases.clear();
     _changeNotifier.dispose();
   }
 }

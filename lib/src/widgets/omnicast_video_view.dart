@@ -85,6 +85,8 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
         _renderer = r;
       });
       widget.onRendererReady?.call(r);
+    } else if (r == null && widget.userId != null) {
+      _initializeLazyRenderer();
     } else if (_renderer != null && _renderer!.srcObject != null) {
       setState(() {});
     }
@@ -116,10 +118,14 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
       }
     } else if (widget.userId != null) {
       renderer = widget.mediaStreamManager.getRenderer(widget.userId);
-      if (renderer == null &&
-          widget.mediaStreamManager.remoteStreams.containsKey(widget.userId)) {
-        renderer = await widget.mediaStreamManager
-            .getOrCreateRemoteRenderer(widget.userId!);
+      if (renderer == null) {
+        final canonicalId =
+            widget.mediaStreamManager.resolveUserId(widget.userId!);
+        if (widget.mediaStreamManager.remoteStreams.containsKey(canonicalId) ||
+            widget.userId == 'host') {
+          renderer = await widget.mediaStreamManager
+              .getOrCreateRemoteRenderer(canonicalId);
+        }
       }
     }
 

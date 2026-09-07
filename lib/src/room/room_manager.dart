@@ -564,8 +564,12 @@ class RoomManager {
       _roomState.setPinnedStageUser(null);
     }
 
-    // Clean up remote renderer for departed user
-    _webRTCManager.mediaStreamManager.removeRemoteRenderer(userId);
+    // Clean up remote renderer for departed user, never touching the active host
+    if (userId != _roomState.hostId &&
+        userId != 'host' &&
+        userId != _roomState.roomId) {
+      _webRTCManager.mediaStreamManager.removeRemoteRenderer(userId);
+    }
 
     _participantLeftController.add(userId);
     _flushParticipantBatch();

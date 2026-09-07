@@ -10,63 +10,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "flutterwindow",
       "source_file": "example/windows/runner/flutter_window.h",
       "source_location": "L12"
-    },
-    {
-      "id": "example_windows_runner_win32_window_point",
-      "label": "Point",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "point",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L15"
-    },
-    {
-      "id": "example_windows_runner_win32_window_size",
-      "label": "Size",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "size",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L21"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window",
-      "label": "Win32Window",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "win32window",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L13"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar",
-      "label": "WindowClassRegistrar",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "windowclassregistrar",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L59"
     },
     {
       "id": "example_ios_runner_appdelegate_appdelegate",
@@ -173,16 +121,56 @@
       "source_location": "L5"
     },
     {
-      "id": "example_windows_flutter_generated_plugin_registrant_registerplugins",
-      "label": "RegisterPlugins()",
+      "id": "example_windows_runner_win32_window_windowclassregistrar",
+      "label": "WindowClassRegistrar",
       "_callable": true,
+      "_callable_class": true,
       "_origin": "ast",
-      "community": 46,
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "windowclassregistrar",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L59"
+    },
+    {
+      "id": "example_windows_runner_win32_window_win32window",
+      "label": "Win32Window",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 81,
       "community_name": "Win32Window",
       "file_type": "code",
-      "norm_label": "registerplugins()",
-      "source_file": "example/windows/flutter/generated_plugin_registrant.cc",
-      "source_location": "L12"
+      "norm_label": "win32window",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L13"
+    },
+    {
+      "id": "example_windows_runner_win32_window_point",
+      "label": "Point",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": "point",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L15"
+    },
+    {
+      "id": "example_windows_runner_win32_window_size",
+      "label": "Size",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": "size",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L21"
     },
     {
       "id": "example_windows_runner_flutter_window_flutterwindow_flutterwindow",
@@ -190,119 +178,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "flutterwindow::flutterwindow()",
       "source_file": "example/windows/runner/flutter_window.cpp",
       "source_location": "L7"
-    },
-    {
-      "id": "example_windows_runner_win32_window_enablefulldpisupportifavailable",
-      "label": "EnableFullDpiSupportIfAvailable()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "enablefulldpisupportifavailable()",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L42"
-    },
-    {
-      "id": "example_windows_runner_win32_window_point_point",
-      "label": ".Point()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": ".point()",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L18"
-    },
-    {
-      "id": "example_windows_runner_win32_window_scale",
-      "label": "Scale()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "scale()",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L36"
-    },
-    {
-      "id": "example_windows_runner_win32_window_size_size",
-      "label": ".Size()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": ".size()",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L24"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_win32window",
-      "label": "Win32Window::Win32Window()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "win32window::win32window()",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L114"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar_getinstance",
-      "label": ".GetInstance()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": ".getinstance()",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L64"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar_getwindowclass",
-      "label": "GetWindowClass",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "getwindowclass",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L73"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar_unregisterwindowclass",
-      "label": "UnregisterWindowClass",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "unregisterwindowclass",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L77"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar_windowclassregistrar",
-      "label": ".~WindowClassRegistrar()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": ".~windowclassregistrar()",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L61"
     },
     {
       "id": "example_ios_runner_appdelegate_appdelegate_application",
@@ -579,6 +459,126 @@
       "norm_label": "utf8fromutf16()",
       "source_file": "example/windows/runner/utils.cpp",
       "source_location": "L44"
+    },
+    {
+      "id": "example_windows_runner_win32_window_scale",
+      "label": "Scale()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "scale()",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L36"
+    },
+    {
+      "id": "example_windows_runner_win32_window_win32window_win32window",
+      "label": "Win32Window::Win32Window()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "win32window::win32window()",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L114"
+    },
+    {
+      "id": "example_windows_runner_win32_window_windowclassregistrar_getinstance",
+      "label": ".GetInstance()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": ".getinstance()",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L64"
+    },
+    {
+      "id": "example_windows_runner_win32_window_windowclassregistrar_getwindowclass",
+      "label": "GetWindowClass",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "getwindowclass",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L73"
+    },
+    {
+      "id": "example_windows_runner_win32_window_windowclassregistrar_unregisterwindowclass",
+      "label": "UnregisterWindowClass",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "unregisterwindowclass",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L77"
+    },
+    {
+      "id": "example_windows_runner_win32_window_windowclassregistrar_windowclassregistrar",
+      "label": ".~WindowClassRegistrar()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": ".~windowclassregistrar()",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L61"
+    },
+    {
+      "id": "example_windows_runner_win32_window_enablefulldpisupportifavailable",
+      "label": "EnableFullDpiSupportIfAvailable()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "MessageHandler",
+      "file_type": "code",
+      "norm_label": "enablefulldpisupportifavailable()",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L42"
+    },
+    {
+      "id": "example_windows_runner_win32_window_point_point",
+      "label": ".Point()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": ".point()",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L18"
+    },
+    {
+      "id": "example_windows_runner_win32_window_size_size",
+      "label": ".Size()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": ".size()",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L24"
+    },
+    {
+      "id": "example_windows_flutter_generated_plugin_registrant_registerplugins",
+      "label": "RegisterPlugins()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "RegisterPlugins",
+      "file_type": "code",
+      "norm_label": "registerplugins()",
+      "source_file": "example/windows/flutter/generated_plugin_registrant.cc",
+      "source_location": "L12"
     },
     {
       "id": "clientconnectionstate_get",
@@ -900,6 +900,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_state_room_state_isuserspeaking",
+      "label": "isUserSpeaking",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "room_state.dart",
+      "file_type": "code",
+      "norm_label": "isuserspeaking",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_state_room_state_isviewer",
       "label": "isViewer",
       "_origin": "ast",
@@ -1208,6 +1219,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_state_room_state_speakingusers",
+      "label": "_speakingUsers",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "room_state.dart",
+      "file_type": "code",
+      "norm_label": "_speakingusers",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_state_room_state_speakingusersnotifier",
+      "label": "speakingUsersNotifier",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "room_state.dart",
+      "file_type": "code",
+      "norm_label": "speakingusersnotifier",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_state_room_state_syncroominfo",
       "label": "syncRoomInfo",
       "_origin": "ast",
@@ -1336,6 +1369,17 @@
       "community_name": "room_state.dart",
       "file_type": "code",
       "norm_label": "updateusermediastate",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_state_room_state_updateuserspeaking",
+      "label": "updateUserSpeaking",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "room_state.dart",
+      "file_type": "code",
+      "norm_label": "updateuserspeaking",
       "source_file": "lib/src/state/room_state.dart",
       "source_location": null
     },
@@ -1600,6 +1644,17 @@
       "community_name": "signaling_client.dart",
       "file_type": "code",
       "norm_label": "_establishconnection",
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_signaling_signaling_client_fetchroomlist",
+      "label": "fetchRoomList",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "signaling_client.dart",
+      "file_type": "code",
+      "norm_label": "fetchroomlist",
       "source_file": "lib/src/signaling/signaling_client.dart",
       "source_location": null
     },
@@ -2077,6 +2132,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_signaling_signaling_client_onuserspeaking",
+      "label": "onUserSpeaking",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "signaling_client.dart",
+      "file_type": "code",
+      "norm_label": "onuserspeaking",
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_signaling_signaling_client_onviewerupdate",
       "label": "onViewerUpdate",
       "_origin": "ast",
@@ -2194,6 +2260,17 @@
       "community_name": "signaling_client.dart",
       "file_type": "code",
       "norm_label": "_reconnecttimer",
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_signaling_signaling_client_requestkeyframe",
+      "label": "requestKeyframe",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "signaling_client.dart",
+      "file_type": "code",
+      "norm_label": "requestkeyframe",
       "source_file": "lib/src/signaling/signaling_client.dart",
       "source_location": null
     },
@@ -2352,6 +2429,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_signaling_signaling_client_sendspeakingstate",
+      "label": "sendSpeakingState",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "signaling_client.dart",
+      "file_type": "code",
+      "norm_label": "sendspeakingstate",
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_signaling_signaling_client_startheartbeat",
       "label": "_startHeartbeat",
       "_origin": "ast",
@@ -2414,6 +2502,17 @@
       "community_name": "signaling_client.dart",
       "file_type": "code",
       "norm_label": "_userleftcontroller",
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_signaling_signaling_client_userspeakingcontroller",
+      "label": "_userSpeakingController",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "signaling_client.dart",
+      "file_type": "code",
+      "norm_label": "_userspeakingcontroller",
       "source_file": "lib/src/signaling/signaling_client.dart",
       "source_location": null
     },
@@ -3375,17 +3474,6 @@
       "source_location": null
     },
     {
-      "id": "dart_typed_data",
-      "label": "dart:typed_data",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "dart:typed_data",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "package_flutter_test_flutter_test_dart",
       "label": "package:flutter_test/flutter_test.dart",
       "_origin": "ast",
@@ -3393,17 +3481,6 @@
       "community_name": "package:omnicast_client/omnicast_client.dart",
       "file_type": "code",
       "norm_label": "package:flutter_test/flutter_test.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "package_flutter_widgets_dart",
-      "label": "package:flutter/widgets.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "package:flutter/widgets.dart",
       "source_file": null,
       "source_location": null
     },
@@ -3441,28 +3518,6 @@
       "source_location": null
     },
     {
-      "id": "test_enterprise_optimization_test",
-      "label": "enterprise_optimization_test.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "enterprise_optimization_test.dart",
-      "source_file": "test/enterprise_optimization_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_enterprise_optimization_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/enterprise_optimization_test.dart",
-      "source_location": null
-    },
-    {
       "id": "test_global_media_and_audio_room_test",
       "label": "global_media_and_audio_room_test.dart",
       "_origin": "ast",
@@ -3482,28 +3537,6 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/global_media_and_audio_room_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_headless_and_performance_test",
-      "label": "headless_and_performance_test.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "headless_and_performance_test.dart",
-      "source_file": "test/headless_and_performance_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_headless_and_performance_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/headless_and_performance_test.dart",
       "source_location": null
     },
     {
@@ -3636,6 +3669,28 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/video_parameters_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_viewer_tracking_test",
+      "label": "viewer_tracking_test.dart",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "package:omnicast_client/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "viewer_tracking_test.dart",
+      "source_file": "test/viewer_tracking_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_viewer_tracking_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "package:omnicast_client/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/viewer_tracking_test.dart",
       "source_location": null
     },
     {
@@ -4904,14 +4959,135 @@
       "source_location": null
     },
     {
-      "id": "datetime",
-      "label": "DateTime",
+      "id": "bool_get",
+      "label": "bool get",
       "_origin": "ast",
       "community": 16,
       "community_name": "seat_models.dart",
       "file_type": "code",
-      "norm_label": "datetime",
+      "norm_label": "bool get",
       "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model",
+      "label": "demo_user_model.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "demo_user_model.dart",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_demosession",
+      "label": "DemoSession",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "demosession",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_ishost",
+      "label": "isHost",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "ishost",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_isviewer",
+      "label": "isViewer",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "isviewer",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_role",
+      "label": "role",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "role",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_roomid",
+      "label": "roomId",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "roomid",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_serverurl",
+      "label": "serverUrl",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "serverurl",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_userid",
+      "label": "userId",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "userid",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_models_demo_user_model_username",
+      "label": "userName",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "username",
+      "source_file": "example/lib/models/demo_user_model.dart",
+      "source_location": null
+    },
+    {
+      "id": "interaction_models_dart",
+      "label": "interaction_models.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "interaction_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "lib_src_models_room_event_models",
+      "label": "room_event_models.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "room_event_models.dart",
+      "source_file": "lib/src/models/room_event_models.dart",
       "source_location": null
     },
     {
@@ -5165,6 +5341,50 @@
       "file_type": "code",
       "norm_label": "userid",
       "source_file": "lib/src/models/seat_models.dart",
+      "source_location": null
+    },
+    {
+      "id": "pk_models_dart",
+      "label": "pk_models.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "pk_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "room_models_dart",
+      "label": "room_models.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "room_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "seat_models_dart",
+      "label": "seat_models.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "seat_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "signaling_message_dart",
+      "label": "signaling_message.dart",
+      "_origin": "ast",
+      "community": 16,
+      "community_name": "seat_models.dart",
+      "file_type": "code",
+      "norm_label": "signaling_message.dart",
+      "source_file": null,
       "source_location": null
     },
     {
@@ -5641,6 +5861,17 @@
       "source_location": null
     },
     {
+      "id": "datetime",
+      "label": "DateTime",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "interaction_models.dart",
+      "file_type": "code",
+      "norm_label": "datetime",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "lib_src_models_interaction_models",
       "label": "interaction_models.dart",
       "_origin": "ast",
@@ -5905,17 +6136,6 @@
       "source_location": null
     },
     {
-      "id": "changenotifier",
-      "label": "ChangeNotifier",
-      "_origin": "ast",
-      "community": 19,
-      "community_name": "interaction_manager.dart",
-      "file_type": "code",
-      "norm_label": "changenotifier",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "lib_src_interaction_interaction_manager",
       "label": "interaction_manager.dart",
       "_origin": "ast",
@@ -6158,17 +6378,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_state_room_state_roomstate",
-      "label": "RoomState",
-      "_origin": "ast",
-      "community": 19,
-      "community_name": "interaction_manager.dart",
-      "file_type": "code",
-      "norm_label": "roomstate",
-      "source_file": "lib/src/state/room_state.dart",
-      "source_location": null
-    },
-    {
       "id": "models_signaling_message_dart",
       "label": "../models/signaling_message.dart",
       "_origin": "ast",
@@ -6187,17 +6396,6 @@
       "community_name": "interaction_manager.dart",
       "file_type": "code",
       "norm_label": "../signaling/signaling_client.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "state_room_state_dart",
-      "label": "../state/room_state.dart",
-      "_origin": "ast",
-      "community": 19,
-      "community_name": "interaction_manager.dart",
-      "file_type": "code",
-      "norm_label": "../state/room_state.dart",
       "source_file": null,
       "source_location": null
     },
@@ -7357,6 +7555,17 @@
       "source_location": null
     },
     {
+      "id": "media_media_stream_manager_dart",
+      "label": "../media/media_stream_manager.dart",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "omnicast_pk_battle_view.dart",
+      "file_type": "code",
+      "norm_label": "../media/media_stream_manager.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "omnicast_video_view_dart",
       "label": "omnicast_video_view.dart",
       "_origin": "ast",
@@ -7566,6 +7775,39 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
+      "label": "OmniCastVideoView",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "omnicast_video_view.dart",
+      "file_type": "code",
+      "norm_label": "omnicastvideoview",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
+      "label": "_OmniCastVideoViewState",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "omnicast_video_view.dart",
+      "file_type": "code",
+      "norm_label": "_omnicastvideoviewstate",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_video_view_onmediamanagerchanged",
+      "label": "_onMediaManagerChanged",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "omnicast_video_view.dart",
+      "file_type": "code",
+      "norm_label": "_onmediamanagerchanged",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_widgets_omnicast_video_view_placeholder",
       "label": "placeholder",
       "_origin": "ast",
@@ -7599,13 +7841,13 @@
       "source_location": null
     },
     {
-      "id": "media_media_stream_manager_dart",
-      "label": "../media/media_stream_manager.dart",
+      "id": "rtcvideorenderer",
+      "label": "RTCVideoRenderer?",
       "_origin": "ast",
       "community": 21,
       "community_name": "omnicast_video_view.dart",
       "file_type": "code",
-      "norm_label": "../media/media_stream_manager.dart",
+      "norm_label": "rtcvideorenderer?",
       "source_file": null,
       "source_location": null
     },
@@ -7661,17 +7903,6 @@
       "community_name": "omnicast_media_control_bar.dart",
       "file_type": "code",
       "norm_label": "build",
-      "source_file": "lib/src/widgets/omnicast_media_control_bar.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_media_control_bar_circlecontrolbutton",
-      "label": "_CircleControlButton",
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "omnicast_media_control_bar.dart",
-      "file_type": "code",
-      "norm_label": "_circlecontrolbutton",
       "source_file": "lib/src/widgets/omnicast_media_control_bar.dart",
       "source_location": null
     },
@@ -8248,6 +8479,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_omnicast_speaking_video_tile_roomstate",
+      "label": "roomState",
+      "_origin": "ast",
+      "community": 24,
+      "community_name": "omnicast_speaking_video_tile.dart",
+      "file_type": "code",
+      "norm_label": "roomstate",
+      "source_file": "lib/src/widgets/omnicast_speaking_video_tile.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_widgets_omnicast_speaking_video_tile_trackid",
       "label": "trackId",
       "_origin": "ast",
@@ -8292,24 +8534,13 @@
       "source_location": null
     },
     {
-      "id": "rtcvideorenderer",
-      "label": "RTCVideoRenderer?",
+      "id": "state_room_state_dart",
+      "label": "../state/room_state.dart",
       "_origin": "ast",
       "community": 24,
       "community_name": "omnicast_speaking_video_tile.dart",
       "file_type": "code",
-      "norm_label": "rtcvideorenderer?",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "dart_async",
-      "label": "dart:async",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "audio_level_detector.dart",
-      "file_type": "code",
-      "norm_label": "dart:async",
+      "norm_label": "../state/room_state.dart",
       "source_file": null,
       "source_location": null
     },
@@ -8443,28 +8674,6 @@
       "file_type": "code",
       "norm_label": "webrtcmanager",
       "source_file": "lib/src/webrtc/webrtc_manager.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_pk_system_test",
-      "label": "pk_system_test.dart",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "audio_level_detector.dart",
-      "file_type": "code",
-      "norm_label": "pk_system_test.dart",
-      "source_file": "test/pk_system_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_pk_system_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "audio_level_detector.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/pk_system_test.dart",
       "source_location": null
     },
     {
@@ -9138,6 +9347,17 @@
       "file_type": "code",
       "norm_label": "omnicastdynamicstage",
       "source_file": "lib/src/widgets/omnicast_dynamic_stage.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_media_control_bar_circlecontrolbutton",
+      "label": "_CircleControlButton",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "StatelessWidget",
+      "file_type": "code",
+      "norm_label": "_circlecontrolbutton",
+      "source_file": "lib/src/widgets/omnicast_media_control_bar.dart",
       "source_location": null
     },
     {
@@ -11538,25 +11758,25 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
-      "label": "OmniCastVideoView",
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
+      "label": "OmniCastGiftingBottomSheet",
       "_origin": "ast",
       "community": 35,
       "community_name": "State",
       "file_type": "code",
-      "norm_label": "omnicastvideoview",
-      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "norm_label": "omnicastgiftingbottomsheet",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
-      "label": "_OmniCastVideoViewState",
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
+      "label": "_OmniCastGiftingBottomSheetState",
       "_origin": "ast",
       "community": 35,
       "community_name": "State",
       "file_type": "code",
-      "norm_label": "_omnicastvideoviewstate",
-      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "norm_label": "_omnicastgiftingbottomsheetstate",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
       "source_location": null
     },
     {
@@ -12550,6 +12770,28 @@
       "source_location": null
     },
     {
+      "id": "lib_src_media_media_controller_bindspeakingsignaling",
+      "label": "_bindSpeakingSignaling",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "_bindspeakingsignaling",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_media_media_controller_checklocalspeakingstate",
+      "label": "_checkLocalSpeakingState",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "_checklocalspeakingstate",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_media_media_controller_config",
       "label": "_config",
       "_origin": "ast",
@@ -12704,6 +12946,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_media_media_controller_iscurrentlyspeaking",
+      "label": "_isCurrentlySpeaking",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "_iscurrentlyspeaking",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_media_media_controller_ishostcameraoffnotifier",
       "label": "isHostCameraOffNotifier",
       "_origin": "ast",
@@ -12810,6 +13063,17 @@
       "community_name": "media_controller.dart",
       "file_type": "code",
       "norm_label": "requesticerestart",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_media_media_controller_requestkeyframe",
+      "label": "requestKeyframe",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "requestkeyframe",
       "source_file": "lib/src/media/media_controller.dart",
       "source_location": null
     },
@@ -12924,6 +13188,17 @@
       "source_location": null
     },
     {
+      "id": "lib_src_media_media_controller_speakingdebouncetimer",
+      "label": "_speakingDebounceTimer",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "_speakingdebouncetimer",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_media_media_controller_startashost",
       "label": "startAsHost",
       "_origin": "ast",
@@ -12997,6 +13272,17 @@
       "community_name": "media_controller.dart",
       "file_type": "code",
       "norm_label": "togglemute",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_media_media_controller_userspeakingsubscription",
+      "label": "_userSpeakingSubscription",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "media_controller.dart",
+      "file_type": "code",
+      "norm_label": "_userspeakingsubscription",
       "source_file": "lib/src/media/media_controller.dart",
       "source_location": null
     },
@@ -14054,24 +14340,11 @@
       "source_location": null
     },
     {
-      "id": "example_windows_runner_flutter_window_flutterwindow_oncreate",
-      "label": "OnCreate",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/flutter_window.cpp",
-      "definition_location": "L12",
-      "file_type": "code",
-      "norm_label": "oncreate",
-      "source_file": "example/windows/runner/flutter_window.h",
-      "source_location": "L20"
-    },
-    {
       "id": "example_windows_runner_flutter_window_flutterwindow_ondestroy",
       "label": "OnDestroy",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/flutter_window.cpp",
       "definition_location": "L42",
       "file_type": "code",
@@ -14084,7 +14357,7 @@
       "label": "MessageHandler",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/flutter_window.cpp",
       "definition_location": "L50",
       "file_type": "code",
@@ -14093,154 +14366,11 @@
       "source_location": "L22"
     },
     {
-      "id": "example_windows_runner_win32_window_win32window_create",
-      "label": "Create",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L123",
-      "file_type": "code",
-      "norm_label": "create",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L37"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_show",
-      "label": "Show",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L152",
-      "file_type": "code",
-      "norm_label": "show",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L40"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_wndproc",
-      "label": "WndProc",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L157",
-      "file_type": "code",
-      "norm_label": "wndproc",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L82"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_messagehandler",
-      "label": "MessageHandler",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L176",
-      "file_type": "code",
-      "norm_label": "messagehandler",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L62"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_destroy",
-      "label": "Destroy",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L224",
-      "file_type": "code",
-      "norm_label": "destroy",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L43"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_getthisfromhandle",
-      "label": "GetThisFromHandle",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L236",
-      "file_type": "code",
-      "norm_label": "getthisfromhandle",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L88"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_setchildcontent",
-      "label": "SetChildContent",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L241",
-      "file_type": "code",
-      "norm_label": "setchildcontent",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L46"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_getclientarea",
-      "label": "GetClientArea",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L252",
-      "file_type": "code",
-      "norm_label": "getclientarea",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L56"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_gethandle",
-      "label": "GetHandle",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L258",
-      "file_type": "code",
-      "norm_label": "gethandle",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L50"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_setquitonclose",
-      "label": "SetQuitOnClose",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L262",
-      "file_type": "code",
-      "norm_label": "setquitonclose",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L53"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_oncreate",
-      "label": "OnCreate",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L266",
-      "file_type": "code",
-      "norm_label": "oncreate",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L69"
-    },
-    {
       "id": "example_windows_runner_win32_window_win32window_ondestroy",
       "label": "OnDestroy",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
       "definition_location": "L271",
       "file_type": "code",
@@ -14249,46 +14379,11 @@
       "source_location": "L72"
     },
     {
-      "id": "example_windows_runner_win32_window_win32window_updatetheme",
-      "label": "UpdateTheme",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
-      "definition_location": "L275",
-      "file_type": "code",
-      "norm_label": "updatetheme",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L91"
-    },
-    {
-      "id": "example_windows_flutter_generated_plugin_registrant_cc_example_windows_flutter_generated_plugin_registrant",
-      "label": "windows/flutter/generated_plugin_registrant.cc",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "windows/flutter/generated_plugin_registrant.cc",
-      "source_file": "example/windows/flutter/generated_plugin_registrant.cc",
-      "source_location": "L1"
-    },
-    {
-      "id": "example_windows_flutter_generated_plugin_registrant_h_example_windows_flutter_generated_plugin_registrant",
-      "label": "windows/flutter/generated_plugin_registrant.h",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "windows/flutter/generated_plugin_registrant.h",
-      "source_file": "example/windows/flutter/generated_plugin_registrant.h",
-      "source_location": "L1"
-    },
-    {
       "id": "example_windows_runner_flutter_window_cpp_dartproject",
       "label": "DartProject",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "dartproject",
       "source_file": "",
@@ -14299,7 +14394,7 @@
       "label": "flutter_window.cpp",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "flutter_window.cpp",
       "source_file": "example/windows/runner/flutter_window.cpp",
@@ -14310,7 +14405,7 @@
       "label": "HWND",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "hwnd",
       "source_file": "",
@@ -14321,7 +14416,7 @@
       "label": "LPARAM",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "lparam",
       "source_file": "",
@@ -14332,7 +14427,7 @@
       "label": "LRESULT",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "lresult",
       "source_file": "",
@@ -14343,7 +14438,7 @@
       "label": "UINT",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "uint",
       "source_file": "",
@@ -14354,7 +14449,7 @@
       "label": "WPARAM",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "wparam",
       "source_file": "",
@@ -14365,7 +14460,7 @@
       "label": "flutter_controller_",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "flutter_controller_",
       "source_file": "example/windows/runner/flutter_window.h",
@@ -14376,7 +14471,7 @@
       "label": "project_",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "project_",
       "source_file": "example/windows/runner/flutter_window.h",
@@ -14387,7 +14482,7 @@
       "label": "DartProject",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "dartproject",
       "source_file": "",
@@ -14398,262 +14493,31 @@
       "label": "flutter_window.h",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "flutter_window.h",
       "source_file": "example/windows/runner/flutter_window.h",
       "source_location": "L1"
     },
     {
-      "id": "example_windows_runner_resource",
-      "label": "resource.h",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "resource.h",
-      "source_file": "example/windows/runner/resource.h",
-      "source_location": "L1"
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_example_windows_runner_win32_window",
-      "label": "win32_window.cpp",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "win32_window.cpp",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L1"
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_hwnd",
-      "label": "HWND",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "hwnd",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_lparam",
-      "label": "LPARAM",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "lparam",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_lresult",
-      "label": "LRESULT",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "lresult",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_uint",
-      "label": "UINT",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "uint",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_wchar_t",
-      "label": "wchar_t",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "wchar_t",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "example_windows_runner_win32_window_cpp_wparam",
-      "label": "WPARAM",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "wparam",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "example_windows_runner_win32_window_h_example_windows_runner_win32_window",
       "label": "win32_window.h",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "win32_window.h",
       "source_file": "example/windows/runner/win32_window.h",
       "source_location": "L1"
     },
     {
-      "id": "example_windows_runner_win32_window_h_hwnd",
-      "label": "HWND",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "hwnd",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "example_windows_runner_win32_window_point_x",
-      "label": "x",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "x",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L16"
-    },
-    {
-      "id": "example_windows_runner_win32_window_point_y",
-      "label": "y",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "y",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L17"
-    },
-    {
-      "id": "example_windows_runner_win32_window_size_height",
-      "label": "height",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "height",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L23"
-    },
-    {
-      "id": "example_windows_runner_win32_window_size_width",
-      "label": "width",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "width",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L22"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_child_content",
-      "label": "child_content_",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "child_content_",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L99"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_quit_on_close",
-      "label": "quit_on_close_",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "quit_on_close_",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L93"
-    },
-    {
-      "id": "example_windows_runner_win32_window_win32window_window_handle",
-      "label": "window_handle_",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "window_handle_",
-      "source_file": "example/windows/runner/win32_window.h",
-      "source_location": "L96"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar_class_registered",
-      "label": "class_registered_",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "class_registered_",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L84"
-    },
-    {
-      "id": "example_windows_runner_win32_window_windowclassregistrar_instance",
-      "label": "instance_",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "instance_",
-      "source_file": "example/windows/runner/win32_window.cpp",
-      "source_location": "L82"
-    },
-    {
-      "id": "pluginregistry",
-      "label": "PluginRegistry",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "pluginregistry",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "rect",
-      "label": "RECT",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "rect",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "unique_ptr",
       "label": "unique_ptr",
       "_origin": "ast",
       "community": 46,
-      "community_name": "Win32Window",
+      "community_name": "FlutterWindow",
       "file_type": "code",
       "norm_label": "unique_ptr",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "wstring",
-      "label": "wstring",
-      "_origin": "ast",
-      "community": 46,
-      "community_name": "Win32Window",
-      "file_type": "code",
-      "norm_label": "wstring",
       "source_file": "",
       "source_location": ""
     },
@@ -17224,28 +17088,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
-      "label": "OmniCastGiftingBottomSheet",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "omnicast_gifting_bottom_sheet.dart",
-      "file_type": "code",
-      "norm_label": "omnicastgiftingbottomsheet",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
-      "label": "_OmniCastGiftingBottomSheetState",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "omnicast_gifting_bottom_sheet.dart",
-      "file_type": "code",
-      "norm_label": "_omnicastgiftingbottomsheetstate",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_ongiftsent",
       "label": "onGiftSent",
       "_origin": "ast",
@@ -19050,6 +18892,17 @@
       "source_location": "L7"
     },
     {
+      "id": "dart_async",
+      "label": "dart:async",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "package:flutter/material.dart",
+      "file_type": "code",
+      "norm_label": "dart:async",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "package_flutter_material_dart",
       "label": "package:flutter/material.dart",
       "_origin": "ast",
@@ -19080,28 +18933,6 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/datachannel_and_native_viewport_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_late_join_and_customizable_stage_test",
-      "label": "late_join_and_customizable_stage_test.dart",
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "package:flutter/material.dart",
-      "file_type": "code",
-      "norm_label": "late_join_and_customizable_stage_test.dart",
-      "source_file": "test/late_join_and_customizable_stage_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_late_join_and_customizable_stage_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "package:flutter/material.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/late_join_and_customizable_stage_test.dart",
       "source_location": null
     },
     {
@@ -19146,6 +18977,28 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/pk_reactive_layout_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_pk_system_test",
+      "label": "pk_system_test.dart",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "package:flutter/material.dart",
+      "file_type": "code",
+      "norm_label": "pk_system_test.dart",
+      "source_file": "test/pk_system_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_pk_system_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "package:flutter/material.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/pk_system_test.dart",
       "source_location": null
     },
     {
@@ -20023,26 +19876,135 @@
       "source_location": "L1"
     },
     {
-      "id": "test_viewer_tracking_test",
-      "label": "viewer_tracking_test.dart",
+      "id": "example_windows_runner_win32_window_win32window_create",
+      "label": "Create",
       "_origin": "ast",
       "community": 73,
-      "community_name": "viewer_tracking_test.dart",
+      "community_name": "win32_window.cpp",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L123",
       "file_type": "code",
-      "norm_label": "viewer_tracking_test.dart",
-      "source_file": "test/viewer_tracking_test.dart",
-      "source_location": null
+      "norm_label": "create",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L37"
     },
     {
-      "id": "test_viewer_tracking_test_main",
-      "label": "main",
+      "id": "example_windows_runner_win32_window_win32window_show",
+      "label": "Show",
       "_origin": "ast",
       "community": 73,
-      "community_name": "viewer_tracking_test.dart",
+      "community_name": "win32_window.cpp",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L152",
       "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/viewer_tracking_test.dart",
-      "source_location": null
+      "norm_label": "show",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L40"
+    },
+    {
+      "id": "example_windows_runner_win32_window_win32window_destroy",
+      "label": "Destroy",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L224",
+      "file_type": "code",
+      "norm_label": "destroy",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L43"
+    },
+    {
+      "id": "example_windows_runner_win32_window_win32window_setquitonclose",
+      "label": "SetQuitOnClose",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L262",
+      "file_type": "code",
+      "norm_label": "setquitonclose",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L53"
+    },
+    {
+      "id": "example_windows_runner_win32_window_win32window_updatetheme",
+      "label": "UpdateTheme",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L275",
+      "file_type": "code",
+      "norm_label": "updatetheme",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L91"
+    },
+    {
+      "id": "example_windows_runner_resource",
+      "label": "resource.h",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "resource.h",
+      "source_file": "example/windows/runner/resource.h",
+      "source_location": "L1"
+    },
+    {
+      "id": "example_windows_runner_win32_window_cpp_example_windows_runner_win32_window",
+      "label": "win32_window.cpp",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "win32_window.cpp",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L1"
+    },
+    {
+      "id": "example_windows_runner_win32_window_cpp_wchar_t",
+      "label": "wchar_t",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "wchar_t",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "example_windows_runner_win32_window_windowclassregistrar_class_registered",
+      "label": "class_registered_",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "class_registered_",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L84"
+    },
+    {
+      "id": "example_windows_runner_win32_window_windowclassregistrar_instance",
+      "label": "instance_",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "instance_",
+      "source_file": "example/windows/runner/win32_window.cpp",
+      "source_location": "L82"
+    },
+    {
+      "id": "wstring",
+      "label": "wstring",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "win32_window.cpp",
+      "file_type": "code",
+      "norm_label": "wstring",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "example_android_app_build_gradle",
@@ -20294,6 +20256,17 @@
       "community_name": "media_stream_manager.dart",
       "file_type": "code",
       "norm_label": "openusermedia",
+      "source_file": "lib/src/media/media_stream_manager.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_media_media_stream_manager_registeralias",
+      "label": "registerAlias",
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "media_stream_manager.dart",
+      "file_type": "code",
+      "norm_label": "registeralias",
       "source_file": "lib/src/media/media_stream_manager.dart",
       "source_location": null
     },
@@ -20650,180 +20623,218 @@
       "source_location": null
     },
     {
-      "id": "bool_get",
-      "label": "bool get",
+      "id": "example_windows_runner_flutter_window_flutterwindow_oncreate",
+      "label": "OnCreate",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/flutter_window.cpp",
+      "definition_location": "L12",
       "file_type": "code",
-      "norm_label": "bool get",
-      "source_file": null,
-      "source_location": null
+      "norm_label": "oncreate",
+      "source_file": "example/windows/runner/flutter_window.h",
+      "source_location": "L20"
     },
     {
-      "id": "example_lib_models_demo_user_model",
-      "label": "demo_user_model.dart",
+      "id": "example_windows_runner_win32_window_win32window_setchildcontent",
+      "label": "SetChildContent",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L241",
       "file_type": "code",
-      "norm_label": "demo_user_model.dart",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "setchildcontent",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L46"
     },
     {
-      "id": "example_lib_models_demo_user_model_demosession",
-      "label": "DemoSession",
+      "id": "example_windows_runner_win32_window_win32window_getclientarea",
+      "label": "GetClientArea",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L252",
       "file_type": "code",
-      "norm_label": "demosession",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "getclientarea",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L56"
     },
     {
-      "id": "example_lib_models_demo_user_model_ishost",
-      "label": "isHost",
+      "id": "example_windows_runner_win32_window_win32window_oncreate",
+      "label": "OnCreate",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L266",
       "file_type": "code",
-      "norm_label": "ishost",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "oncreate",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L69"
     },
     {
-      "id": "example_lib_models_demo_user_model_isviewer",
-      "label": "isViewer",
+      "id": "example_windows_runner_win32_window_h_hwnd",
+      "label": "HWND",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
       "file_type": "code",
-      "norm_label": "isviewer",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "hwnd",
+      "source_file": "",
+      "source_location": ""
     },
     {
-      "id": "example_lib_models_demo_user_model_role",
-      "label": "role",
+      "id": "example_windows_runner_win32_window_win32window_child_content",
+      "label": "child_content_",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
       "file_type": "code",
-      "norm_label": "role",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "child_content_",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L99"
     },
     {
-      "id": "example_lib_models_demo_user_model_roomid",
-      "label": "roomId",
+      "id": "example_windows_runner_win32_window_win32window_quit_on_close",
+      "label": "quit_on_close_",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
       "file_type": "code",
-      "norm_label": "roomid",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "quit_on_close_",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L93"
     },
     {
-      "id": "example_lib_models_demo_user_model_serverurl",
-      "label": "serverUrl",
+      "id": "example_windows_runner_win32_window_win32window_window_handle",
+      "label": "window_handle_",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
       "file_type": "code",
-      "norm_label": "serverurl",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "window_handle_",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L96"
     },
     {
-      "id": "example_lib_models_demo_user_model_userid",
-      "label": "userId",
+      "id": "rect",
+      "label": "RECT",
       "_origin": "ast",
       "community": 81,
-      "community_name": "bool get",
+      "community_name": "Win32Window",
       "file_type": "code",
-      "norm_label": "userid",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
+      "norm_label": "rect",
+      "source_file": "",
+      "source_location": ""
     },
     {
-      "id": "example_lib_models_demo_user_model_username",
-      "label": "userName",
-      "_origin": "ast",
-      "community": 81,
-      "community_name": "bool get",
-      "file_type": "code",
-      "norm_label": "username",
-      "source_file": "example/lib/models/demo_user_model.dart",
-      "source_location": null
-    },
-    {
-      "id": "interaction_models_dart",
-      "label": "interaction_models.dart",
+      "id": "example_windows_runner_win32_window_win32window_wndproc",
+      "label": "WndProc",
       "_origin": "ast",
       "community": 82,
-      "community_name": "room_event_models.dart",
+      "community_name": "MessageHandler",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L157",
       "file_type": "code",
-      "norm_label": "interaction_models.dart",
-      "source_file": null,
-      "source_location": null
+      "norm_label": "wndproc",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L82"
     },
     {
-      "id": "lib_src_models_room_event_models",
-      "label": "room_event_models.dart",
+      "id": "example_windows_runner_win32_window_win32window_messagehandler",
+      "label": "MessageHandler",
       "_origin": "ast",
       "community": 82,
-      "community_name": "room_event_models.dart",
+      "community_name": "MessageHandler",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L176",
       "file_type": "code",
-      "norm_label": "room_event_models.dart",
-      "source_file": "lib/src/models/room_event_models.dart",
-      "source_location": null
+      "norm_label": "messagehandler",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L62"
     },
     {
-      "id": "pk_models_dart",
-      "label": "pk_models.dart",
+      "id": "example_windows_runner_win32_window_win32window_getthisfromhandle",
+      "label": "GetThisFromHandle",
       "_origin": "ast",
       "community": 82,
-      "community_name": "room_event_models.dart",
+      "community_name": "MessageHandler",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L236",
       "file_type": "code",
-      "norm_label": "pk_models.dart",
-      "source_file": null,
-      "source_location": null
+      "norm_label": "getthisfromhandle",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L88"
     },
     {
-      "id": "room_models_dart",
-      "label": "room_models.dart",
+      "id": "example_windows_runner_win32_window_win32window_gethandle",
+      "label": "GetHandle",
       "_origin": "ast",
       "community": 82,
-      "community_name": "room_event_models.dart",
+      "community_name": "MessageHandler",
+      "definition_file": "/Users/kitkat/development/go_media_server/sdk/omnicast_client/example/windows/runner/win32_window.cpp",
+      "definition_location": "L258",
       "file_type": "code",
-      "norm_label": "room_models.dart",
-      "source_file": null,
-      "source_location": null
+      "norm_label": "gethandle",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L50"
     },
     {
-      "id": "seat_models_dart",
-      "label": "seat_models.dart",
+      "id": "example_windows_runner_win32_window_cpp_hwnd",
+      "label": "HWND",
       "_origin": "ast",
       "community": 82,
-      "community_name": "room_event_models.dart",
+      "community_name": "MessageHandler",
       "file_type": "code",
-      "norm_label": "seat_models.dart",
-      "source_file": null,
-      "source_location": null
+      "norm_label": "hwnd",
+      "source_file": "",
+      "source_location": ""
     },
     {
-      "id": "signaling_message_dart",
-      "label": "signaling_message.dart",
+      "id": "example_windows_runner_win32_window_cpp_lparam",
+      "label": "LPARAM",
       "_origin": "ast",
       "community": 82,
-      "community_name": "room_event_models.dart",
+      "community_name": "MessageHandler",
       "file_type": "code",
-      "norm_label": "signaling_message.dart",
-      "source_file": null,
-      "source_location": null
+      "norm_label": "lparam",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "example_windows_runner_win32_window_cpp_lresult",
+      "label": "LRESULT",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "MessageHandler",
+      "file_type": "code",
+      "norm_label": "lresult",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "example_windows_runner_win32_window_cpp_uint",
+      "label": "UINT",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "MessageHandler",
+      "file_type": "code",
+      "norm_label": "uint",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "example_windows_runner_win32_window_cpp_wparam",
+      "label": "WPARAM",
+      "_origin": "ast",
+      "community": 82,
+      "community_name": "MessageHandler",
+      "file_type": "code",
+      "norm_label": "wparam",
+      "source_file": "",
+      "source_location": ""
     },
     {
       "id": "lib_src_media_media_stream_manager_mediastreammanager",
@@ -20845,6 +20856,193 @@
       "file_type": "code",
       "norm_label": "listenable",
       "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "example_windows_runner_win32_window_point_x",
+      "label": "x",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": "x",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L16"
+    },
+    {
+      "id": "example_windows_runner_win32_window_point_y",
+      "label": "y",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": "y",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L17"
+    },
+    {
+      "id": "example_windows_runner_win32_window_size_height",
+      "label": "height",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": "height",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L23"
+    },
+    {
+      "id": "example_windows_runner_win32_window_size_width",
+      "label": "width",
+      "_origin": "ast",
+      "community": 84,
+      "community_name": "Point",
+      "file_type": "code",
+      "norm_label": "width",
+      "source_file": "example/windows/runner/win32_window.h",
+      "source_location": "L22"
+    },
+    {
+      "id": "example_windows_flutter_generated_plugin_registrant_cc_example_windows_flutter_generated_plugin_registrant",
+      "label": "windows/flutter/generated_plugin_registrant.cc",
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "RegisterPlugins",
+      "file_type": "code",
+      "norm_label": "windows/flutter/generated_plugin_registrant.cc",
+      "source_file": "example/windows/flutter/generated_plugin_registrant.cc",
+      "source_location": "L1"
+    },
+    {
+      "id": "example_windows_flutter_generated_plugin_registrant_h_example_windows_flutter_generated_plugin_registrant",
+      "label": "windows/flutter/generated_plugin_registrant.h",
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "RegisterPlugins",
+      "file_type": "code",
+      "norm_label": "windows/flutter/generated_plugin_registrant.h",
+      "source_file": "example/windows/flutter/generated_plugin_registrant.h",
+      "source_location": "L1"
+    },
+    {
+      "id": "pluginregistry",
+      "label": "PluginRegistry",
+      "_origin": "ast",
+      "community": 85,
+      "community_name": "RegisterPlugins",
+      "file_type": "code",
+      "norm_label": "pluginregistry",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "dart_typed_data",
+      "label": "dart:typed_data",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "dart:typed_data",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "test_enterprise_optimization_test",
+      "label": "enterprise_optimization_test.dart",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "enterprise_optimization_test.dart",
+      "source_file": "test/enterprise_optimization_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_enterprise_optimization_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 86,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/enterprise_optimization_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "package_flutter_widgets_dart",
+      "label": "package:flutter/widgets.dart",
+      "_origin": "ast",
+      "community": 87,
+      "community_name": "headless_and_performance_test.dart",
+      "file_type": "code",
+      "norm_label": "package:flutter/widgets.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "test_headless_and_performance_test",
+      "label": "headless_and_performance_test.dart",
+      "_origin": "ast",
+      "community": 87,
+      "community_name": "headless_and_performance_test.dart",
+      "file_type": "code",
+      "norm_label": "headless_and_performance_test.dart",
+      "source_file": "test/headless_and_performance_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_headless_and_performance_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 87,
+      "community_name": "headless_and_performance_test.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/headless_and_performance_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "changenotifier",
+      "label": "ChangeNotifier",
+      "_origin": "ast",
+      "community": 88,
+      "community_name": "RoomState",
+      "file_type": "code",
+      "norm_label": "changenotifier",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "lib_src_state_room_state_roomstate",
+      "label": "RoomState",
+      "_origin": "ast",
+      "community": 88,
+      "community_name": "RoomState",
+      "file_type": "code",
+      "norm_label": "roomstate",
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_late_join_and_customizable_stage_test",
+      "label": "late_join_and_customizable_stage_test.dart",
+      "_origin": "ast",
+      "community": 89,
+      "community_name": "late_join_and_customizable_stage_test.dart",
+      "file_type": "code",
+      "norm_label": "late_join_and_customizable_stage_test.dart",
+      "source_file": "test/late_join_and_customizable_stage_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_late_join_and_customizable_stage_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 89,
+      "community_name": "late_join_and_customizable_stage_test.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/late_join_and_customizable_stage_test.dart",
       "source_location": null
     },
     {
@@ -23864,6 +24062,18 @@
     },
     {
       "source": "lib_src_media_media_controller",
+      "target": "timer",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "variable_type",
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
       "target": "valuenotifier",
       "relation": "references",
       "_origin": "ast",
@@ -25653,6 +25863,18 @@
     {
       "source": "lib_src_widgets_omnicast_speaking_video_tile",
       "target": "lib_src_media_audio_level_detector_audioleveldetector",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "variable_type",
+      "source_file": "lib/src/widgets/omnicast_speaking_video_tile.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_widgets_omnicast_speaking_video_tile",
+      "target": "lib_src_state_room_state_roomstate",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -32533,6 +32755,28 @@
     },
     {
       "source": "lib_src_media_media_controller",
+      "target": "lib_src_media_media_controller_bindspeakingsignaling",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
+      "target": "lib_src_media_media_controller_checklocalspeakingstate",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
       "target": "lib_src_media_media_controller_config",
       "relation": "defines",
       "_origin": "ast",
@@ -32687,6 +32931,17 @@
     },
     {
       "source": "lib_src_media_media_controller",
+      "target": "lib_src_media_media_controller_iscurrentlyspeaking",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
       "target": "lib_src_media_media_controller_ishostcameraoffnotifier",
       "relation": "defines",
       "_origin": "ast",
@@ -32808,6 +33063,17 @@
     },
     {
       "source": "lib_src_media_media_controller",
+      "target": "lib_src_media_media_controller_requestkeyframe",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
       "target": "lib_src_media_media_controller_requestlayerforuser",
       "relation": "defines",
       "_origin": "ast",
@@ -32918,6 +33184,17 @@
     },
     {
       "source": "lib_src_media_media_controller",
+      "target": "lib_src_media_media_controller_speakingdebouncetimer",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
       "target": "lib_src_media_media_controller_startashost",
       "relation": "defines",
       "_origin": "ast",
@@ -32985,6 +33262,17 @@
     {
       "source": "lib_src_media_media_controller",
       "target": "lib_src_media_media_controller_togglemute",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_controller.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_controller",
+      "target": "lib_src_media_media_controller_userspeakingsubscription",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -33194,6 +33482,17 @@
     {
       "source": "lib_src_media_media_stream_manager",
       "target": "lib_src_media_media_stream_manager_openusermedia",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/media/media_stream_manager.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_media_media_stream_manager",
+      "target": "lib_src_media_media_stream_manager_registeralias",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -37351,6 +37650,17 @@
     },
     {
       "source": "lib_src_signaling_signaling_client",
+      "target": "lib_src_signaling_signaling_client_fetchroomlist",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_signaling_signaling_client",
       "target": "lib_src_signaling_signaling_client_giftcontroller",
       "relation": "defines",
       "_origin": "ast",
@@ -37835,6 +38145,17 @@
     },
     {
       "source": "lib_src_signaling_signaling_client",
+      "target": "lib_src_signaling_signaling_client_onuserspeaking",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_signaling_signaling_client",
       "target": "lib_src_signaling_signaling_client_onviewerupdate",
       "relation": "defines",
       "_origin": "ast",
@@ -37946,6 +38267,17 @@
     {
       "source": "lib_src_signaling_signaling_client",
       "target": "lib_src_signaling_signaling_client_reconnecttimer",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_signaling_signaling_client",
+      "target": "lib_src_signaling_signaling_client_requestkeyframe",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -38110,6 +38442,17 @@
     },
     {
       "source": "lib_src_signaling_signaling_client",
+      "target": "lib_src_signaling_signaling_client_sendspeakingstate",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_signaling_signaling_client",
       "target": "lib_src_signaling_signaling_client_signalingclient",
       "relation": "defines",
       "_origin": "ast",
@@ -38177,6 +38520,17 @@
     {
       "source": "lib_src_signaling_signaling_client",
       "target": "lib_src_signaling_signaling_client_userleftcontroller",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/signaling/signaling_client.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_signaling_signaling_client",
+      "target": "lib_src_signaling_signaling_client_userspeakingcontroller",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -38517,6 +38871,17 @@
     },
     {
       "source": "lib_src_state_room_state",
+      "target": "lib_src_state_room_state_isuserspeaking",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_state_room_state",
       "target": "lib_src_state_room_state_isviewer",
       "relation": "defines",
       "_origin": "ast",
@@ -38836,6 +39201,28 @@
     },
     {
       "source": "lib_src_state_room_state",
+      "target": "lib_src_state_room_state_speakingusers",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_state_room_state",
+      "target": "lib_src_state_room_state_speakingusersnotifier",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_state_room_state",
       "target": "lib_src_state_room_state_syncroominfo",
       "relation": "defines",
       "_origin": "ast",
@@ -38958,6 +39345,17 @@
     {
       "source": "lib_src_state_room_state",
       "target": "lib_src_state_room_state_updateusermediastate",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/state/room_state.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_state_room_state",
+      "target": "lib_src_state_room_state_updateuserspeaking",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -41476,6 +41874,17 @@
     },
     {
       "source": "lib_src_widgets_omnicast_speaking_video_tile",
+      "target": "lib_src_widgets_omnicast_speaking_video_tile_roomstate",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/widgets/omnicast_speaking_video_tile.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_widgets_omnicast_speaking_video_tile",
       "target": "lib_src_widgets_omnicast_speaking_video_tile_speakingwaveformicon",
       "relation": "defines",
       "_origin": "ast",
@@ -42027,6 +42436,17 @@
     {
       "source": "lib_src_widgets_omnicast_video_view",
       "target": "lib_src_widgets_omnicast_video_view_omnicastvideoviewstate",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_widgets_omnicast_video_view",
+      "target": "lib_src_widgets_omnicast_video_view_onmediamanagerchanged",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -45061,6 +45481,17 @@
       "weight": 1.0
     },
     {
+      "source": "lib_src_widgets_omnicast_speaking_video_tile",
+      "target": "state_room_state_dart",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/widgets/omnicast_speaking_video_tile.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
       "source": "lib_src_widgets_omnicast_stage_grid",
       "target": "core_omnicast_client_dart",
       "relation": "imports",
@@ -46807,5 +47238,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0435820dadcc299cb7b7e7742a1ebe6d0c1f1f6a"
+  "built_at_commit": "5844f7d114f636856fa14d77cb00c9bc2e257633"
 }
