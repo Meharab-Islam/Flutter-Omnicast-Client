@@ -295,9 +295,6 @@ class WebRTCManager {
       } else {
         createLocalMediaStream('stream_${event.track.id}')
             .then((stream) {
-              try {
-                stream.addTrack(event.track).catchError((_) {});
-              } catch (_) {}
               onRemoteTrack?.call(event.track, stream);
             })
             .catchError((_) {});
