@@ -19,6 +19,7 @@ class RoomState extends ChangeNotifier {
   int _hostCoinBalance = 0;
   int _userCoinBalance = 0;
   String? _pinnedStageUserId;
+  bool _isDisposed = false;
 
   final List<Participant> _viewers = [];
   final List<StageSeat> _activeSeats = [];
@@ -29,6 +30,7 @@ class RoomState extends ChangeNotifier {
   final List<CoHostInvite> _pendingInvites = [];
   final Map<String, bool> _userAudioMuteStates = {};
   final Map<String, bool> _userCameraOffStates = {};
+  final Map<String, bool> _speakingUsers = {};
 
   PKBattleInfo? _activePK;
 
@@ -42,30 +44,13 @@ class RoomState extends ChangeNotifier {
   final ValueNotifier<bool> showJoinMessagesNotifier = ValueNotifier<bool>(
     true,
   );
-  final ValueNotifier<List<StageSeat>> activeSeatsNotifier =
-      ValueNotifier<List<StageSeat>>(const []);
-  final ValueNotifier<int> occupiedSeatsCountNotifier = ValueNotifier<int>(0);
-  final Map<String, bool> _speakingUsers = {};
   final ValueNotifier<Map<String, bool>> speakingUsersNotifier =
-      ValueNotifier<Map<String, bool>>(const {});
-
-  bool _isDisposed = false;
-
-  /// Returns whether this state container has been disposed.
-  bool get isDisposed => _isDisposed;
-
-  @override
-  void notifyListeners() {
-    if (_isDisposed) return;
-    super.notifyListeners();
-  }
+      ValueNotifier<Map<String, bool>>({});
 
   // Getters
+  bool get isDisposed => _isDisposed;
   bool get showJoinMessages => showJoinMessagesNotifier.value;
-  set showJoinMessages(bool val) {
-    if (_isDisposed) return;
-    showJoinMessagesNotifier.value = val;
-  }
+  set showJoinMessages(bool val) => showJoinMessagesNotifier.value = val;
 
   String? get roomId => _roomId;
   String? get hostId => _hostId;
@@ -80,25 +65,18 @@ class RoomState extends ChangeNotifier {
   int get hostCoinBalance => _hostCoinBalance;
   int get userCoinBalance => _userCoinBalance;
   String? get pinnedStageUserId => _pinnedStageUserId;
-
-  /// Returns the user ID of the participant occupying the Main Seat.
-  /// Defaults to [_hostId] if no specific co-host is pinned.
-  String? get mainSeatUserId =>
-      (_pinnedStageUserId != null && _pinnedStageUserId!.isNotEmpty)
-      ? _pinnedStageUserId
-      : _hostId;
-
-  /// Returns whether the Host is currently occupying the Main Seat.
   bool get isHostInMainSeat =>
-      _pinnedStageUserId == null ||
-      _pinnedStageUserId!.isEmpty ||
-      _pinnedStageUserId == _hostId;
+      _pinnedStageUserId == null || _pinnedStageUserId == _hostId;
+  String? get mainSeatUserId => _pinnedStageUserId ?? _hostId;
 
   List<Participant> get viewers => List.unmodifiable(_viewers);
   List<StageSeat> get activeSeats => List.unmodifiable(_activeSeats);
-  List<StageSeat> get occupiedSeats =>
-      _activeSeats.where((s) => s.isOccupied).toList();
-  int get occupiedSeatsCount => _activeSeats.where((s) => s.isOccupied).length;
+  int get occupiedSeatsCount => _activeSeats
+      .where((s) => s.userId != null && s.userId!.isNotEmpty)
+      .length;
+  List<StageSeat> get occupiedSeats => _activeSeats
+      .where((s) => s.userId != null && s.userId!.isNotEmpty)
+      .toList();
   Set<String> get activeRemoteUserIds => Set.unmodifiable(_activeRemoteUserIds);
   List<ChatMessage> get chatHistory => List.unmodifiable(_chatHistory);
   List<GiftEvent> get recentGifts => List.unmodifiable(_recentGifts);
@@ -111,30 +89,24 @@ class RoomState extends ChangeNotifier {
   Map<String, bool> get userCameraOffStates =>
       Map.unmodifiable(_userCameraOffStates);
 
-  /// Returns the [StageSeat] at [seatIndex] (1-indexed or 0-indexed as provided), or null if not found.
-  StageSeat? getSeat(int seatIndex) {
-    try {
-      return _activeSeats.firstWhere((s) => s.seatIndex == seatIndex);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /// Returns the [StageSeat] assigned to [userId], or null if user is not in a seat.
-  StageSeat? getSeatOfUser(String userId) {
-    try {
-      return _activeSeats.firstWhere((s) => s.userId == userId);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  /// Checks if [userId] is currently muted (audio).
-  bool isUserMuted(String userId) => isUserAudioMuted(userId);
   bool isUserAudioMuted(String userId) => _userAudioMuteStates[userId] ?? false;
-
-  /// Checks if [userId] currently has camera disabled/off.
+  bool isUserMuted(String userId) => isUserAudioMuted(userId);
   bool isUserCameraOff(String userId) => _userCameraOffStates[userId] ?? false;
+  bool isUserSpeaking(String userId) => _speakingUsers[userId] ?? false;
+
+  StageSeat? getSeat(int seatIndex) {
+    return _activeSeats.cast<StageSeat?>().firstWhere(
+      (s) => s?.seatIndex == seatIndex,
+      orElse: () => null,
+    );
+  }
+
+  StageSeat? getSeatOfUser(String userId) {
+    return _activeSeats.cast<StageSeat?>().firstWhere(
+      (s) => s?.userId == userId,
+      orElse: () => null,
+    );
+  }
 
   PKBattleInfo? get activePK => _activePK;
   PKState get pkState => _activePK != null
@@ -159,43 +131,41 @@ class RoomState extends ChangeNotifier {
     RoomType roomType = RoomType.video,
     String? hostId,
   }) {
+    if (_isDisposed) return;
     _roomId = roomId;
     _userId = userId;
     _role = role;
     _roomType = roomType;
     _hostId = hostId ?? (role == UserRole.host ? userId : null);
-    _pinnedStageUserId = null;
     notifyListeners();
   }
 
   /// Updates connection state.
   void updateConnectionState(ClientConnectionState state) {
-    if (_connectionState == state) return;
+    if (_isDisposed || _connectionState == state) return;
     _connectionState = state;
     notifyListeners();
   }
 
   /// Updates user role.
   void updateRole(UserRole newRole) {
-    if (_role == newRole) return;
+    if (_isDisposed || _role == newRole) return;
     _role = newRole;
     notifyListeners();
   }
 
   /// Updates room type (audio-only vs video).
   void updateRoomType(RoomType type) {
-    if (_roomType == type) return;
+    if (_isDisposed || _roomType == type) return;
     _roomType = type;
     notifyListeners();
   }
 
   /// Synchronizes full room info on join or late-join (`room_info_sync`).
   void syncRoomInfo(Map<String, dynamic> data) {
+    if (_isDisposed) return;
     _roomId = data['room_id'] as String? ?? _roomId;
-    final host = data['host_id'] as String?;
-    if (host != null && host.isNotEmpty) {
-      _hostId = host;
-    }
+    _hostId = data['host_id'] as String? ?? _hostId;
     final typeStr = data['room_type'] as String?;
     if (typeStr != null) {
       _roomType = typeStr.toLowerCase() == 'audio'
@@ -205,80 +175,114 @@ class RoomState extends ChangeNotifier {
     _viewersCount =
         (data['viewers_count'] as num?)?.toInt() ??
         (data['viewer_count'] as num?)?.toInt() ??
-        (data['total_viewers'] as num?)?.toInt() ??
-        (data['count'] as num?)?.toInt() ??
         _viewersCount;
     _hostCoinBalance =
         (data['host_coin_balance'] as num?)?.toInt() ??
         (data['host_coins'] as num?)?.toInt() ??
         (data['host_score'] as num?)?.toInt() ??
         _hostCoinBalance;
-    final mainSeat = data['main_seat_id'] as String?;
-    final pinned = data['pinned_user_id'] as String?;
-    if (pinned != null && pinned.isNotEmpty && pinned != _hostId) {
-      _pinnedStageUserId = pinned;
-    } else if (mainSeat != null && mainSeat.isNotEmpty && mainSeat != _hostId) {
-      _pinnedStageUserId = mainSeat;
-    } else {
-      _pinnedStageUserId = null;
+
+    final mainSeatId = data['main_seat_id'] as String?;
+    if (mainSeatId != null) {
+      _pinnedStageUserId = mainSeatId == _hostId ? null : mainSeatId;
+    } else if (data['pinned_user_id'] != null) {
+      _pinnedStageUserId = data['pinned_user_id'] as String?;
     }
 
-    // Populate active users/viewers from viewers, viewers_list, or participants
-    final viewersData =
-        data['viewers'] ?? data['viewers_list'] ?? data['participants'];
-    if (viewersData is List) {
-      _viewers.clear();
-      for (final item in viewersData) {
-        if (item is Map<String, dynamic>) {
-          _viewers.add(Participant.fromJson(item));
-        } else if (item is Map) {
-          _viewers.add(Participant.fromJson(Map<String, dynamic>.from(item)));
-        } else if (item is String && item.isNotEmpty) {
-          _viewers.add(
-            Participant(
-              userId: item,
-              displayName: item,
-              role: item == _hostId ? UserRole.host : UserRole.viewer,
-              joinedAt: DateTime.now(),
-            ),
-          );
-        }
-      }
-    }
-
-    // 1. Populate media states map first so seats get initialized with correct audio/video states
+    // Populate media states map if provided first
     if (data['media_states'] is Map<String, dynamic>) {
       final states = data['media_states'] as Map<String, dynamic>;
       states.forEach((uId, stateMap) {
         if (stateMap is Map) {
-          final isMuted =
-              (stateMap['muted_audio'] as bool?) ??
-              (stateMap['muted'] as bool?) ??
-              (stateMap['is_muted'] as bool?) ??
-              (stateMap['audio_muted'] as bool?);
-          if (isMuted != null) {
-            _userAudioMuteStates[uId] = isMuted;
+          if (stateMap['muted'] != null ||
+              stateMap['is_muted'] != null ||
+              stateMap['muted_audio'] != null) {
+            _userAudioMuteStates[uId] =
+                (stateMap['muted'] ??
+                        stateMap['is_muted'] ??
+                        stateMap['muted_audio'])
+                    as bool;
           }
-
-          final isCamOff =
-              (stateMap['muted_video'] as bool?) ??
-              (stateMap['camera_off'] as bool?) ??
-              (stateMap['is_camera_off'] as bool?) ??
-              (stateMap['is_video_muted'] as bool?) ??
-              (stateMap['video_muted'] as bool?);
-          if (isCamOff != null) {
-            _userCameraOffStates[uId] = isCamOff;
+          if (stateMap['camera_off'] != null ||
+              stateMap['is_camera_off'] != null ||
+              stateMap['is_video_muted'] != null ||
+              stateMap['muted_video'] != null) {
+            _userCameraOffStates[uId] =
+                (stateMap['camera_off'] ??
+                        stateMap['is_camera_off'] ??
+                        stateMap['is_video_muted'] ??
+                        stateMap['muted_video'])
+                    as bool;
           }
         }
       });
     }
 
-    // 2. Populate active seats
-    if (data['active_seats'] != null) {
-      updateActiveSeats(data['active_seats']);
+    // Populate active users/viewers
+    if (data['viewers'] is List) {
+      _viewers.clear();
+      for (final item in data['viewers'] as List) {
+        if (item is Map<String, dynamic>) {
+          _viewers.add(Participant.fromJson(item));
+        }
+      }
     }
 
-    // 3. Populate waiting list / pending seat requests for late-join users
+    // Populate active seats & media states
+    if (data['active_seats'] is List) {
+      _activeSeats.clear();
+      for (final item in data['active_seats'] as List) {
+        if (item is Map<String, dynamic>) {
+          final seat = StageSeat.fromJson(item);
+          _activeSeats.add(seat);
+          if (seat.userId != null && seat.userId!.isNotEmpty) {
+            if (seat.userId != _userId) {
+              _activeRemoteUserIds.add(seat.userId!);
+            }
+            _userAudioMuteStates[seat.userId!] = seat.isMuted;
+            _userCameraOffStates[seat.userId!] = seat.isCameraOff;
+          }
+        }
+      }
+    } else if (data['active_seats'] is Map) {
+      final map = data['active_seats'] as Map;
+      _activeSeats.clear();
+      map.forEach((k, v) {
+        final sIndex = int.tryParse(k.toString()) ?? 0;
+        final uId = v is String
+            ? v
+            : (v is Map ? v['user_id']?.toString() : null);
+        if (uId != null && uId.isNotEmpty) {
+          if (uId != _userId) {
+            _activeRemoteUserIds.add(uId);
+          }
+          final isMuted =
+              _userAudioMuteStates[uId] ??
+              (v is Map
+                  ? (v['is_muted'] ?? v['muted'] ?? v['muted_audio'])
+                            as bool? ??
+                        false
+                  : false);
+          final isCamOff =
+              _userCameraOffStates[uId] ??
+              (v is Map
+                  ? (v['is_camera_off'] ?? v['camera_off'] ?? v['muted_video'])
+                            as bool? ??
+                        false
+                  : false);
+          _activeSeats.add(
+            StageSeat(
+              seatIndex: sIndex,
+              userId: uId,
+              isMuted: isMuted,
+              isCameraOff: isCamOff,
+            ),
+          );
+        }
+      });
+    }
+
+    // Populate waiting list / pending seat requests for late-join users
     if (data['waiting_list'] is List ||
         data['pending_requests'] is List ||
         data['seat_requests'] is List) {
@@ -327,22 +331,12 @@ class RoomState extends ChangeNotifier {
       _activePK = null;
     }
 
-    _syncSeatNotifiers();
     notifyListeners();
-  }
-
-  void _syncSeatNotifiers() {
-    if (_isDisposed) return;
-    try {
-      activeSeatsNotifier.value = List.unmodifiable(_activeSeats);
-      occupiedSeatsCountNotifier.value = _activeSeats
-          .where((s) => s.isOccupied)
-          .length;
-    } catch (_) {}
   }
 
   /// Updates the viewer count and list of active viewers.
   void updateViewers({required int count, List<Participant>? viewersList}) {
+    if (_isDisposed) return;
     _viewersCount = count;
     if (viewersList != null) {
       _viewers.clear();
@@ -351,103 +345,9 @@ class RoomState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Updates active co-host seats from either a List or Map representation.
-  void updateActiveSeats(dynamic activeSeatsData) {
-    if (activeSeatsData == null) return;
-    _activeSeats.clear();
-
-    if (activeSeatsData is List) {
-      for (int i = 0; i < activeSeatsData.length; i++) {
-        final item = activeSeatsData[i];
-        if (item is Map<String, dynamic>) {
-          final seat = StageSeat.fromJson(item);
-          final uId = seat.userId ?? '';
-          Participant? userProfile = seat.user;
-          if (userProfile == null && uId.isNotEmpty) {
-            try {
-              userProfile = _viewers.firstWhere((p) => p.userId == uId);
-            } catch (_) {}
-          }
-          final resolvedSeat = seat.copyWith(
-            user: userProfile,
-            isMuted: _userAudioMuteStates[uId] ?? seat.isMuted,
-            isCameraOff: _userCameraOffStates[uId] ?? seat.isCameraOff,
-          );
-          _activeSeats.add(resolvedSeat);
-          if (uId.isNotEmpty) {
-            if (uId != _userId) _activeRemoteUserIds.add(uId);
-            _userAudioMuteStates[uId] = resolvedSeat.isMuted;
-            _userCameraOffStates[uId] = resolvedSeat.isCameraOff;
-          }
-        } else if (item is Map) {
-          final seat = StageSeat.fromJson(Map<String, dynamic>.from(item));
-          final uId = seat.userId ?? '';
-          Participant? userProfile = seat.user;
-          if (userProfile == null && uId.isNotEmpty) {
-            try {
-              userProfile = _viewers.firstWhere((p) => p.userId == uId);
-            } catch (_) {}
-          }
-          final resolvedSeat = seat.copyWith(
-            user: userProfile,
-            isMuted: _userAudioMuteStates[uId] ?? seat.isMuted,
-            isCameraOff: _userCameraOffStates[uId] ?? seat.isCameraOff,
-          );
-          _activeSeats.add(resolvedSeat);
-          if (uId.isNotEmpty) {
-            if (uId != _userId) _activeRemoteUserIds.add(uId);
-            _userAudioMuteStates[uId] = resolvedSeat.isMuted;
-            _userCameraOffStates[uId] = resolvedSeat.isCameraOff;
-          }
-        } else if (item is String && item.isNotEmpty) {
-          Participant? userProfile;
-          try {
-            userProfile = _viewers.firstWhere((p) => p.userId == item);
-          } catch (_) {}
-          final seat = StageSeat(
-            seatIndex: i + 1,
-            userId: item,
-            user: userProfile,
-            isMuted: _userAudioMuteStates[item] ?? false,
-            isCameraOff: _userCameraOffStates[item] ?? false,
-          );
-          _activeSeats.add(seat);
-          if (item != _userId) {
-            _activeRemoteUserIds.add(item);
-          }
-        }
-      }
-    } else if (activeSeatsData is Map) {
-      activeSeatsData.forEach((k, v) {
-        final seatIndex = int.tryParse(k.toString()) ?? 0;
-        final uId =
-            (v is Map ? (v['user_id'] ?? v['userId']) : v)?.toString() ?? '';
-        if (uId.isNotEmpty) {
-          Participant? userProfile;
-          try {
-            userProfile = _viewers.firstWhere((p) => p.userId == uId);
-          } catch (_) {}
-          final seat = StageSeat(
-            seatIndex: seatIndex,
-            userId: uId,
-            user: userProfile,
-            isMuted: _userAudioMuteStates[uId] ?? false,
-            isCameraOff: _userCameraOffStates[uId] ?? false,
-          );
-          _activeSeats.add(seat);
-          if (uId != _userId) {
-            _activeRemoteUserIds.add(uId);
-          }
-        }
-      });
-    }
-
-    _syncSeatNotifiers();
-    notifyListeners();
-  }
-
   /// Atomically adds a new participant (e.g. user_joined) and increments viewer count.
   void addParticipant(OmniCastParticipant participant) {
+    if (_isDisposed) return;
     final idx = _viewers.indexWhere((p) => p.userId == participant.userId);
     if (idx >= 0) {
       _viewers[idx] = participant;
@@ -463,6 +363,7 @@ class RoomState extends ChangeNotifier {
 
   /// Atomically removes a participant (e.g. user_left) and decrements viewer count.
   void removeParticipant(String userId) {
+    if (_isDisposed) return;
     _viewers.removeWhere((p) => p.userId == userId);
     if (_viewersCount > 0) {
       _viewersCount--;
@@ -472,6 +373,7 @@ class RoomState extends ChangeNotifier {
 
   /// Adds a new chat message to history (capped to last 200 items).
   void addChatMessage(ChatMessage message) {
+    if (_isDisposed) return;
     _chatHistory.add(message);
     if (_chatHistory.length > 200) {
       _chatHistory.removeRange(0, _chatHistory.length - 200);
@@ -481,6 +383,7 @@ class RoomState extends ChangeNotifier {
 
   /// Processes a gift event, updates host coin balance, and atomically bumps active PK scores.
   void processGift(GiftEvent event) {
+    if (_isDisposed) return;
     _recentGifts.add(event);
     if (_recentGifts.length > 50) {
       _recentGifts.removeRange(0, _recentGifts.length - 50);
@@ -527,6 +430,7 @@ class RoomState extends ChangeNotifier {
 
   /// Updates personal or host balance.
   void updateBalance(BalanceUpdate update) {
+    if (_isDisposed) return;
     if (update.userId == _userId) {
       _userCoinBalance = update.newBalance;
     }
@@ -538,13 +442,14 @@ class RoomState extends ChangeNotifier {
 
   /// Sets or clears the pinned stage user ID.
   void setPinnedStageUser(String? userId) {
+    if (_isDisposed) return;
     _pinnedStageUserId = userId;
     notifyListeners();
   }
 
   /// Updates real-time audio mute and camera on/off states per user.
   void updateUserMediaState(String userId, {bool? isMuted, bool? isCameraOff}) {
-    if (userId.isEmpty) return;
+    if (_isDisposed || userId.isEmpty) return;
 
     if (isMuted != null) {
       _userAudioMuteStates[userId] = isMuted;
@@ -563,12 +468,67 @@ class RoomState extends ChangeNotifier {
       );
     }
 
-    _syncSeatNotifiers();
+    notifyListeners();
+  }
+
+  /// Updates speaking status of a user.
+  void updateUserSpeaking(String userId, bool isSpeaking) {
+    if (_isDisposed || userId.isEmpty) return;
+    _speakingUsers[userId] = isSpeaking;
+    speakingUsersNotifier.value = Map<String, bool>.from(_speakingUsers);
+    notifyListeners();
+  }
+
+  /// Updates active seats from map or list.
+  void updateActiveSeats(dynamic seats) {
+    if (_isDisposed) return;
+    _activeSeats.clear();
+    if (seats is Map) {
+      seats.forEach((key, val) {
+        final seatIndex = int.tryParse(key.toString()) ?? 0;
+        if (val is StageSeat) {
+          _activeSeats.add(val);
+        } else if (val is String) {
+          _activeSeats.add(
+            StageSeat(
+              seatIndex: seatIndex,
+              userId: val,
+              isMuted: _userAudioMuteStates[val] ?? false,
+              isCameraOff: _userCameraOffStates[val] ?? false,
+            ),
+          );
+        } else if (val is Map<String, dynamic>) {
+          _activeSeats.add(StageSeat.fromJson(val));
+        }
+      });
+    } else if (seats is List) {
+      for (final item in seats) {
+        if (item is StageSeat) {
+          _activeSeats.add(item);
+        } else if (item is Map<String, dynamic>) {
+          _activeSeats.add(StageSeat.fromJson(item));
+        }
+      }
+    }
+    for (final seat in _activeSeats) {
+      if (seat.userId != null && seat.userId!.isNotEmpty) {
+        if (seat.userId != _userId) {
+          _activeRemoteUserIds.add(seat.userId!);
+        }
+        _userAudioMuteStates[seat.userId!] = seat.isMuted;
+        _userCameraOffStates[seat.userId!] = seat.isCameraOff;
+      }
+    }
+    if (!isInPKBattle) {
+      _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
+      roomModeNotifier.value = _roomMode;
+    }
     notifyListeners();
   }
 
   /// Adds or updates a stage seat.
   void updateStageSeat(StageSeat seat) {
+    if (_isDisposed) return;
     final idx = _activeSeats.indexWhere((s) => s.seatIndex == seat.seatIndex);
     if (idx >= 0) {
       _activeSeats[idx] = seat;
@@ -586,12 +546,12 @@ class RoomState extends ChangeNotifier {
       _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
       roomModeNotifier.value = _roomMode;
     }
-    _syncSeatNotifiers();
     notifyListeners();
   }
 
   /// Removes a user from a stage seat.
   void removeStageSeat(int seatIndex) {
+    if (_isDisposed) return;
     final idx = _activeSeats.indexWhere((s) => s.seatIndex == seatIndex);
     if (idx >= 0) {
       final removed = _activeSeats.removeAt(idx);
@@ -604,13 +564,13 @@ class RoomState extends ChangeNotifier {
         _roomMode = _activeSeats.isNotEmpty ? RoomMode.coHost : RoomMode.solo;
         roomModeNotifier.value = _roomMode;
       }
-      _syncSeatNotifiers();
       notifyListeners();
     }
   }
 
   /// Adds a pending seat request from a viewer.
   void addSeatRequest(SeatRequest request) {
+    if (_isDisposed) return;
     _pendingSeatRequests.removeWhere(
       (r) => r.requesterId == request.requesterId,
     );
@@ -620,12 +580,14 @@ class RoomState extends ChangeNotifier {
 
   /// Removes a handled seat request.
   void removeSeatRequest(String requesterId) {
+    if (_isDisposed) return;
     _pendingSeatRequests.removeWhere((r) => r.requesterId == requesterId);
     notifyListeners();
   }
 
   /// Adds a co-host invite from host.
   void addInvite(CoHostInvite invite) {
+    if (_isDisposed) return;
     _pendingInvites.removeWhere((i) => i.inviteId == invite.inviteId);
     _pendingInvites.add(invite);
     notifyListeners();
@@ -633,12 +595,14 @@ class RoomState extends ChangeNotifier {
 
   /// Removes a handled invite.
   void removeInvite(String inviteId) {
+    if (_isDisposed) return;
     _pendingInvites.removeWhere((i) => i.inviteId == inviteId);
     notifyListeners();
   }
 
   /// Starts or updates a PK battle.
   void updatePKBattle(PKBattleInfo pkInfo) {
+    if (_isDisposed) return;
     _activePK = pkInfo;
     if (pkInfo.opponentUserId.isNotEmpty) {
       _activeRemoteUserIds.add(pkInfo.opponentUserId);
@@ -654,7 +618,7 @@ class RoomState extends ChangeNotifier {
 
   /// Updates PK scores in real-time.
   void updatePKScore(PKScoreUpdate scoreUpdate) {
-    if (_activePK == null) return;
+    if (_isDisposed || _activePK == null) return;
     _activePK = PKBattleInfo(
       battleId: _activePK!.battleId,
       hostRoomId: _activePK!.hostRoomId,
@@ -679,7 +643,7 @@ class RoomState extends ChangeNotifier {
 
   /// Updates PK remaining seconds timer tick.
   void updatePKTimer(PKTimerTick tick) {
-    if (_activePK == null) return;
+    if (_isDisposed || _activePK == null) return;
     _activePK = PKBattleInfo(
       battleId: _activePK!.battleId,
       hostRoomId: _activePK!.hostRoomId,
@@ -700,6 +664,7 @@ class RoomState extends ChangeNotifier {
 
   /// Ends the active PK battle.
   void endPKBattle() {
+    if (_isDisposed) return;
     if (_activePK != null) {
       _activeRemoteUserIds.remove(_activePK!.opponentUserId);
       _activePK = null;
@@ -712,28 +677,18 @@ class RoomState extends ChangeNotifier {
 
   /// Registers an active remote user track.
   void addActiveRemoteUser(String userId) {
-    _activeRemoteUserIds.add(userId);
-    notifyListeners();
-  }
-
-  /// Unregisters an active remote user track.
-  void removeActiveRemoteUser(String userId) {
-    if (_activeRemoteUserIds.remove(userId)) {
+    if (_isDisposed) return;
+    if (_activeRemoteUserIds.add(userId)) {
       notifyListeners();
     }
   }
 
-  /// Returns whether a participant is currently speaking.
-  bool isUserSpeaking(String userId) => _speakingUsers[userId] == true;
-
-  /// Updates the speaking status for a given user.
-  void updateUserSpeaking(String userId, bool isSpeaking) {
+  /// Unregisters an active remote user track.
+  void removeActiveRemoteUser(String userId) {
     if (_isDisposed) return;
-    if (_speakingUsers[userId] == isSpeaking) return;
-    _speakingUsers[userId] = isSpeaking;
-    speakingUsersNotifier.value =
-        Map<String, bool>.unmodifiable(_speakingUsers);
-    notifyListeners();
+    if (_activeRemoteUserIds.remove(userId)) {
+      notifyListeners();
+    }
   }
 
   /// Resets state when disconnecting or leaving room.
@@ -744,20 +699,10 @@ class RoomState extends ChangeNotifier {
     _userId = null;
     _role = UserRole.viewer;
     _roomMode = RoomMode.solo;
-    if (!_isDisposed) {
-      try {
-        roomModeNotifier.value = RoomMode.solo;
-      } catch (_) {}
-      try {
-        pkScoreNotifier.value = const PkScore();
-      } catch (_) {}
-      try {
-        activeSeatsNotifier.value = const [];
-      } catch (_) {}
-      try {
-        occupiedSeatsCountNotifier.value = 0;
-      } catch (_) {}
-    }
+    roomModeNotifier.value = RoomMode.solo;
+    pkScoreNotifier.value = const PkScore();
+    speakingUsersNotifier.value = {};
+    _speakingUsers.clear();
     _viewersCount = 0;
     _hostCoinBalance = 0;
     _userCoinBalance = 0;
@@ -769,36 +714,26 @@ class RoomState extends ChangeNotifier {
     _recentGifts.clear();
     _pendingSeatRequests.clear();
     _pendingInvites.clear();
-    _speakingUsers.clear();
-    try {
-      speakingUsersNotifier.value = const {};
-    } catch (_) {}
+    _userAudioMuteStates.clear();
+    _userCameraOffStates.clear();
     _activePK = null;
     notifyListeners();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
   }
 
   @override
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;
-    try {
-      roomModeNotifier.dispose();
-    } catch (_) {}
-    try {
-      pkScoreNotifier.dispose();
-    } catch (_) {}
-    try {
-      showJoinMessagesNotifier.dispose();
-    } catch (_) {}
-    try {
-      activeSeatsNotifier.dispose();
-    } catch (_) {}
-    try {
-      occupiedSeatsCountNotifier.dispose();
-    } catch (_) {}
-    try {
-      speakingUsersNotifier.dispose();
-    } catch (_) {}
+    roomModeNotifier.dispose();
+    pkScoreNotifier.dispose();
+    speakingUsersNotifier.dispose();
     super.dispose();
   }
 }

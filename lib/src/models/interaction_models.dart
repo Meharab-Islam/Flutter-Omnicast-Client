@@ -61,6 +61,7 @@ class GiftEvent {
   final String giftId;
   final String giftName;
   final String? giftIconUrl;
+  final String? giftSoundUrl;
   final String senderId;
   final String senderName;
   final String? targetUserId;
@@ -73,6 +74,7 @@ class GiftEvent {
     required this.giftId,
     required this.giftName,
     this.giftIconUrl,
+    this.giftSoundUrl,
     required this.senderId,
     required this.senderName,
     this.targetUserId,
@@ -83,68 +85,49 @@ class GiftEvent {
   });
 
   factory GiftEvent.fromJson(Map<String, dynamic> json) {
-    final amount = (json['amount'] as num?)?.toInt() ?? 1;
-    final coinVal =
-        (json['coin_value'] as num?)?.toInt() ??
-        (json['coins'] as num?)?.toInt() ??
-        (json['points_added'] as num?)?.toInt() ??
-        (json['points'] as num?)?.toInt() ??
-        0;
-    final totalHostCoins =
-        (json['host_total_coins'] as num?)?.toInt() ??
-        (json['host_coin_balance'] as num?)?.toInt() ??
-        (json['new_score'] as num?)?.toInt() ??
-        (json['host_a_points'] as num?)?.toInt() ??
-        0;
-
     return GiftEvent(
-      giftId: json['gift_id'] as String? ?? json['gift'] as String? ?? '',
-      giftName:
-          json['gift_name'] as String? ??
-          json['gift'] as String? ??
-          json['gift_id'] as String? ??
-          'Gift',
-      giftIconUrl: json['gift_icon_url'] as String?,
+      giftId: json['gift_id'] as String? ?? '',
+      giftName: json['gift_name'] as String? ?? 'Gift',
+      giftIconUrl: json['gift_icon_url'] as String? ??
+          json['giftIconUrl'] as String? ??
+          json['icon_url'] as String? ??
+          json['image'] as String?,
+      giftSoundUrl: json['gift_sound_url'] as String? ??
+          json['giftSoundUrl'] as String? ??
+          json['gift_sound'] as String? ??
+          json['sound_url'] as String? ??
+          json['sound'] as String?,
       senderId:
-          json['sender_id'] as String? ??
-          json['user_id'] as String? ??
-          json['sender'] as String? ??
-          '',
+          json['sender_id'] as String? ?? json['user_id'] as String? ?? '',
       senderName: json['sender_name'] as String? ?? 'Anonymous',
-      targetUserId:
-          json['target_user_id'] as String? ??
-          json['target_host_id'] as String? ??
-          json['receiver_id'] as String? ??
-          json['host_id'] as String?,
-      amount: amount,
-      coinValue: coinVal,
-      hostTotalCoins: totalHostCoins,
+      targetUserId: json['target_user_id'] as String?,
+      amount: (json['amount'] as num?)?.toInt() ?? 1,
+      coinValue: (json['coin_value'] as num?)?.toInt() ?? 0,
+      hostTotalCoins:
+          (json['host_total_coins'] as num?)?.toInt() ??
+          (json['host_coin_balance'] as num?)?.toInt() ??
+          0,
       timestamp: json['timestamp'] != null
           ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
           : DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    final totalCoins = coinValue > 0 ? (coinValue * amount) : amount;
-    return {
-      'gift_id': giftId,
-      'gift_name': giftName,
-      'gift': giftName,
+  Map<String, dynamic> toJson() => {
+    'gift_id': giftId,
+    'gift_name': giftName,
+    if (giftIconUrl != null && giftIconUrl!.isNotEmpty)
       'gift_icon_url': giftIconUrl,
-      'sender_id': senderId,
-      'sender_name': senderName,
-      'target_user_id': targetUserId,
-      'target_host_id': targetUserId,
-      'receiver_id': targetUserId,
-      'amount': amount,
-      'coin_value': coinValue,
-      'coins': totalCoins,
-      'points': totalCoins,
-      'host_total_coins': hostTotalCoins,
-      'timestamp': timestamp.toIso8601String(),
-    };
-  }
+    if (giftSoundUrl != null && giftSoundUrl!.isNotEmpty)
+      'gift_sound_url': giftSoundUrl,
+    'sender_id': senderId,
+    'sender_name': senderName,
+    'target_user_id': targetUserId,
+    'amount': amount,
+    'coin_value': coinValue,
+    'host_total_coins': hostTotalCoins,
+    'timestamp': timestamp.toIso8601String(),
+  };
 }
 
 /// Coin balance update event for the user or host.

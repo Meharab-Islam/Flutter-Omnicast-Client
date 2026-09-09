@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import '../core/omnicast_client.dart';
 import '../media/media_controller.dart';
 import '../media/media_stream_manager.dart';
 
@@ -58,95 +57,82 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   bool _isMounted = false;
   String? _lastAdaptiveLayer;
 
-  bool get _isLocalUser {
-    final uid = widget.userId;
-    if (uid == null || uid.isEmpty || uid == 'local') return true;
-    final client = OmniCastClient.instance;
-    if (client != null) {
-      if (client.userId != null && client.userId == uid) return true;
-      if (client.room.userId != null && client.room.userId == uid) return true;
-    }
-    return false;
-  }
-
   bool get _effectiveMirror {
     if (widget.mirror != null) return widget.mirror!;
-    return _isLocalUser; // Local front camera = true, Remote streams = false (never mirrored)
+    final isLocal = widget.userId == null || widget.userId == 'local';
+    return isLocal; // Local front camera = true, Remote streams = false (never mirrored)
   }
 
   @override
   void initState() {
     super.initState();
     _isMounted = true;
-    widget.mediaStreamManager.addListener(_onMediaManagerChanged);
+    widget.mediaStreamManager.addListener(_onStreamManagerChanged);
     _initializeLazyRenderer();
-  }
-
-  void _onMediaManagerChanged() {
-    if (!_isMounted) return;
-    final isLocal = _isLocalUser;
-    RTCVideoRenderer? r;
-    if (isLocal) {
-      r = widget.mediaStreamManager.localRenderer;
-    } else {
-      r = widget.mediaStreamManager.getRenderer(widget.userId);
-    }
-    if (r != null && r != _renderer) {
-      setState(() {
-        _renderer = r;
-      });
-      widget.onRendererReady?.call(r);
-    } else if (r == null && widget.userId != null && !isLocal) {
-      _initializeLazyRenderer();
-    } else if (_renderer != null && _renderer!.srcObject != null) {
-      setState(() {});
-    }
   }
 
   @override
   void didUpdateWidget(covariant OmniCastVideoView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.mediaStreamManager != widget.mediaStreamManager) {
-      oldWidget.mediaStreamManager.removeListener(_onMediaManagerChanged);
-      widget.mediaStreamManager.addListener(_onMediaManagerChanged);
-      _cleanupRenderer();
-      _initializeLazyRenderer();
-    } else if (oldWidget.userId != widget.userId) {
-      _cleanupRenderer();
-      _initializeLazyRenderer();
+      oldWidget.mediaStreamManager.removeListener(_onStreamManagerChanged);
+      widget.mediaStreamManager.addListener(_onStreamManagerChanged);
+    }
+    if (oldWidget.userId != widget.userId) {
+      _onStreamManagerChanged();
     }
   }
 
-  /// Lazy initialization: binds directly to shared renderer from MediaStreamManager
-  /// to eliminate duplicate EGL contexts.
+  void _onStreamManagerChanged() {
+    if (!_isMounted || _renderer == null) return;
+    final isLocal = widget.userId == null || widget.userId == 'local';
+    final targetStream = isLocal
+        ? widget.mediaStreamManager.localStream
+        : widget.mediaStreamManager.getRemoteStream(widget.userId);
+
+    if (_renderer!.srcObject != targetStream) {
+      _renderer!.srcObject = targetStream;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  /// Lazy initialization: only allocate renderer resources when mounted in widget tree.
   Future<void> _initializeLazyRenderer() async {
-    final isLocal = _isLocalUser;
-    RTCVideoRenderer? renderer;
-    if (isLocal) {
-      renderer = widget.mediaStreamManager.localRenderer;
-      if (renderer == null && widget.mediaStreamManager.localStream != null) {
-        renderer = await widget.mediaStreamManager.initLocalRenderer();
+    try {
+      final renderer = RTCVideoRenderer();
+      await renderer.initialize();
+
+      if (!_isMounted) {
+        await renderer.dispose();
+        return;
       }
-    } else if (widget.userId != null) {
-      renderer = widget.mediaStreamManager.getRenderer(widget.userId);
-      if (renderer == null) {
-        final canonicalId =
-            widget.mediaStreamManager.resolveUserId(widget.userId!);
-        if (widget.mediaStreamManager.remoteStreams.containsKey(canonicalId) ||
-            widget.userId == 'host') {
-          renderer = await widget.mediaStreamManager
-              .getOrCreateRemoteRenderer(canonicalId);
+
+      final isLocal = widget.userId == null || widget.userId == 'local';
+      if (isLocal) {
+        if (widget.mediaStreamManager.localStream != null) {
+          renderer.srcObject = widget.mediaStreamManager.localStream;
+        }
+      } else {
+        final remoteStream =
+            widget.mediaStreamManager.getRemoteStream(widget.userId);
+        if (remoteStream != null) {
+          renderer.srcObject = remoteStream;
         }
       }
-    }
 
-    if (!_isMounted) return;
-
-    if (renderer != null) {
-      setState(() {
-        _renderer = renderer;
-      });
-      widget.onRendererReady?.call(renderer);
+      if (_isMounted) {
+        setState(() {
+          _renderer = renderer;
+        });
+        widget.onRendererReady?.call(renderer);
+      } else {
+        renderer.srcObject = null;
+        await renderer.dispose();
+      }
+    } catch (e) {
+      // Graceful fallback if device has temporarily reached EGL context limits
     }
   }
 
@@ -154,7 +140,7 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
     if (!widget.enableAdaptiveStreaming ||
         widget.mediaController == null ||
         widget.userId == null ||
-        _isLocalUser) {
+        widget.userId == 'local') {
       return;
     }
 
@@ -177,14 +163,18 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   }
 
   void _cleanupRenderer() {
-    _renderer = null;
+    if (_renderer != null) {
+      _renderer!.srcObject = null;
+      _renderer!.dispose();
+      _renderer = null;
+    }
   }
 
-  /// Aggressive Disposal: Free VRAM and detach listeners immediately on unmount.
+  /// Aggressive Disposal: Free VRAM and hardware resources immediately on unmount.
   @override
   void dispose() {
     _isMounted = false;
-    widget.mediaStreamManager.removeListener(_onMediaManagerChanged);
+    widget.mediaStreamManager.removeListener(_onStreamManagerChanged);
     _cleanupRenderer();
     super.dispose();
   }

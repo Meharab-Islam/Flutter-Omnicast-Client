@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../api/omnicast_api.dart';
 import '../datachannel/data_channel_manager.dart';
@@ -55,28 +54,12 @@ class OmniCastClient {
 
   final List<StreamSubscription> _subscriptions = [];
   bool _isDisposed = false;
+  final ValueNotifier<List<RoomModel>> _liveRoomsNotifier =
+      ValueNotifier<List<RoomModel>>([]);
   Timer? _roomsWatchTimer;
 
-  /// Reactive notifier holding the list of active live broadcasting rooms.
-  /// Automatically updated when [watchLiveRooms] is called or via signaling room events.
-  final ValueNotifier<List<RoomModel>> liveRoomsNotifier =
-      ValueNotifier<List<RoomModel>>(const []);
-
-  OmniCastClient._internal({
-    required this.config,
-    this.mediaConfig = const GlobalMediaConfig(),
-    required SignalingClient signalingClient,
-    required MediaStreamManager mediaStreamManager,
-    required WebRTCManager webRTCManager,
-    required RoomState roomState,
-  }) : _signalingClient = signalingClient,
-       _mediaStreamManager = mediaStreamManager,
-       _webRTCManager = webRTCManager,
-       _roomState = roomState {
-    instance = this;
-    _initSubManagers();
-    _bindInternalEventListeners();
-  }
+  /// Real-time live rooms notifier for UI builders and reactive listeners.
+  ValueNotifier<List<RoomModel>> get liveRoomsNotifier => _liveRoomsNotifier;
 
   factory OmniCastClient.custom({
     required OmniCastConfig config,
@@ -86,36 +69,62 @@ class OmniCastClient {
     WebRTCManager? webRTCManager,
     RoomState? roomState,
   }) {
-    final effectiveMediaStreamManager =
-        mediaStreamManager ?? MediaStreamManager();
-    final effectiveSignalingClient =
+    final streamManager = mediaStreamManager ?? MediaStreamManager();
+    final signaling =
         signalingClient ??
         SignalingClient(heartbeatInterval: config.heartbeatInterval);
-    final effectiveRoomState = roomState ?? RoomState();
-    final effectiveWebRTCManager =
+    final state = roomState ?? RoomState();
+    final rtcManager =
         webRTCManager ??
         WebRTCManager(
-          mediaStreamManager: effectiveMediaStreamManager,
+          mediaStreamManager: streamManager,
           configuration: {
             'iceServers': config.iceServers,
             'sdpSemantics': 'unified-plan',
           },
         );
 
-    return OmniCastClient._internal(
+    return OmniCastClient._raw(
       config: config,
       mediaConfig: mediaConfig,
-      signalingClient: effectiveSignalingClient,
-      mediaStreamManager: effectiveMediaStreamManager,
-      webRTCManager: effectiveWebRTCManager,
-      roomState: effectiveRoomState,
+      signalingClient: signaling,
+      mediaStreamManager: streamManager,
+      webRTCManager: rtcManager,
+      roomState: state,
     );
+  }
+
+  OmniCastClient._raw({
+    required this.config,
+    this.mediaConfig = const GlobalMediaConfig(),
+    required SignalingClient signalingClient,
+    required MediaStreamManager mediaStreamManager,
+    required WebRTCManager webRTCManager,
+    required RoomState roomState,
+  })  : _mediaStreamManager = mediaStreamManager,
+        _signalingClient = signalingClient,
+        _webRTCManager = webRTCManager,
+        _roomState = roomState {
+    instance = this;
+    _initSubManagers();
+    _bindInternalEventListeners();
   }
 
   factory OmniCastClient._({
     required OmniCastConfig config,
-    GlobalMediaConfig mediaConfig,
-  }) = OmniCastClient.custom;
+    GlobalMediaConfig mediaConfig = const GlobalMediaConfig(),
+    SignalingClient? signalingClient,
+    MediaStreamManager? mediaStreamManager,
+    WebRTCManager? webRTCManager,
+    RoomState? roomState,
+  }) => OmniCastClient.custom(
+        config: config,
+        mediaConfig: mediaConfig,
+        signalingClient: signalingClient,
+        mediaStreamManager: mediaStreamManager,
+        webRTCManager: webRTCManager,
+        roomState: roomState,
+      );
 
   /// Master toggle for console logs across the SDK (WebRTC, signaling, media).
   static bool get enableLogging => OmniCastLogger.enableLogging;
@@ -155,16 +164,6 @@ class OmniCastClient {
   }) async {
     OmniCastLogger.enableLogging = enableLogging;
 
-    // Initialize WebRTC engine with loopback adapter ignored and internal C++ logs silenced
-    try {
-      await WebRTC.initialize(
-        options: {
-          'logSeverity': enableLogging ? 'warning' : 'none',
-          'networkIgnoreMask': ['adapterTypeLoopback'],
-        },
-      );
-    } catch (_) {}
-
     final config = OmniCastConfig.fromServer(
       serverUrl: serverUrl,
       hostUrl: hostUrl,
@@ -193,31 +192,8 @@ class OmniCastClient {
     );
     instance = client;
 
-    // 🚀 Extract token claims and initialize session state immediately
-    if (token != null && token.isNotEmpty) {
-      try {
-        final parts = token.split('.');
-        if (parts.length >= 2) {
-          final normalized = base64Url.normalize(parts[1]);
-          final payload = jsonDecode(utf8.decode(base64Url.decode(normalized)))
-              as Map<String, dynamic>;
-          final uId =
-              (payload['userId'] ?? payload['user_id'] ?? payload['sub'])
-                  ?.toString();
-          final rId = (payload['roomId'] ?? payload['room_id'])?.toString();
-          final rRole = payload['role']?.toString();
-          if (uId != null && rId != null) {
-            final roleEnum = (rRole == 'host' || rRole == 'publisher')
-                ? UserRole.host
-                : (rRole == 'cohost' ? UserRole.coHost : UserRole.viewer);
-            client._roomState.setSession(
-              roomId: rId,
-              userId: uId,
-              role: roleEnum,
-            );
-          }
-        }
-      } catch (_) {}
+    if (autoWatchRooms) {
+      client.startWatchingRooms(interval: watchRoomsInterval);
     }
 
     if (autoConnect) {
@@ -232,10 +208,35 @@ class OmniCastClient {
         );
       }
     }
-    if (autoWatchRooms) {
-      client.watchLiveRooms(interval: watchRoomsInterval);
-    }
     return client;
+  }
+
+  /// Starts polling the live rooms endpoint at the specified interval and updating [liveRoomsNotifier].
+  void startWatchingRooms({Duration interval = const Duration(seconds: 5)}) {
+    stopWatchingRooms();
+    updateLiveRooms();
+    _roomsWatchTimer = Timer.periodic(interval, (_) => updateLiveRooms());
+  }
+
+  /// Stops periodic room list watching.
+  void stopWatchingRooms() {
+    _roomsWatchTimer?.cancel();
+    _roomsWatchTimer = null;
+  }
+
+  /// Fetches the latest live rooms and updates [liveRoomsNotifier].
+  Future<List<RoomModel>> updateLiveRooms() async {
+    if (_isDisposed) return [];
+    try {
+      final rooms = await _api.getLiveRooms();
+      if (!_isDisposed) {
+        _liveRoomsNotifier.value = rooms;
+      }
+      return rooms;
+    } catch (e) {
+      OmniCastLogger.error('[OmniCastClient] Error updating live rooms: $e');
+      return _liveRoomsNotifier.value;
+    }
   }
 
   /// Creates and starts a new live broadcasting room as Host.
@@ -314,9 +315,6 @@ class OmniCastClient {
       webRTCManager: _webRTCManager,
       roomState: _roomState,
     );
-    _webRTCManager.onPeerConnectionCreated = (pc) {
-      _dataChannelManager.attachIncomingChannel(pc);
-    };
   }
 
   // Sub-module Getters
@@ -332,6 +330,7 @@ class OmniCastClient {
   MediaStreamManager get mediaStreamManager => _mediaStreamManager;
   String? get userId => _roomState.userId;
   String? get roomId => _roomState.roomId;
+  String? get hostId => _roomState.hostId;
   SignalingClient get signaling => _signalingClient;
   SignalingClient get signalingClient => _signalingClient;
   WebRTCManager get webrtc => _webRTCManager;
@@ -350,29 +349,8 @@ class OmniCastClient {
   Stream<String> get onParticipantLeft => _roomManager.onParticipantLeft;
   Stream<OmniCastParticipant> get onUserJoined => _roomManager.onUserJoined;
   Stream<String> get onUserLeft => _roomManager.onUserLeft;
-  Stream<SignalingMessage> get onViewerUpdate =>
-      _signalingClient.onViewerUpdate;
-  Stream<SignalingMessage> get onPresenceUpdate =>
-      _signalingClient.onPresenceUpdate;
   Stream<SignalingMessage> get onMediaStateChanged =>
       _signalingClient.onMediaStateChanged;
-  Stream<ChatMessage> get onChat => _interactionManager.chatStream;
-  Stream<GiftEvent> get onGift => _interactionManager.giftStream;
-  Stream<PKBattleInfo> get onPKStarted => _pkManager.onPKStarted;
-  Stream<PKScoreUpdate> get onPKScoreUpdated => _pkManager.onPKScoreUpdated;
-  Stream<PKTimerTick> get onPKTimerTick => _pkManager.onPKTimerTick;
-  Stream<String> get onPKEnded => _pkManager.onPKEnded;
-  Stream<SignalingMessage> get onPKRequested => _pkManager.onPKRequested;
-  Stream<SignalingMessage> get onSeatUpdated => _signalingClient.onSeatUpdated;
-  Stream<SignalingMessage> get onSeatKicked => _signalingClient.onSeatKicked;
-  Stream<SignalingMessage> get onLayerSwitched =>
-      _signalingClient.onLayerSwitched;
-  Stream<SignalingMessage> get onViewportUpdated =>
-      _signalingClient.onViewportUpdated;
-  Stream<SignalingMessage> get onLeaveAcknowledged =>
-      _signalingClient.onLeaveAcknowledged;
-  Stream<List<RoomModel>> get onLiveRoomsUpdated =>
-      _signalingClient.onRoomListReceived;
 
   // Real-time Reactive ValueListenable Notifiers for UI Composition
   ValueNotifier<List<OmniCastParticipant>> get viewersNotifier =>
@@ -386,20 +364,6 @@ class OmniCastClient {
   bool get showJoinMessages => _roomState.showJoinMessages;
   set showJoinMessages(bool value) => _roomState.showJoinMessages = value;
 
-  // Stage Seat Facades
-  ValueNotifier<List<StageSeat>> get activeSeatsNotifier =>
-      _seatManager.activeSeatsNotifier;
-  ValueNotifier<List<SeatRequest>> get pendingSeatRequestsNotifier =>
-      _seatManager.pendingSeatRequestsNotifier;
-  ValueNotifier<int> get occupiedSeatsCountNotifier =>
-      _seatManager.occupiedSeatsCountNotifier;
-  List<StageSeat> get occupiedSeats => _seatManager.occupiedSeats;
-  int get occupiedSeatsCount => _seatManager.occupiedSeatsCount;
-  StageSeat? getSeat(int seatIndex) => _seatManager.getSeat(seatIndex);
-  StageSeat? getSeatOfUser(String userId) => _seatManager.getSeatOfUser(userId);
-  bool isUserMuted(String userId) => _seatManager.isUserMuted(userId);
-  bool isUserCameraOff(String userId) => _seatManager.isUserCameraOff(userId);
-
   /// Host action: Kicks/ejects a participant out of the live room.
   void kickUser(String targetUserId, {String? reason}) =>
       _roomManager.kickUser(targetUserId, reason: reason);
@@ -407,9 +371,6 @@ class OmniCastClient {
   /// Host action alias: Kicks/ejects a participant out of the live room.
   void kickParticipant(String targetUserId, {String? reason}) =>
       _roomManager.kickUser(targetUserId, reason: reason);
-
-  /// Requests a fresh room state snapshot from the server.
-  void requestRoomInfoSync() => _roomManager.requestRoomInfoSync();
 
   // Co-Host & Stage Seat Action Facades
   /// Viewer action: Requests to join the broadcast stage as a Co-Host.
@@ -452,87 +413,6 @@ class OmniCastClient {
   /// Host action: Demotes a co-host back to a viewer seat without kicking them.
   void demoteCoHost(String userId) => _seatManager.demoteToViewer(userId);
 
-  /// Host action: Kicks a co-host from their assigned stage seat.
-  void kickSeat(int seatIndex, {String? targetUserId}) =>
-      _seatManager.kickSeat(seatIndex, targetUserId: targetUserId);
-
-  /// Viewer action: Subscribes to a co-host's media stream.
-  void subscribeCoHost(String coHostUserId) =>
-      _seatManager.subscribeCoHost(coHostUserId);
-
-  /// Returns currently pending co-host seat requests.
-  List<SeatRequest> get pendingSeatRequests => _seatManager.pendingSeatRequests;
-
-  /// Returns list of all active stage seats.
-  List<StageSeat> get activeSeats => _seatManager.activeSeats;
-
-  // Social & Interactivity Facades
-  /// Sends a real-time chat message to the room.
-  void sendChat(String text) => _interactionManager.sendChat(text);
-
-  /// Sends a gift to the room host or a specific participant.
-  void sendGift({
-    required String giftId,
-    required int amount,
-    String? targetUserId,
-    String giftName = 'Gift',
-    int coinValue = 0,
-  }) => _interactionManager.sendGift(
-    giftId: giftId,
-    amount: amount,
-    targetUserId: targetUserId,
-    giftName: giftName,
-    coinValue: coinValue,
-  );
-
-  // PK Battle System Facades
-  /// Host action: Sends a cross-room PK battle challenge to an opponent host.
-  void sendPKRequest({
-    required String targetRoomId,
-    required String targetHostId,
-    int durationSeconds = 300,
-  }) => _pkManager.sendPKRequest(
-    targetRoomId: targetRoomId,
-    targetHostId: targetHostId,
-    durationSeconds: durationSeconds,
-  );
-
-  /// Host action: Accepts an incoming PK battle challenge.
-  void acceptPKRequest(
-    String battleId, {
-    String? opponentRoomId,
-    String? opponentHostId,
-  }) => _pkManager.acceptPKRequest(
-    battleId,
-    opponentRoomId: opponentRoomId,
-    opponentHostId: opponentHostId,
-  );
-
-  /// Host action: Rejects an incoming PK challenge.
-  void rejectPKRequest(String battleId) => _pkManager.rejectPKRequest(battleId);
-
-  /// Host action: Terminates an ongoing PK battle.
-  void endPK(String battleId) => _pkManager.endPK(battleId);
-
-  // Media & Hardware Controls
-  /// Toggles local microphone mute state.
-  void setMicrophoneMuted(bool muted) =>
-      _mediaController.setMicrophoneMuted(muted);
-
-  /// Toggles local camera enabled state.
-  void setCameraEnabled(bool enabled) =>
-      _mediaController.setCameraEnabled(enabled);
-
-  /// Switches between front and rear cameras.
-  Future<void> switchCamera() => _mediaController.switchCamera();
-
-  /// Switches simulcast subscription layer ('f', 'h', 'q').
-  void setSimulcastLayer(String layer, {String? targetUserId}) =>
-      _mediaController.setSimulcastLayer(layer, targetUserId: targetUserId);
-
-  /// Requests seamless ICE restart for reconnection.
-  Future<void> requestICERestart() => _mediaController.requestICERestart();
-
   // Co-Host Streams
   /// Stream emitting when a viewer requests to become a co-host (Host listens to this).
   Stream<SeatRequest> get onCoHostRequested =>
@@ -548,6 +428,89 @@ class OmniCastClient {
   /// Stream emitting when the viewer's co-host request is rejected.
   Stream<SignalingMessage> get onCoHostRejected => _seatManager.onSeatRejected;
 
+  /// Stream emitting when any stage seat is updated.
+  Stream<StageSeat> get onSeatUpdated => _seatManager.onSeatUpdated;
+
+  /// Stream emitting when a participant is kicked/demoted from a seat.
+  Stream<SignalingMessage> get onSeatKicked => _signalingClient.onSeatKick;
+
+  /// Host action: Kicks/demotes a seat occupant back to a viewer.
+  void kickSeat(dynamic seat, {String? targetUserId}) =>
+      _seatManager.kickSeat(seat, targetUserId: targetUserId);
+
+  // Interaction Facades
+  /// Stream emitting incoming chat messages.
+  Stream<ChatMessage> get onChat => _interactionManager.chatStream;
+
+  /// Stream emitting incoming gift events.
+  Stream<GiftEvent> get onGift => _interactionManager.giftStream;
+
+  /// Sends a real-time chat message.
+  void sendChat(String text) => _interactionManager.sendChat(text);
+
+  /// Sends a gift to the host or co-host, with optional [giftSoundUrl] and [giftIconUrl].
+  void sendGift({
+    required String giftId,
+    required int amount,
+    String? targetUserId,
+    String giftName = 'Gift',
+    String? giftIconUrl,
+    String? giftSoundUrl,
+    int coinValue = 0,
+  }) => _interactionManager.sendGift(
+    giftId: giftId,
+    amount: amount,
+    targetUserId: targetUserId,
+    giftName: giftName,
+    giftIconUrl: giftIconUrl,
+    giftSoundUrl: giftSoundUrl,
+    coinValue: coinValue,
+  );
+
+  // PK Battle Facades
+  Stream<PKBattleInfo> get onPKStarted => _pkManager.onPKStarted;
+  Stream<PKScoreUpdate> get onPKScoreUpdated => _pkManager.onPKScoreUpdated;
+  Stream<PKTimerTick> get onPKTimerTick => _pkManager.onPKTimerTick;
+  Stream<String> get onPKEnded => _pkManager.onPKEnded;
+
+  /// Sends a PK challenge request to another host.
+  void sendPKRequest({
+    String? targetUserId,
+    String? targetHostId,
+    String? targetRoomId,
+    int duration = 180,
+    int durationSeconds = 180,
+  }) => _pkManager.sendPKRequest(
+    targetHostId: targetHostId ?? targetUserId,
+    targetRoomId: targetRoomId ?? targetHostId ?? targetUserId,
+    durationSeconds: durationSeconds != 180 ? durationSeconds : duration,
+  );
+
+  /// Ends the active PK battle.
+  void endPK([String? battleId]) => _pkManager.endPK(battleId ?? '');
+
+  // Media Control Facades
+  /// Mutes or unmutes the local microphone.
+  void setMicrophoneMuted(bool muted) =>
+      _mediaController.setMicrophoneMuted(muted);
+
+  /// Enables or disables the local camera feed.
+  void setCameraEnabled(bool enabled) =>
+      _mediaController.setCameraEnabled(enabled);
+
+  /// Toggles front and back cameras.
+  Future<void> switchCamera() => _mediaController.switchCamera();
+
+  /// Switches active simulcast layer ('f', 'h', 'q').
+  void setSimulcastLayer(String layer) =>
+      _mediaController.setSimulcastLayer(layer);
+
+  /// Manually triggers an ICE restart on the active room session.
+  Future<void> requestICERestart() => _roomManager.requestICERestart();
+
+  /// Convenience alias for updating live rooms.
+  Future<List<RoomModel>> refreshLiveRooms() => updateLiveRooms();
+
   /// Built-in hardware permission requester for Camera and Microphone.
   ///
   /// Prompts Android and iOS to grant microphone/camera permissions without external plugins.
@@ -558,40 +521,6 @@ class OmniCastClient {
     camera: camera,
     microphone: microphone,
   );
-
-  /// Automatically polls and syncs active live rooms in the background without manual API calls.
-  /// Updates [liveRoomsNotifier] in real-time.
-  Future<List<RoomModel>> watchLiveRooms({
-    Duration interval = const Duration(seconds: 5),
-  }) async {
-    _roomsWatchTimer?.cancel();
-    await refreshLiveRooms();
-    _roomsWatchTimer = Timer.periodic(interval, (_) async {
-      await refreshLiveRooms();
-    });
-    return liveRoomsNotifier.value;
-  }
-
-  /// Stops background polling of live rooms.
-  void stopWatchingRooms() {
-    _roomsWatchTimer?.cancel();
-    _roomsWatchTimer = null;
-  }
-
-  /// Refreshes the active live room list immediately and updates [liveRoomsNotifier].
-  Future<List<RoomModel>> refreshLiveRooms() async {
-    try {
-      final rooms = await _api.getLiveRooms();
-      liveRoomsNotifier.value = List.unmodifiable(rooms);
-      return rooms;
-    } catch (e) {
-      OmniCastLogger.error('[OmniCastClient] refreshLiveRooms error: $e');
-      if (_signalingClient.isConnected) {
-        _signalingClient.requestRoomList();
-      }
-      return liveRoomsNotifier.value;
-    }
-  }
 
   /// REST API: Fetches all active live broadcasting rooms from the backend (`GET /rooms`).
   Future<List<RoomModel>> getLiveRooms({
@@ -608,12 +537,14 @@ class OmniCastClient {
   void _bindInternalEventListeners() {
     // 1. WebRTC Local ICE Candidates -> Signaling Server
     _webRTCManager.onLocalIceCandidate = (candidate) {
-      if (_roomState.isInRoom) {
+      final rId = _roomState.roomId ?? _roomManager.roomId;
+      final uId = _roomState.userId ?? _roomManager.userId;
+      if (rId != null && uId != null) {
         _signalingClient.send(
           SignalingMessage(
             event: SignalingEvents.ice,
-            roomId: _roomState.roomId!,
-            userId: _roomState.userId!,
+            roomId: rId,
+            userId: uId,
             payload: {
               'candidate': candidate.candidate,
               'sdpMid': candidate.sdpMid,
@@ -710,117 +641,98 @@ class OmniCastClient {
       final streamId = stream.id;
       final trackId = track.id ?? '';
       final hostId = _roomState.hostId;
-      final roomId = _roomState.roomId;
-      final isCurrentHost =
-          _roomState.isHost ||
-          (_roomState.userId != null && _roomState.userId == hostId);
 
-      // 1. If track ID has cohost_ prefix (e.g. cohost_user123_video), extract cohost user ID
-      var cohostUserId = '';
-      if (trackId.startsWith('cohost_')) {
-        final withoutPrefix = trackId.substring('cohost_'.length);
-        final lastUnderscore = withoutPrefix.lastIndexOf('_');
-        if (lastUnderscore > 0) {
-          cohostUserId = withoutPrefix.substring(0, lastUnderscore);
-        } else {
-          cohostUserId = withoutPrefix;
-        }
-        if (cohostUserId.isNotEmpty) {
-          await _mediaStreamManager.attachRemoteStream(cohostUserId, stream);
-          _roomState.addActiveRemoteUser(cohostUserId);
-        }
+      OmniCastLogger.log(
+        '[OmniCastClient] onRemoteTrack: trackId=$trackId, streamId=$streamId, hostId=$hostId',
+      );
+
+      await _mediaStreamManager.attachRemoteStream(streamId, stream);
+      _roomState.addActiveRemoteUser(streamId);
+
+      // Extract numeric ID from streamId/trackId if available (e.g., 3319 from 3319_Softin Global)
+      final streamNumMatch = RegExp(r'\d+').firstMatch(streamId)?.group(0);
+      if (streamNumMatch != null && streamNumMatch.isNotEmpty) {
+        _mediaStreamManager.registerAlias('user_$streamNumMatch', streamId);
+        _mediaStreamManager.registerAlias(streamNumMatch, streamId);
+        await _mediaStreamManager.attachRemoteStream('user_$streamNumMatch', stream);
+        await _mediaStreamManager.attachRemoteStream(streamNumMatch, stream);
       }
 
-      // 2. Check if streamId directly matches an active co-host seat user
-      if (cohostUserId.isEmpty) {
+      // 1. Identify if this track belongs to a co-host or specific seated user
+      String? matchedUserId;
+      bool isCoHostTrack = false;
+
+      if (trackId.startsWith('cohost_') || streamId.startsWith('cohost_')) {
+        isCoHostTrack = true;
+        final raw = trackId.startsWith('cohost_') ? trackId : streamId;
+        final parts = raw.split('_');
+        if (parts.length >= 3 && (parts[1] == 'video' || parts[1] == 'audio')) {
+          matchedUserId = parts.sublist(2).join('_');
+        } else if (parts.length >= 2) {
+          matchedUserId = parts.sublist(1).join('_');
+        }
+      } else if (trackId.startsWith('pk-') || streamId.startsWith('pk-')) {
+        isCoHostTrack = true;
+        final raw = trackId.startsWith('pk-') ? trackId : streamId;
+        matchedUserId = raw;
+      } else {
+        // If it does NOT start with cohost_ or pk-, check if it explicitly matches an active seated co-host
         for (final seat in _roomState.activeSeats) {
-          if (seat.isOccupied && seat.userId != null) {
-            final uId = seat.userId!;
-            if (streamId == uId ||
-                streamId.contains(uId) ||
-                trackId.contains(uId)) {
-              cohostUserId = uId;
-              await _mediaStreamManager.attachRemoteStream(uId, stream);
-              _roomState.addActiveRemoteUser(uId);
+          final sUser = seat.userId;
+          if (sUser != null && sUser.isNotEmpty && sUser != hostId && sUser != 'host') {
+            if (streamId == sUser || trackId == sUser) {
+              matchedUserId = sUser;
+              isCoHostTrack = true;
               break;
             }
           }
         }
       }
 
-      // 3. Fallback matching for Host client:
-      // Any remote track received by the Host is GUARANTEED to be from a Co-Host!
-      if (isCurrentHost && cohostUserId.isEmpty) {
-        for (final seat in _roomState.activeSeats) {
-          if (seat.isOccupied &&
-              seat.userId != null &&
-              seat.userId != _roomState.userId) {
-            final uId = seat.userId!;
-            cohostUserId = uId;
-            await _mediaStreamManager.attachRemoteStream(uId, stream);
-            _roomState.addActiveRemoteUser(uId);
-            break;
-          }
+      if (!isCoHostTrack) {
+        // 🚀 Main Host Track: Always attach to 'host' and targetHost alias
+        final targetHost =
+            (hostId != null && hostId.isNotEmpty && hostId != 'local')
+                ? hostId
+                : 'host';
+        final currentRoomId = _roomState.roomId;
+        if (currentRoomId != null && currentRoomId.isNotEmpty) {
+          _mediaStreamManager.registerAlias(currentRoomId, 'host');
+          _mediaStreamManager.registerAlias(currentRoomId, targetHost);
+          _mediaStreamManager.registerAlias('host', currentRoomId);
+          _mediaStreamManager.registerAlias(targetHost, currentRoomId);
+          await _mediaStreamManager.attachRemoteStream(currentRoomId, stream);
+        }
+        _mediaStreamManager.registerAlias('host', targetHost);
+        _mediaStreamManager.registerAlias(targetHost, 'host');
+        _mediaStreamManager.registerAlias(streamId, targetHost);
+        _mediaStreamManager.registerAlias(streamId, 'host');
+        await _mediaStreamManager.attachRemoteStream('host', stream);
+        await _mediaStreamManager.attachRemoteStream(targetHost, stream);
+        _roomState.addActiveRemoteUser('host');
+        _roomState.addActiveRemoteUser(targetHost);
+
+        final hostNum = RegExp(r'\d+').firstMatch(targetHost)?.group(0);
+        if (hostNum != null && hostNum.isNotEmpty) {
+          _mediaStreamManager.registerAlias('user_$hostNum', targetHost);
+          _mediaStreamManager.registerAlias(hostNum, targetHost);
+          _mediaStreamManager.registerAlias('user_$hostNum', 'host');
+          _mediaStreamManager.registerAlias(hostNum, 'host');
+        }
+      } else {
+        // 🚀 Co-Host Track: Route to dedicated co-host user ID
+        final coHostUser = matchedUserId ?? streamId;
+        _mediaStreamManager.registerAlias(coHostUser, streamId);
+        _mediaStreamManager.registerAlias(streamId, coHostUser);
+        await _mediaStreamManager.attachRemoteStream(coHostUser, stream);
+        _roomState.addActiveRemoteUser(coHostUser);
+
+        final userNum = RegExp(r'\d+').firstMatch(coHostUser)?.group(0);
+        if (userNum != null && userNum.isNotEmpty) {
+          _mediaStreamManager.registerAlias('user_$userNum', coHostUser);
+          _mediaStreamManager.registerAlias(userNum, coHostUser);
         }
       }
-
-      // 4. Fallback matching for Viewer client when a second stream arrives
-      final hasHostStream =
-          _mediaStreamManager.remoteStreams.containsKey('host') ||
-          (hostId != null &&
-              _mediaStreamManager.remoteStreams.containsKey(hostId));
-
-      if (!isCurrentHost && cohostUserId.isEmpty) {
-        if (hasHostStream) {
-          for (final seat in _roomState.activeSeats) {
-            if (seat.isOccupied &&
-                seat.userId != null &&
-                seat.userId != hostId &&
-                seat.userId != _roomState.userId) {
-              final uId = seat.userId!;
-              final existing = _mediaStreamManager.remoteStreams[uId];
-              final needsThisTrack = existing == null ||
-                  (track.kind == 'video' && existing.getVideoTracks().isEmpty) ||
-                  (track.kind == 'audio' && existing.getAudioTracks().isEmpty);
-              if (needsThisTrack) {
-                cohostUserId = uId;
-                await _mediaStreamManager.attachRemoteStream(uId, stream);
-                _roomState.addActiveRemoteUser(uId);
-                break;
-              }
-            }
-          }
-        }
-      }
-
-      // 5. If main host stream (only when not host, and not a cohost track)
-      final isCoHost = cohostUserId.isNotEmpty || trackId.startsWith('cohost_');
-      if (!isCurrentHost && !isCoHost) {
-        final hostKey =
-            (hostId != null && hostId.isNotEmpty) ? hostId : 'host';
-        await _mediaStreamManager.attachRemoteStream(hostKey, stream);
-        _mediaStreamManager.registerAlias('host', hostKey);
-        _mediaStreamManager.registerAlias(hostKey, 'host');
-        if (hostId != null && hostId.isNotEmpty) {
-          _mediaStreamManager.registerAlias(hostId, 'host');
-          _mediaStreamManager.registerAlias('host', hostId);
-        }
-        if (roomId != null && roomId.isNotEmpty) {
-          _mediaStreamManager.registerAlias(roomId, hostKey);
-          _mediaStreamManager.registerAlias(hostKey, roomId);
-        }
-        if (streamId.isNotEmpty && streamId != hostKey) {
-          _mediaStreamManager.registerAlias(streamId, hostKey);
-          _mediaStreamManager.registerAlias(hostKey, streamId);
-        }
-      }
-
-      final peerId = cohostUserId.isNotEmpty
-          ? cohostUserId
-          : (hostId ?? roomId ?? streamId);
-      _roomState.addActiveRemoteUser(peerId);
-      if (roomId != null) _roomState.addActiveRemoteUser(roomId);
-      if (hostId != null) _roomState.addActiveRemoteUser(hostId);
     };
 
     // 3. Signaling State -> RoomState
@@ -833,22 +745,12 @@ class OmniCastClient {
     // 4. Signaling Answer -> WebRTC Manager
     _subscriptions.add(
       _signalingClient.onAnswer.listen((msg) async {
-        final payload = msg.payload;
-        String? sdp;
-        if (payload is Map) {
-          sdp = (payload['sdp'] ?? payload['SDP'])?.toString();
-        } else if (payload is String) {
-          sdp = payload;
-        }
-
-        if (sdp != null && sdp.isNotEmpty) {
-          try {
-            await _webRTCManager.handleRemoteAnswer(sdp);
-          } catch (e) {
-            OmniCastLogger.error(
-              '[OmniCastClient] Error handling remote SDP answer: $e',
-            );
+        try {
+          if (_roomState.isInRoom && msg.payload != null) {
+            await _webRTCManager.handleRemoteAnswer(msg.payload);
           }
+        } catch (e, stack) {
+          OmniCastLogger.error('[OmniCastClient] Error handling remote answer: $e\n$stack');
         }
       }),
     );
@@ -856,18 +758,11 @@ class OmniCastClient {
     // 5. Server-Initiated SDP Offer -> WebRTC Answer -> Reply via Signaling
     _subscriptions.add(
       _signalingClient.onOffer.listen((msg) async {
-        final payload = msg.payload;
-        String? sdp;
-        if (payload is Map) {
-          sdp = (payload['sdp'] ?? payload['SDP'])?.toString();
-        } else if (payload is String) {
-          sdp = payload;
-        }
-
-        if (sdp != null && sdp.isNotEmpty && _roomState.isInRoom) {
-          try {
-            final answer = await _webRTCManager
-                .handleRemoteOfferAndCreateAnswer(sdp);
+        try {
+          if (_roomState.isInRoom && msg.payload != null) {
+            final answer = await _webRTCManager.handleRemoteOfferAndCreateAnswer(
+              msg.payload,
+            );
             _signalingClient.send(
               SignalingMessage(
                 event: SignalingEvents.sdpAnswer,
@@ -876,15 +771,9 @@ class OmniCastClient {
                 payload: {'sdp': answer.sdp, 'type': answer.type},
               ),
             );
-            _signalingClient.requestKeyframe(
-              roomId: _roomState.roomId!,
-              userId: _roomState.userId,
-            );
-          } catch (e) {
-            OmniCastLogger.error(
-              '[OmniCastClient] Error handling remote SDP offer: $e',
-            );
           }
+        } catch (e, stack) {
+          OmniCastLogger.error('[OmniCastClient] Error handling remote offer: $e\n$stack');
         }
       }),
     );
@@ -892,10 +781,12 @@ class OmniCastClient {
     // 6. Incoming ICE Candidates -> WebRTC Manager
     _subscriptions.add(
       _signalingClient.onIceCandidate.listen((msg) async {
-        if (msg.payload is Map<String, dynamic>) {
-          await _webRTCManager.addRemoteCandidate(
-            msg.payload as Map<String, dynamic>,
-          );
+        try {
+          if (msg.payload != null) {
+            await _webRTCManager.addRemoteCandidate(msg.payload);
+          }
+        } catch (e) {
+          OmniCastLogger.error('[OmniCastClient] Error adding remote candidate: $e');
         }
       }),
     );
@@ -905,10 +796,6 @@ class OmniCastClient {
       _signalingClient.onRoomInfoSync.listen((msg) {
         if (msg.payload is Map<String, dynamic>) {
           _roomState.syncRoomInfo(msg.payload as Map<String, dynamic>);
-        } else if (msg.payload is Map) {
-          _roomState.syncRoomInfo(
-            Map<String, dynamic>.from(msg.payload as Map),
-          );
         }
       }),
     );
@@ -916,8 +803,8 @@ class OmniCastClient {
     // 8. Viewer Updates
     _subscriptions.add(
       _signalingClient.onViewerUpdate.listen((msg) {
-        if (msg.payload is Map) {
-          final payload = Map<String, dynamic>.from(msg.payload as Map);
+        if (msg.payload is Map<String, dynamic>) {
+          final payload = msg.payload as Map<String, dynamic>;
           final count =
               (payload['viewers_count'] as num?)?.toInt() ??
               (payload['viewer_count'] as num?)?.toInt() ??
@@ -925,10 +812,7 @@ class OmniCastClient {
           List<Participant>? viewersList;
           if (payload['viewers'] is List) {
             viewersList = (payload['viewers'] as List)
-                .map(
-                  (e) =>
-                      Participant.fromJson(Map<String, dynamic>.from(e as Map)),
-                )
+                .map((e) => Participant.fromJson(e as Map<String, dynamic>))
                 .toList();
           }
           _roomState.updateViewers(count: count, viewersList: viewersList);
@@ -946,52 +830,17 @@ class OmniCastClient {
     // 10. Seat Invites & Requests
     _subscriptions.add(
       _signalingClient.onMessage.listen((msg) {
-        if (msg.event == SignalingEvents.seatInvite && msg.payload is Map) {
+        if (msg.event == SignalingEvents.seatInvite &&
+            msg.payload is Map<String, dynamic>) {
           _roomState.addInvite(
-            CoHostInvite.fromJson(
-              Map<String, dynamic>.from(msg.payload as Map),
-            ),
+            CoHostInvite.fromJson(msg.payload as Map<String, dynamic>),
           );
-        } else if ((msg.event == SignalingEvents.pinStage ||
-                msg.event == 'main_seat_changed') &&
-            msg.payload is Map) {
-          final payload = Map<String, dynamic>.from(msg.payload as Map);
-          final target =
-              payload['pinned_user_id'] as String? ??
-              payload['target_id'] as String? ??
-              payload['main_seat_id'] as String?;
-          final pinned =
-              (target != null &&
-                  target.isNotEmpty &&
-                  target != _roomState.hostId &&
-                  target != 'host' &&
-                  target != 'clear' &&
-                  target != 'none')
-              ? target
-              : null;
-          _roomState.setPinnedStageUser(pinned);
-        } else if (msg.event == 'new_cohost' && msg.payload is Map) {
-          final payload = msg.payload as Map;
-          final cohostId = payload['cohost_id']?.toString() ?? msg.userId;
-          final streamId = payload['stream_id']?.toString();
-          if (cohostId.isNotEmpty) {
-            if (streamId != null &&
-                _mediaStreamManager.remoteStreams.containsKey(streamId)) {
-              _mediaStreamManager.attachRemoteStream(
-                cohostId,
-                _mediaStreamManager.remoteStreams[streamId]!,
-              );
-            }
-            _roomState.addActiveRemoteUser(cohostId);
-          }
+        } else if (msg.event == SignalingEvents.pinStage &&
+            msg.payload is Map<String, dynamic>) {
+          _roomState.setPinnedStageUser(
+            msg.payload['pinned_user_id'] as String?,
+          );
         }
-      }),
-    );
-
-    // 11. Room List from WebSocket Signaling
-    _subscriptions.add(
-      _signalingClient.onRoomListReceived.listen((rooms) {
-        liveRoomsNotifier.value = List.unmodifiable(rooms);
       }),
     );
   }
@@ -1001,20 +850,15 @@ class OmniCastClient {
     if (_isDisposed) return;
     _isDisposed = true;
 
-    stopWatchingRooms();
-
-    if (_roomState.isInRoom) {
-      try {
-        await _roomManager.leaveRoom();
-      } catch (_) {}
-    }
-
     for (final sub in _subscriptions) {
       try {
         sub.cancel();
       } catch (_) {}
     }
     _subscriptions.clear();
+
+    stopWatchingRooms();
+    _liveRoomsNotifier.dispose();
 
     _roomManager.dispose();
     _mediaController.dispose();

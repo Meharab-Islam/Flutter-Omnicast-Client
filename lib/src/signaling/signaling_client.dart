@@ -37,11 +37,6 @@ class SignalingClient {
   final _roomInfoController = StreamController<SignalingMessage>.broadcast();
   final _viewerUpdateController =
       StreamController<SignalingMessage>.broadcast();
-  final _presenceUpdateController =
-      StreamController<SignalingMessage>.broadcast();
-  final _userJoinedController =
-      StreamController<OmniCastParticipant>.broadcast();
-  final _userLeftController = StreamController<String>.broadcast();
   final _chatController = StreamController<ChatMessage>.broadcast();
   final _giftController = StreamController<GiftEvent>.broadcast();
   final _seatRequestController = StreamController<SeatRequest>.broadcast();
@@ -49,26 +44,9 @@ class SignalingClient {
   final _seatAcceptController = StreamController<SignalingMessage>.broadcast();
   final _seatRejectController = StreamController<SignalingMessage>.broadcast();
   final _seatLeaveController = StreamController<SignalingMessage>.broadcast();
-  final _seatUpdatedController = StreamController<SignalingMessage>.broadcast();
-  final _seatKickedController = StreamController<SignalingMessage>.broadcast();
   final _mediaStateController = StreamController<SignalingMessage>.broadcast();
-  final _pkStartedController = StreamController<SignalingMessage>.broadcast();
-  final _pkScoreController = StreamController<SignalingMessage>.broadcast();
-  final _pkEndedController = StreamController<SignalingMessage>.broadcast();
-  final _pkGiftOverlayController =
-      StreamController<SignalingMessage>.broadcast();
-  final _layerSwitchedController =
-      StreamController<SignalingMessage>.broadcast();
-  final _viewportUpdatedController =
-      StreamController<SignalingMessage>.broadcast();
-  final _leaveAcknowledgedController =
-      StreamController<SignalingMessage>.broadcast();
   final _roomCreatedController = StreamController<RoomModel>.broadcast();
   final _roomClosedController = StreamController<String>.broadcast();
-  final _roomListController = StreamController<List<RoomModel>>.broadcast();
-
-  final _userSpeakingController =
-      StreamController<SignalingMessage>.broadcast();
 
   // Reconnection state
   bool autoReconnect;
@@ -76,7 +54,7 @@ class SignalingClient {
   int _reconnectAttempts = 0;
 
   SignalingClient({
-    this.heartbeatInterval = const Duration(seconds: 5),
+    this.heartbeatInterval = const Duration(seconds: 15),
     this.autoReconnect = true,
   });
 
@@ -96,10 +74,6 @@ class SignalingClient {
   Stream<SignalingMessage> get onIceCandidate => _iceController.stream;
   Stream<SignalingMessage> get onRoomInfoSync => _roomInfoController.stream;
   Stream<SignalingMessage> get onViewerUpdate => _viewerUpdateController.stream;
-  Stream<SignalingMessage> get onPresenceUpdate =>
-      _presenceUpdateController.stream;
-  Stream<OmniCastParticipant> get onUserJoined => _userJoinedController.stream;
-  Stream<String> get onUserLeft => _userLeftController.stream;
   Stream<ChatMessage> get onChat => _chatController.stream;
   Stream<GiftEvent> get onGift => _giftController.stream;
   Stream<SeatRequest> get onSeatRequest => _seatRequestController.stream;
@@ -107,25 +81,16 @@ class SignalingClient {
   Stream<SignalingMessage> get onSeatAccept => _seatAcceptController.stream;
   Stream<SignalingMessage> get onSeatReject => _seatRejectController.stream;
   Stream<SignalingMessage> get onSeatLeave => _seatLeaveController.stream;
-  Stream<SignalingMessage> get onSeatUpdated => _seatUpdatedController.stream;
-  Stream<SignalingMessage> get onSeatKicked => _seatKickedController.stream;
-  Stream<SignalingMessage> get onPKStarted => _pkStartedController.stream;
-  Stream<SignalingMessage> get onPKScoreUpdate => _pkScoreController.stream;
-  Stream<SignalingMessage> get onPKEnded => _pkEndedController.stream;
-  Stream<SignalingMessage> get onPKGiftOverlay =>
-      _pkGiftOverlayController.stream;
-  Stream<SignalingMessage> get onLayerSwitched =>
-      _layerSwitchedController.stream;
-  Stream<SignalingMessage> get onViewportUpdated =>
-      _viewportUpdatedController.stream;
-  Stream<SignalingMessage> get onLeaveAcknowledged =>
-      _leaveAcknowledgedController.stream;
+  Stream<SignalingMessage> get onSeatKick => _messageController.stream.where(
+    (m) =>
+        m.event == SignalingEvents.seatKick ||
+        m.event == 'seat_demote' ||
+        m.event == 'seat_kick',
+  );
   Stream<SignalingMessage> get onMediaStateChanged =>
       _mediaStateController.stream;
-  Stream<SignalingMessage> get onUserSpeaking => _userSpeakingController.stream;
   Stream<RoomModel> get onRoomCreated => _roomCreatedController.stream;
   Stream<String> get onRoomClosed => _roomClosedController.stream;
-  Stream<List<RoomModel>> get onRoomListReceived => _roomListController.stream;
 
   /// Connects to the OmniCast WebSocket signaling server.
   Future<void> connect({required String wsUrl, String? token}) async {
@@ -145,11 +110,6 @@ class SignalingClient {
 
     try {
       var uri = Uri.parse(_wsUrl!);
-      if (uri.scheme == 'http') {
-        uri = uri.replace(scheme: 'ws');
-      } else if (uri.scheme == 'https') {
-        uri = uri.replace(scheme: 'wss');
-      }
       final queryParams = Map<String, String>.from(uri.queryParameters);
 
       if (_token != null && _token!.isNotEmpty) {
@@ -245,70 +205,14 @@ class SignalingClient {
         break;
 
       case SignalingEvents.roomInfoSync:
-      case SignalingEvents.roomInfo:
-      case 'room_state':
-      case 'sync_state':
         _roomInfoController.add(msg);
         break;
 
-      case 'room_list':
-      case 'rooms':
-        if (msg.payload is List) {
-          try {
-            final list = (msg.payload as List)
-                .map(
-                  (e) =>
-                      RoomModel.fromJson(Map<String, dynamic>.from(e as Map)),
-                )
-                .toList();
-            _roomListController.add(list);
-          } catch (e) {
-            OmniCastLogger.error(
-              '[SignalingClient] Failed to parse room_list: $e',
-            );
-          }
-        }
-        break;
-
       case SignalingEvents.viewerUpdate:
-      case SignalingEvents.viewerCount:
         _viewerUpdateController.add(msg);
-        break;
-
-      case SignalingEvents.presenceUpdate:
-        _presenceUpdateController.add(msg);
-        _viewerUpdateController.add(msg);
-        break;
-
-      case SignalingEvents.userJoined:
-      case 'participant_joined':
-      case 'new_cohost':
-      case 'host_reconnected':
-        if (msg.payload is Map<String, dynamic>) {
-          _userJoinedController.add(
-            OmniCastParticipant.fromJson(msg.payload as Map<String, dynamic>),
-          );
-        } else {
-          _userJoinedController.add(
-            OmniCastParticipant(userId: msg.userId, joinedAt: DateTime.now()),
-          );
-        }
-        break;
-
-      case SignalingEvents.userLeft:
-      case 'participant_left':
-      case 'participant_removed':
-      case 'cohost_left':
-        final leftId = msg.payload is Map && msg.payload['user_id'] != null
-            ? msg.payload['user_id'].toString()
-            : msg.userId;
-        if (leftId.isNotEmpty) {
-          _userLeftController.add(leftId);
-        }
         break;
 
       case SignalingEvents.chat:
-      case SignalingEvents.chatMessage:
         if (msg.payload is Map<String, dynamic>) {
           _chatController.add(
             ChatMessage.fromJson(msg.payload as Map<String, dynamic>),
@@ -328,15 +232,6 @@ class SignalingClient {
 
       case SignalingEvents.gift:
       case SignalingEvents.giftProcessed:
-        if (msg.payload is Map<String, dynamic>) {
-          _giftController.add(
-            GiftEvent.fromJson(msg.payload as Map<String, dynamic>),
-          );
-        }
-        break;
-
-      case SignalingEvents.pkGiftOverlay:
-        _pkGiftOverlayController.add(msg);
         if (msg.payload is Map<String, dynamic>) {
           _giftController.add(
             GiftEvent.fromJson(msg.payload as Map<String, dynamic>),
@@ -377,56 +272,12 @@ class SignalingClient {
         break;
 
       case SignalingEvents.seatLeave:
-      case SignalingEvents.seatLeft:
         _seatLeaveController.add(msg);
-        break;
-
-      case SignalingEvents.seatUpdated:
-        _seatUpdatedController.add(msg);
-        break;
-
-      case SignalingEvents.seatKick:
-      case 'seat_kicked':
-        _seatKickedController.add(msg);
-        break;
-
-      case SignalingEvents.pkStart:
-      case SignalingEvents.pkStarted:
-        _pkStartedController.add(msg);
-        break;
-
-      case SignalingEvents.pkScoreUpdate:
-        _pkScoreController.add(msg);
-        break;
-
-      case SignalingEvents.pkStop:
-      case SignalingEvents.pkEnd:
-      case SignalingEvents.pkEnded:
-        _pkEndedController.add(msg);
-        break;
-
-      case SignalingEvents.layerSwitched:
-        _layerSwitchedController.add(msg);
-        break;
-
-      case SignalingEvents.viewportUpdated:
-        _viewportUpdatedController.add(msg);
-        break;
-
-      case SignalingEvents.leaveAcknowledged:
-        _leaveAcknowledgedController.add(msg);
         break;
 
       case SignalingEvents.mediaStateChanged:
       case SignalingEvents.trackMuted:
-      case SignalingEvents.trackUnmuted:
         _mediaStateController.add(msg);
-        break;
-
-      case 'user_speaking':
-      case 'speaking':
-      case 'speaking_state_changed':
-        _userSpeakingController.add(msg);
         break;
 
       case SignalingEvents.roomCreated:
@@ -480,13 +331,6 @@ class SignalingClient {
   @visibleForTesting
   Future<void> handleRawMessage(dynamic rawData) async {
     _onDataReceived(rawData);
-  }
-
-  /// Requests the active room list from the server over WebSocket signaling.
-  void requestRoomList() {
-    send(
-      SignalingMessage(event: 'get_rooms', roomId: '', userId: _token ?? ''),
-    );
   }
 
   void _scheduleReconnect() {
@@ -601,44 +445,6 @@ class SignalingClient {
     _updateState(ClientConnectionState.disconnected);
   }
 
-  /// Broadcasts the local participant's speaking status to the room.
-  bool sendSpeakingState({
-    required String roomId,
-    required String userId,
-    required bool isSpeaking,
-    double level = 0.0,
-  }) {
-    return send(
-      SignalingMessage(
-        event: 'user_speaking',
-        roomId: roomId,
-        userId: userId,
-        payload: {
-          'user_id': userId,
-          'is_speaking': isSpeaking,
-          'speaking': isSpeaking,
-          'audio_level': level,
-        },
-      ),
-    );
-  }
-
-  /// Requests an immediate unthrottled Keyframe (PLI) from the media server.
-  bool requestKeyframe({required String roomId, String? userId}) {
-    return send(
-      SignalingMessage(
-        event: 'request_keyframe',
-        roomId: roomId,
-        userId: userId ?? '',
-      ),
-    );
-  }
-
-  /// Requests a refreshed list of active broadcast rooms from the server.
-  void fetchRoomList() {
-    requestRoomList();
-  }
-
   /// Permanently disposes the signaling client and closes all broadcast streams.
   Future<void> dispose() async {
     if (_isDisposed) return;
@@ -654,9 +460,6 @@ class SignalingClient {
     await _iceController.close();
     await _roomInfoController.close();
     await _viewerUpdateController.close();
-    await _presenceUpdateController.close();
-    await _userJoinedController.close();
-    await _userLeftController.close();
     await _chatController.close();
     await _giftController.close();
     await _seatRequestController.close();
@@ -664,19 +467,8 @@ class SignalingClient {
     await _seatAcceptController.close();
     await _seatRejectController.close();
     await _seatLeaveController.close();
-    await _seatUpdatedController.close();
-    await _seatKickedController.close();
     await _mediaStateController.close();
-    await _userSpeakingController.close();
-    await _pkStartedController.close();
-    await _pkScoreController.close();
-    await _pkEndedController.close();
-    await _pkGiftOverlayController.close();
-    await _layerSwitchedController.close();
-    await _viewportUpdatedController.close();
-    await _leaveAcknowledgedController.close();
     await _roomCreatedController.close();
     await _roomClosedController.close();
-    await _roomListController.close();
   }
 }

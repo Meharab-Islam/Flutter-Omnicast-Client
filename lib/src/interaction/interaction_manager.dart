@@ -33,7 +33,9 @@ class InteractionManager {
 
   // Pure Stream Getters
   Stream<ChatMessage> get chatStream => _chatController.stream;
+  Stream<ChatMessage> get onChat => _chatController.stream;
   Stream<GiftEvent> get giftStream => _giftReceivedController.stream;
+  Stream<GiftEvent> get onGift => _giftReceivedController.stream;
   Stream<GiftEvent> get onGiftReceived => _giftReceivedController.stream;
   Stream<BalanceUpdate> get onBalanceUpdated =>
       _balanceUpdatedController.stream;
@@ -100,12 +102,14 @@ class InteractionManager {
     _roomState.addChatMessage(msg);
   }
 
-  /// Sends a gift to the room host or a specific co-host [targetUserId].
+  /// Sends a gift to the room host or a specific co-host [targetUserId], with optional [giftSoundUrl] and [giftIconUrl].
   void sendGift({
     required String giftId,
     required int amount,
     String? targetUserId,
     String giftName = 'Gift',
+    String? giftIconUrl,
+    String? giftSoundUrl,
     int coinValue = 0,
   }) {
     if (!_roomState.isInRoom) return;
@@ -113,6 +117,8 @@ class InteractionManager {
     final giftEvent = GiftEvent(
       giftId: giftId,
       giftName: giftName,
+      giftIconUrl: giftIconUrl,
+      giftSoundUrl: giftSoundUrl,
       senderId: _roomState.userId!,
       senderName: _roomState.userId!,
       targetUserId: targetUserId ?? _roomState.hostId,
@@ -124,11 +130,28 @@ class InteractionManager {
 
     _signalingClient.send(
       SignalingMessage(
-        event: SignalingEvents.gift,
+        event: SignalingEvents.giftProcessed,
         roomId: _roomState.roomId!,
         userId: _roomState.userId!,
         targetUser: targetUserId,
         payload: giftEvent.toJson(),
+      ),
+    );
+  }
+
+  /// Sends a like/heart reaction to the room.
+  void sendLike({String emoji = '❤️'}) {
+    if (!_roomState.isInRoom) return;
+    _signalingClient.send(
+      SignalingMessage(
+        event: 'like',
+        roomId: _roomState.roomId!,
+        userId: _roomState.userId!,
+        payload: {
+          'type': 'like',
+          'user': _roomState.userId!,
+          'emoji': emoji,
+        },
       ),
     );
   }

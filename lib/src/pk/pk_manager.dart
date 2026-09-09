@@ -106,29 +106,6 @@ class PKManager {
           }
           break;
 
-        case SignalingEvents.pkGiftOverlay:
-          if (msg.payload is Map<String, dynamic>) {
-            final payload = msg.payload as Map<String, dynamic>;
-            final hostA =
-                (payload['host_a_points'] as num?)?.toInt() ??
-                (payload['room_a_score'] as num?)?.toInt();
-            final hostB =
-                (payload['host_b_points'] as num?)?.toInt() ??
-                (payload['room_b_score'] as num?)?.toInt();
-            if (hostA != null && hostB != null) {
-              final scoreUpdate = PKScoreUpdate(
-                battleId:
-                    payload['session_id'] as String? ??
-                    (_roomState.activePK?.battleId ?? ''),
-                hostScore: hostA,
-                opponentScore: hostB,
-              );
-              _pkScoreController.add(scoreUpdate);
-              _roomState.updatePKScore(scoreUpdate);
-            }
-          }
-          break;
-
         case 'room_mode_changed':
           if (msg.payload is Map<String, dynamic>) {
             final payload = msg.payload as Map<String, dynamic>;
@@ -176,7 +153,6 @@ class PKManager {
 
         case 'pk_ended':
         case SignalingEvents.pkEnd:
-        case SignalingEvents.pkStop:
           final battleId = msg.payload is Map
               ? (msg.payload['battle_id'] as String? ?? '')
               : msg.payload.toString();
@@ -189,23 +165,28 @@ class PKManager {
 
   /// Sends a cross-room PK battle challenge to an opponent host.
   void sendPKRequest({
-    required String targetRoomId,
-    required String targetHostId,
+    String? targetRoomId,
+    String? targetHostId,
     int durationSeconds = 300,
+    int? duration,
   }) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
+    final host = targetHostId ?? '';
+    final room = (targetRoomId != null && targetRoomId.isNotEmpty)
+        ? targetRoomId
+        : host;
+    final dur = duration ?? durationSeconds;
 
     _signalingClient.send(
       SignalingMessage(
         event: SignalingEvents.pkRequest,
         roomId: _roomState.roomId!,
         userId: _roomState.userId!,
-        targetUser: targetRoomId,
+        targetUser: host,
         payload: {
-          'target_room': targetRoomId,
-          'target_room_id': targetRoomId,
-          'target_host_id': targetHostId,
-          'duration_seconds': durationSeconds,
+          'target_room_id': room,
+          'target_host_id': host,
+          'duration_seconds': dur,
         },
       ),
     );
@@ -219,19 +200,15 @@ class PKManager {
   }) {
     if (!_roomState.isInRoom || !_roomState.isHost) return;
 
-    final targetRoom = opponentRoomId ?? '';
     _signalingClient.send(
       SignalingMessage(
         event: SignalingEvents.pkAccept,
         roomId: _roomState.roomId!,
         userId: _roomState.userId!,
-        targetUser: targetRoom,
         payload: {
-          'target_room': targetRoom,
-          'from_room_id': targetRoom,
           'battle_id': battleId,
-          'opponent_room_id': opponentRoomId,
-          'opponent_host_id': opponentHostId,
+          'opponent_room_id': ?opponentRoomId,
+          'opponent_host_id': ?opponentHostId,
         },
       ),
     );
@@ -261,14 +238,10 @@ class PKManager {
 
     _signalingClient.send(
       SignalingMessage(
-        event: SignalingEvents.pkStop,
+        event: SignalingEvents.pkEnd,
         roomId: _roomState.roomId!,
         userId: _roomState.userId!,
-        payload: {
-          'action': 'pk_stop',
-          'room_id': _roomState.roomId!,
-          'battle_id': battleId,
-        },
+        payload: {'battle_id': battleId},
       ),
     );
 

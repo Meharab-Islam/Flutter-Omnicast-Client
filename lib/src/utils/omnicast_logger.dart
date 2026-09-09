@@ -28,7 +28,7 @@ class OmniCastLogger {
   /// Logs an error or warning message to console if [enableLogging] is true.
   static void error(String message, [dynamic error]) {
     if (enableLogging) {
-      debugPrint('$message ${error ?? ""}');
+      debugPrint('[ERROR] $message ${error ?? ""}');
     }
   }
 }

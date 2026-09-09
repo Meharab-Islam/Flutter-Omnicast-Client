@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../core/omnicast_client.dart';
 import '../models/room_models.dart';
 import 'omnicast_speaking_video_tile.dart';
-import 'omnicast_dynamic_stage.dart';
 
 /// Inbuilt reactive live broadcasting canvas that automatically transitions between
 /// Fullscreen Solo, Multi-guest Co-Host, and TikTok-style 50/50 Split-Screen PK Battle
@@ -174,13 +173,47 @@ class OmniCastVideoCanvas extends StatelessWidget {
     );
   }
 
-  /// Multi-Guest Dynamic Co-Host Stage View (1-person Fullscreen / 2x2 Grid)
+  /// Multi-Guest Co-Host Stage View
   Widget _buildCoHostStage(BuildContext context) {
-    return OmniCastDynamicStage(
+    final activeSeats = client.state.activeSeats;
+
+    return GridView.builder(
       key: const ValueKey('cohost_stage_canvas'),
-      client: client,
-      mirrorLocal: mirrorLocal,
-      mirrorRemote: mirrorRemote,
+      padding: const EdgeInsets.fromLTRB(12, 60, 12, 90),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: activeSeats.length,
+      itemBuilder: (context, index) {
+        final seat = activeSeats[index];
+        final userId = seat.userId ?? 'seat_$index';
+        final isLocal = userId == client.state.userId;
+        final renderer = isLocal
+            ? client.streamManager.localRenderer
+            : client.streamManager.getRenderer(userId);
+
+        final isCameraEnabled = isLocal
+            ? client.media.isCameraEnabled
+            : (!client.state.isUserCameraOff(userId) && !seat.isCameraOff);
+        final isMicMuted = isLocal
+            ? client.media.isMicrophoneMuted
+            : (client.state.isUserAudioMuted(userId) || seat.isMuted);
+
+        return OmniCastSpeakingVideoTile(
+          userId: userId,
+          trackId: userId,
+          userName: seat.user?.displayName ?? 'Guest ${index + 1}',
+          avatarUrl: seat.user?.avatarUrl,
+          renderer: renderer,
+          isCameraEnabled: isCameraEnabled,
+          isMicMuted: isMicMuted,
+          mirror: isLocal ? mirrorLocal : mirrorRemote,
+          audioDetector: client.media.audioDetector,
+        );
+      },
     );
   }
 

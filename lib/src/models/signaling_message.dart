@@ -28,25 +28,23 @@ class SignalingMessage {
   });
 
   factory SignalingMessage.fromJson(Map<String, dynamic> json) {
-    dynamic payload = json['payload'];
-    if (payload is Map<String, dynamic>) {
-      payload = <String, dynamic>{...json, ...payload};
-    } else if (payload == null) {
-      const standardKeys = {
-        'event',
-        'action',
-        'room_id',
-        'roomId',
-        'user_id',
-        'userId',
-        'target_user',
-        'targetUser',
-        'payload',
-      };
-      final hasExtraKeys = json.keys.any((k) => !standardKeys.contains(k));
-      if (hasExtraKeys) {
-        payload = json;
-      }
+    var rawPayload = json['payload'];
+    if (rawPayload is String) {
+      try {
+        final decoded = jsonDecode(rawPayload);
+        rawPayload = decoded;
+      } catch (_) {}
+    }
+
+    dynamic finalPayload;
+    if (rawPayload is Map<String, dynamic>) {
+      finalPayload = {...json, ...rawPayload};
+    } else if (rawPayload is Map) {
+      finalPayload = {...json, ...Map<String, dynamic>.from(rawPayload)};
+    } else if (rawPayload != null) {
+      finalPayload = rawPayload;
+    } else {
+      finalPayload = null;
     }
 
     return SignalingMessage(
@@ -55,7 +53,7 @@ class SignalingMessage {
       userId: json['user_id'] as String? ?? json['userId'] as String? ?? '',
       targetUser:
           json['target_user'] as String? ?? json['targetUser'] as String?,
-      payload: payload,
+      payload: finalPayload,
     );
   }
 
@@ -102,44 +100,27 @@ abstract final class SignalingEvents {
   static const String sdpAnswer = 'sdp_answer';
   static const String ice = 'ice';
   static const String candidate = 'candidate';
-  static const String iceRestart = 'ice_restart';
-  static const String restartIce = 'restart_ice';
 
   // Room Actions & Lifecycle
   static const String createRoom = 'create_room';
   static const String joinRoom = 'join_room';
   static const String publish = 'publish';
   static const String leaveRoom = 'leave_room';
-  static const String leave = 'leave';
-  static const String leaveAcknowledged = 'leave_acknowledged';
   static const String kickUser = 'kick_user';
-  static const String kickParticipant = 'kick_participant';
   static const String ping = 'ping';
   static const String pong = 'pong';
-  static const String heartbeat = 'heartbeat';
 
   // State Sync & Participants
   static const String roomInfoSync = 'room_info_sync';
-  static const String roomInfo = 'room_info';
   static const String viewerUpdate = 'viewer_update';
-  static const String viewerCount = 'viewer_count';
-  static const String presenceUpdate = 'presence_update';
   static const String userJoined = 'user_joined';
   static const String userLeft = 'user_left';
   static const String userKicked = 'user_kicked';
-  static const String participantRemoved = 'participant_removed';
-  static const String hostReconnecting = 'host_reconnecting';
-  static const String hostReconnected = 'host_reconnected';
-  static const String participantReconnecting = 'participant_reconnecting';
-  static const String participantReconnected = 'participant_reconnected';
 
   // Social & Interactive Events
   static const String chat = 'chat';
-  static const String chatMessage = 'chat_message';
   static const String gift = 'gift';
-  static const String sendGift = 'send_gift';
   static const String giftProcessed = 'gift_processed';
-  static const String pkGiftOverlay = 'pk_gift_overlay';
   static const String balanceUpdate = 'balance_update';
 
   // Seat & Stage Management
@@ -149,39 +130,23 @@ abstract final class SignalingEvents {
   static const String seatInvite = 'seat_invite';
   static const String seatKick = 'seat_kick';
   static const String seatLeave = 'seat_leave';
-  static const String seatLeft = 'seat_left';
-  static const String seatUpdated = 'seat_updated';
-  static const String cohostLeft = 'cohost_left';
-  static const String newCohost = 'new_cohost';
-  static const String mainSeatChanged = 'main_seat_changed';
   static const String pinStage = 'pin_stage';
-  static const String subscribeCohost = 'subscribe_cohost';
 
   // PK Battle System
   static const String pkRequest = 'pk_request';
   static const String pkAccept = 'pk_accept';
   static const String pkReject = 'pk_reject';
   static const String pkStart = 'pk_start';
-  static const String pkStarted = 'pk_started';
   static const String pkScoreUpdate = 'pk_score_update';
   static const String pkTimerTick = 'pk_timer_tick';
-  static const String pkStop = 'pk_stop';
   static const String pkEnd = 'pk_end';
-  static const String pkEnded = 'pk_ended';
 
   // Media & Dynacast Controls
   static const String mediaStateChanged = 'media_state_changed';
   static const String trackMuted = 'track_muted';
-  static const String trackUnmuted = 'track_unmuted';
   static const String roomCreated = 'room_created';
   static const String roomClosed = 'room_closed';
-  static const String roomEnded = 'room_ended';
-  static const String endRoom = 'end_room';
   static const String layerSelect = 'layer_select';
-  static const String requestLayer = 'request_layer';
-  static const String layerSwitched = 'layer_switched';
-  static const String setViewport = 'set_viewport';
-  static const String viewportUpdated = 'viewport_updated';
   static const String trackPause = 'track_pause';
   static const String trackResume = 'track_resume';
 }

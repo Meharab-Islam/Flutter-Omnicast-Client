@@ -332,7 +332,8 @@ class OmniCastDynamicStage extends StatelessWidget {
               client.state.isUserCameraOff(userId));
 
     // If active video frames or enabled video tracks exist on the renderer, prioritize showing video
-    final hasActiveVideo = renderer != null &&
+    final hasActiveVideo =
+        renderer != null &&
         (renderer.renderVideo ||
             (renderer.srcObject?.getVideoTracks().any((t) => t.enabled) ??
                 false));

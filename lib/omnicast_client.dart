@@ -28,15 +28,22 @@ export 'src/webrtc/webrtc_stats_monitor.dart';
 export 'src/state/room_state.dart';
 
 // Models
-export 'src/models/room_models.dart' hide Participant;
+export 'src/models/room_models.dart';
 export 'src/models/pk_models.dart';
 export 'src/models/interaction_models.dart';
 export 'src/models/seat_models.dart';
 export 'src/models/signaling_message.dart';
 
 // UI Widgets
+export 'src/widgets/omnicast_live_room.dart';
+export 'src/widgets/omnicast_live_chat.dart';
+export 'src/widgets/omnicast_live_header.dart';
+export 'src/widgets/omnicast_live_bottom_bar.dart';
 export 'src/widgets/omnicast_video_view.dart';
 export 'src/widgets/omnicast_video_canvas.dart';
+export 'src/widgets/omnicast_dynamic_stage.dart';
+export 'src/widgets/omnicast_stage_grid.dart';
+export 'src/widgets/omnicast_room_list_view.dart';
 export 'src/widgets/omnicast_pk_battle_view.dart';
 export 'src/widgets/pk_score_progress_bar.dart';
 export 'src/widgets/gift_overlay_manager.dart';
@@ -46,11 +53,9 @@ export 'src/widgets/omnicast_native_viewport_tracker.dart';
 export 'src/widgets/omnicast_flying_hearts_overlay.dart';
 export 'src/widgets/omnicast_gifting_bottom_sheet.dart';
 export 'src/widgets/omnicast_viewers_bottom_sheet.dart';
-export 'src/widgets/omnicast_room_list_view.dart';
-export 'src/widgets/omnicast_stage_grid.dart';
-export 'src/widgets/omnicast_dynamic_stage.dart';
 export 'src/widgets/omnicast_seat_requests_bottom_sheet.dart';
 export 'src/utils/omnicast_logger.dart';
+
+// Re-export Underlying WebRTC & Permission Handlers (Zero external setup required for developers)
 export 'package:permission_handler/permission_handler.dart';
 export 'package:flutter_webrtc/flutter_webrtc.dart';
-

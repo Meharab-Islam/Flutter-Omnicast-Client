@@ -23,7 +23,6 @@ class WebRTCManager {
   bool _isNegotiating = false;
   bool _simulcastEnabled = false;
   bool _isDisposed = false;
-  bool _isUpgradingViewer = false;
   Timer? _iceDisconnectTimer;
   late final WebRTCStatsMonitor _statsMonitor;
 
@@ -33,7 +32,6 @@ class WebRTCManager {
   OnLocalIceCandidateCallback? onLocalIceCandidate;
   OnRemoteTrackCallback? onRemoteTrack;
   OnIceRestartNeededCallback? onIceRestartNeeded;
-  Function(RTCPeerConnection pc)? onPeerConnectionCreated;
 
   WebRTCManager({
     required this.mediaStreamManager,
@@ -62,6 +60,17 @@ class WebRTCManager {
   RTCRtpSender? get videoSender => _videoSender;
   RTCRtpSender? get audioSender => _audioSender;
   WebRTCStatsMonitor get statsMonitor => _statsMonitor;
+
+  /// Strips transport-cc header extensions and feedback attributes from SDP.
+  static String stripTransportCc(String sdp) {
+    final lines = sdp.split(RegExp(r'\r?\n'));
+    final filtered = lines.where((line) {
+      if (line.contains('transport-cc')) return false;
+      if (line.contains('transport-wide-cc-extensions')) return false;
+      return true;
+    }).toList();
+    return '${filtered.join('\r\n')}\r\n';
+  }
 
   /// Modifies an SDP string to prioritize a specific codec (e.g. 'VP8') at the front of the m=video line.
   /// Strictly prioritizes VP8 for flawless packet loss recovery, PLI keyframe handling, and zero macroblocking.
@@ -166,62 +175,17 @@ class WebRTCManager {
     return lines.join(delimiter);
   }
 
-  /// Strips transport-cc RTCP feedback and header extensions from SDP to prevent
-  /// libwebrtc TransportFeedbackAdapter send time history lookup errors and
-  /// packet sequence desynchronization in multi-stream SFU broadcasting.
-  static String stripTransportCc(String sdp) {
-    if (sdp.isEmpty) return sdp;
-    final delimiter = sdp.contains('\r\n') ? '\r\n' : '\n';
-    final lines = sdp.split(delimiter);
-    final filtered = <String>[];
-
-    for (final line in lines) {
-      final lower = line.toLowerCase();
-      // Remove transport-cc rtcp-fb lines
-      if (lower.startsWith('a=rtcp-fb:') && lower.contains('transport-cc')) {
-        continue;
-      }
-      // Remove transport-wide-cc header extensions
-      if (lower.startsWith('a=extmap:') &&
-          (lower.contains('transport-wide-cc') ||
-              lower.contains('transport_wide_cc'))) {
-        continue;
-      }
-      filtered.add(line);
-    }
-
-    return filtered.join(delimiter);
-  }
-
   /// Initializes a new [RTCPeerConnection] with standard configuration and sets up listeners.
   Future<RTCPeerConnection> initializePeerConnection() async {
     if (_peerConnection != null) {
       return _peerConnection!;
     }
 
-    // Ensure WebRTC native engine ignores loopback interface and silences internal C++ logs
-    try {
-      await WebRTC.initialize(
-        options: {
-          'logSeverity': OmniCastLogger.enableLogging ? 'warning' : 'none',
-          'networkIgnoreMask': ['adapterTypeLoopback'],
-        },
-      );
-    } catch (_) {}
-
     final pc = await createPeerConnection(rtcConfiguration);
     _peerConnection = pc;
-    onPeerConnectionCreated?.call(pc);
 
     pc.onIceCandidate = (candidate) {
       if (candidate.candidate != null && candidate.candidate!.isNotEmpty) {
-        final c = candidate.candidate!.toLowerCase();
-        // Ignore loopback candidates to eliminate invalid STUN ping failures
-        if (c.contains('127.0.0.') ||
-            c.contains('::1') ||
-            c.contains('.local')) {
-          return;
-        }
         onLocalIceCandidate?.call(candidate);
       }
     };
@@ -277,50 +241,82 @@ class WebRTCManager {
       }
     };
 
-    pc.onTrack = (RTCTrackEvent event) {
+    pc.onTrack = (RTCTrackEvent event) async {
       OmniCastLogger.log(
         '[WebRTCManager] onTrack: kind=${event.track.kind}, streams=${event.streams.length}, id=${event.track.id}',
       );
 
-      // Force immediate zero-latency playout on incoming remote tracks (bypasses jitter buffer delay)
       try {
-        // ignore: avoid_dynamic_calls
-        (event.track as dynamic).playoutDelayHint = 0.0;
-      } catch (_) {}
-      try {
-        // ignore: avoid_dynamic_calls
-        (event.receiver as dynamic)?.playoutDelayHint = 0.0;
+        event.track.enabled = true;
       } catch (_) {}
 
-      if (event.streams.isNotEmpty) {
-        final stream = event.streams.first;
-        onRemoteTrack?.call(event.track, stream);
-      } else {
-        createLocalMediaStream('stream_${event.track.id}')
-            .then((stream) async {
-              await stream.addTrack(event.track);
-              onRemoteTrack?.call(event.track, stream);
-            })
-            .catchError((_) {});
+      if (event.track.kind == 'audio') {
+        try {
+          await Helper.setSpeakerphoneOn(true);
+        } catch (_) {}
       }
+
+      MediaStream stream;
+      if (event.streams.isNotEmpty) {
+        stream = event.streams.first;
+        if (!stream.getTracks().any((t) => t.id == event.track.id)) {
+          try {
+            await stream.addTrack(event.track);
+          } catch (_) {}
+        }
+      } else {
+        final streamId = 'stream_${event.track.kind}_${event.track.id}';
+        stream = await createLocalMediaStream(streamId);
+        await stream.addTrack(event.track);
+      }
+      onRemoteTrack?.call(event.track, stream);
     };
 
     return pc;
   }
 
   /// Sets up initial transceivers for a viewer (Receive-Only for audio and video).
+  /// Reuses existing transceivers during role downgrades to prevent duplicate m-lines.
   Future<void> setupViewerTransceivers() async {
     final pc = await initializePeerConnection();
 
-    await pc.addTransceiver(
-      kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-      init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
-    );
+    final transceivers = await pc.getTransceivers();
+    RTCRtpTransceiver? audioTransceiver;
+    RTCRtpTransceiver? videoTransceiver;
 
-    await pc.addTransceiver(
-      kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-      init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
-    );
+    for (final t in transceivers) {
+      final senderKind = t.sender.track?.kind;
+      final receiverKind = t.receiver.track?.kind;
+      if (senderKind == 'audio' || receiverKind == 'audio') {
+        audioTransceiver ??= t;
+      } else if (senderKind == 'video' || receiverKind == 'video') {
+        videoTransceiver ??= t;
+      }
+    }
+
+    if (audioTransceiver != null) {
+      try {
+        await audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+        await audioTransceiver.sender.replaceTrack(null);
+      } catch (_) {}
+    } else {
+      await pc.addTransceiver(
+        kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+        init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
+      );
+    }
+
+    if (videoTransceiver != null) {
+      try {
+        await videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+        await videoTransceiver.sender.replaceTrack(null);
+      } catch (_) {}
+    } else {
+      await pc.addTransceiver(
+        kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+        init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly),
+      );
+    }
   }
 
   /// Adds local media tracks to [RTCPeerConnection], configuring hardware-friendly H264/VP8 codecs,
@@ -334,80 +330,78 @@ class WebRTCManager {
 
     _simulcastEnabled = false;
 
-    final existingSenders = await pc.getSenders();
-    RTCRtpSender? existingAudioSender;
-    RTCRtpSender? existingVideoSender;
-    for (final s in existingSenders) {
-      if (s.track?.kind == 'audio' || s == _audioSender) {
-        existingAudioSender = s;
-      } else if (s.track?.kind == 'video' || s == _videoSender) {
-        existingVideoSender = s;
+    // Check existing transceivers to reuse if upgrading from viewer (Unified Plan)
+    final transceivers = await pc.getTransceivers();
+    RTCRtpTransceiver? audioTransceiver;
+    RTCRtpTransceiver? videoTransceiver;
+
+    for (final t in transceivers) {
+      final senderKind = t.sender.track?.kind;
+      final receiverKind = t.receiver.track?.kind;
+      if (senderKind == 'audio' || receiverKind == 'audio') {
+        audioTransceiver ??= t;
+      } else if (senderKind == 'video' || receiverKind == 'video') {
+        videoTransceiver ??= t;
       }
     }
 
-    // Add audio track
+    // Add / Replace audio track
     final audioTracks = localStream.getAudioTracks();
     if (audioTracks.isNotEmpty) {
       final audioTrack = audioTracks.first;
-      if (existingAudioSender != null) {
-        try {
-          await existingAudioSender.replaceTrack(audioTrack);
-          _audioSender = existingAudioSender;
-        } catch (e) {
-          OmniCastLogger.warn('[WebRTCManager] Failed to replaceTrack for audio: $e');
-        }
-      } else {
-        try {
+      try {
+        if (audioTransceiver != null) {
+          await audioTransceiver.setDirection(TransceiverDirection.SendRecv);
+          await audioTransceiver.sender.replaceTrack(audioTrack);
+          _audioSender = audioTransceiver.sender;
+        } else {
           _audioSender = await pc.addTrack(audioTrack, localStream);
-        } catch (e) {
-          OmniCastLogger.error('[WebRTCManager] Failed to addTrack for audio: $e');
         }
+      } catch (e) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] Note on audio track attachment: $e',
+        );
       }
     }
 
-    // Add video track with mobile dynamic bitrate & zero-lag framerate preference
+    // Add / Replace video track with mobile dynamic bitrate & zero-lag framerate preference
     final videoTracks = localStream.getVideoTracks();
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
-
-      if (existingVideoSender != null) {
-        try {
-          await existingVideoSender.replaceTrack(videoTrack);
-          _videoSender = existingVideoSender;
-        } catch (e) {
-          OmniCastLogger.warn('[WebRTCManager] Failed to replaceTrack for video: $e');
-        }
-      } else {
-        try {
+      try {
+        if (videoTransceiver != null) {
+          await videoTransceiver.setDirection(TransceiverDirection.SendRecv);
+          await videoTransceiver.sender.replaceTrack(videoTrack);
+          _videoSender = videoTransceiver.sender;
+        } else {
           _videoSender = await pc.addTrack(videoTrack, localStream);
-        } catch (e) {
-          OmniCastLogger.error('[WebRTCManager] Failed to addTrack for video: $e');
         }
+      } catch (e) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] Note on video track attachment: $e',
+        );
       }
 
       // Force VP8 codec preference over H264/VP9 for rock-solid packet loss & PLI resilience
       try {
-        final transceivers = await pc.getTransceivers();
-        final videoTransceiver = transceivers.firstWhere(
+        final currentTransceivers = await pc.getTransceivers();
+        final currentVideoTransceiver = currentTransceivers.firstWhere(
           (t) => t.sender.track?.kind == 'video' || t.sender == _videoSender,
         );
         final capabilities = await getRtpSenderCapabilities('video');
         if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
-          final sortedCodecs = List<RTCRtpCodecCapability>.from(
-            capabilities.codecs!,
-          );
-          sortedCodecs.sort((a, b) {
-            final mimeA = a.mimeType.toLowerCase();
-            final mimeB = b.mimeType.toLowerCase();
-            int scoreA = mimeA.contains('vp8')
-                ? 0
-                : (mimeA.contains('vp9') ? 1 : 2);
-            int scoreB = mimeB.contains('vp8')
-                ? 0
-                : (mimeB.contains('vp9') ? 1 : 2);
-            return scoreA.compareTo(scoreB);
-          });
-          await videoTransceiver.setCodecPreferences(sortedCodecs);
+          final sortedCodecs =
+              List<RTCRtpCodecCapability>.from(capabilities.codecs!)..sort((
+                a,
+                b,
+              ) {
+                final aMime = a.mimeType.toLowerCase();
+                final bMime = b.mimeType.toLowerCase();
+                if (aMime.contains('vp8') && !bMime.contains('vp8')) return -1;
+                if (!aMime.contains('vp8') && bMime.contains('vp8')) return 1;
+                return 0;
+              });
+          await currentVideoTransceiver.setCodecPreferences(sortedCodecs);
         }
       } catch (_) {}
 
@@ -423,25 +417,81 @@ class WebRTCManager {
         }
         videoSender ??= _videoSender;
         if (videoSender != null) {
-          final params = videoSender.parameters;
-          params.degradationPreference =
-              RTCDegradationPreference.MAINTAIN_FRAMERATE;
-          if (params.encodings != null && params.encodings!.isNotEmpty) {
-            params.encodings![0].maxBitrate = 600000;
-            params.encodings![0].minBitrate = 150000;
-            params.encodings![0].maxFramerate = 24;
-            params.encodings![0].scalabilityMode = 'L1T3';
+          try {
+            final params = videoSender.parameters;
+            params.degradationPreference =
+                RTCDegradationPreference.MAINTAIN_FRAMERATE;
+            if (params.encodings != null && params.encodings!.isNotEmpty) {
+              params.encodings![0].maxBitrate = 1200000;
+              params.encodings![0].minBitrate = 300000;
+              params.encodings![0].maxFramerate = 24;
+            }
+            await videoSender.setParameters(params);
+            OmniCastLogger.log(
+              '[WebRTCManager] Configured clean VP8 video track with maxBitrate: 1200 kbps',
+            );
+          } catch (paramErr) {
+            OmniCastLogger.warn(
+              '[WebRTCManager] Set video sender parameters note: $paramErr',
+            );
           }
-          await videoSender.setParameters(params);
-          OmniCastLogger.log(
-            '[WebRTCManager] Configured clean VP8 video track with maxBitrate: 600 kbps',
-          );
         }
       } catch (e) {
         OmniCastLogger.error(
           '[WebRTCManager] Set single-stream parameters notice: $e',
         );
       }
+    }
+  }
+
+  /// Dynamically adjusts publishing bitrate and framerate based on stage seat count
+  /// to ensure silky-smooth multi-seat streaming without packet loss or thermal lag.
+  Future<void> updatePublishBitrateForSeatCount(int occupiedSeatCount) async {
+    if (_peerConnection == null) return;
+    try {
+      final senders = await _peerConnection!.getSenders();
+      RTCRtpSender? vSender;
+      for (final s in senders) {
+        if (s.track?.kind == 'video') {
+          vSender = s;
+          break;
+        }
+      }
+      vSender ??= _videoSender;
+      if (vSender == null) return;
+
+      final int maxBitrate;
+      final int minBitrate;
+      final int maxFramerate;
+
+      if (occupiedSeatCount <= 1) {
+        maxBitrate = 1200000;
+        minBitrate = 300000;
+        maxFramerate = 30;
+      } else if (occupiedSeatCount <= 4) {
+        maxBitrate = 600000;
+        minBitrate = 180000;
+        maxFramerate = 24;
+      } else {
+        maxBitrate = 350000;
+        minBitrate = 120000;
+        maxFramerate = 20;
+      }
+
+      final params = vSender.parameters;
+      if (params.encodings != null && params.encodings!.isNotEmpty) {
+        params.encodings![0].maxBitrate = maxBitrate;
+        params.encodings![0].minBitrate = minBitrate;
+        params.encodings![0].maxFramerate = maxFramerate;
+        await vSender.setParameters(params);
+        OmniCastLogger.log(
+          '[WebRTCManager] Dynamically updated publish bitrate for $occupiedSeatCount active seats: maxBitrate=$maxBitrate, fps=$maxFramerate',
+        );
+      }
+    } catch (e) {
+      OmniCastLogger.error(
+        '[WebRTCManager] Failed to update publish bitrate: $e',
+      );
     }
   }
 
@@ -549,20 +599,8 @@ class WebRTCManager {
     _isNegotiating = true;
     try {
       final offer = await pc.createOffer(constraints);
-      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-      processedSdp = setInitialBitrate(
-        processedSdp,
-        startKbps: 500,
-        minKbps: 150,
-        maxKbps: 600,
-      );
-      processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
-      final mungedOffer = RTCSessionDescription(
-        processedSdp,
-        offer.type ?? 'offer',
-      );
-      await pc.setLocalDescription(mungedOffer);
-      return mungedOffer;
+      await pc.setLocalDescription(offer);
+      return offer;
     } finally {
       _isNegotiating = false;
     }
@@ -591,7 +629,7 @@ class WebRTCManager {
         minKbps: 150,
         maxKbps: 600,
       );
-      processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
+      processedSdp = enableOpusDtx(processedSdp);
       final mungedOffer = RTCSessionDescription(
         processedSdp,
         offer.type ?? 'offer',
@@ -603,122 +641,140 @@ class WebRTCManager {
     }
   }
 
-  /// Safely sanitizes and unrolls incoming SDP strings from JSON envelopes or escaped strings.
-  static String sanitizeSdp(dynamic input) {
-    if (input == null) return '';
-    String sdp = '';
+  /// Recursively extracts clean SDP string starting from 'v=' from any payload structure (Map, JSON, string)
+  static String? extractSdp(dynamic input) {
+    if (input == null) return null;
+    if (input is RTCSessionDescription) {
+      return input.sdp;
+    }
     if (input is Map) {
-      sdp = (input['sdp'] ?? input['SDP'] ?? '').toString();
-    } else if (input is String) {
-      final trimmed = input.trim();
-      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-        try {
-          final decoded = jsonDecode(trimmed);
-          if (decoded is Map) {
-            sdp = (decoded['sdp'] ?? decoded['SDP'] ?? '').toString();
-            if (sdp.isEmpty) {
-              sdp = trimmed;
-            }
-          } else {
-            sdp = trimmed;
-          }
-        } catch (_) {
-          sdp = trimmed;
-        }
-      } else {
-        sdp = trimmed;
+      final val =
+          input['sdp'] ?? input['SDP'] ?? input['payload'] ?? input['data'];
+      if (val != null) {
+        final extracted = extractSdp(val);
+        if (extracted != null && extracted.isNotEmpty) return extracted;
       }
-    } else {
-      sdp = input.toString();
+      for (final v in input.values) {
+        if (v is String && v.contains('v=')) {
+          final extracted = extractSdp(v);
+          if (extracted != null && extracted.isNotEmpty) return extracted;
+        }
+      }
     }
-
-    // Fix escaped newlines if JSON-encoded
-    if (sdp.contains(r'\r\n') || (sdp.contains(r'\n') && !sdp.contains('\n'))) {
-      sdp = sdp.replaceAll(r'\r\n', '\r\n').replaceAll(r'\n', '\n');
+    if (input is String) {
+      var s = input.trim();
+      while ((s.startsWith('"') && s.endsWith('"')) ||
+          (s.startsWith("'") && s.endsWith("'"))) {
+        s = s.substring(1, s.length - 1).trim();
+      }
+      if (s.startsWith('{') && s.endsWith('}')) {
+        try {
+          final decoded = jsonDecode(s);
+          final extracted = extractSdp(decoded);
+          if (extracted != null && extracted.isNotEmpty) return extracted;
+        } catch (_) {}
+      }
+      if (s.contains(r'\r\n') || s.contains(r'\n')) {
+        s = s.replaceAll(r'\r\n', '\r\n').replaceAll(r'\n', '\n');
+      }
+      if (s.contains('v=')) {
+        final vIndex = s.indexOf('v=');
+        if (vIndex > 0) {
+          s = s.substring(vIndex);
+        }
+        while (s.endsWith('"') || s.endsWith("'") || s.endsWith('}')) {
+          s = s.substring(0, s.length - 1).trim();
+        }
+        final normalized = s.replaceAll(RegExp(r'\r\n|\r|\n'), '\r\n').trim();
+        return '$normalized\r\n';
+      }
     }
-
-    // Ensure valid trailing newline format required by native WebRTC
-    sdp = sdp.trimRight();
-    if (sdp.isNotEmpty) {
-      sdp = '$sdp\r\n';
-    }
-
-    return sdp;
+    return null;
   }
 
-  /// Handles a remote SDP Answer received from the signaling server.
-  Future<void> handleRemoteAnswer(dynamic rawSdp) async {
+  /// Handles an incoming SDP Answer from the SFU.
+  Future<void> handleRemoteAnswer(dynamic sdpOrPayload) async {
     if (_peerConnection == null) {
-      throw StateError(
-        'Cannot handle remote answer without an active PeerConnection',
-      );
-    }
-
-    final sdp = sanitizeSdp(rawSdp);
-    if (sdp.isEmpty) {
-      OmniCastLogger.error(
-        '[WebRTCManager] handleRemoteAnswer received empty SDP',
+      OmniCastLogger.warn(
+        '[WebRTCManager] Cannot handle remote answer without an active PeerConnection, skipping',
       );
       return;
     }
 
-    final description = RTCSessionDescription(stripTransportCc(sdp), 'answer');
-    await _peerConnection!.setRemoteDescription(description);
-    await _processQueuedCandidates();
+    try {
+      final signalingState = await _peerConnection!.getSignalingState();
+      if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] PeerConnection signalingState is already stable, skipping redundant setRemoteDescription',
+        );
+        return;
+      }
+
+      if (signalingState != RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] PeerConnection signalingState is $signalingState (expected haveLocalOffer), skipping answer',
+        );
+        return;
+      }
+
+      final rawSdp = extractSdp(sdpOrPayload);
+      if (rawSdp == null || rawSdp.isEmpty) {
+        OmniCastLogger.error(
+          '[WebRTCManager] Could not extract valid SDP from payload: $sdpOrPayload',
+        );
+        return;
+      }
+
+      final description = RTCSessionDescription(rawSdp, 'answer');
+      await _peerConnection!.setRemoteDescription(description);
+      await _processQueuedCandidates();
+    } catch (e) {
+      OmniCastLogger.error(
+        '[WebRTCManager] handleRemoteAnswer setRemoteDescription error: $e',
+      );
+    }
   }
 
   /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(
-    dynamic rawSdp,
+    dynamic sdpOrPayload,
   ) async {
-    final sdp = sanitizeSdp(rawSdp);
-    if (sdp.isEmpty) {
-      throw ArgumentError(
-        'Cannot handle remote offer with empty or invalid SDP: $rawSdp',
+    final pc = await initializePeerConnection();
+
+    final rawSdp = extractSdp(sdpOrPayload);
+    if (rawSdp == null || rawSdp.isEmpty) {
+      throw StateError(
+        'Cannot handle remote offer: invalid or empty SDP payload',
       );
     }
 
-    final pc = await initializePeerConnection();
+    try {
+      final remoteDescription = RTCSessionDescription(rawSdp, 'offer');
+      await pc.setRemoteDescription(remoteDescription);
+      await _processQueuedCandidates();
 
-    // Check signaling state: If we have an offer collision (have-local-offer),
-    // perform JSEP rollback before applying the remote offer.
-    final state = pc.signalingState;
-    if (state == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
-      try {
-        await pc.setLocalDescription(RTCSessionDescription('', 'rollback'));
-        OmniCastLogger.log(
-          '[WebRTCManager] Successfully rolled back local offer on collision',
-        );
-      } catch (e) {
-        OmniCastLogger.log(
-          '[WebRTCManager] Rollback attempt on offer collision: $e',
-        );
-      }
+      final answer = await pc.createAnswer({});
+      var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
+      processedSdp = setInitialBitrate(
+        processedSdp,
+        startKbps: 500,
+        minKbps: 150,
+        maxKbps: 600,
+      );
+      processedSdp = enableOpusDtx(processedSdp);
+      final mungedAnswer = RTCSessionDescription(
+        processedSdp,
+        answer.type ?? 'answer',
+      );
+      await pc.setLocalDescription(mungedAnswer);
+
+      return mungedAnswer;
+    } catch (e) {
+      OmniCastLogger.error(
+        '[WebRTCManager] handleRemoteOfferAndCreateAnswer error: $e',
+      );
+      rethrow;
     }
-
-    final remoteDescription = RTCSessionDescription(
-      stripTransportCc(sdp),
-      'offer',
-    );
-    await pc.setRemoteDescription(remoteDescription);
-    await _processQueuedCandidates();
-
-    final answer = await pc.createAnswer({});
-    var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
-    processedSdp = setInitialBitrate(
-      processedSdp,
-      startKbps: 500,
-      minKbps: 150,
-      maxKbps: 600,
-    );
-    processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
-    final mungedAnswer = RTCSessionDescription(
-      processedSdp,
-      answer.type ?? 'answer',
-    );
-    await pc.setLocalDescription(mungedAnswer);
-
-    return mungedAnswer;
   }
 
   /// Seamlessly upgrades a Viewer to a Co-Host without tearing down the existing [RTCPeerConnection].
@@ -734,113 +790,76 @@ class WebRTCManager {
       );
     }
 
-    if (_isUpgradingViewer) {
-      OmniCastLogger.warn(
-        '[WebRTCManager] upgradeViewerToCoHost is already in progress, returning active description',
-      );
-      final desc = await _peerConnection!.getLocalDescription();
-      if (desc != null) return desc;
-      return await _peerConnection!.createOffer({});
-    }
+    // 1. Capture local camera/microphone
+    await mediaStreamManager.openUserMedia(
+      parameters: parameters,
+      video: video,
+      audio: audio,
+    );
 
-    _isUpgradingViewer = true;
-    try {
-      // 1. Capture local camera/microphone
-      await mediaStreamManager.openUserMedia(
-        parameters: parameters,
-        video: video,
-        audio: audio,
-      );
+    // 2. Add local tracks to existing PeerConnection
+    await addLocalMediaTracks(enableSimulcast: enableSimulcast);
 
-      // 2. Add local tracks to existing PeerConnection
-      await addLocalMediaTracks(enableSimulcast: enableSimulcast);
+    // 3. Create clean renegotiation offer without SDP munging corruption
+    final offer = await _peerConnection!.createOffer({});
+    final nativeOffer = RTCSessionDescription(offer.sdp, offer.type ?? 'offer');
+    await _peerConnection!.setLocalDescription(nativeOffer);
 
-      // 3. Create renegotiation offer with VP8 and Opus DTX preference
-      final offer = await _peerConnection!.createOffer({});
-      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-      processedSdp = setInitialBitrate(
-        processedSdp,
-        startKbps: 500,
-        minKbps: 150,
-        maxKbps: 600,
-      );
-      processedSdp = stripTransportCc(enableOpusDtx(processedSdp));
-      final mungedOffer = RTCSessionDescription(
-        processedSdp,
-        offer.type ?? 'offer',
-      );
-      await _peerConnection!.setLocalDescription(mungedOffer);
-
-      return mungedOffer;
-    } finally {
-      _isUpgradingViewer = false;
-    }
-  }
-
-  /// Seamlessly downgrades a Co-Host back to Viewer mode without destroying downlink subscriptions.
-  Future<void> downgradeCoHostToViewer() async {
-    // 1. Stop hardware camera and microphone
-    await mediaStreamManager.stopLocalMedia();
-
-    // 2. Remove local audio and video senders from active PeerConnection
-    if (_peerConnection != null) {
-      if (_videoSender != null) {
-        try {
-          await _peerConnection!.removeTrack(_videoSender!);
-        } catch (_) {}
-        _videoSender = null;
-      }
-      if (_audioSender != null) {
-        try {
-          await _peerConnection!.removeTrack(_audioSender!);
-        } catch (_) {}
-        _audioSender = null;
-      }
-    }
+    return nativeOffer;
   }
 
   /// Queues or adds remote ICE candidates safely after remote description is set.
   Future<void> addRemoteCandidate(dynamic candidate) async {
+    if (candidate == null) return;
     RTCIceCandidate? iceCandidate;
     if (candidate is RTCIceCandidate) {
       iceCandidate = candidate;
-    } else if (candidate is Map<String, dynamic>) {
-      iceCandidate = RTCIceCandidate(
-        candidate['candidate'] as String? ?? '',
-        candidate['sdpMid'] as String? ?? candidate['sdp_mid'] as String? ?? '',
-        (candidate['sdpMLineIndex'] as num?)?.toInt() ??
-            (candidate['sdp_m_line_index'] as num?)?.toInt() ??
-            0,
-      );
+    } else if (candidate is Map) {
+      final candStr =
+          (candidate['candidate'] ?? candidate['Candidate'])?.toString() ?? '';
+      final sdpMid =
+          (candidate['sdpMid'] ?? candidate['sdp_mid'] ?? candidate['SdpMid'])
+              ?.toString() ??
+          '';
+      final sdpMLineIndex =
+          (candidate['sdpMLineIndex'] as num?)?.toInt() ??
+          (candidate['sdp_m_line_index'] as num?)?.toInt() ??
+          (candidate['SdpMLineIndex'] as num?)?.toInt() ??
+          0;
+      if (candStr.isNotEmpty) {
+        iceCandidate = RTCIceCandidate(candStr, sdpMid, sdpMLineIndex);
+      }
+    } else if (candidate is String) {
+      try {
+        final decoded = jsonDecode(candidate);
+        if (decoded != null) {
+          return addRemoteCandidate(decoded);
+        }
+      } catch (_) {}
     }
 
     if (iceCandidate == null) return;
-
-    final c = (iceCandidate.candidate ?? '').toLowerCase();
-    if (c.contains('127.0.0.') || c.contains('::1') || c.contains('.local')) {
-      return;
-    }
 
     if (_peerConnection == null) {
       _queuedRemoteCandidates.add(iceCandidate);
       return;
     }
 
-    final remoteDesc = await _peerConnection!.getRemoteDescription();
-    if (remoteDesc == null) {
-      _queuedRemoteCandidates.add(iceCandidate);
-    } else {
-      await _peerConnection!.addCandidate(iceCandidate);
+    try {
+      final remoteDesc = await _peerConnection!.getRemoteDescription();
+      if (remoteDesc == null) {
+        _queuedRemoteCandidates.add(iceCandidate);
+      } else {
+        await _peerConnection!.addCandidate(iceCandidate);
+      }
+    } catch (e) {
+      OmniCastLogger.warn('[WebRTCManager] addCandidate warning: $e');
     }
   }
 
   Future<void> _processQueuedCandidates() async {
     if (_peerConnection == null) return;
     for (final candidate in _queuedRemoteCandidates) {
-      final c = (candidate.candidate ?? '').toLowerCase();
-      if (c.contains('127.0.0.') || c.contains('::1') || c.contains('.local')) {
-        continue;
-      }
       await _peerConnection!.addCandidate(candidate);
     }
     _queuedRemoteCandidates.clear();

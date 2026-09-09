@@ -53,6 +53,8 @@ class DataChannelManager {
       StreamController<ChatMessage>.broadcast();
   final StreamController<DataChannelReaction> _reactionController =
       StreamController<DataChannelReaction>.broadcast();
+  final StreamController<Uint8List> _dataReceivedController =
+      StreamController<Uint8List>.broadcast();
 
   final ValueNotifier<bool> isChannelOpenNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<DataChannelReaction?> latestReactionNotifier =
@@ -64,22 +66,11 @@ class DataChannelManager {
   }) : _webRTCManager = webRTCManager,
        _roomState = roomState;
 
-  final StreamController<Uint8List> _rawMessageController =
-      StreamController<Uint8List>.broadcast();
-
   Stream<ChatMessage> get onChatMessage => _chatController.stream;
   Stream<DataChannelReaction> get onReactionReceived =>
       _reactionController.stream;
-  Stream<Uint8List> get onDataReceived => _rawMessageController.stream;
+  Stream<Uint8List> get onDataReceived => _dataReceivedController.stream;
   bool get isChannelOpen => isChannelOpenNotifier.value;
-
-  /// Broadcasts arbitrary bytes across the WebRTC DataChannel.
-  void broadcast(Uint8List data) {
-    if (_dataChannel != null &&
-        _dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen) {
-      _dataChannel!.send(RTCDataChannelMessage.fromBinary(data));
-    }
-  }
 
   /// Initializes an outgoing DataChannel for a host/publisher.
   Future<void> createPublisherChannel({String label = 'room-events'}) async {
@@ -117,10 +108,12 @@ class DataChannelManager {
     channel.onMessage = (RTCDataChannelMessage message) {
       if (_isDisposed) return;
 
-      final bytes = message.isBinary ? message.binary : Uint8List.fromList(utf8.encode(message.text));
-      _rawMessageController.add(bytes);
-
       try {
+        final Uint8List rawBytes = message.isBinary
+            ? message.binary
+            : Uint8List.fromList(utf8.encode(message.text));
+        _dataReceivedController.add(rawBytes);
+
         String decodedText;
         if (message.isBinary) {
           decodedText = utf8.decode(message.binary);
@@ -305,11 +298,15 @@ class DataChannelManager {
   }
 
   /// Sends raw binary bytes directly over the DataChannel.
-  void sendDirectBinary(Uint8List bytes) {
+  void sendDirectBinary(Uint8List bytes) => broadcast(bytes);
+
+  /// Broadcasts raw binary / byte data directly over the WebRTC DataChannel.
+  void broadcast(List<int> data) {
     if (_dataChannel == null ||
         _dataChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
       return;
     }
+    final bytes = data is Uint8List ? data : Uint8List.fromList(data);
     _dataChannel!.send(RTCDataChannelMessage.fromBinary(bytes));
   }
 
@@ -342,5 +339,6 @@ class DataChannelManager {
 
     await _chatController.close();
     await _reactionController.close();
+    await _dataReceivedController.close();
   }
 }

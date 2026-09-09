@@ -96,9 +96,13 @@ class OmniCastConfig {
       jwtSecret: jwtSecret ?? apiSecret,
       iceServers:
           iceServers ??
-          const [
+          [
+            if (effectiveHostUrl.contains('://'))
+              {'urls': 'stun:${Uri.tryParse(effectiveHostUrl)?.host ?? 'omnilive.lolipoplive.top'}:3478'},
             {'urls': 'stun:stun.l.google.com:19302'},
             {'urls': 'stun:stun1.l.google.com:19302'},
+            {'urls': 'stun:stun2.l.google.com:19302'},
+            {'urls': 'stun:stun.cloudflare.com:3478'},
           ],
       heartbeatInterval: heartbeatInterval,
       reconnectDelay: reconnectDelay,
@@ -134,12 +138,8 @@ class OmniCastConfig {
       raw = raw.replaceFirst('https://', '');
     }
 
-    final isNumericIp = RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(raw);
-    if (raw.contains('localhost') ||
-        raw.contains('127.0.0.1') ||
-        isNumericIp ||
-        raw.contains(':8080') ||
-        raw.contains(':8000')) {
+    final isIpAddress = RegExp(r'^(\d{1,3}\.){3}\d{1,3}').hasMatch(raw);
+    if (raw.contains('localhost') || raw.contains('127.0.0.1') || isIpAddress) {
       if (useSsl == null) isSecure = false;
     }
 
@@ -183,12 +183,8 @@ class OmniCastConfig {
       raw = raw.replaceFirst('wss://', '');
     }
 
-    final isNumericIp = RegExp(r'^\d+\.\d+\.\d+\.\d+').hasMatch(raw);
-    if (raw.contains('localhost') ||
-        raw.contains('127.0.0.1') ||
-        isNumericIp ||
-        raw.contains(':8080') ||
-        raw.contains(':8000')) {
+    final isIpAddress = RegExp(r'^(\d{1,3}\.){3}\d{1,3}').hasMatch(raw);
+    if (raw.contains('localhost') || raw.contains('127.0.0.1') || isIpAddress) {
       if (useSsl == null) isSecure = false;
     }
 

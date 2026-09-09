@@ -52,65 +52,88 @@ class OmniCastApi {
     return host.replaceAll(RegExp(r'/+$'), '');
   }
 
-  /// Fetches active live broadcasting rooms from the backend (`GET /rooms`).
+  /// Fetches active live broadcasting rooms from the backend (`GET /rooms` or `GET /api/rooms`).
   Future<List<RoomModel>> getLiveRooms({
     Duration timeout = const Duration(seconds: 10),
   }) async {
-    final baseUrl = baseApiUrl;
-    final urlString = '$baseUrl/rooms';
-    final uri = Uri.parse(urlString);
+    final base = baseApiUrl;
+    final root = base.replaceAll(RegExp(r'/api$'), '');
 
-    try {
-      final response = await _client
-          .get(uri, headers: defaultHeaders)
-          .timeout(timeout);
+    final candidateUrls = <String>[
+      '$root/rooms',
+      if (base != root) '$base/rooms' else '$root/api/rooms',
+    ];
 
-      if (response.statusCode == 200) {
-        final body = response.body.trim();
-        if (body.isEmpty || body == 'null') return [];
+    Exception? lastError;
 
-        try {
-          final decoded = jsonDecode(body);
-          List roomList = [];
+    for (final urlString in candidateUrls) {
+      final uri = Uri.parse(urlString);
+      try {
+        final response = await _client
+            .get(uri, headers: defaultHeaders)
+            .timeout(timeout);
 
-          if (decoded is List) {
-            roomList = decoded;
-          } else if (decoded is Map<String, dynamic>) {
-            if (decoded['rooms'] is List) {
-              roomList = decoded['rooms'] as List;
-            } else if (decoded['rooms'] is Map<String, dynamic>) {
-              roomList = (decoded['rooms'] as Map<String, dynamic>).values
-                  .toList();
-            } else if (decoded['data'] is List) {
-              roomList = decoded['data'] as List;
-            } else if (decoded['active_rooms'] is List) {
-              roomList = decoded['active_rooms'] as List;
-            } else if (decoded['result'] is List) {
-              roomList = decoded['result'] as List;
+        OmniCastLogger.log(
+          '[OmniCastApi] Rooms response from $urlString (${response.statusCode}): ${response.body}',
+        );
+
+        if (response.statusCode == 200) {
+          final body = response.body.trim();
+          if (body.isEmpty || body == 'null') return [];
+
+          try {
+            final decoded = jsonDecode(body);
+            List roomList = [];
+
+            if (decoded is List) {
+              roomList = decoded;
+            } else if (decoded is Map<String, dynamic>) {
+              if (decoded['rooms'] is List) {
+                roomList = decoded['rooms'] as List;
+              } else if (decoded['rooms'] is Map<String, dynamic>) {
+                roomList = (decoded['rooms'] as Map<String, dynamic>).values
+                    .toList();
+              } else if (decoded['data'] is List) {
+                roomList = decoded['data'] as List;
+              } else if (decoded['active_rooms'] is List) {
+                roomList = decoded['active_rooms'] as List;
+              } else if (decoded['result'] is List) {
+                roomList = decoded['result'] as List;
+              }
             }
+
+            final rooms = roomList
+                .whereType<Map<String, dynamic>>()
+                .map((item) => RoomModel.fromJson(item))
+                .toList();
+
+            return rooms;
+          } catch (e) {
+            OmniCastLogger.error('[OmniCastApi] JSON Parsing Error: $e');
+            rethrow;
           }
-
-          final rooms = roomList
-              .whereType<Map<String, dynamic>>()
-              .map((item) => RoomModel.fromJson(item))
-              .toList();
-
-          return rooms;
-        } catch (e) {
-          OmniCastLogger.error('[OmniCastApi] JSON Parsing Error: $e');
-          rethrow;
+        } else if (response.statusCode == 404 || response.statusCode == 204) {
+          continue; // Try next candidate endpoint
+        } else {
+          lastError = Exception(
+            'OmniCastApi.getLiveRooms failed ($urlString): ${response.statusCode} - ${response.body}',
+          );
         }
-      } else if (response.statusCode == 404 || response.statusCode == 204) {
-        return [];
-      } else {
-        throw Exception(
-          'OmniCastApi.getLiveRooms failed: ${response.statusCode} - ${response.body}',
+      } catch (e) {
+        lastError = Exception(
+          'OmniCastApi.getLiveRooms request error ($urlString): $e',
         );
       }
-    } catch (e) {
-      OmniCastLogger.error('[OmniCastApi] Error fetching live rooms: $e');
-      rethrow;
     }
+
+    if (lastError != null) {
+      OmniCastLogger.error(
+        '[OmniCastApi] Error fetching live rooms: $lastError',
+      );
+      return []; // Graceful fallback to empty list instead of throwing
+    }
+
+    return [];
   }
 
   /// Fetches a single room's details including active viewers (`GET /rooms/{roomId}`).
@@ -118,23 +141,26 @@ class OmniCastApi {
     String roomId, {
     Duration timeout = const Duration(seconds: 5),
   }) async {
-    final baseUrl = baseApiUrl;
-    final urlString = baseUrl.endsWith('/api')
-        ? '$baseUrl/rooms/$roomId'
-        : '$baseUrl/rooms/$roomId';
-    final uri = Uri.parse(urlString);
+    final base = baseApiUrl;
+    final root = base.replaceAll(RegExp(r'/api$'), '');
+    final candidateUrls = [
+      '$root/rooms/$roomId',
+      if (base != root) '$base/rooms/$roomId' else '$root/api/rooms/$roomId',
+    ];
 
-    try {
-      final response = await _client
-          .get(uri, headers: defaultHeaders)
-          .timeout(timeout);
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        final decoded = jsonDecode(response.body);
-        if (decoded is Map<String, dynamic>) {
-          return decoded;
+    for (final urlString in candidateUrls) {
+      try {
+        final response = await _client
+            .get(Uri.parse(urlString), headers: defaultHeaders)
+            .timeout(timeout);
+        if (response.statusCode == 200 && response.body.isNotEmpty) {
+          final decoded = jsonDecode(response.body);
+          if (decoded is Map<String, dynamic>) {
+            return decoded;
+          }
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
     return null;
   }
 
