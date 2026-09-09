@@ -279,15 +279,21 @@ class MediaStreamManager with ChangeNotifier {
       _remoteStreams[resolvedId] = effectiveStream;
     }
 
-    // If a UI renderer was already allocated for this user/alias, update its srcObject without creating new EGL contexts
-    RTCVideoRenderer? renderer =
-        _remoteRenderers[resolvedId ?? userId] ?? _remoteRenderers[userId];
-    if (renderer != null && renderer.srcObject != effectiveStream) {
-      renderer.srcObject = effectiveStream;
+    // If a UI renderer was already allocated for this user/alias, update its srcObject
+    final matchingKeys = [
+      userId,
+      ?resolvedId,
+      ..._aliases.keys.where((k) => _aliases[k] == userId || (resolvedId != null && _aliases[k] == resolvedId)),
+    ];
+    for (final k in matchingKeys) {
+      final r = _remoteRenderers[k];
+      if (r != null) {
+        r.srcObject = effectiveStream;
+      }
     }
 
     notifyListeners();
-    return renderer;
+    return _remoteRenderers[resolvedId ?? userId] ?? _remoteRenderers[userId];
   }
 
   /// Safely removes and disposes the [RTCVideoRenderer] and cached stream for a given [userId].
@@ -381,9 +387,14 @@ class MediaStreamManager with ChangeNotifier {
       if (_remoteStreams.isNotEmpty) return _remoteStreams.values.first;
     }
     
-    // If 'host' stream is available and the requested userId is not an active co-host, fallback to host stream
+    // If 'host' stream is available and the requested userId is not a co-host with distinct stream
     if (_remoteStreams.containsKey('host') && !userId.startsWith('cohost_') && !userId.startsWith('pk-')) {
-      return _remoteStreams['host'];
+      final isCoHostWithStream = _remoteStreams.keys.any(
+        (k) => k != 'host' && (k.contains(userId) || userId.contains(k)),
+      );
+      if (!isCoHostWithStream) {
+        return _remoteStreams['host'];
+      }
     }
     return null;
   }

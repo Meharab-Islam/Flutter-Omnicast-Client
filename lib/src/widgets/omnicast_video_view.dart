@@ -90,7 +90,9 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
         ? widget.mediaStreamManager.localStream
         : widget.mediaStreamManager.getRemoteStream(widget.userId);
 
-    if (_renderer!.srcObject != targetStream) {
+    if (_renderer!.srcObject != targetStream ||
+        (_renderer!.srcObject?.getVideoTracks().length !=
+            targetStream?.getVideoTracks().length)) {
       _renderer!.srcObject = targetStream;
     }
     if (mounted) {
@@ -181,7 +183,9 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_renderer == null || _renderer!.srcObject == null) {
+    if (_renderer == null ||
+        _renderer!.srcObject == null ||
+        _renderer!.srcObject!.getVideoTracks().isEmpty) {
       return widget.placeholder ?? const SizedBox.shrink();
     }
 

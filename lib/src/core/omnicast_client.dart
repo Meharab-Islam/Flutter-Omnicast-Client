@@ -665,22 +665,36 @@ class OmniCastClient {
       if (trackId.startsWith('cohost_') || streamId.startsWith('cohost_')) {
         isCoHostTrack = true;
         final raw = trackId.startsWith('cohost_') ? trackId : streamId;
-        final parts = raw.split('_');
-        if (parts.length >= 3 && (parts[1] == 'video' || parts[1] == 'audio')) {
-          matchedUserId = parts.sublist(2).join('_');
-        } else if (parts.length >= 2) {
-          matchedUserId = parts.sublist(1).join('_');
+
+        var extracted = raw;
+        if (extracted.startsWith('cohost_video_')) {
+          extracted = extracted.substring('cohost_video_'.length);
+        } else if (extracted.startsWith('cohost_audio_')) {
+          extracted = extracted.substring('cohost_audio_'.length);
+        } else if (extracted.startsWith('cohost_')) {
+          extracted = extracted.substring('cohost_'.length);
         }
+
+        if (extracted.endsWith('_video')) {
+          extracted = extracted.substring(0, extracted.length - '_video'.length);
+        } else if (extracted.endsWith('_audio')) {
+          extracted = extracted.substring(0, extracted.length - '_audio'.length);
+        }
+
+        matchedUserId = extracted;
       } else if (trackId.startsWith('pk-') || streamId.startsWith('pk-')) {
         isCoHostTrack = true;
-        final raw = trackId.startsWith('pk-') ? trackId : streamId;
+        var raw = trackId.startsWith('pk-') ? trackId : streamId;
+        if (raw.endsWith('-audio')) {
+          raw = raw.substring(0, raw.length - '-audio'.length);
+        }
         matchedUserId = raw;
       } else {
         // If it does NOT start with cohost_ or pk-, check if it explicitly matches an active seated co-host
         for (final seat in _roomState.activeSeats) {
           final sUser = seat.userId;
           if (sUser != null && sUser.isNotEmpty && sUser != hostId && sUser != 'host') {
-            if (streamId == sUser || trackId == sUser) {
+            if (streamId == sUser || trackId == sUser || streamId.contains(sUser) || sUser.contains(streamId)) {
               matchedUserId = sUser;
               isCoHostTrack = true;
               break;
@@ -712,12 +726,22 @@ class OmniCastClient {
         _roomState.addActiveRemoteUser('host');
         _roomState.addActiveRemoteUser(targetHost);
 
+        if (track.kind == 'video') {
+          _roomState.updateUserMediaState(targetHost, isCameraOff: false);
+          _roomState.updateUserMediaState('host', isCameraOff: false);
+        } else if (track.kind == 'audio') {
+          _roomState.updateUserMediaState(targetHost, isMuted: false);
+          _roomState.updateUserMediaState('host', isMuted: false);
+        }
+
         final hostNum = RegExp(r'\d+').firstMatch(targetHost)?.group(0);
         if (hostNum != null && hostNum.isNotEmpty) {
           _mediaStreamManager.registerAlias('user_$hostNum', targetHost);
           _mediaStreamManager.registerAlias(hostNum, targetHost);
           _mediaStreamManager.registerAlias('user_$hostNum', 'host');
           _mediaStreamManager.registerAlias(hostNum, 'host');
+          await _mediaStreamManager.attachRemoteStream('user_$hostNum', stream);
+          await _mediaStreamManager.attachRemoteStream(hostNum, stream);
         }
       } else {
         // 🚀 Co-Host Track: Route to dedicated co-host user ID
@@ -727,10 +751,38 @@ class OmniCastClient {
         await _mediaStreamManager.attachRemoteStream(coHostUser, stream);
         _roomState.addActiveRemoteUser(coHostUser);
 
+        if (track.kind == 'video') {
+          _roomState.updateUserMediaState(coHostUser, isCameraOff: false);
+        } else if (track.kind == 'audio') {
+          _roomState.updateUserMediaState(coHostUser, isMuted: false);
+        }
+
+        // Match against active seated users to create cross-aliases
+        for (final seat in _roomState.activeSeats) {
+          final sUser = seat.userId;
+          if (sUser != null && sUser.isNotEmpty) {
+            final sNum = RegExp(r'\d+').firstMatch(sUser)?.group(0);
+            final cNum = RegExp(r'\d+').firstMatch(coHostUser)?.group(0);
+            if (sUser == coHostUser || (sNum != null && sNum == cNum)) {
+              _mediaStreamManager.registerAlias(sUser, coHostUser);
+              _mediaStreamManager.registerAlias(coHostUser, sUser);
+              await _mediaStreamManager.attachRemoteStream(sUser, stream);
+              _roomState.addActiveRemoteUser(sUser);
+              if (track.kind == 'video') {
+                _roomState.updateUserMediaState(sUser, isCameraOff: false);
+              } else if (track.kind == 'audio') {
+                _roomState.updateUserMediaState(sUser, isMuted: false);
+              }
+            }
+          }
+        }
+
         final userNum = RegExp(r'\d+').firstMatch(coHostUser)?.group(0);
         if (userNum != null && userNum.isNotEmpty) {
           _mediaStreamManager.registerAlias('user_$userNum', coHostUser);
           _mediaStreamManager.registerAlias(userNum, coHostUser);
+          await _mediaStreamManager.attachRemoteStream('user_$userNum', stream);
+          await _mediaStreamManager.attachRemoteStream(userNum, stream);
         }
       }
     };
