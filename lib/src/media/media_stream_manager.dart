@@ -53,10 +53,21 @@ class MediaStreamManager with ChangeNotifier {
   /// Registers an alias for a user ID (e.g. mapping 'host' to a specific user ID).
   void registerAlias(String alias, String targetId) {
     _aliases[alias] = targetId;
-    final stream = _remoteStreams[targetId] ?? _remoteStreams[alias];
+    final aliasUnder = alias.replaceAll(' ', '_');
+    final targetUnder = targetId.replaceAll(' ', '_');
+    _aliases[aliasUnder] = targetId;
+    _aliases[alias] = targetUnder;
+    _aliases[aliasUnder] = targetUnder;
+
+    final stream = _remoteStreams[targetId] ??
+        _remoteStreams[alias] ??
+        _remoteStreams[targetUnder] ??
+        _remoteStreams[aliasUnder];
     if (stream != null) {
       _remoteStreams[alias] = stream;
       _remoteStreams[targetId] = stream;
+      _remoteStreams[aliasUnder] = stream;
+      _remoteStreams[targetUnder] = stream;
     }
   }
 
@@ -350,20 +361,9 @@ class MediaStreamManager with ChangeNotifier {
 
   /// Explicitly mutes or unmutes a remote peer's media track by kind ('audio' or 'video').
   void setRemoteTrackEnabled(String? userId, String kind, bool enabled) {
-    if (userId != null && _remoteStreams.containsKey(userId)) {
-      final stream = _remoteStreams[userId]!;
-      if (kind == 'audio') {
-        for (final track in stream.getAudioTracks()) {
-          track.enabled = enabled;
-        }
-      } else if (kind == 'video') {
-        for (final track in stream.getVideoTracks()) {
-          track.enabled = enabled;
-        }
-      }
-    } else {
-      // If userId is omitted or empty, apply to all remote streams
-      for (final stream in _remoteStreams.values) {
+    if (userId != null && userId.isNotEmpty) {
+      final stream = getRemoteStream(userId);
+      if (stream != null) {
         if (kind == 'audio') {
           for (final track in stream.getAudioTracks()) {
             track.enabled = enabled;
@@ -372,6 +372,21 @@ class MediaStreamManager with ChangeNotifier {
           for (final track in stream.getVideoTracks()) {
             track.enabled = enabled;
           }
+        }
+      }
+      // If a specific userId was targeted, do NOT touch other users' streams!
+      return;
+    }
+
+    // Only if userId is explicitly omitted/empty, apply to all remote streams
+    for (final stream in _remoteStreams.values) {
+      if (kind == 'audio') {
+        for (final track in stream.getAudioTracks()) {
+          track.enabled = enabled;
+        }
+      } else if (kind == 'video') {
+        for (final track in stream.getVideoTracks()) {
+          track.enabled = enabled;
         }
       }
     }
@@ -549,9 +564,17 @@ class MediaStreamManager with ChangeNotifier {
       }
     }
 
-    // 1. Direct match
+    // 1. Direct match & space/underscore variants
     if (_remoteStreams.containsKey(userId)) {
       addCandidate(_remoteStreams[userId]);
+    }
+    final underId = userId.replaceAll(' ', '_');
+    final spaceId = userId.replaceAll('_', ' ');
+    if (_remoteStreams.containsKey(underId)) {
+      addCandidate(_remoteStreams[underId]);
+    }
+    if (_remoteStreams.containsKey(spaceId)) {
+      addCandidate(_remoteStreams[spaceId]);
     }
     
     // 2. Alias match
@@ -559,10 +582,14 @@ class MediaStreamManager with ChangeNotifier {
     if (_remoteStreams.containsKey(resolvedId)) {
       addCandidate(_remoteStreams[resolvedId]);
     }
+    final resolvedUnder = resolveUserId(underId);
+    if (_remoteStreams.containsKey(resolvedUnder)) {
+      addCandidate(_remoteStreams[resolvedUnder]);
+    }
 
     // 3. Reverse alias match
     for (final entry in _aliases.entries) {
-      if ((entry.value == userId || entry.value == resolvedId) &&
+      if ((entry.value == userId || entry.value == resolvedId || entry.value == underId || entry.value == spaceId) &&
           _remoteStreams.containsKey(entry.key)) {
         addCandidate(_remoteStreams[entry.key]);
       }

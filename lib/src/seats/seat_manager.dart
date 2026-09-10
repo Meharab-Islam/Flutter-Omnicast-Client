@@ -316,9 +316,9 @@ class SeatManager {
       throw StateError('Cannot upgrade to co-host when not in a room');
     }
 
-    if (_isUpgradingToCoHost || _roomState.isCoHost) {
+    if (_isUpgradingToCoHost || (_roomState.isCoHost && _webRTCManager.mediaStreamManager.localStream != null)) {
       OmniCastLogger.log(
-        '[SeatManager] Already co-host or upgrade in progress, skipping redundant upgrade',
+        '[SeatManager] Already actively publishing as co-host, skipping redundant upgrade',
       );
       return;
     }
@@ -351,28 +351,32 @@ class SeatManager {
 
   /// Co-Host action: Voluntarily leaves the stage seat and returns to viewer mode.
   Future<void> leaveSeat() async {
-    if (!_roomState.isInRoom || !_roomState.isCoHost) return;
+    if (!_roomState.isInRoom) return;
 
-    _signalingClient.send(
-      SignalingMessage(
-        event: SignalingEvents.seatLeave,
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-      ),
-    );
+    if (_signalingClient.isConnected && _roomState.roomId != null && _roomState.userId != null) {
+      _signalingClient.send(
+        SignalingMessage(
+          event: SignalingEvents.seatLeave,
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+        ),
+      );
+    }
 
     await _webRTCManager.mediaStreamManager.stopLocalMedia();
     _roomState.updateRole(UserRole.viewer);
     await _webRTCManager.setupViewerTransceivers();
     final offer = await _webRTCManager.createAndSetLocalOffer();
-    _signalingClient.send(
-      SignalingMessage(
-        event: SignalingEvents.joinRoom,
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-        payload: {'sdp': offer.sdp, 'type': offer.type},
-      ),
-    );
+    if (_signalingClient.isConnected && _roomState.roomId != null && _roomState.userId != null) {
+      _signalingClient.send(
+        SignalingMessage(
+          event: SignalingEvents.joinRoom,
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          payload: {'sdp': offer.sdp, 'type': offer.type},
+        ),
+      );
+    }
   }
 
   /// Host action: Demotes a co-host back to a viewer seat without kicking them from the room.

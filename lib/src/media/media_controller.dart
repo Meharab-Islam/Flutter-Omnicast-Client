@@ -371,9 +371,10 @@ class MediaController with WidgetsBindingObserver {
             (type == 'video' ? isMuted : false);
 
         // If the host force-muted or disabled the camera of this local user
-        if (msg.targetUser == _roomState.userId ||
-            (payload['target_user'] == _roomState.userId &&
-                payload['forced_by_host'] == true)) {
+        final isTargetingMe = (_roomState.userId != null && _roomState.userId!.isNotEmpty) &&
+            ((msg.targetUser != null && msg.targetUser!.isNotEmpty && msg.targetUser == _roomState.userId) ||
+             (payload['target_user'] != null && payload['target_user'].toString().isNotEmpty && payload['target_user'] == _roomState.userId && payload['forced_by_host'] == true));
+        if (isTargetingMe) {
           if (type == 'audio') {
             _webRTCManager.setLocalTrackEnabled('audio', !isMuted);
             isMicrophoneMutedNotifier.value = isMuted;
@@ -398,9 +399,11 @@ class MediaController with WidgetsBindingObserver {
           );
         }
 
-        if (targetUserId == _roomState.hostId ||
-            targetUserId.isEmpty ||
-            _roomState.hostId == null) {
+        final bool isExplicitHostTarget = targetUserId.isNotEmpty &&
+            _roomState.hostId != null &&
+            _roomState.hostId!.isNotEmpty &&
+            (targetUserId == _roomState.hostId || targetUserId == 'host');
+        if (isExplicitHostTarget) {
           if (type == 'video') {
             isHostCameraOffNotifier.value = isCameraOff;
           } else if (type == 'audio') {
