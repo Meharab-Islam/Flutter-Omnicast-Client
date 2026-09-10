@@ -18,17 +18,13 @@ class OmniCastLogger {
     }
   }
 
-  /// Logs a warning message to console if [enableLogging] is true.
+  /// Logs a warning message to console.
   static void warn(String message) {
-    if (enableLogging) {
-      debugPrint('[WARN] $message');
-    }
+    debugPrint('[WARN] $message');
   }
 
-  /// Logs an error or warning message to console if [enableLogging] is true.
+  /// Logs an error or warning message to console.
   static void error(String message, [dynamic error]) {
-    if (enableLogging) {
-      debugPrint('[ERROR] $message ${error ?? ""}');
-    }
+    debugPrint('[ERROR] $message ${error ?? ""}');
   }
 }

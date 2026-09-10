@@ -9,23 +9,42 @@ import '../utils/omnicast_logger.dart';
 class MediaStreamManager with ChangeNotifier {
   MediaStream? _localStream;
   RTCVideoRenderer? _localRenderer;
+  MediaStream? _screenStream;
+  RTCVideoRenderer? _screenRenderer;
+  MediaStreamTrack? _musicTrack;
+  MediaStream? _musicStream;
+
   final Map<String, RTCVideoRenderer> _remoteRenderers = {};
   final Map<String, MediaStream> _remoteStreams = {};
+  final Map<String, RTCVideoRenderer> _remoteScreenRenderers = {};
+  final Map<String, MediaStream> _remoteScreenStreams = {};
   final Map<String, String> _aliases = {};
 
   VideoParameters _currentParameters = VideoParameters.presetSmooth480p;
   bool _isAudioMuted = false;
   bool _isVideoMuted = false;
+  bool _isScreenSharing = false;
   bool _isDisposed = false;
 
   // Getters
   MediaStream? get localStream => _localStream;
   RTCVideoRenderer? get localRenderer => _localRenderer;
+  MediaStream? get screenStream => _screenStream;
+  RTCVideoRenderer? get screenRenderer => _screenRenderer;
+  MediaStreamTrack? get musicTrack => _musicTrack;
+  MediaStream? get musicStream => _musicStream;
+  bool get isScreenSharing => _isScreenSharing;
+  bool get hasMusicTrack => _musicTrack != null;
+
   VideoParameters get currentParameters => _currentParameters;
   Map<String, RTCVideoRenderer> get remoteRenderers =>
       Map.unmodifiable(_remoteRenderers);
   Map<String, MediaStream> get remoteStreams =>
       Map.unmodifiable(_remoteStreams);
+  Map<String, RTCVideoRenderer> get remoteScreenRenderers =>
+      Map.unmodifiable(_remoteScreenRenderers);
+  Map<String, MediaStream> get remoteScreenStreams =>
+      Map.unmodifiable(_remoteScreenStreams);
 
   bool get isAudioMuted => _isAudioMuted;
   bool get isVideoMuted => _isVideoMuted;
@@ -34,6 +53,11 @@ class MediaStreamManager with ChangeNotifier {
   /// Registers an alias for a user ID (e.g. mapping 'host' to a specific user ID).
   void registerAlias(String alias, String targetId) {
     _aliases[alias] = targetId;
+    final stream = _remoteStreams[targetId] ?? _remoteStreams[alias];
+    if (stream != null) {
+      _remoteStreams[alias] = stream;
+      _remoteStreams[targetId] = stream;
+    }
   }
 
   /// Resolves an alias or canonical user ID (e.g. mapping alias to target user ID).
@@ -41,7 +65,12 @@ class MediaStreamManager with ChangeNotifier {
 
   /// Initializes the local video renderer safely without leaking EGL contexts.
   Future<RTCVideoRenderer?> initLocalRenderer() async {
-    if (_localRenderer != null) return _localRenderer!;
+    if (_localRenderer != null) {
+      if (_localStream != null && _localRenderer!.srcObject != _localStream) {
+        _localRenderer!.srcObject = _localStream;
+      }
+      return _localRenderer!;
+    }
 
     final renderer = RTCVideoRenderer();
     try {
@@ -58,6 +87,123 @@ class MediaStreamManager with ChangeNotifier {
     }
     notifyListeners();
     return renderer;
+  }
+
+  /// Initializes the local screen share video renderer.
+  Future<RTCVideoRenderer?> initScreenRenderer() async {
+    if (_screenRenderer != null) return _screenRenderer!;
+
+    final renderer = RTCVideoRenderer();
+    try {
+      await renderer.initialize();
+      _screenRenderer = renderer;
+      if (_screenStream != null) {
+        renderer.srcObject = _screenStream;
+      }
+    } catch (e) {
+      OmniCastLogger.warn(
+        '[MediaStreamManager] initScreenRenderer failed to allocate EGL context: $e',
+      );
+      return null;
+    }
+    notifyListeners();
+    return renderer;
+  }
+
+  /// Starts capturing device display screen and optional system audio.
+  Future<MediaStream?> startScreenShare({bool captureAudio = false}) async {
+    if (_isDisposed) {
+      throw StateError('Cannot start screen share on disposed MediaStreamManager');
+    }
+
+    await stopScreenShare();
+
+    try {
+      final Map<String, dynamic> mediaConstraints = {
+        'audio': captureAudio,
+        'video': {
+          'mandatory': {
+            'minWidth': '1280',
+            'minHeight': '720',
+            'minFrameRate': '30',
+          },
+          'facingMode': 'user',
+          'optional': [],
+        }
+      };
+
+      final stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+      _screenStream = stream;
+      _isScreenSharing = true;
+
+      // Listen for screen share termination from OS system tray/notification
+      for (final track in stream.getVideoTracks()) {
+        track.onEnded = () {
+          stopScreenShare();
+        };
+      }
+
+      if (_screenRenderer != null) {
+        _screenRenderer!.srcObject = stream;
+      }
+
+      notifyListeners();
+      return stream;
+    } catch (e) {
+      OmniCastLogger.error('[MediaStreamManager] getDisplayMedia failed: $e');
+      _isScreenSharing = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  /// Stops the local screen share stream and clears its renderer.
+  Future<void> stopScreenShare() async {
+    if (_screenStream != null) {
+      for (final track in _screenStream!.getTracks()) {
+        try {
+          await track.stop();
+        } catch (_) {}
+      }
+      try {
+        await _screenStream!.dispose();
+      } catch (_) {}
+      _screenStream = null;
+    }
+
+    if (_screenRenderer != null) {
+      _screenRenderer!.srcObject = null;
+    }
+
+    _isScreenSharing = false;
+    notifyListeners();
+  }
+
+  /// Publishes a secondary auxiliary music/in-app audio track.
+  Future<void> publishMusicTrack(MediaStreamTrack track) async {
+    _musicTrack = track;
+    try {
+      _musicStream = await createLocalMediaStream('music_stream_${track.id}');
+      await _musicStream!.addTrack(track);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  /// Stops publishing the secondary music track.
+  Future<void> stopMusicTrack() async {
+    if (_musicTrack != null) {
+      try {
+        await _musicTrack!.stop();
+      } catch (_) {}
+      _musicTrack = null;
+    }
+    if (_musicStream != null) {
+      try {
+        await _musicStream!.dispose();
+      } catch (_) {}
+      _musicStream = null;
+    }
+    notifyListeners();
   }
 
   /// Opens the device camera and microphone with custom [VideoParameters].
@@ -88,6 +234,30 @@ class MediaStreamManager with ChangeNotifier {
         fps: frameRate ?? _currentParameters.frameRate,
         facingMode: facingMode ?? _currentParameters.facingMode,
       );
+    }
+
+    // Check if we already have an active local stream with the requested video/audio tracks
+    final hasActiveVideo = _localStream != null &&
+        _localStream!.getVideoTracks().any((t) => t.enabled && !(t.muted ?? false));
+    final hasActiveAudio = _localStream != null &&
+        _localStream!.getAudioTracks().isNotEmpty;
+
+    if (_localStream != null &&
+        (!video || hasActiveVideo) &&
+        (!audio || hasActiveAudio) &&
+        parameters == null &&
+        width == null &&
+        height == null) {
+      OmniCastLogger.log(
+        '[MediaStreamManager] Existing localStream is active, reusing without restarting camera hardware',
+      );
+      if (_localRenderer != null && _localRenderer!.srcObject != _localStream) {
+        _localRenderer!.srcObject = _localStream;
+      }
+      _isAudioMuted = !audio;
+      _isVideoMuted = !video;
+      notifyListeners();
+      return _localStream!;
     }
 
     // Stop existing local stream if any
@@ -133,7 +303,7 @@ class MediaStreamManager with ChangeNotifier {
     _localStream = stream;
 
     // Attach stream to existing local renderer if active without creating redundant EGL contexts
-    if (_localRenderer != null) {
+    if (_localRenderer != null && _localRenderer!.srcObject != stream) {
       _localRenderer!.srcObject = stream;
     }
 
@@ -211,7 +381,20 @@ class MediaStreamManager with ChangeNotifier {
   Future<RTCVideoRenderer> getOrCreateRemoteRenderer(String userId) async {
     final resolvedId = _aliases[userId] ?? userId;
     if (_remoteRenderers.containsKey(resolvedId)) {
-      return _remoteRenderers[resolvedId]!;
+      final r = _remoteRenderers[resolvedId]!;
+      final stream = getRemoteStream(userId);
+      if (stream != null && r.srcObject != stream) {
+        r.srcObject = stream;
+      }
+      return r;
+    }
+    if (_remoteRenderers.containsKey(userId)) {
+      final r = _remoteRenderers[userId]!;
+      final stream = getRemoteStream(userId);
+      if (stream != null && r.srcObject != stream) {
+        r.srcObject = stream;
+      }
+      return r;
     }
 
     final renderer = RTCVideoRenderer();
@@ -223,8 +406,9 @@ class MediaStreamManager with ChangeNotifier {
       );
     }
     _remoteRenderers[resolvedId] = renderer;
+    _remoteRenderers[userId] = renderer;
 
-    final stream = _remoteStreams[resolvedId] ?? _remoteStreams[userId];
+    final stream = getRemoteStream(userId);
     if (stream != null) {
       renderer.srcObject = stream;
     }
@@ -246,6 +430,7 @@ class MediaStreamManager with ChangeNotifier {
         for (final at in existingStream.getAudioTracks()) {
           if (!effectiveStream.getTracks().any((t) => t.id == at.id || t.kind == 'audio')) {
             try {
+              at.enabled = true;
               await effectiveStream.addTrack(at);
             } catch (_) {}
           }
@@ -256,6 +441,7 @@ class MediaStreamManager with ChangeNotifier {
       for (final at in stream.getAudioTracks()) {
         if (!effectiveStream.getTracks().any((t) => t.id == at.id || t.kind == 'audio')) {
           try {
+            at.enabled = true;
             await effectiveStream.addTrack(at);
           } catch (_) {}
         }
@@ -266,6 +452,7 @@ class MediaStreamManager with ChangeNotifier {
         for (final track in existingStream.getTracks()) {
           if (!effectiveStream.getTracks().any((t) => t.id == track.id || t.kind == track.kind)) {
             try {
+              track.enabled = true;
               await effectiveStream.addTrack(track);
             } catch (_) {}
           }
@@ -273,27 +460,61 @@ class MediaStreamManager with ChangeNotifier {
       }
     }
 
+    // Explicitly guarantee all tracks in effectiveStream are enabled
+    for (final t in effectiveStream.getTracks()) {
+      try {
+        t.enabled = true;
+      } catch (_) {}
+    }
+
     _remoteStreams[userId] = effectiveStream;
     final resolvedId = _aliases[userId];
     if (resolvedId != null && resolvedId != userId) {
       _remoteStreams[resolvedId] = effectiveStream;
     }
+    for (final entry in _aliases.entries) {
+      if (entry.key == userId || entry.value == userId || (resolvedId != null && (entry.key == resolvedId || entry.value == resolvedId))) {
+        _remoteStreams[entry.key] = effectiveStream;
+        _remoteStreams[entry.value] = effectiveStream;
+      }
+    }
 
-    // If a UI renderer was already allocated for this user/alias, update its srcObject
+    final primaryKey = resolvedId ?? userId;
+    var primaryRenderer = _remoteRenderers[primaryKey] ?? _remoteRenderers[userId];
+    if (primaryRenderer == null) {
+      final newRenderer = RTCVideoRenderer();
+      try {
+        await newRenderer.initialize();
+        newRenderer.srcObject = effectiveStream;
+        _remoteRenderers[primaryKey] = newRenderer;
+        _remoteRenderers[userId] = newRenderer;
+        primaryRenderer = newRenderer;
+      } catch (e) {
+        OmniCastLogger.warn(
+          '[MediaStreamManager] Failed to auto-initialize renderer for $primaryKey: $e',
+        );
+      }
+    } else {
+      primaryRenderer.srcObject = effectiveStream;
+    }
+
+    // Link all matching keys / aliases to this renderer and stream
     final matchingKeys = [
       userId,
-      ?resolvedId,
+      if (resolvedId != null) resolvedId,
       ..._aliases.keys.where((k) => _aliases[k] == userId || (resolvedId != null && _aliases[k] == resolvedId)),
     ];
     for (final k in matchingKeys) {
-      final r = _remoteRenderers[k];
-      if (r != null) {
+      var r = _remoteRenderers[k];
+      if (r == null && primaryRenderer != null) {
+        _remoteRenderers[k] = primaryRenderer;
+      } else if (r != null) {
         r.srcObject = effectiveStream;
       }
     }
 
     notifyListeners();
-    return _remoteRenderers[resolvedId ?? userId] ?? _remoteRenderers[userId];
+    return primaryRenderer ?? _remoteRenderers[resolvedId ?? userId] ?? _remoteRenderers[userId];
   }
 
   /// Safely removes and disposes the [RTCVideoRenderer] and cached stream for a given [userId].
@@ -311,6 +532,7 @@ class MediaStreamManager with ChangeNotifier {
     if (renderer != null) {
       renderer.srcObject = null;
       await renderer.dispose();
+      _remoteRenderers.removeWhere((k, v) => v == renderer);
     }
     notifyListeners();
   }
@@ -357,45 +579,46 @@ class MediaStreamManager with ChangeNotifier {
       }
     }
 
-    // 5. Substring match
+    // 5. Substring match (Never match 'host' or 'local' against arbitrary user IDs)
     for (final entry in _remoteStreams.entries) {
+      if (entry.key == 'host' || entry.key == 'local') continue;
       if (entry.key == userId ||
           entry.key == resolvedId ||
-          entry.key.contains(userId) ||
-          userId.contains(entry.key)) {
+          (entry.key.length >= 3 && userId.length >= 3 && (entry.key.contains(userId) || userId.contains(entry.key)))) {
         addCandidate(entry.value);
       }
     }
 
-    // 6. Return candidate with video track first, or any candidate
+    // Check if this query is explicitly for the broadcaster/host
+    final bool isHostQuery = userId == 'host' ||
+        userId.toLowerCase().contains('host') ||
+        resolveUserId(userId) == 'host' ||
+        _aliases['host'] == userId;
+
+    // Include 'host' stream as candidate ONLY if this query is actually targeting the host
+    if (isHostQuery && _remoteStreams.containsKey('host')) {
+      addCandidate(_remoteStreams['host']);
+    }
+
+    // 6. Return candidate with video track first
     for (final c in candidates) {
       if (c.getVideoTracks().isNotEmpty) return c;
     }
+
+    // 7. Dynamic Host Fallback: check host stream for video tracks ONLY if asking for host
+    if (isHostQuery && _remoteStreams.containsKey('host')) {
+      final hostStream = _remoteStreams['host'];
+      if (hostStream != null && hostStream.getVideoTracks().isNotEmpty) {
+        return hostStream;
+      }
+    }
+
     if (candidates.isNotEmpty) return candidates.first;
 
-    // 7. Fallback: Host query, room ID query, or single remote stream fallback
-    final isHostQuery = userId == 'host' ||
-        userId.toLowerCase().contains('host') ||
-        (resolveUserId(userId) == 'host');
-    if (isHostQuery || _remoteStreams.length == 1) {
-      if (_remoteStreams.containsKey('host')) {
-        return _remoteStreams['host'];
-      }
-      for (final s in _remoteStreams.values) {
-        if (s.getVideoTracks().isNotEmpty) return s;
-      }
-      if (_remoteStreams.isNotEmpty) return _remoteStreams.values.first;
+    if (isHostQuery && _remoteStreams.containsKey('host')) {
+      return _remoteStreams['host'];
     }
-    
-    // If 'host' stream is available and the requested userId is not a co-host with distinct stream
-    if (_remoteStreams.containsKey('host') && !userId.startsWith('cohost_') && !userId.startsWith('pk-')) {
-      final isCoHostWithStream = _remoteStreams.keys.any(
-        (k) => k != 'host' && (k.contains(userId) || userId.contains(k)),
-      );
-      if (!isCoHostWithStream) {
-        return _remoteStreams['host'];
-      }
-    }
+
     return null;
   }
 
@@ -431,10 +654,138 @@ class MediaStreamManager with ChangeNotifier {
         }
       }
     }
-    if (_remoteRenderers.isNotEmpty) {
-      if (userId == 'host' || _remoteRenderers.length == 1) {
-        return _remoteRenderers.values.first;
+    // Dynamic Host Fallback
+    if (_remoteRenderers.containsKey('host')) {
+      if (_remoteRenderers.length == 1 ||
+          userId == 'host' ||
+          userId.toLowerCase().contains('host') ||
+          resolveUserId(userId) == 'host' ||
+          !userId.startsWith('cohost_')) {
+        return _remoteRenderers['host'];
       }
+    }
+    // Single remote renderer fallback
+    if (_remoteRenderers.length == 1 && !userId.startsWith('cohost_')) {
+      return _remoteRenderers.values.first;
+    }
+    if (_remoteRenderers.isNotEmpty && (userId == 'host' || !userId.startsWith('cohost_'))) {
+      return _remoteRenderers.values.first;
+    }
+    return null;
+  }
+
+  /// Attaches a remote screen share [MediaStream] to storage and notifies listening UI components.
+  Future<RTCVideoRenderer?> attachRemoteScreenStream(
+    String userId,
+    MediaStream stream,
+  ) async {
+    _remoteScreenStreams[userId] = stream;
+    final resolvedId = _aliases[userId];
+    if (resolvedId != null && resolvedId != userId) {
+      _remoteScreenStreams[resolvedId] = stream;
+    }
+
+    final renderer = await getOrCreateRemoteScreenRenderer(userId);
+    renderer.srcObject = stream;
+
+    notifyListeners();
+    return renderer;
+  }
+
+  /// Removes and disposes the remote screen share stream and renderer for a given [userId].
+  Future<void> removeRemoteScreenStream(String userId) async {
+    final resolvedId = _aliases[userId] ?? userId;
+    final stream = _remoteScreenStreams.remove(resolvedId) ?? _remoteScreenStreams.remove(userId);
+    if (stream != null) {
+      for (final track in stream.getTracks()) {
+        try {
+          await track.stop();
+        } catch (_) {}
+      }
+      try {
+        await stream.dispose();
+      } catch (_) {}
+    }
+
+    final renderer = _remoteScreenRenderers.remove(resolvedId) ?? _remoteScreenRenderers.remove(userId);
+    if (renderer != null) {
+      renderer.srcObject = null;
+      try {
+        await renderer.dispose();
+      } catch (_) {}
+    }
+    notifyListeners();
+  }
+
+  /// Retrieves or creates and initializes an [RTCVideoRenderer] for screen sharing of a given [userId].
+  Future<RTCVideoRenderer> getOrCreateRemoteScreenRenderer(String userId) async {
+    final resolvedId = _aliases[userId] ?? userId;
+    if (_remoteScreenRenderers.containsKey(resolvedId)) {
+      return _remoteScreenRenderers[resolvedId]!;
+    }
+
+    final renderer = RTCVideoRenderer();
+    try {
+      await renderer.initialize();
+    } catch (e) {
+      OmniCastLogger.warn(
+        '[MediaStreamManager] Failed to initialize RTCVideoRenderer for screen $userId: $e',
+      );
+    }
+    _remoteScreenRenderers[resolvedId] = renderer;
+
+    final stream = _remoteScreenStreams[resolvedId] ?? _remoteScreenStreams[userId];
+    if (stream != null) {
+      renderer.srcObject = stream;
+    }
+
+    return renderer;
+  }
+
+  /// Returns the remote screen share [MediaStream] for a given [userId].
+  MediaStream? getRemoteScreenStream(String? userId) {
+    if (userId == null || userId == 'local') return _screenStream;
+
+    if (_remoteScreenStreams.containsKey(userId)) {
+      return _remoteScreenStreams[userId];
+    }
+    final resolvedId = resolveUserId(userId);
+    if (_remoteScreenStreams.containsKey(resolvedId)) {
+      return _remoteScreenStreams[resolvedId];
+    }
+
+    for (final entry in _remoteScreenStreams.entries) {
+      if (entry.key == userId || entry.key == resolvedId || entry.key.contains(userId) || userId.contains(entry.key)) {
+        return entry.value;
+      }
+    }
+
+    if (_remoteScreenStreams.isNotEmpty) {
+      return _remoteScreenStreams.values.first;
+    }
+    return null;
+  }
+
+  /// Returns the remote screen share [RTCVideoRenderer] for a given [userId].
+  RTCVideoRenderer? getRemoteScreenRenderer(String? userId) {
+    if (userId == null || userId == 'local') return _screenRenderer;
+
+    final resolvedId = resolveUserId(userId);
+    if (_remoteScreenRenderers.containsKey(resolvedId)) {
+      return _remoteScreenRenderers[resolvedId];
+    }
+    if (_remoteScreenRenderers.containsKey(userId)) {
+      return _remoteScreenRenderers[userId];
+    }
+
+    for (final entry in _remoteScreenRenderers.entries) {
+      if (entry.key == userId || entry.key == resolvedId || entry.key.contains(userId) || userId.contains(entry.key)) {
+        return entry.value;
+      }
+    }
+
+    if (_remoteScreenRenderers.isNotEmpty) {
+      return _remoteScreenRenderers.values.first;
     }
     return null;
   }
@@ -478,6 +829,8 @@ class MediaStreamManager with ChangeNotifier {
     _isDisposed = true;
 
     await stopLocalMedia();
+    await stopScreenShare();
+    await stopMusicTrack();
 
     if (_localRenderer != null) {
       try {
@@ -489,12 +842,28 @@ class MediaStreamManager with ChangeNotifier {
       _localRenderer = null;
     }
 
+    if (_screenRenderer != null) {
+      try {
+        await _screenRenderer!.dispose().timeout(
+          const Duration(milliseconds: 250),
+          onTimeout: () {},
+        );
+      } catch (_) {}
+      _screenRenderer = null;
+    }
+
     final remoteIds = List<String>.from(_remoteRenderers.keys);
     for (final id in remoteIds) {
       await removeRemoteRenderer(id);
     }
+    final remoteScreenIds = List<String>.from(_remoteScreenRenderers.keys);
+    for (final id in remoteScreenIds) {
+      await removeRemoteScreenStream(id);
+    }
     _remoteStreams.clear();
     _remoteRenderers.clear();
+    _remoteScreenStreams.clear();
+    _remoteScreenRenderers.clear();
     _aliases.clear();
 
     super.dispose();

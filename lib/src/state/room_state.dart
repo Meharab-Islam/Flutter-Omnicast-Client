@@ -54,6 +54,7 @@ class RoomState extends ChangeNotifier {
 
   String? get roomId => _roomId;
   String? get hostId => _hostId;
+  String? get hostUserId => _hostId;
   String? get userId => _userId;
   UserRole get role => _role;
   RoomType get roomType => _roomType;
@@ -137,6 +138,13 @@ class RoomState extends ChangeNotifier {
     _role = role;
     _roomType = roomType;
     _hostId = hostId ?? (role == UserRole.host ? userId : null);
+    notifyListeners();
+  }
+
+  /// Sets or updates the host user ID dynamically.
+  void setHostId(String? hostId) {
+    if (_isDisposed || _hostId == hostId) return;
+    _hostId = hostId;
     notifyListeners();
   }
 

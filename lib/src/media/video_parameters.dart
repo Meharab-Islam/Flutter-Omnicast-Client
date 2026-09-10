@@ -87,9 +87,12 @@ class VideoParameters {
     );
   }
 
-  /// Converts parameters to ideal/mandatory getUserMedia constraints map.
-  /// Strictly caps framerate (min: 15, ideal: 24, max: 30) and disables CPU-heavy software processing
-  /// to eliminate latency, encoder throttling, and freezing.
+  /// Converts parameters to ideal/optional getUserMedia constraints map.
+  ///
+  /// Uses W3C `ideal`-based constraints instead of strict `mandatory` dimensions.
+  /// This prevents Samsung/Qualcomm camera2 HAL SIGABRT crashes (CSLAcquireDeviceHW)
+  /// that occur when portrait-mode devices are asked for mandatory landscape resolutions.
+  /// The browser/WebRTC engine picks the closest available resolution without hard-failing.
   Map<String, dynamic> toMediaConstraints({
     bool video = true,
     bool audio = true,
@@ -113,13 +116,9 @@ class VideoParameters {
       'video': video
           ? {
               'facingMode': facingMode,
-              'optional': [],
-              'mandatory': {
-                'minWidth': '$width',
-                'minHeight': '$height',
-                'minFrameRate': '15',
-                'maxFrameRate': '$frameRate',
-              },
+              'width': {'ideal': width},
+              'height': {'ideal': height},
+              'frameRate': {'min': 15, 'ideal': frameRate, 'max': frameRate},
             }
           : false,
     };

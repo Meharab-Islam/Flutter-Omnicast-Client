@@ -20,6 +20,8 @@ class WebRTCManager {
   RTCPeerConnection? _peerConnection;
   RTCRtpSender? _videoSender;
   RTCRtpSender? _audioSender;
+  RTCRtpSender? _screenSender;
+  RTCRtpSender? _musicSender;
   bool _isNegotiating = false;
   bool _simulcastEnabled = false;
   bool _isDisposed = false;
@@ -27,6 +29,38 @@ class WebRTCManager {
   late final WebRTCStatsMonitor _statsMonitor;
 
   final List<RTCIceCandidate> _queuedRemoteCandidates = [];
+  Future<void>? _sdpQueue;
+
+  Future<T> _enqueueSdp<T>(Future<T> Function() fn) {
+    final prev = _sdpQueue;
+    final completer = Completer<T>();
+    final syncCompleter = Completer<void>();
+    _sdpQueue = syncCompleter.future;
+
+    void run() async {
+      if (prev != null) {
+        try {
+          await prev;
+        } catch (_) {}
+      }
+      if (_isDisposed) {
+        syncCompleter.complete();
+        completer.completeError(StateError('WebRTCManager is disposed'));
+        return;
+      }
+      try {
+        final res = await fn();
+        syncCompleter.complete();
+        completer.complete(res);
+      } catch (e, st) {
+        syncCompleter.complete();
+        completer.completeError(e, st);
+      }
+    }
+
+    run();
+    return completer.future;
+  }
 
   // Callbacks
   OnLocalIceCandidateCallback? onLocalIceCandidate;
@@ -59,6 +93,8 @@ class WebRTCManager {
   bool get simulcastEnabled => _simulcastEnabled;
   RTCRtpSender? get videoSender => _videoSender;
   RTCRtpSender? get audioSender => _audioSender;
+  RTCRtpSender? get screenSender => _screenSender;
+  RTCRtpSender? get musicSender => _musicSender;
   WebRTCStatsMonitor get statsMonitor => _statsMonitor;
 
   /// Strips transport-cc header extensions and feedback attributes from SDP.
@@ -330,18 +366,17 @@ class WebRTCManager {
 
     _simulcastEnabled = false;
 
-    // Check existing transceivers to reuse if upgrading from viewer (Unified Plan)
+    // 1. Look up existing transceivers or senders
     final transceivers = await pc.getTransceivers();
-    RTCRtpTransceiver? audioTransceiver;
-    RTCRtpTransceiver? videoTransceiver;
+    RTCRtpTransceiver? existingAudioTransceiver;
+    RTCRtpTransceiver? existingVideoTransceiver;
 
     for (final t in transceivers) {
-      final senderKind = t.sender.track?.kind;
-      final receiverKind = t.receiver.track?.kind;
-      if (senderKind == 'audio' || receiverKind == 'audio') {
-        audioTransceiver ??= t;
-      } else if (senderKind == 'video' || receiverKind == 'video') {
-        videoTransceiver ??= t;
+      final kind = t.sender.track?.kind ?? t.receiver.track?.kind;
+      if (kind == 'audio' && existingAudioTransceiver == null) {
+        existingAudioTransceiver = t;
+      } else if (kind == 'video' && existingVideoTransceiver == null) {
+        existingVideoTransceiver = t;
       }
     }
 
@@ -350,10 +385,12 @@ class WebRTCManager {
     if (audioTracks.isNotEmpty) {
       final audioTrack = audioTracks.first;
       try {
-        if (audioTransceiver != null) {
-          await audioTransceiver.setDirection(TransceiverDirection.SendRecv);
-          await audioTransceiver.sender.replaceTrack(audioTrack);
-          _audioSender = audioTransceiver.sender;
+        if (existingAudioTransceiver != null) {
+          await existingAudioTransceiver.setDirection(
+            TransceiverDirection.SendRecv,
+          );
+          await existingAudioTransceiver.sender.replaceTrack(audioTrack);
+          _audioSender = existingAudioTransceiver.sender;
         } else {
           _audioSender = await pc.addTrack(audioTrack, localStream);
         }
@@ -369,10 +406,12 @@ class WebRTCManager {
     if (videoTracks.isNotEmpty) {
       final videoTrack = videoTracks.first;
       try {
-        if (videoTransceiver != null) {
-          await videoTransceiver.setDirection(TransceiverDirection.SendRecv);
-          await videoTransceiver.sender.replaceTrack(videoTrack);
-          _videoSender = videoTransceiver.sender;
+        if (existingVideoTransceiver != null) {
+          await existingVideoTransceiver.setDirection(
+            TransceiverDirection.SendRecv,
+          );
+          await existingVideoTransceiver.sender.replaceTrack(videoTrack);
+          _videoSender = existingVideoTransceiver.sender;
         } else {
           _videoSender = await pc.addTrack(videoTrack, localStream);
         }
@@ -385,23 +424,32 @@ class WebRTCManager {
       // Force VP8 codec preference over H264/VP9 for rock-solid packet loss & PLI resilience
       try {
         final currentTransceivers = await pc.getTransceivers();
-        final currentVideoTransceiver = currentTransceivers.firstWhere(
-          (t) => t.sender.track?.kind == 'video' || t.sender == _videoSender,
-        );
-        final capabilities = await getRtpSenderCapabilities('video');
-        if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
-          final sortedCodecs =
-              List<RTCRtpCodecCapability>.from(capabilities.codecs!)..sort((
-                a,
-                b,
-              ) {
-                final aMime = a.mimeType.toLowerCase();
-                final bMime = b.mimeType.toLowerCase();
-                if (aMime.contains('vp8') && !bMime.contains('vp8')) return -1;
-                if (!aMime.contains('vp8') && bMime.contains('vp8')) return 1;
-                return 0;
-              });
-          await currentVideoTransceiver.setCodecPreferences(sortedCodecs);
+        RTCRtpTransceiver? currentVideoTransceiver;
+        for (final t in currentTransceivers) {
+          if (t.sender.track?.kind == 'video' ||
+              t.sender == _videoSender ||
+              t.receiver.track?.kind == 'video') {
+            currentVideoTransceiver = t;
+            break;
+          }
+        }
+        if (currentVideoTransceiver != null) {
+          final capabilities = await getRtpSenderCapabilities('video');
+          if (capabilities.codecs != null && capabilities.codecs!.isNotEmpty) {
+            final sortedCodecs =
+                List<RTCRtpCodecCapability>.from(capabilities.codecs!)..sort((
+                  a,
+                  b,
+                ) {
+                  final aMime = a.mimeType.toLowerCase();
+                  final bMime = b.mimeType.toLowerCase();
+                  if (aMime.contains('vp8') && !bMime.contains('vp8'))
+                    return -1;
+                  if (!aMime.contains('vp8') && bMime.contains('vp8')) return 1;
+                  return 0;
+                });
+            await currentVideoTransceiver.setCodecPreferences(sortedCodecs);
+          }
         }
       } catch (_) {}
 
@@ -440,6 +488,70 @@ class WebRTCManager {
         OmniCastLogger.error(
           '[WebRTCManager] Set single-stream parameters notice: $e',
         );
+      }
+    }
+  }
+
+  /// Adds a screen sharing track to the active [RTCPeerConnection].
+  Future<RTCRtpSender?> addScreenTrack(
+    MediaStreamTrack track,
+    MediaStream stream,
+  ) async {
+    final pc = await initializePeerConnection();
+    try {
+      _screenSender = await pc.addTrack(track, stream);
+      return _screenSender;
+    } catch (e) {
+      OmniCastLogger.error('[WebRTCManager] Failed to add screen track: $e');
+      return null;
+    }
+  }
+
+  /// Removes the screen sharing track from the active [RTCPeerConnection].
+  Future<void> removeScreenTrack() async {
+    final pc = _peerConnection;
+    final sender = _screenSender;
+    _screenSender = null;
+    if (pc != null && sender != null) {
+      try {
+        final senders = await pc.getSenders();
+        if (senders.any((s) => s.senderId == sender.senderId)) {
+          await pc.removeTrack(sender);
+        }
+      } catch (e) {
+        OmniCastLogger.warn('[WebRTCManager] removeScreenTrack error: $e');
+      }
+    }
+  }
+
+  /// Adds an auxiliary music/in-app audio track to the active [RTCPeerConnection].
+  Future<RTCRtpSender?> addMusicTrack(
+    MediaStreamTrack track,
+    MediaStream stream,
+  ) async {
+    final pc = await initializePeerConnection();
+    try {
+      _musicSender = await pc.addTrack(track, stream);
+      return _musicSender;
+    } catch (e) {
+      OmniCastLogger.error('[WebRTCManager] Failed to add music track: $e');
+      return null;
+    }
+  }
+
+  /// Removes the music audio track from the active [RTCPeerConnection].
+  Future<void> removeMusicTrack() async {
+    final pc = _peerConnection;
+    final sender = _musicSender;
+    _musicSender = null;
+    if (pc != null && sender != null) {
+      try {
+        final senders = await pc.getSenders();
+        if (senders.any((s) => s.senderId == sender.senderId)) {
+          await pc.removeTrack(sender);
+        }
+      } catch (e) {
+        OmniCastLogger.warn('[WebRTCManager] removeMusicTrack error: $e');
       }
     }
   }
@@ -585,7 +697,7 @@ class WebRTCManager {
   Future<RTCSessionDescription> createAndSetLocalOffer({
     bool offerToReceiveAudio = true,
     bool offerToReceiveVideo = true,
-  }) async {
+  }) => _enqueueSdp(() async {
     final pc = await initializePeerConnection();
 
     final constraints = <String, dynamic>{
@@ -604,96 +716,184 @@ class WebRTCManager {
     } finally {
       _isNegotiating = false;
     }
-  }
+  });
 
   /// Creates an ICE Restart SDP Offer ({ 'IceRestart': true }) for seamless network handoffs.
-  Future<RTCSessionDescription> createIceRestartOffer() async {
-    final pc = await initializePeerConnection();
+  Future<RTCSessionDescription> createIceRestartOffer() =>
+      _enqueueSdp(() async {
+        final pc = await initializePeerConnection();
 
-    final constraints = <String, dynamic>{
-      'mandatory': {
-        'OfferToReceiveAudio': true,
-        'OfferToReceiveVideo': true,
-        'IceRestart': true,
-      },
-      'optional': [],
-    };
+        final constraints = <String, dynamic>{
+          'mandatory': {
+            'OfferToReceiveAudio': true,
+            'OfferToReceiveVideo': true,
+            'IceRestart': true,
+          },
+          'optional': [],
+        };
 
-    _isNegotiating = true;
-    try {
-      final offer = await pc.createOffer(constraints);
-      var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
-      processedSdp = setInitialBitrate(
-        processedSdp,
-        startKbps: 500,
-        minKbps: 150,
-        maxKbps: 600,
-      );
-      processedSdp = enableOpusDtx(processedSdp);
-      final mungedOffer = RTCSessionDescription(
-        processedSdp,
-        offer.type ?? 'offer',
-      );
-      await pc.setLocalDescription(mungedOffer);
-      return mungedOffer;
-    } finally {
-      _isNegotiating = false;
-    }
-  }
+        _isNegotiating = true;
+        try {
+          final offer = await pc.createOffer(constraints);
+          var processedSdp = preferCodec(offer.sdp ?? '', 'VP8');
+          processedSdp = setInitialBitrate(
+            processedSdp,
+            startKbps: 500,
+            minKbps: 150,
+            maxKbps: 600,
+          );
+          processedSdp = enableOpusDtx(processedSdp);
+          final mungedOffer = RTCSessionDescription(
+            processedSdp,
+            offer.type ?? 'offer',
+          );
+          await pc.setLocalDescription(mungedOffer);
+          return mungedOffer;
+        } finally {
+          _isNegotiating = false;
+        }
+      });
 
   /// Recursively extracts clean SDP string starting from 'v=' from any payload structure (Map, JSON, string)
   static String? extractSdp(dynamic input) {
     if (input == null) return null;
     if (input is RTCSessionDescription) {
-      return input.sdp;
+      final sdp = input.sdp;
+      if (sdp != null && sdp.trim().isNotEmpty) {
+        return extractSdp(sdp);
+      }
+      return null;
     }
+
+    // 1. If it's a Map, check common keys
     if (input is Map) {
-      final val =
-          input['sdp'] ?? input['SDP'] ?? input['payload'] ?? input['data'];
-      if (val != null) {
-        final extracted = extractSdp(val);
-        if (extracted != null && extracted.isNotEmpty) return extracted;
+      if (input['sdp'] != null) {
+        final res = extractSdp(input['sdp']);
+        if (res != null && res.isNotEmpty) return res;
+      }
+      if (input['SDP'] != null) {
+        final res = extractSdp(input['SDP']);
+        if (res != null && res.isNotEmpty) return res;
+      }
+      if (input['payload'] != null && input['payload'] != input) {
+        final res = extractSdp(input['payload']);
+        if (res != null && res.isNotEmpty) return res;
+      }
+      if (input['data'] != null && input['data'] != input) {
+        final res = extractSdp(input['data']);
+        if (res != null && res.isNotEmpty) return res;
+      }
+      if (input['offer'] != null && input['offer'] != input) {
+        final res = extractSdp(input['offer']);
+        if (res != null && res.isNotEmpty) return res;
+      }
+      if (input['answer'] != null && input['answer'] != input) {
+        final res = extractSdp(input['answer']);
+        if (res != null && res.isNotEmpty) return res;
       }
       for (final v in input.values) {
         if (v is String && v.contains('v=')) {
-          final extracted = extractSdp(v);
-          if (extracted != null && extracted.isNotEmpty) return extracted;
+          final res = extractSdp(v);
+          if (res != null && res.isNotEmpty) return res;
+        } else if (v is Map && v != input) {
+          final res = extractSdp(v);
+          if (res != null && res.isNotEmpty) return res;
         }
       }
     }
+
+    // 2. If it's a String
     if (input is String) {
       var s = input.trim();
+      if (s.isEmpty) return null;
+
+      // Strip outer quotes
       while ((s.startsWith('"') && s.endsWith('"')) ||
           (s.startsWith("'") && s.endsWith("'"))) {
+        if (s.length <= 1) break;
         s = s.substring(1, s.length - 1).trim();
       }
+
+      // Try JSON decode if it looks like JSON
       if (s.startsWith('{') && s.endsWith('}')) {
         try {
           final decoded = jsonDecode(s);
-          final extracted = extractSdp(decoded);
-          if (extracted != null && extracted.isNotEmpty) return extracted;
+          if (decoded != null && decoded != s) {
+            final res = extractSdp(decoded);
+            if (res != null && res.isNotEmpty) return res;
+          }
         } catch (_) {}
       }
-      if (s.contains(r'\r\n') || s.contains(r'\n')) {
-        s = s.replaceAll(r'\r\n', '\r\n').replaceAll(r'\n', '\n');
+
+      // Regex extraction for "sdp":"..." or 'sdp':'...' within any JSON/string
+      final sdpRegex = RegExp(
+        r'''["'](?:sdp|SDP)["']\s*:\s*("(?:\\.|[^"\\])*"|'(?:\\.|[^\'\\])*')''',
+        dotAll: true,
+      );
+      final match = sdpRegex.firstMatch(s);
+      if (match != null && match.group(1) != null) {
+        try {
+          final rawVal = match.group(1)!;
+          final decodedVal = jsonDecode(
+            rawVal.startsWith("'")
+                ? '"${rawVal.substring(1, rawVal.length - 1)}"'
+                : rawVal,
+          );
+          final res = extractSdp(decodedVal);
+          if (res != null && res.isNotEmpty) return res;
+        } catch (_) {}
       }
+
+      // If it contains v=0 or v=\d+
       if (s.contains('v=')) {
         final vIndex = s.indexOf('v=');
-        if (vIndex > 0) {
+        if (vIndex >= 0) {
           s = s.substring(vIndex);
         }
-        while (s.endsWith('"') || s.endsWith("'") || s.endsWith('}')) {
-          s = s.substring(0, s.length - 1).trim();
+
+        // Unescape literal \r\n and \n if present
+        s = s
+            .replaceAll(r'\r\n', '\r\n')
+            .replaceAll(r'\n', '\n')
+            .replaceAll(r'\"', '"')
+            .replaceAll(r'\\', r'\');
+
+        // Extract ONLY contiguous valid SDP lines (e.g. v=, o=, s=, a=, m=, c=, t=, b=)
+        final lines = s.split(RegExp(r'\r\n|\r|\n'));
+        final validSdpLines = <String>[];
+        for (final line in lines) {
+          final trimmed = line.trim();
+          if (trimmed.isEmpty) continue;
+          // Valid SDP line pattern: single lowercase letter followed by '='
+          if (RegExp(r'^[a-z]=').hasMatch(trimmed)) {
+            validSdpLines.add(trimmed);
+          } else {
+            // Stop if we hit JSON closing tags or random non-SDP text after SDP body
+            if (trimmed.startsWith('}') ||
+                trimmed.startsWith('",') ||
+                trimmed.startsWith('"type"') ||
+                trimmed.startsWith('type:')) {
+              break;
+            }
+          }
         }
-        final normalized = s.replaceAll(RegExp(r'\r\n|\r|\n'), '\r\n').trim();
-        return '$normalized\r\n';
+
+        if (validSdpLines.isNotEmpty && validSdpLines.first.startsWith('v=')) {
+          var sdpJoined = '${validSdpLines.join('\r\n')}\r\n';
+          sdpJoined = sdpJoined
+              .replaceAll('a=msid-semantic:WMS*', 'a=msid-semantic: WMS *')
+              .replaceAll('a=msid-semantic:WMS', 'a=msid-semantic: WMS')
+              .replaceAll('a=msid-semantic:  WMS', 'a=msid-semantic: WMS');
+          return sdpJoined;
+        }
       }
     }
     return null;
   }
 
   /// Handles an incoming SDP Answer from the SFU.
-  Future<void> handleRemoteAnswer(dynamic sdpOrPayload) async {
+  /// Queued through _enqueueSdp to safely serialize with createAndSetLocalOffer and prevent race conditions.
+  Future<void> handleRemoteAnswer(dynamic sdpOrPayload) => _enqueueSdp(() async {
     if (_peerConnection == null) {
       OmniCastLogger.warn(
         '[WebRTCManager] Cannot handle remote answer without an active PeerConnection, skipping',
@@ -701,81 +901,126 @@ class WebRTCManager {
       return;
     }
 
+    final rawSdp = extractSdp(sdpOrPayload);
+    if (rawSdp == null || rawSdp.isEmpty || !rawSdp.contains('v=')) {
+      OmniCastLogger.error(
+        '[WebRTCManager] Could not extract valid SDP from payload: $sdpOrPayload',
+      );
+      return;
+    }
+
+    final cleanSdp = rawSdp.endsWith('\r\n') ? rawSdp : '${rawSdp.trim()}\r\n';
+    final description = RTCSessionDescription(cleanSdp, 'answer');
+    if (description.sdp == null || description.sdp!.isEmpty) {
+      OmniCastLogger.error(
+        '[WebRTCManager] Answer SessionDescription is NULL, skipping',
+      );
+      return;
+    }
+
     try {
-      final signalingState = await _peerConnection!.getSignalingState();
-      if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
-        OmniCastLogger.warn(
-          '[WebRTCManager] PeerConnection signalingState is already stable, skipping redundant setRemoteDescription',
-        );
-        return;
-      }
-
+      // Wait for signalingState to reach haveLocalOffer (offer may still be setting)
+      var signalingState = await _peerConnection!.getSignalingState();
       if (signalingState != RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+        // Brief wait for async setLocalDescription to complete (up to 500ms)
+        for (var i = 0; i < 10; i++) {
+          await Future.delayed(const Duration(milliseconds: 50));
+          if (_peerConnection == null) return;
+          signalingState = await _peerConnection!.getSignalingState();
+          if (signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+            break;
+          }
+        }
+      }
+
+      if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
+        // If stable, the answer may have already been applied or offer was never set.
+        // Try applying anyway — setRemoteDescription on a stable PC with an answer
+        // will throw if truly invalid, which we catch below.
         OmniCastLogger.warn(
-          '[WebRTCManager] PeerConnection signalingState is $signalingState (expected haveLocalOffer), skipping answer',
+          '[WebRTCManager] signalingState is stable but received answer; attempting setRemoteDescription anyway',
         );
-        return;
       }
 
-      final rawSdp = extractSdp(sdpOrPayload);
-      if (rawSdp == null || rawSdp.isEmpty) {
-        OmniCastLogger.error(
-          '[WebRTCManager] Could not extract valid SDP from payload: $sdpOrPayload',
-        );
-        return;
-      }
-
-      final description = RTCSessionDescription(rawSdp, 'answer');
       await _peerConnection!.setRemoteDescription(description);
       await _processQueuedCandidates();
+      OmniCastLogger.log(
+        '[WebRTCManager] Successfully set remote answer -> signalingState is now stable',
+      );
     } catch (e) {
       OmniCastLogger.error(
         '[WebRTCManager] handleRemoteAnswer setRemoteDescription error: $e',
       );
     }
-  }
+  });
 
-  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with VP8/DTX answer.
+  /// Handles a server-initiated SDP Offer (e.g. when a new co-host joins), replying with clean SDP answer.
   Future<RTCSessionDescription> handleRemoteOfferAndCreateAnswer(
     dynamic sdpOrPayload,
-  ) async {
+  ) => _enqueueSdp(() async {
     final pc = await initializePeerConnection();
 
     final rawSdp = extractSdp(sdpOrPayload);
-    if (rawSdp == null || rawSdp.isEmpty) {
+    if (rawSdp == null || rawSdp.isEmpty || !rawSdp.contains('v=')) {
       throw StateError(
         'Cannot handle remote offer: invalid or empty SDP payload',
       );
     }
 
     try {
-      final remoteDescription = RTCSessionDescription(rawSdp, 'offer');
+      var state = await pc.getSignalingState();
+      if (state == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] Handling incoming offer during haveLocalOffer (glare). Awaiting pending answer to stabilize...',
+        );
+        for (var i = 0; i < 40; i++) {
+          await Future.delayed(const Duration(milliseconds: 50));
+          state = await pc.getSignalingState();
+          if (state == RTCSignalingState.RTCSignalingStateStable) {
+            break;
+          }
+        }
+      }
+
+      if (state != RTCSignalingState.RTCSignalingStateStable) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] Cannot apply remote offer in non-stable state ($state), skipping to avoid crash',
+        );
+        throw StateError('Cannot apply incoming offer in state $state');
+      }
+
+      final cleanSdp = rawSdp.endsWith('\r\n') ? rawSdp : '${rawSdp.trim()}\r\n';
+      final remoteDescription = RTCSessionDescription(cleanSdp, 'offer');
+      if (remoteDescription.sdp == null || remoteDescription.sdp!.isEmpty) {
+        throw StateError('Remote offer SessionDescription SDP is NULL');
+      }
       await pc.setRemoteDescription(remoteDescription);
       await _processQueuedCandidates();
 
       final answer = await pc.createAnswer({});
-      var processedSdp = preferCodec(answer.sdp ?? '', 'VP8');
-      processedSdp = setInitialBitrate(
-        processedSdp,
-        startKbps: 500,
-        minKbps: 150,
-        maxKbps: 600,
-      );
-      processedSdp = enableOpusDtx(processedSdp);
-      final mungedAnswer = RTCSessionDescription(
-        processedSdp,
+      final answerSdp = answer.sdp ?? '';
+      if (answerSdp.isEmpty || !answerSdp.contains('v=')) {
+        throw StateError('Created answer SDP is empty or invalid');
+      }
+      final cleanAnswerSdp =
+          answerSdp.endsWith('\r\n') ? answerSdp : '${answerSdp.trim()}\r\n';
+      final cleanAnswer = RTCSessionDescription(
+        cleanAnswerSdp,
         answer.type ?? 'answer',
       );
-      await pc.setLocalDescription(mungedAnswer);
+      if (cleanAnswer.sdp == null || cleanAnswer.sdp!.isEmpty) {
+        throw StateError('Created answer SessionDescription SDP is NULL');
+      }
+      await pc.setLocalDescription(cleanAnswer);
 
-      return mungedAnswer;
-    } catch (e) {
+      return cleanAnswer;
+    } catch (e, stack) {
       OmniCastLogger.error(
-        '[WebRTCManager] handleRemoteOfferAndCreateAnswer error: $e',
+        '[WebRTCManager] handleRemoteOfferAndCreateAnswer error: $e\n$stack\nOffered SDP:\n$rawSdp',
       );
       rethrow;
     }
-  }
+  });
 
   /// Seamlessly upgrades a Viewer to a Co-Host without tearing down the existing [RTCPeerConnection].
   Future<RTCSessionDescription> upgradeViewerToCoHost({
@@ -783,7 +1028,7 @@ class WebRTCManager {
     bool audio = true,
     bool enableSimulcast = false,
     VideoParameters? parameters,
-  }) async {
+  }) => _enqueueSdp(() async {
     if (_peerConnection == null) {
       throw StateError(
         'Cannot upgrade to co-host without an active PeerConnection',
@@ -802,11 +1047,21 @@ class WebRTCManager {
 
     // 3. Create clean renegotiation offer without SDP munging corruption
     final offer = await _peerConnection!.createOffer({});
-    final nativeOffer = RTCSessionDescription(offer.sdp, offer.type ?? 'offer');
+    final offerSdp = offer.sdp ?? '';
+    if (offerSdp.isEmpty || !offerSdp.contains('v=')) {
+      throw StateError('Created co-host offer SDP is empty or invalid');
+    }
+    final cleanOfferSdp =
+        offerSdp.endsWith('\r\n') ? offerSdp : '${offerSdp.trim()}\r\n';
+    final nativeOffer =
+        RTCSessionDescription(cleanOfferSdp, offer.type ?? 'offer');
+    if (nativeOffer.sdp == null || nativeOffer.sdp!.isEmpty) {
+      throw StateError('Co-host offer SessionDescription SDP is NULL');
+    }
     await _peerConnection!.setLocalDescription(nativeOffer);
 
     return nativeOffer;
-  }
+  });
 
   /// Queues or adds remote ICE candidates safely after remote description is set.
   Future<void> addRemoteCandidate(dynamic candidate) async {
@@ -817,10 +1072,13 @@ class WebRTCManager {
     } else if (candidate is Map) {
       final candStr =
           (candidate['candidate'] ?? candidate['Candidate'])?.toString() ?? '';
-      final sdpMid =
+      final rawMid =
           (candidate['sdpMid'] ?? candidate['sdp_mid'] ?? candidate['SdpMid'])
-              ?.toString() ??
-          '';
+              ?.toString();
+      final sdpMid =
+          (rawMid == null || rawMid.trim().isEmpty || rawMid == 'null')
+              ? null
+              : rawMid.trim();
       final sdpMLineIndex =
           (candidate['sdpMLineIndex'] as num?)?.toInt() ??
           (candidate['sdp_m_line_index'] as num?)?.toInt() ??
@@ -859,10 +1117,17 @@ class WebRTCManager {
 
   Future<void> _processQueuedCandidates() async {
     if (_peerConnection == null) return;
-    for (final candidate in _queuedRemoteCandidates) {
-      await _peerConnection!.addCandidate(candidate);
-    }
+    final candidates = List<RTCIceCandidate>.from(_queuedRemoteCandidates);
     _queuedRemoteCandidates.clear();
+    for (final candidate in candidates) {
+      try {
+        await _peerConnection!.addCandidate(candidate);
+      } catch (e) {
+        OmniCastLogger.warn(
+          '[WebRTCManager] Failed to add queued ICE candidate: $e',
+        );
+      }
+    }
   }
 
   /// Closes and resets the active PeerConnection.

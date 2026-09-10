@@ -24,11 +24,13 @@ void main() {
         expect(audioMap['googHighpassFilter'], isTrue);
         expect(audioMap['googTypingNoiseDetection'], isTrue);
 
-        expect(constraints['video']['mandatory']['minWidth'], '640');
-        expect(constraints['video']['mandatory']['minHeight'], '480');
-        expect(constraints['video']['mandatory']['minFrameRate'], '15');
-        expect(constraints['video']['mandatory']['maxFrameRate'], '24');
-        expect(constraints['video']['facingMode'], 'user');
+        // Verify ideal-based video constraints (no more mandatory block — prevents camera HAL SIGABRT)
+        final videoConstraints = constraints['video'] as Map<String, dynamic>;
+        expect(videoConstraints['width']['ideal'], 640);
+        expect(videoConstraints['height']['ideal'], 480);
+        expect(videoConstraints['frameRate']['min'], 15);
+        expect(videoConstraints['frameRate']['ideal'], 24);
+        expect(videoConstraints['facingMode'], 'user');
       },
     );
 

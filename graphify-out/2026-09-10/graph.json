@@ -2671,17 +2671,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_seats_seat_manager_isupgradingtocohost",
-      "label": "_isUpgradingToCoHost",
-      "_origin": "ast",
-      "community": 11,
-      "community_name": "seat_manager.dart",
-      "file_type": "code",
-      "norm_label": "_isupgradingtocohost",
-      "source_file": "lib/src/seats/seat_manager.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_seats_seat_manager_isusercameraoff",
       "label": "isUserCameraOff",
       "_origin": "ast",
@@ -3056,17 +3045,6 @@
       "source_location": null
     },
     {
-      "id": "dart_typed_data",
-      "label": "dart:typed_data",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "dart:typed_data",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "package_flutter_test_flutter_test_dart",
       "label": "package:flutter_test/flutter_test.dart",
       "_origin": "ast",
@@ -3100,17 +3078,6 @@
       "source_location": null
     },
     {
-      "id": "package_omnicast_client_src_webrtc_webrtc_manager_dart",
-      "label": "package:omnicast_client/src/webrtc/webrtc_manager.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "package:omnicast_client/src/webrtc/webrtc_manager.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "test_dynamic_stage_and_main_seat_test",
       "label": "dynamic_stage_and_main_seat_test.dart",
       "_origin": "ast",
@@ -3130,28 +3097,6 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/dynamic_stage_and_main_seat_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_enterprise_optimization_test",
-      "label": "enterprise_optimization_test.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "enterprise_optimization_test.dart",
-      "source_file": "test/enterprise_optimization_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_enterprise_optimization_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/enterprise_optimization_test.dart",
       "source_location": null
     },
     {
@@ -3243,28 +3188,6 @@
       "source_location": null
     },
     {
-      "id": "test_pk_reactive_layout_test",
-      "label": "pk_reactive_layout_test.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "pk_reactive_layout_test.dart",
-      "source_file": "test/pk_reactive_layout_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_pk_reactive_layout_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/pk_reactive_layout_test.dart",
-      "source_location": null
-    },
-    {
       "id": "test_room_state_test",
       "label": "room_state_test.dart",
       "_origin": "ast",
@@ -3284,6 +3207,28 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/room_state_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_speaking_and_media_controls_test",
+      "label": "speaking_and_media_controls_test.dart",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "package:omnicast_client/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "speaking_and_media_controls_test.dart",
+      "source_file": "test/speaking_and_media_controls_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_speaking_and_media_controls_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "package:omnicast_client/omnicast_client.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/speaking_and_media_controls_test.dart",
       "source_location": null
     },
     {
@@ -3350,28 +3295,6 @@
       "file_type": "code",
       "norm_label": "main",
       "source_file": "test/video_parameters_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_webrtc_sdp_test",
-      "label": "webrtc_sdp_test.dart",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "webrtc_sdp_test.dart",
-      "source_file": "test/webrtc_sdp_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "test_webrtc_sdp_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 12,
-      "community_name": "package:omnicast_client/omnicast_client.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "test/webrtc_sdp_test.dart",
       "source_location": null
     },
     {
@@ -6686,6 +6609,17 @@
       "source_location": null
     },
     {
+      "id": "rtcvideoviewobjectfit",
+      "label": "RTCVideoViewObjectFit",
+      "_origin": "ast",
+      "community": 20,
+      "community_name": "omnicast_pk_battle_view.dart",
+      "file_type": "code",
+      "norm_label": "rtcvideoviewobjectfit",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "lib_src_widgets_omnicast_video_view",
       "label": "omnicast_video_view.dart",
       "_origin": "ast",
@@ -6715,6 +6649,17 @@
       "community_name": "omnicast_video_view.dart",
       "file_type": "code",
       "norm_label": "_checkadaptivestreaming",
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_video_view_cleanuprenderer",
+      "label": "_cleanupRenderer",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "omnicast_video_view.dart",
+      "file_type": "code",
+      "norm_label": "_cleanuprenderer",
       "source_file": "lib/src/widgets/omnicast_video_view.dart",
       "source_location": null
     },
@@ -6892,17 +6837,6 @@
       "file_type": "code",
       "norm_label": "userid",
       "source_file": "lib/src/widgets/omnicast_video_view.dart",
-      "source_location": null
-    },
-    {
-      "id": "rtcvideoviewobjectfit",
-      "label": "RTCVideoViewObjectFit",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "omnicast_video_view.dart",
-      "file_type": "code",
-      "norm_label": "rtcvideoviewobjectfit",
-      "source_file": null,
       "source_location": null
     },
     {
@@ -10362,36 +10296,190 @@
       "source_location": null
     },
     {
-      "id": "example_test_widget_test",
-      "label": "widget_test.dart",
+      "id": "class",
+      "label": "class",
       "_origin": "ast",
       "community": 30,
-      "community_name": "widget_test.dart",
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
       "file_type": "code",
-      "norm_label": "widget_test.dart",
-      "source_file": "example/test/widget_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "example_test_widget_test_main",
-      "label": "main",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "widget_test.dart",
-      "file_type": "code",
-      "norm_label": "main",
-      "source_file": "example/test/widget_test.dart",
-      "source_location": null
-    },
-    {
-      "id": "package_omnicast_example_main_dart",
-      "label": "package:omnicast_example/main.dart",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "widget_test.dart",
-      "file_type": "code",
-      "norm_label": "package:omnicast_example/main.dart",
+      "norm_label": "class",
       "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "function",
+      "label": "Function?",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "function?",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet",
+      "label": "omnicast_gifting_bottom_sheet.dart",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "omnicast_gifting_bottom_sheet.dart",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_client",
+      "label": "client",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "client",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_coinprice",
+      "label": "coinPrice",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "coinprice",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_createstate",
+      "label": "createState",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "createstate",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_emoji",
+      "label": "emoji",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "emoji",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_gifts",
+      "label": "gifts",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "gifts",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_id",
+      "label": "id",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "id",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_name",
+      "label": "name",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "name",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_ongiftsent",
+      "label": "onGiftSent",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "ongiftsent",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_onsendgift",
+      "label": "onSendGift",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "onsendgift",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_selectedgiftindex",
+      "label": "_selectedGiftIndex",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "_selectedgiftindex",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_selectedtarget",
+      "label": "_selectedTarget",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "_selectedtarget",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_show",
+      "label": "show",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "show",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_virtualgiftitem",
+      "label": "VirtualGiftItem",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "omnicast_gifting_bottom_sheet.dart",
+      "file_type": "code",
+      "norm_label": "virtualgiftitem",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
       "source_location": null
     },
     {
@@ -10900,6 +10988,50 @@
       "source_location": null
     },
     {
+      "id": "lib_src_widgets_omnicast_flying_hearts_overlay_omnicastflyingheartsoverlay",
+      "label": "OmniCastFlyingHeartsOverlay",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "omnicastflyingheartsoverlay",
+      "source_file": "lib/src/widgets/omnicast_flying_hearts_overlay.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_flying_hearts_overlay_omnicastflyingheartsoverlaystate",
+      "label": "_OmniCastFlyingHeartsOverlayState",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "_omnicastflyingheartsoverlaystate",
+      "source_file": "lib/src/widgets/omnicast_flying_hearts_overlay.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
+      "label": "OmniCastGiftingBottomSheet",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "omnicastgiftingbottomsheet",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
+      "label": "_OmniCastGiftingBottomSheetState",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "_omnicastgiftingbottomsheetstate",
+      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
       "id": "lib_src_widgets_omnicast_video_view_omnicastvideoview",
       "label": "OmniCastVideoView",
       "_origin": "ast",
@@ -10940,6 +11072,17 @@
       "community_name": "State",
       "file_type": "code",
       "norm_label": "statefulwidget",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "tickerproviderstatemixin",
+      "label": "TickerProviderStateMixin",
+      "_origin": "ast",
+      "community": 35,
+      "community_name": "State",
+      "file_type": "code",
+      "norm_label": "tickerproviderstatemixin",
       "source_file": null,
       "source_location": null
     },
@@ -16630,6 +16773,72 @@
       "source_location": null
     },
     {
+      "id": "dart_typed_data",
+      "label": "dart:typed_data",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "dart:typed_data",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "package_omnicast_client_src_webrtc_webrtc_manager_dart",
+      "label": "package:omnicast_client/src/webrtc/webrtc_manager.dart",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "package:omnicast_client/src/webrtc/webrtc_manager.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
+      "id": "test_enterprise_optimization_test",
+      "label": "enterprise_optimization_test.dart",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "enterprise_optimization_test.dart",
+      "source_file": "test/enterprise_optimization_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_enterprise_optimization_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/enterprise_optimization_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_webrtc_sdp_test",
+      "label": "webrtc_sdp_test.dart",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "webrtc_sdp_test.dart",
+      "source_file": "test/webrtc_sdp_test.dart",
+      "source_location": null
+    },
+    {
+      "id": "test_webrtc_sdp_test_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 54,
+      "community_name": "enterprise_optimization_test.dart",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "test/webrtc_sdp_test.dart",
+      "source_location": null
+    },
+    {
       "id": "interaction_models_dart",
       "label": "interaction_models.dart",
       "_origin": "ast",
@@ -17059,14 +17268,47 @@
       "source_location": null
     },
     {
-      "id": "lib_src_core_omnicast_client_omnicastclient",
-      "label": "OmniCastClient",
+      "id": "example_lib_main",
+      "label": "main.dart",
       "_origin": "ast",
       "community": 58,
       "community_name": "StatelessWidget",
       "file_type": "code",
-      "norm_label": "omnicastclient",
-      "source_file": "lib/src/core/omnicast_client.dart",
+      "norm_label": "main.dart",
+      "source_file": "example/lib/main.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_main_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "StatelessWidget",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "example/lib/main.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_main_main",
+      "label": "main",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "StatelessWidget",
+      "file_type": "code",
+      "norm_label": "main",
+      "source_file": "example/lib/main.dart",
+      "source_location": null
+    },
+    {
+      "id": "example_lib_main_omnicastdemoapp",
+      "label": "OmniCastDemoApp",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "StatelessWidget",
+      "file_type": "code",
+      "norm_label": "omnicastdemoapp",
+      "source_file": "example/lib/main.dart",
       "source_location": null
     },
     {
@@ -17111,72 +17353,6 @@
       "file_type": "code",
       "norm_label": "omnicastpkbattleview",
       "source_file": "lib/src/widgets/omnicast_pk_battle_view.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet",
-      "label": "omnicast_seat_requests_bottom_sheet.dart",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "StatelessWidget",
-      "file_type": "code",
-      "norm_label": "omnicast_seat_requests_bottom_sheet.dart",
-      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_build",
-      "label": "build",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "StatelessWidget",
-      "file_type": "code",
-      "norm_label": "build",
-      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_client",
-      "label": "client",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "StatelessWidget",
-      "file_type": "code",
-      "norm_label": "client",
-      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_omnicastseatrequestsbottomsheet",
-      "label": "OmniCastSeatRequestsBottomSheet",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "StatelessWidget",
-      "file_type": "code",
-      "norm_label": "omnicastseatrequestsbottomsheet",
-      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_omnicastseatrequestsbuilder",
-      "label": "OmniCastSeatRequestsBuilder",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "StatelessWidget",
-      "file_type": "code",
-      "norm_label": "omnicastseatrequestsbuilder",
-      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_show",
-      "label": "show",
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "StatelessWidget",
-      "file_type": "code",
-      "norm_label": "show",
-      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
       "source_location": null
     },
     {
@@ -17246,13 +17422,13 @@
       "source_location": null
     },
     {
-      "id": "models_seat_models_dart",
-      "label": "../models/seat_models.dart",
+      "id": "screens_lobby_screen_dart",
+      "label": "screens/lobby_screen.dart",
       "_origin": "ast",
       "community": 58,
       "community_name": "StatelessWidget",
       "file_type": "code",
-      "norm_label": "../models/seat_models.dart",
+      "norm_label": "screens/lobby_screen.dart",
       "source_file": null,
       "source_location": null
     },
@@ -18247,6 +18423,94 @@
       "source_location": null
     },
     {
+      "id": "lib_src_core_omnicast_client_omnicastclient",
+      "label": "OmniCastClient",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "omnicastclient",
+      "source_file": "lib/src/core/omnicast_client.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet",
+      "label": "omnicast_seat_requests_bottom_sheet.dart",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "omnicast_seat_requests_bottom_sheet.dart",
+      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_build",
+      "label": "build",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "build",
+      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_client",
+      "label": "client",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "client",
+      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_omnicastseatrequestsbottomsheet",
+      "label": "OmniCastSeatRequestsBottomSheet",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "omnicastseatrequestsbottomsheet",
+      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_omnicastseatrequestsbuilder",
+      "label": "OmniCastSeatRequestsBuilder",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "omnicastseatrequestsbuilder",
+      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "lib_src_widgets_omnicast_seat_requests_bottom_sheet_show",
+      "label": "show",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "show",
+      "source_file": "lib/src/widgets/omnicast_seat_requests_bottom_sheet.dart",
+      "source_location": null
+    },
+    {
+      "id": "models_seat_models_dart",
+      "label": "../models/seat_models.dart",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "OmniCastClient",
+      "file_type": "code",
+      "norm_label": "../models/seat_models.dart",
+      "source_file": null,
+      "source_location": null
+    },
+    {
       "id": "example_web_manifest",
       "label": "manifest.json",
       "_origin": "ast",
@@ -18368,47 +18632,25 @@
       "source_location": "L7"
     },
     {
-      "id": "example_lib_main",
-      "label": "main.dart",
+      "id": "example_test_widget_test",
+      "label": "widget_test.dart",
       "_origin": "ast",
       "community": 64,
       "community_name": "package:flutter/material.dart",
       "file_type": "code",
-      "norm_label": "main.dart",
-      "source_file": "example/lib/main.dart",
+      "norm_label": "widget_test.dart",
+      "source_file": "example/test/widget_test.dart",
       "source_location": null
     },
     {
-      "id": "example_lib_main_build",
-      "label": "build",
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "package:flutter/material.dart",
-      "file_type": "code",
-      "norm_label": "build",
-      "source_file": "example/lib/main.dart",
-      "source_location": null
-    },
-    {
-      "id": "example_lib_main_main",
+      "id": "example_test_widget_test_main",
       "label": "main",
       "_origin": "ast",
       "community": 64,
       "community_name": "package:flutter/material.dart",
       "file_type": "code",
       "norm_label": "main",
-      "source_file": "example/lib/main.dart",
-      "source_location": null
-    },
-    {
-      "id": "example_lib_main_omnicastdemoapp",
-      "label": "OmniCastDemoApp",
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "package:flutter/material.dart",
-      "file_type": "code",
-      "norm_label": "omnicastdemoapp",
-      "source_file": "example/lib/main.dart",
+      "source_file": "example/test/widget_test.dart",
       "source_location": null
     },
     {
@@ -18423,13 +18665,13 @@
       "source_location": null
     },
     {
-      "id": "screens_lobby_screen_dart",
-      "label": "screens/lobby_screen.dart",
+      "id": "package_omnicast_example_main_dart",
+      "label": "package:omnicast_example/main.dart",
       "_origin": "ast",
       "community": 64,
       "community_name": "package:flutter/material.dart",
       "file_type": "code",
-      "norm_label": "screens/lobby_screen.dart",
+      "norm_label": "package:omnicast_example/main.dart",
       "source_file": null,
       "source_location": null
     },
@@ -18500,25 +18742,25 @@
       "source_location": null
     },
     {
-      "id": "test_speaking_and_media_controls_test",
-      "label": "speaking_and_media_controls_test.dart",
+      "id": "test_pk_reactive_layout_test",
+      "label": "pk_reactive_layout_test.dart",
       "_origin": "ast",
       "community": 64,
       "community_name": "package:flutter/material.dart",
       "file_type": "code",
-      "norm_label": "speaking_and_media_controls_test.dart",
-      "source_file": "test/speaking_and_media_controls_test.dart",
+      "norm_label": "pk_reactive_layout_test.dart",
+      "source_file": "test/pk_reactive_layout_test.dart",
       "source_location": null
     },
     {
-      "id": "test_speaking_and_media_controls_test_main",
+      "id": "test_pk_reactive_layout_test_main",
       "label": "main",
       "_origin": "ast",
       "community": 64,
       "community_name": "package:flutter/material.dart",
       "file_type": "code",
       "norm_label": "main",
-      "source_file": "test/speaking_and_media_controls_test.dart",
+      "source_file": "test/pk_reactive_layout_test.dart",
       "source_location": null
     },
     {
@@ -21696,17 +21938,6 @@
       "source_location": null
     },
     {
-      "id": "class",
-      "label": "class",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "class",
-      "source_file": null,
-      "source_location": null
-    },
-    {
       "id": "datachannel_data_channel_manager_dart",
       "label": "../datachannel/data_channel_manager.dart",
       "_origin": "ast",
@@ -21714,17 +21945,6 @@
       "community_name": "omnicast_flying_hearts_overlay.dart",
       "file_type": "code",
       "norm_label": "../datachannel/data_channel_manager.dart",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "function",
-      "label": "Function?",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "function?",
       "source_file": null,
       "source_location": null
     },
@@ -21861,28 +22081,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_flying_hearts_overlay_omnicastflyingheartsoverlay",
-      "label": "OmniCastFlyingHeartsOverlay",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "omnicastflyingheartsoverlay",
-      "source_file": "lib/src/widgets/omnicast_flying_hearts_overlay.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_flying_hearts_overlay_omnicastflyingheartsoverlaystate",
-      "label": "_OmniCastFlyingHeartsOverlayState",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "_omnicastflyingheartsoverlaystate",
-      "source_file": "lib/src/widgets/omnicast_flying_hearts_overlay.dart",
-      "source_location": null
-    },
-    {
       "id": "lib_src_widgets_omnicast_flying_hearts_overlay_onreactionnotifierfired",
       "label": "_onReactionNotifierFired",
       "_origin": "ast",
@@ -21960,193 +22158,6 @@
       "source_location": null
     },
     {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet",
-      "label": "omnicast_gifting_bottom_sheet.dart",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "omnicast_gifting_bottom_sheet.dart",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_build",
-      "label": "build",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "build",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_client",
-      "label": "client",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "client",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_coinprice",
-      "label": "coinPrice",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "coinprice",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_createstate",
-      "label": "createState",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "createstate",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_emoji",
-      "label": "emoji",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "emoji",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_gifts",
-      "label": "gifts",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "gifts",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_id",
-      "label": "id",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "id",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_name",
-      "label": "name",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "name",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheet",
-      "label": "OmniCastGiftingBottomSheet",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "omnicastgiftingbottomsheet",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_omnicastgiftingbottomsheetstate",
-      "label": "_OmniCastGiftingBottomSheetState",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "_omnicastgiftingbottomsheetstate",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_ongiftsent",
-      "label": "onGiftSent",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "ongiftsent",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_onsendgift",
-      "label": "onSendGift",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "onsendgift",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_selectedgiftindex",
-      "label": "_selectedGiftIndex",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "_selectedgiftindex",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_selectedtarget",
-      "label": "_selectedTarget",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "_selectedtarget",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_show",
-      "label": "show",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "show",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
-      "id": "lib_src_widgets_omnicast_gifting_bottom_sheet_virtualgiftitem",
-      "label": "VirtualGiftItem",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "virtualgiftitem",
-      "source_file": "lib/src/widgets/omnicast_gifting_bottom_sheet.dart",
-      "source_location": null
-    },
-    {
       "id": "random",
       "label": "Random",
       "_origin": "ast",
@@ -22165,17 +22176,6 @@
       "community_name": "omnicast_flying_hearts_overlay.dart",
       "file_type": "code",
       "norm_label": "stream",
-      "source_file": null,
-      "source_location": null
-    },
-    {
-      "id": "tickerproviderstatemixin",
-      "label": "TickerProviderStateMixin",
-      "_origin": "ast",
-      "community": 9,
-      "community_name": "omnicast_flying_hearts_overlay.dart",
-      "file_type": "code",
-      "norm_label": "tickerproviderstatemixin",
       "source_file": null,
       "source_location": null
     }
@@ -38083,17 +38083,6 @@
     },
     {
       "source": "lib_src_seats_seat_manager",
-      "target": "lib_src_seats_seat_manager_isupgradingtocohost",
-      "relation": "defines",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "lib/src/seats/seat_manager.dart",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "lib_src_seats_seat_manager",
       "target": "lib_src_seats_seat_manager_isusercameraoff",
       "relation": "defines",
       "_origin": "ast",
@@ -43672,6 +43661,17 @@
     {
       "source": "lib_src_widgets_omnicast_video_view",
       "target": "lib_src_widgets_omnicast_video_view_checkadaptivestreaming",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "lib/src/widgets/omnicast_video_view.dart",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "lib_src_widgets_omnicast_video_view",
+      "target": "lib_src_widgets_omnicast_video_view_cleanuprenderer",
       "relation": "defines",
       "_origin": "ast",
       "confidence": "EXTRACTED",

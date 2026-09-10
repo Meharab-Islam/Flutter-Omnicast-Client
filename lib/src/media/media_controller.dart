@@ -198,6 +198,7 @@ class MediaController with WidgetsBindingObserver {
     required String roomId,
     required String userId,
     String? token,
+    String? serverUrl,
     RoomType roomType = RoomType.video,
     Map<String, dynamic>? metadata,
     VideoParameters? videoParameters,
@@ -213,14 +214,6 @@ class MediaController with WidgetsBindingObserver {
               ) ??
               '');
 
-    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
-    if (wsUrl != null) {
-      if (!_signalingClient.isConnected ||
-          _signalingClient.token != effectiveToken) {
-        await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
-      }
-    }
-
     _roomState.setSession(
       roomId: roomId,
       userId: userId,
@@ -234,16 +227,27 @@ class MediaController with WidgetsBindingObserver {
         ? false
         : (enableSimulcast ?? _globalConfig.enableSimulcast);
 
-    // Automated Track Disabling: Enforce video: false in getUserMedia constraints for audio-only
-    await _mediaStreamManager.openUserMedia(
-      audio: true,
-      video: !isAudioOnly,
-      parameters: params,
-    );
+    // 🚀 CRITICAL: Open local hardware media FIRST so camera preview starts immediately!
+    try {
+      await _mediaStreamManager.openUserMedia(
+        audio: true,
+        video: !isAudioOnly,
+        parameters: params,
+      );
+      isCameraEnabledNotifier.value = !isAudioOnly;
+      await _webRTCManager.addLocalMediaTracks(enableSimulcast: simulcast);
+    } catch (e) {
+      OmniCastLogger.error('[MediaController] Error opening local hardware media: $e');
+    }
 
-    isCameraEnabledNotifier.value = !isAudioOnly;
-
-    await _webRTCManager.addLocalMediaTracks(enableSimulcast: simulcast);
+    final wsUrl = serverUrl ?? _config?.hostUrl ?? _signalingClient.wsUrl;
+    if (wsUrl != null) {
+      if (!_signalingClient.isConnected ||
+          _signalingClient.wsUrl != wsUrl ||
+          _signalingClient.token != effectiveToken) {
+        await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
+      }
+    }
 
     final offer = await _webRTCManager.createAndSetLocalOffer();
 
@@ -500,6 +504,23 @@ class MediaController with WidgetsBindingObserver {
         targetUser: targetUserId,
       ),
     );
+  }
+
+  /// Sends an immediate Keyframe / Picture Loss Indication (PLI) request to the SFU
+  /// to ensure remote video encoders output an instantaneous IDR frame for smooth video playback.
+  void requestKeyframe({String? targetUserId}) {
+    if (_signalingClient.isConnected && _roomState.isInRoom) {
+      _signalingClient.send(
+        SignalingMessage(
+          event: 'request_keyframe',
+          roomId: _roomState.roomId ?? '',
+          userId: _roomState.userId ?? '',
+          payload: {
+            'target_user': targetUserId,
+          },
+        ),
+      );
+    }
   }
 
   /// Built-in hardware permission requester for Camera and Microphone.

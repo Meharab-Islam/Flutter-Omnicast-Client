@@ -44,6 +44,8 @@ class RoomManager {
   String? get userId => _roomState.userId;
   String? get roomId => _roomState.roomId;
   String? get hostId => _roomState.hostId;
+  String? get hostUserId => _roomState.hostId;
+  RoomState get roomState => _roomState;
 
   // Internal high-frequency event batching queue
   final List<OmniCastParticipant> _pendingJoins = [];
@@ -226,6 +228,11 @@ class RoomManager {
                       Map<String, dynamic>.from(e),
                     ),
                   )
+                  .where(
+                    (p) =>
+                        p.role != UserRole.host &&
+                        p.userId != _roomState.hostUserId,
+                  )
                   .take(maxViewersInMemory)
                   .toList();
               activeViewersList.value = viewers;
@@ -356,6 +363,11 @@ class RoomManager {
           .map(
             (e) => OmniCastParticipant.fromJson(Map<String, dynamic>.from(e)),
           )
+          .where(
+            (p) =>
+                p.role != UserRole.host &&
+                p.userId != _roomState.hostUserId,
+          )
           .take(maxViewersInMemory)
           .toList();
       activeViewersList.value = List.unmodifiable(parsedList);
@@ -403,6 +415,9 @@ class RoomManager {
     // Apply joins (prepend latest)
     if (_pendingJoins.isNotEmpty) {
       for (final p in _pendingJoins.reversed) {
+        if (p.role == UserRole.host || p.userId == _roomState.hostUserId) {
+          continue;
+        }
         currentList.removeWhere((existing) => existing.userId == p.userId);
         currentList.insert(0, p);
       }
@@ -425,6 +440,7 @@ class RoomManager {
     required String roomId,
     required String userId,
     String? token,
+    String? serverUrl,
     RoomOptions options = const RoomOptions(),
     Map<String, dynamic>? metadata,
   }) async {
@@ -463,8 +479,8 @@ class RoomManager {
       metadata: mergedMetadata,
     );
     _roomState.addParticipant(hostParticipant);
-    activeViewersList.value = [hostParticipant];
-    totalViewerCount.value = 1;
+    activeViewersList.value = const [];
+    totalViewerCount.value = 0;
 
     _startRoomStateSync();
 
@@ -490,9 +506,10 @@ class RoomManager {
     }
 
     // 2. Connect signaling WebSocket and publish room session
-    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
+    final wsUrl = serverUrl ?? _config?.hostUrl ?? _signalingClient.wsUrl;
     if (wsUrl != null) {
       if (!_signalingClient.isConnected ||
+          _signalingClient.wsUrl != wsUrl ||
           _signalingClient.token != effectiveToken) {
         try {
           await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
@@ -529,6 +546,7 @@ class RoomManager {
     required String roomId,
     required String userId,
     String? token,
+    String? serverUrl,
     Map<String, dynamic>? metadata,
   }) async {
     final effectiveToken = (token != null && token.isNotEmpty)
@@ -541,9 +559,10 @@ class RoomManager {
               ) ??
               '');
 
-    final wsUrl = _config?.hostUrl ?? _signalingClient.wsUrl;
+    final wsUrl = serverUrl ?? _config?.hostUrl ?? _signalingClient.wsUrl;
     if (wsUrl != null) {
       if (!_signalingClient.isConnected ||
+          _signalingClient.wsUrl != wsUrl ||
           _signalingClient.token != effectiveToken) {
         await _signalingClient.connect(wsUrl: wsUrl, token: effectiveToken);
       }

@@ -308,31 +308,45 @@ class SeatManager {
     );
   }
 
+  bool _isUpgradingToCoHost = false;
+
   /// Seamlessly upgrades the active user to a Co-Host without destroying [RTCPeerConnection].
   Future<void> upgradeToCoHost({bool video = true, bool audio = true}) async {
     if (!_roomState.isInRoom) {
       throw StateError('Cannot upgrade to co-host when not in a room');
     }
 
-    final offer = await _webRTCManager.upgradeViewerToCoHost(
-      video: video,
-      audio: audio,
-    );
+    if (_isUpgradingToCoHost || _roomState.isCoHost) {
+      OmniCastLogger.log(
+        '[SeatManager] Already co-host or upgrade in progress, skipping redundant upgrade',
+      );
+      return;
+    }
 
-    _roomState.updateRole(UserRole.coHost);
+    _isUpgradingToCoHost = true;
+    try {
+      final offer = await _webRTCManager.upgradeViewerToCoHost(
+        video: video,
+        audio: audio,
+      );
 
-    _signalingClient.send(
-      SignalingMessage(
-        event: SignalingEvents.publish,
-        roomId: _roomState.roomId!,
-        userId: _roomState.userId!,
-        payload: {
-          'sdp': offer.sdp,
-          'type': offer.type,
-          'role': 'cohost',
-        },
-      ),
-    );
+      _roomState.updateRole(UserRole.coHost);
+
+      _signalingClient.send(
+        SignalingMessage(
+          event: SignalingEvents.publish,
+          roomId: _roomState.roomId!,
+          userId: _roomState.userId!,
+          payload: {
+            'sdp': offer.sdp,
+            'type': offer.type,
+            'role': 'cohost',
+          },
+        ),
+      );
+    } finally {
+      _isUpgradingToCoHost = false;
+    }
   }
 
   /// Co-Host action: Voluntarily leaves the stage seat and returns to viewer mode.

@@ -10,11 +10,15 @@ void main() {
 
       final constraints = params.toMediaConstraints(video: true, audio: true);
       expect(constraints['audio'], isA<Map<String, dynamic>>());
-      expect(constraints['video']['mandatory']['minWidth'], '640');
-      expect(constraints['video']['mandatory']['minHeight'], '480');
-      expect(constraints['video']['mandatory']['minFrameRate'], '15');
-      expect(constraints['video']['mandatory']['maxFrameRate'], '24');
-      expect(constraints['video']['facingMode'], 'user');
+      final videoConstraints = constraints['video'] as Map<String, dynamic>;
+      expect(videoConstraints['width'], isA<Map>());
+      expect(videoConstraints['width']['ideal'], 640);
+      expect(videoConstraints['height'], isA<Map>());
+      expect(videoConstraints['height']['ideal'], 480);
+      expect(videoConstraints['frameRate'], isA<Map>());
+      expect(videoConstraints['frameRate']['min'], 15);
+      expect(videoConstraints['frameRate']['ideal'], 24);
+      expect(videoConstraints['facingMode'], 'user');
     });
 
     test(
@@ -71,17 +75,19 @@ void main() {
       const params = VideoParameters.presetHD720p;
       final constraints = params.toMediaConstraints(video: true, audio: true);
       expect(constraints['audio'], isA<Map<String, dynamic>>());
-      expect(constraints['video']['mandatory']['minWidth'], '1280');
-      expect(constraints['video']['mandatory']['minHeight'], '720');
-      expect(constraints['video']['facingMode'], 'user');
+      final videoConstraints = constraints['video'] as Map<String, dynamic>;
+      expect(videoConstraints['width']['ideal'], 1280);
+      expect(videoConstraints['height']['ideal'], 720);
+      expect(videoConstraints['facingMode'], 'user');
     });
 
     test('presetFHD1080p constraints when audio is false', () {
       const params = VideoParameters.presetFHD1080p;
       final constraints = params.toMediaConstraints(video: true, audio: false);
       expect(constraints['audio'], isFalse);
-      expect(constraints['video']['mandatory']['minWidth'], '1920');
-      expect(constraints['video']['mandatory']['minHeight'], '1080');
+      final videoConstraints = constraints['video'] as Map<String, dynamic>;
+      expect(videoConstraints['width']['ideal'], 1920);
+      expect(videoConstraints['height']['ideal'], 1080);
     });
   });
 

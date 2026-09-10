@@ -52,6 +52,11 @@ class OmniCastClient {
   late final PKManager _pkManager;
   late final DataChannelManager _dataChannelManager;
 
+  final StreamController<String> _screenShareStartedController =
+      StreamController<String>.broadcast();
+  final StreamController<String> _screenShareStoppedController =
+      StreamController<String>.broadcast();
+
   final List<StreamSubscription> _subscriptions = [];
   bool _isDisposed = false;
   final ValueNotifier<List<RoomModel>> _liveRoomsNotifier =
@@ -245,12 +250,14 @@ class OmniCastClient {
     required String roomId,
     required String userId,
     String? token,
+    String? serverUrl,
     RoomOptions options = const RoomOptions(),
     Map<String, dynamic>? metadata,
   }) => _roomManager.createRoom(
     roomId: roomId,
     userId: userId,
     token: token,
+    serverUrl: serverUrl,
     options: options,
     metadata: metadata,
   );
@@ -261,11 +268,13 @@ class OmniCastClient {
     required String roomId,
     required String userId,
     String? token,
+    String? serverUrl,
     Map<String, dynamic>? metadata,
   }) => _roomManager.joinRoom(
     roomId: roomId,
     userId: userId,
     token: token,
+    serverUrl: serverUrl,
     metadata: metadata,
   );
 
@@ -501,6 +510,68 @@ class OmniCastClient {
   /// Toggles front and back cameras.
   Future<void> switchCamera() => _mediaController.switchCamera();
 
+  /// Starts sharing the device display screen (Dual Video Track: Camera + Screen).
+  Future<bool> startScreenShare({bool captureAudio = false}) async {
+    final stream = await _mediaStreamManager.startScreenShare(captureAudio: captureAudio);
+    if (stream == null) return false;
+
+    final videoTracks = stream.getVideoTracks();
+    if (videoTracks.isNotEmpty) {
+      await _webRTCManager.addScreenTrack(videoTracks.first, stream);
+      _screenShareStartedController.add(_roomState.userId ?? 'local');
+    }
+
+    if (captureAudio) {
+      final audioTracks = stream.getAudioTracks();
+      if (audioTracks.isNotEmpty) {
+        await _webRTCManager.addMusicTrack(audioTracks.first, stream);
+      }
+    }
+
+    return true;
+  }
+
+  /// Stops sharing the device display screen.
+  Future<void> stopScreenShare() async {
+    await _webRTCManager.removeScreenTrack();
+    await _mediaStreamManager.stopScreenShare();
+    _screenShareStoppedController.add(_roomState.userId ?? 'local');
+  }
+
+  /// Publishes a background music or auxiliary in-app audio track alongside microphone voice.
+  Future<void> publishMusicTrack(MediaStreamTrack track) async {
+    await _mediaStreamManager.publishMusicTrack(track);
+    final musicStream = _mediaStreamManager.musicStream;
+    if (musicStream != null) {
+      await _webRTCManager.addMusicTrack(track, musicStream);
+    }
+  }
+
+  /// Stops publishing the background music or auxiliary audio track.
+  Future<void> stopMusicTrack() async {
+    await _webRTCManager.removeMusicTrack();
+    await _mediaStreamManager.stopMusicTrack();
+  }
+
+  /// Returns whether this device is currently sharing its screen.
+  bool get isScreenSharing => _mediaStreamManager.isScreenSharing;
+
+  /// Returns the screen share [MediaStream] for a given [userId].
+  MediaStream? getScreenStream(String? userId) =>
+      _mediaStreamManager.getRemoteScreenStream(userId);
+
+  /// Returns the screen share [RTCVideoRenderer] for a given [userId].
+  RTCVideoRenderer? getScreenRenderer(String? userId) =>
+      _mediaStreamManager.getRemoteScreenRenderer(userId);
+
+  /// Stream emitting when screen share starts (payload: user ID).
+  Stream<String> get onScreenShareStarted =>
+      _screenShareStartedController.stream;
+
+  /// Stream emitting when screen share stops (payload: user ID).
+  Stream<String> get onScreenShareStopped =>
+      _screenShareStoppedController.stream;
+
   /// Switches active simulcast layer ('f', 'h', 'q').
   void setSimulcastLayer(String layer) =>
       _mediaController.setSimulcastLayer(layer);
@@ -641,26 +712,32 @@ class OmniCastClient {
       final streamId = stream.id;
       final trackId = track.id ?? '';
       final hostId = _roomState.hostId;
+      final currentRoomId = _roomState.roomId;
 
       OmniCastLogger.log(
         '[OmniCastClient] onRemoteTrack: trackId=$trackId, streamId=$streamId, hostId=$hostId',
       );
-
-      await _mediaStreamManager.attachRemoteStream(streamId, stream);
-      _roomState.addActiveRemoteUser(streamId);
 
       // Extract numeric ID from streamId/trackId if available (e.g., 3319 from 3319_Softin Global)
       final streamNumMatch = RegExp(r'\d+').firstMatch(streamId)?.group(0);
       if (streamNumMatch != null && streamNumMatch.isNotEmpty) {
         _mediaStreamManager.registerAlias('user_$streamNumMatch', streamId);
         _mediaStreamManager.registerAlias(streamNumMatch, streamId);
-        await _mediaStreamManager.attachRemoteStream('user_$streamNumMatch', stream);
-        await _mediaStreamManager.attachRemoteStream(streamNumMatch, stream);
       }
 
-      // 1. Identify if this track belongs to a co-host or specific seated user
+      // 1. Identify if this track belongs to an explicit co-host or stage seated user
       String? matchedUserId;
       bool isCoHostTrack = false;
+
+      final bool isExplicitCoHost = trackId.startsWith('cohost_') ||
+          streamId.startsWith('cohost_') ||
+          trackId.startsWith('pk-') ||
+          streamId.startsWith('pk-') ||
+          (_roomState.activeSeats.any((s) =>
+              s.isOccupied &&
+              s.seatIndex > 0 &&
+              s.userId != null &&
+              (s.userId == streamId || s.userId == trackId)));
 
       if (trackId.startsWith('cohost_') || streamId.startsWith('cohost_')) {
         isCoHostTrack = true;
@@ -689,50 +766,52 @@ class OmniCastClient {
           raw = raw.substring(0, raw.length - '-audio'.length);
         }
         matchedUserId = raw;
+      } else if (isExplicitCoHost) {
+        isCoHostTrack = true;
+        matchedUserId = streamId;
       } else {
-        // If it does NOT start with cohost_ or pk-, check if it explicitly matches an active seated co-host
-        for (final seat in _roomState.activeSeats) {
-          final sUser = seat.userId;
-          if (sUser != null && sUser.isNotEmpty && sUser != hostId && sUser != 'host') {
-            if (streamId == sUser || trackId == sUser || streamId.contains(sUser) || sUser.contains(streamId)) {
-              matchedUserId = sUser;
-              isCoHostTrack = true;
-              break;
-            }
-          }
+        // Default: Any primary incoming track from server SFU is the Host Track
+        isCoHostTrack = false;
+      }
+
+      // Handle Screen Sharing multi-track streams
+      final isScreenShare = trackId.contains('screen') || streamId.contains('screen');
+      final isMusicAudio = trackId.contains('music') || streamId.contains('music') || trackId.contains('aux');
+
+      if (isScreenShare) {
+        final screenUserId = isCoHostTrack ? (matchedUserId ?? streamId) : (hostId ?? 'host');
+        await _mediaStreamManager.attachRemoteScreenStream(screenUserId, stream);
+        _screenShareStartedController.add(screenUserId);
+        OmniCastLogger.log('[OmniCastClient] Attached remote screen share stream for $screenUserId');
+        _mediaController.requestKeyframe();
+        return;
+      }
+
+      if (isMusicAudio) {
+        for (final t in stream.getAudioTracks()) {
+          t.enabled = true;
         }
+        OmniCastLogger.log('[OmniCastClient] Received and enabled auxiliary music audio track');
       }
 
       if (!isCoHostTrack) {
-        // 🚀 Main Host Track: Always attach to 'host' and targetHost alias
+        // 🚀 Main Host Track: Register aliases upfront and attach once
         final targetHost =
             (hostId != null && hostId.isNotEmpty && hostId != 'local')
                 ? hostId
                 : 'host';
-        final currentRoomId = _roomState.roomId;
         if (currentRoomId != null && currentRoomId.isNotEmpty) {
           _mediaStreamManager.registerAlias(currentRoomId, 'host');
           _mediaStreamManager.registerAlias(currentRoomId, targetHost);
           _mediaStreamManager.registerAlias('host', currentRoomId);
           _mediaStreamManager.registerAlias(targetHost, currentRoomId);
-          await _mediaStreamManager.attachRemoteStream(currentRoomId, stream);
         }
         _mediaStreamManager.registerAlias('host', targetHost);
         _mediaStreamManager.registerAlias(targetHost, 'host');
         _mediaStreamManager.registerAlias(streamId, targetHost);
         _mediaStreamManager.registerAlias(streamId, 'host');
-        await _mediaStreamManager.attachRemoteStream('host', stream);
-        await _mediaStreamManager.attachRemoteStream(targetHost, stream);
-        _roomState.addActiveRemoteUser('host');
-        _roomState.addActiveRemoteUser(targetHost);
-
-        if (track.kind == 'video') {
-          _roomState.updateUserMediaState(targetHost, isCameraOff: false);
-          _roomState.updateUserMediaState('host', isCameraOff: false);
-        } else if (track.kind == 'audio') {
-          _roomState.updateUserMediaState(targetHost, isMuted: false);
-          _roomState.updateUserMediaState('host', isMuted: false);
-        }
+        _mediaStreamManager.registerAlias(trackId, targetHost);
+        _mediaStreamManager.registerAlias(trackId, 'host');
 
         final hostNum = RegExp(r'\d+').firstMatch(targetHost)?.group(0);
         if (hostNum != null && hostNum.isNotEmpty) {
@@ -740,21 +819,35 @@ class OmniCastClient {
           _mediaStreamManager.registerAlias(hostNum, targetHost);
           _mediaStreamManager.registerAlias('user_$hostNum', 'host');
           _mediaStreamManager.registerAlias(hostNum, 'host');
-          await _mediaStreamManager.attachRemoteStream('user_$hostNum', stream);
-          await _mediaStreamManager.attachRemoteStream(hostNum, stream);
+        }
+
+        await _mediaStreamManager.attachRemoteStream(targetHost, stream);
+        await _mediaStreamManager.attachRemoteStream('host', stream);
+        if (streamId != targetHost && streamId != 'host') {
+          await _mediaStreamManager.attachRemoteStream(streamId, stream);
+        }
+        _roomState.addActiveRemoteUser('host');
+        _roomState.addActiveRemoteUser(targetHost);
+
+        if (track.kind == 'video') {
+          _roomState.updateUserMediaState(targetHost, isCameraOff: false);
+          _roomState.updateUserMediaState('host', isCameraOff: false);
+          _mediaController.requestKeyframe(targetUserId: targetHost);
+        } else if (track.kind == 'audio') {
+          _roomState.updateUserMediaState(targetHost, isMuted: false);
+          _roomState.updateUserMediaState('host', isMuted: false);
         }
       } else {
-        // 🚀 Co-Host Track: Route to dedicated co-host user ID
+        // 🚀 Co-Host Track: Route to dedicated co-host user ID and aliases
         final coHostUser = matchedUserId ?? streamId;
         _mediaStreamManager.registerAlias(coHostUser, streamId);
         _mediaStreamManager.registerAlias(streamId, coHostUser);
-        await _mediaStreamManager.attachRemoteStream(coHostUser, stream);
-        _roomState.addActiveRemoteUser(coHostUser);
-
-        if (track.kind == 'video') {
-          _roomState.updateUserMediaState(coHostUser, isCameraOff: false);
-        } else if (track.kind == 'audio') {
-          _roomState.updateUserMediaState(coHostUser, isMuted: false);
+        final coHostNum = RegExp(r'\d+').firstMatch(coHostUser)?.group(0);
+        if (coHostNum != null && coHostNum.isNotEmpty) {
+          _mediaStreamManager.registerAlias('user_$coHostNum', coHostUser);
+          _mediaStreamManager.registerAlias(coHostNum, coHostUser);
+          _mediaStreamManager.registerAlias('user_$coHostNum', streamId);
+          _mediaStreamManager.registerAlias(coHostNum, streamId);
         }
 
         // Match against active seated users to create cross-aliases
@@ -762,27 +855,28 @@ class OmniCastClient {
           final sUser = seat.userId;
           if (sUser != null && sUser.isNotEmpty) {
             final sNum = RegExp(r'\d+').firstMatch(sUser)?.group(0);
-            final cNum = RegExp(r'\d+').firstMatch(coHostUser)?.group(0);
-            if (sUser == coHostUser || (sNum != null && sNum == cNum)) {
+            if (sUser == coHostUser || sUser == streamId || (coHostNum != null && sNum != null && sNum == coHostNum)) {
               _mediaStreamManager.registerAlias(sUser, coHostUser);
               _mediaStreamManager.registerAlias(coHostUser, sUser);
-              await _mediaStreamManager.attachRemoteStream(sUser, stream);
               _roomState.addActiveRemoteUser(sUser);
-              if (track.kind == 'video') {
-                _roomState.updateUserMediaState(sUser, isCameraOff: false);
-              } else if (track.kind == 'audio') {
-                _roomState.updateUserMediaState(sUser, isMuted: false);
-              }
             }
           }
         }
 
-        final userNum = RegExp(r'\d+').firstMatch(coHostUser)?.group(0);
-        if (userNum != null && userNum.isNotEmpty) {
-          _mediaStreamManager.registerAlias('user_$userNum', coHostUser);
-          _mediaStreamManager.registerAlias(userNum, coHostUser);
-          await _mediaStreamManager.attachRemoteStream('user_$userNum', stream);
-          await _mediaStreamManager.attachRemoteStream(userNum, stream);
+        await _mediaStreamManager.attachRemoteStream(coHostUser, stream);
+        _roomState.addActiveRemoteUser(coHostUser);
+
+        if (track.kind == 'video') {
+          _roomState.updateUserMediaState(coHostUser, isCameraOff: false);
+          _roomState.updateUserMediaState(streamId, isCameraOff: false);
+          _mediaController.requestKeyframe(targetUserId: coHostUser);
+          _mediaController.requestKeyframe();
+        } else if (track.kind == 'audio') {
+          _roomState.updateUserMediaState(coHostUser, isMuted: false);
+          _roomState.updateUserMediaState(streamId, isMuted: false);
+          try {
+            track.enabled = true;
+          } catch (_) {}
         }
       }
     };
@@ -798,7 +892,7 @@ class OmniCastClient {
     _subscriptions.add(
       _signalingClient.onAnswer.listen((msg) async {
         try {
-          if (_roomState.isInRoom && msg.payload != null) {
+          if (msg.payload != null) {
             await _webRTCManager.handleRemoteAnswer(msg.payload);
           }
         } catch (e, stack) {
@@ -811,9 +905,10 @@ class OmniCastClient {
     _subscriptions.add(
       _signalingClient.onOffer.listen((msg) async {
         try {
-          if (_roomState.isInRoom && msg.payload != null) {
+          if (_roomState.isInRoom && (msg.payload != null || msg.toJson().isNotEmpty)) {
+            final payloadToUse = msg.payload ?? msg.toJson();
             final answer = await _webRTCManager.handleRemoteOfferAndCreateAnswer(
-              msg.payload,
+              payloadToUse,
             );
             _signalingClient.send(
               SignalingMessage(

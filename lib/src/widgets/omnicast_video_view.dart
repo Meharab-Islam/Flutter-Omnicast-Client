@@ -84,54 +84,51 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
   }
 
   void _onStreamManagerChanged() {
-    if (!_isMounted || _renderer == null) return;
+    if (!_isMounted) return;
     final isLocal = widget.userId == null || widget.userId == 'local';
     final targetStream = isLocal
         ? widget.mediaStreamManager.localStream
         : widget.mediaStreamManager.getRemoteStream(widget.userId);
+    final targetRenderer = isLocal
+        ? widget.mediaStreamManager.localRenderer
+        : widget.mediaStreamManager.getRenderer(widget.userId);
 
-    if (_renderer!.srcObject != targetStream ||
-        (_renderer!.srcObject?.getVideoTracks().length !=
-            targetStream?.getVideoTracks().length)) {
+    if (targetRenderer != null && _renderer != targetRenderer) {
+      _renderer = targetRenderer;
+    }
+
+    if (_renderer != null && targetStream != null && _renderer!.srcObject != targetStream) {
       _renderer!.srcObject = targetStream;
+    }
+
+    if (!isLocal && targetStream != null && targetStream.getVideoTracks().isNotEmpty) {
+      widget.mediaController?.requestKeyframe(targetUserId: widget.userId);
     }
     if (mounted) {
       setState(() {});
     }
   }
 
-  /// Lazy initialization: only allocate renderer resources when mounted in widget tree.
+  /// Lazy initialization: fetch or initialize renderer from MediaStreamManager without duplicate textures.
   Future<void> _initializeLazyRenderer() async {
     try {
-      final renderer = RTCVideoRenderer();
-      await renderer.initialize();
-
-      if (!_isMounted) {
-        await renderer.dispose();
-        return;
-      }
-
       final isLocal = widget.userId == null || widget.userId == 'local';
+      RTCVideoRenderer? renderer;
       if (isLocal) {
-        if (widget.mediaStreamManager.localStream != null) {
-          renderer.srcObject = widget.mediaStreamManager.localStream;
-        }
+        renderer = await widget.mediaStreamManager.initLocalRenderer();
       } else {
-        final remoteStream =
-            widget.mediaStreamManager.getRemoteStream(widget.userId);
-        if (remoteStream != null) {
-          renderer.srcObject = remoteStream;
-        }
+        renderer = await widget.mediaStreamManager.getOrCreateRemoteRenderer(widget.userId!);
       }
 
-      if (_isMounted) {
+      if (!_isMounted) return;
+
+      if (mounted) {
         setState(() {
           _renderer = renderer;
         });
-        widget.onRendererReady?.call(renderer);
-      } else {
-        renderer.srcObject = null;
-        await renderer.dispose();
+        if (renderer != null) {
+          widget.onRendererReady?.call(renderer);
+        }
       }
     } catch (e) {
       // Graceful fallback if device has temporarily reached EGL context limits
@@ -164,20 +161,10 @@ class _OmniCastVideoViewState extends State<OmniCastVideoView> {
     }
   }
 
-  void _cleanupRenderer() {
-    if (_renderer != null) {
-      _renderer!.srcObject = null;
-      _renderer!.dispose();
-      _renderer = null;
-    }
-  }
-
-  /// Aggressive Disposal: Free VRAM and hardware resources immediately on unmount.
   @override
   void dispose() {
     _isMounted = false;
     widget.mediaStreamManager.removeListener(_onStreamManagerChanged);
-    _cleanupRenderer();
     super.dispose();
   }
 
